@@ -64,24 +64,42 @@ git add -A
 NFILES=$(git diff --cached --name-only HEAD 2>/dev/null | wc -l)
 if ! git commit -q -m "TIER1 backup $TS (db=$DBROWS rows)" --allow-empty; then FAIL=1; fi
 
-# 3) push (빈 원격 → 직행; 원격에 히스토리가 생긴 경우 병합 후 재시도)
-PUSHOUT=$(git push -u origin main 2>&1)
-if ! echo "$PUSHOUT" | grep -qE "main|up-to-date"; then
-  git fetch origin main 2>/dev/null && \
-  git merge -q --allow-unrelated-histories -X ours origin/main -m "merge remote" 2>/dev/null && \
-  PUSHOUT=$(git push -u origin main 2>&1) || FAIL=1
+# 3) push + 실측 검증 (성공 판정은 "원격 SHA == 로컬 SHA" 실측으로만 한다 — 출력 문자열 금지)
+LOCAL_SHA=$(git rev-parse HEAD)
+PUSHOK=0
+if git push -u origin main >/tmp/gitbk_push.log 2>&1; then
+  PUSHOK=1
+else
+  # 원격 선행 커밋/분기 → 병합 후 1회 재시도 (종료 코드 기준 — 출력 grep 금지)
+  if git fetch origin main >/dev/null 2>&1; then
+    git merge -q --allow-unrelated-histories -X ours origin/main -m "merge remote" >/dev/null 2>&1 || true
+    LOCAL_SHA=$(git rev-parse HEAD)
+    if git push -u origin main >>/tmp/gitbk_push.log 2>&1; then PUSHOK=1; else FAIL=1; fi
+  else
+    FAIL=1
+  fi
 fi
-echo "$PUSHOUT" | tail -2
+tail -2 /tmp/gitbk_push.log
+
+# 원격 SHA 실측 대조 — push 성공 메시지가 아니라 원격의 실제 HEAD로만 판정
+REMOTE_SHA=""
+if [ "$PUSHOK" = "1" ]; then
+  REMOTE_SHA=$(timeout 30 git ls-remote origin refs/heads/main 2>/dev/null | cut -f1)
+  if [ -z "$REMOTE_SHA" ] || [ "$REMOTE_SHA" != "$LOCAL_SHA" ]; then
+    echo "GITBK_ERR: push 후 원격 SHA 불일치 local=${LOCAL_SHA} remote=${REMOTE_SHA:-empty}" >&2
+    PUSHOK=0; FAIL=1
+  fi
+fi
 
 if [ "$FAIL" != "0" ]; then
   echo "GITBK_FAILED $TS" >&2
   mkdir -p /home/z/my-project/NEW2_run/backup
-  echo "$TS push=FAIL fail=1 db=$DBROWS" >> /home/z/my-project/NEW2_run/backup/git_log.md
+  echo "$TS push=FAIL fail=1 db=$DBROWS local_sha=${LOCAL_SHA:0:7} remote_sha=${REMOTE_SHA:0:7}" >> /home/z/my-project/NEW2_run/backup/git_log.md
   exit 2
 fi
 
-# 4) 로그 1행 + 요약
+# 4) 로그 1행 + 요약 (원격 SHA 실측치를 함께 기록 — F-25 재발 방지)
 NCOMMIT=$(git rev-list --count HEAD)
 mkdir -p /home/z/my-project/NEW2_run/backup
-echo "$TS push=OK db=$DBROWS commits=$NCOMMIT" >> /home/z/my-project/NEW2_run/backup/git_log.md
-echo "GITBK_OK $TS db=$DBROWS files_changed=$NFILES commits=$NCOMMIT"
+echo "$TS push=OK db=$DBROWS commits=$NCOMMIT sha=${REMOTE_SHA:0:7}" >> /home/z/my-project/NEW2_run/backup/git_log.md
+echo "GITBK_OK $TS db=$DBROWS files_changed=$NFILES commits=$NCOMMIT remote_sha=${REMOTE_SHA:0:7}"
