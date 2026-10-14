@@ -16,6 +16,7 @@ TS=$(date -u +%Y%m%dT%H%M%SZ)
 
 export GIT_SSH_COMMAND="bun /home/z/my-project/NEW2_run/gitssh/gitssh.js"
 export GITSSH_KEY=/home/z/my-project/NEW2_run/gitssh/deploy_key
+export KNOWN_FP=$(cat /home/z/my-project/NEW2_run/gitssh/known_hosts_fp | tr -d '\n')
 
 FAIL=0
 
