@@ -1015,3 +1015,20 @@ Work Log:
 Stage Summary:
 - 루프 종료 판정 유지 확정(10회차 스캔 후). 이번 라운드 신규 측정·승격 후보 없음 — 인프라 누적만 정상 진행
 - 장부 3종 무수정 원칙 유지. 다음 주기 변동 요인: 백업 cron 첫 자동 실행(익일 09:00 KST), GitHub Deploy Key 등록(사용자 액션 대기), maker 체결 표본 누적
+---
+Task ID: 45
+Agent: Z.ai Code (main, 사용자 "https://github.com/tlsehd195/new2-strategy-archive + 완료" — Task 43 대기 단계 완결)
+Task: Deploy Key 연결 검증 → TIER1 초기 push → 일일 백업 cron 통합 교체 → 오프사이트 백업 체계 완성
+
+Work Log:
+- [연결 검증] git ls-remote git@github.com:tlsehd195/new2-strategy-archive.git → exit 0 (빈 저장소 인증 성공). gitssh.js 전송기 + Deploy Key 실전 작동 확인
+- [push 스크립트 신설] NEW2_run/git_backup_push.sh: SQLite VACUUM INTO 일관성 스냅샷 → allow-list 수집(data/results/research/run/docs/src — PREREG 전체·보고서 v3~v28·종합정리·worklog·소스·공개키·백업·전송 스크립트) → 민감물 혼입 이중 차단(deploy_key·토큰 감지 시 중단) → 커밋 → push(원격 히스토리 존재 시 병합 재시도) → git_log.md 기록
+- [초기 push 성공] commit a5e13e3e → 원격 main 생성. 재실행 멱등성 검증(commit 2ada3c9, push OK). 저장소 334파일·13MB
+- [버그 수정] cd 후 상대경로 로그 기록 실패 → 절대경로 교체
+- [cron 통합 교체] Job 458540 삭제 → Job 458723 신설(매일 09:00 KST): backup_snapshot.sh(로컬 7세대) + git_backup_push.sh(GitHub) 연속 실행, 행 수 감소·SSH 인증 오류 시 원인 조사·크게 보고, 장부 무수정 유지
+- [보안 확인] 개인키·토큰은 git 트리에 미포함(allow-list+감지 차단). 공개키만 run/deploy_key.pub으로 포함(무해)
+
+Stage Summary:
+- **오프사이트 백업 체계 완성**: 로컬 스냅샷(7세대 회전·SHA256) + GitHub push(매일 09:00 KST 자동) 이중화. 샌드박스 전체 소실 시에도 GitHub 저장소에서 프로젝트 TIER1 전체 복원 가능 — 3계층 리스크 매트릭스의 마지막 빈칸(전체 소실) 해소
+- 회수 방법 안내 완료: GitHub 저장소 Settings → Deploy keys 삭제 시 push 즉시 차단
+- 대기 사항 소진: 재개 트리거 ③(사용자 지시)으로 착수된 인프라 전부 완결 — 이후 정기 판정(2027-01-11/2027-07-01)과 누적만 남음

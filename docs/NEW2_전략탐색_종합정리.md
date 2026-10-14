@@ -404,3 +404,9 @@ P1, X3, F1, C1, C4, C5, X1, L3, F2/X6, X5, L1, X7, X2, X4/F3, C3, X1-R, C7, C9, 
 - 신설: NEW2_run/backup_snapshot.sh — TIER1(대체 불가: 수집 장부 3종·results·research·PREREG·보고서 전 버전·소스) 스냅샷, SQLite VACUUM INTO 일관성 보장, SHA256 manifest, 7개 회전. 최초 스냅샷 3.04MB(DB 2,562행) 성공
 - 자동화: cron Job 458540 매일 09:00 KST 갱신+행 수 감소 검사. TIER2(시세 원천 326MB)는 재다운로드 가능해 제외
 - 데이터 원본 위치 불변: 수집 장부=mini-services/*/data/, 기록=NEW2_run/, 문서=루트. git 원격 없음 — 완전 방어는 사용자 제공 외부 저장소(GitHub 등) 필요
+
+## §12.62 (2026-10-14) GitHub 오프사이트 백업 완성 (Task 43→45)
+- 사용자 요구("토큰 채팅 노출 없이, 저장소 하나에만 권한")에 맞춰 OAuth device flow(scope=repo=계정 전체) 기각 → Deploy Key(SSH) 방식 채택. 권한은 단일 저장소 read/write에 한정, 공개키만 채팅 노출, 개인키는 샌드박스에만 존재
+- 환경 제약(openssh-client·gh·sudo 전무) 극복: GIT_SSH 대체 전송기 직접 구현(ssh2@1.17), ed25519 키는 ssh2 네이티브 생성(PKCS8 미지원 이슈 해소)
+- 저장소: github.com/tlsehd195/new2-strategy-archive (Private) — TIER1 334파일·13MB 초기 push 완료(a5e13e3e), 일일 자동 push(매일 09:00 KST, Job 458723)
+- 데이터 내구성 3계층 최종 상태: ①파일 손상/실수 삭제 → 로컬 스냅샷 7세대+SHA256 방어 ②프로세스 사망 → 워치독 방어 ③샌드박스 전체 소실 → GitHub 오프사이트 복원 가능(신규 해소)
