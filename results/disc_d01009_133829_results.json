@@ -1,0 +1,22 @@
+{
+ "cid": "d01009_133829",
+ "ts": "2026-10-14T13:38:29Z",
+ "family": "ret_rev",
+ "symbols": [
+  "BNBUSDT",
+  "ADAUSDT"
+ ],
+ "params": {
+  "k": 4,
+  "thr": 1.6449,
+  "horizons": [
+   48
+  ]
+ },
+ "variant": null,
+ "kind": "base",
+ "verdict": "DATA_MISSING",
+ "cells": [],
+ "prereg": "/home/z/my-project/NEW2_run/PREREG_discd01009_133829_2026-10-14.md",
+ "engine": "NEW2-discovery-v2-audit1"
+}

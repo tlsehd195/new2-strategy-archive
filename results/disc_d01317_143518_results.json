@@ -1,0 +1,61 @@
+{
+ "cid": "d01317_143518",
+ "ts": "2026-10-14T14:35:18Z",
+ "family": "fng",
+ "symbols": [
+  "DOGEUSDT",
+  "LINKUSDT"
+ ],
+ "params": {
+  "lo": 5,
+  "hi": 95,
+  "horizons": [
+   16
+  ]
+ },
+ "variant": null,
+ "kind": "reverify",
+ "verdict": "UNDETERMINED_POWER",
+ "cells": [
+  {
+   "sym": "DOGEUSDT",
+   "h": 16,
+   "n_raw": 2,
+   "vn_nonov": 2,
+   "fail_closed_o10k": 0,
+   "mean_net_bp": -220.2442326865069,
+   "se": 58.369716227871244,
+   "t": -3.7732620084478223,
+   "p": 0.9175364382624263,
+   "span_means": [
+    null,
+    -220.2442326865069
+   ],
+   "raw_mean_bp": -220.2442326865069,
+   "raw_n": 2,
+   "mean_net_o100k_bp": null,
+   "p_holm": 1.0
+  },
+  {
+   "sym": "LINKUSDT",
+   "h": 16,
+   "n_raw": 2,
+   "vn_nonov": 2,
+   "fail_closed_o10k": 0,
+   "mean_net_bp": -287.3937753625721,
+   "se": 65.12927063501434,
+   "t": -4.412666878662472,
+   "p": 0.929062682877131,
+   "span_means": [
+    null,
+    -287.3937753625721
+   ],
+   "raw_mean_bp": -287.3937753625721,
+   "raw_n": 2,
+   "mean_net_o100k_bp": null,
+   "p_holm": 1.0
+  }
+ ],
+ "prereg": "/home/z/my-project/NEW2_run/PREREG_discd01317_143518_2026-10-14.md",
+ "engine": "NEW2-discovery-v2-audit2"
+}

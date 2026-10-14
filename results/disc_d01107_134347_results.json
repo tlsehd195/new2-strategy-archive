@@ -1,0 +1,22 @@
+{
+ "cid": "d01107_134347",
+ "ts": "2026-10-14T13:43:47Z",
+ "family": "fng",
+ "symbols": [
+  "BNBUSDT",
+  "ADAUSDT"
+ ],
+ "params": {
+  "lo": 5,
+  "hi": 95,
+  "horizons": [
+   16
+  ]
+ },
+ "variant": null,
+ "kind": "base",
+ "verdict": "DATA_MISSING",
+ "cells": [],
+ "prereg": "/home/z/my-project/NEW2_run/PREREG_discd01107_134347_2026-10-14.md",
+ "engine": "NEW2-discovery-v2-audit1"
+}

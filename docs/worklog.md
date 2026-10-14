@@ -1105,3 +1105,39 @@ Work Log:
 Stage Summary:
 - Phase 1 완료 — 수정 전 조사 보고서 확정. 원칙 준수: 장부 무수정(복구 병합만), 게이트 변경은 전부 엄격 방향+사전 고지 예정, 과거/신규 행은 버전 필드로 구분 예정
 - 다음: Phase 2(실행 안정성: pipefail·원자적 state·장부 기반 복구·락 수명주기·경로 설정화) → Phase 3(후보 관리·재검증 큐) → Phase 4(통계) → Phase 5(데이터+ADA/LINK 재다운로드) → Phase 6(백테스트 정확성) → Phase 7(테스트·문서·최종 보고)
+---
+Task ID: 50
+Agent: Z.ai Code (main, 감사 프로젝트 Phase 2 — 실행 안정성과 상태 관리)
+Task: F-04/05/08/09/11/23 수정 + 각 시나리오 실측 테스트
+
+Work Log:
+- [F-04 pipefail] run_cycle.sh v2: set -u -o pipefail + PIPESTATUS[0]로 python 종료코드 보존. 종료코드 체계 0=CYCLE_OK/2=CYCLE_PARTIAL/1=CYCLE_FAILED/3=SKIPPED/4=환경오류. T4 실측 exit 2 전파 확인
+- [F-05 락] PID 기록+스테일 감지(사망 프로세스+4시간 초과 시 회수). **자체 버그 발견·수정**: v2 초안이 pid 파일을 넣고 rmdir(빈 디렉터리만 제거)해서 정상 종료 후에도 락 잔존 → rm -rf로 수정. T2(점유시 skip exit3)·T3(스테일 회수 후 정상 실행+락 청소) 통과
+- [F-08 오류 반영] 후보 단위 치명 오류(PREREG 실패 등)를 main 루프에서 포착→장부 ERROR 행 기록→사이클 계속→CYCLE_PARTIAL exit 2. **자체 버그 추가 발견**: write_prereg 예외가 try 밖이라 사이클 전체 FATAL이던 것 → 격리 환경(bogus family 주입)에서 end-to-end 재현 후 수정, ERROR 행+exit 2 실측 확인
+- [F-09 state 원자화] tmp+fsync+os.replace 저장. 손상 시 load_state가 장부 기반 rebuild_state_from_ledger()로 재구성(커서=역색인 매칭, 생존/승격/stouffer=판정 행 재유도, runs/tested=실측). reconcile(): 기동 시마다 장부 기대값 대조, 불일치 시 장부 우선+reconcile.log 기록. T1 실측: state 파손 주입→재구성(cycle9/tested60/runs69 정확)→정상 계속
+- [F-11 경로] NEW2_ROOT 환경변수(기본값 불변=호환). 데이터 부재 오류 메시지에 검색 경로 명시
+- [F-23 지표 통일] state.tested=유니크 전략 수, state.runs=실행(행) 수 분리. 장부 신규 행에 engine/cand_id(전략ID)/run_id(실행ID) 필드 추가(과거 행 무수정)
+- [실측 사이클] 스모크 3회(cycle 8/9/10, 총 17후보): CYCLE_OK, fail_cost 15·undetermined 1·**data_missing 6(F-24 ADA/LINK 실측 재현)**·errors 0, tested 70/779
+
+Stage Summary:
+- Phase 2 완료. 테스트 6종 전부 실측 통과(T1 state파손복구/T2 락점유/T3 스테일락/T4 종료코드/T5 ERROR경로/스모크3회). 감사 테스트 과정에서 자체 결함 2건(rmdir 락 잔존, prereg 예외 미포착)을 발견·수정 — "테스트가 실패를 숨기지 않는다" 원칙 실천
+- 다음: Phase 3 재검증 큐·고갈 처리 → Phase 4 통계 강화 → Phase 5 데이터 → Phase 6 백테스트 → Phase 7 테스트 스위트·문서·최종 보고
+---
+Task ID: 51
+Agent: Z.ai Code (main, 감사 프로젝트 Phase 5~7 — 데이터·백테스트·테스트·문서·최종 보고)
+Task: 데이터 파이프라인 복원·품질화 + 백테스트 정확성 강화 + 정식 테스트 스위트 + 최종 감사 보고서
+
+Work Log:
+- [F-24 데이터 복원] ADA/LINK 15m klines 재다운로드(Binance fapi, 월별 66개) — 418 레이트리밋 19+11건 재시도 극복, 빈 파일 0건
+- [F-13 품질 검사] data_quality_check.py 신설(커버리지/갭/중복/OHLC/음수값, 보고 전용 무보간) → 실측: BTC 결측월 2개·ETH 9개 발견(사고 복원 캐시의 구 다운로드 실패분) → 전부 재수집, **갭 0 달성**. BTC 결측분은 잠금 TEST 구간 내부라 2027 판정에도 필수였음. 구형 47파일 헤더 행은 원본 보존 원칙으로 미수정·문서화(로더가 구조적 제거)
+- [F-16 펀딩] funding_cost_ms 신설 — 보유 구간 (entry,exit] 실측 펀딩 합산. **R8**: fund_z 생존은 펀딩 차감 후 양수 요구(FAIL_FUNDING), 타 패밀리 진단 병기. 단위 테스트 3케이스 통과
+- [F-22 룩어헤드] 실증 테스트: 신호봉 i 이후 데이터 2배 조작 → i까지 신호·진입가 불변 확인(진입=i+1 시가·청산=i+1+h 시가). 잠금 구간 진입 배제 실증(8,160행 주입 → 0건 통과, 경계 반개구간 정확)
+- [F-17 포트폴리오] portfolio_sim.py 신설 — 슬롯 제한·심볼 중복 차단·fail-closed 스킵·펀딩 반영, MDD/Sharpe/Sortino/스킵률 산출. 이벤트 스터디와 수치가 다른 이유 명시. 2027 심사 입력용(판정 아님)
+- [F-23/F-03 수색] data_version 지문(state 기록+재검증 트리거), 동일 버전 재발화 방지
+- [Phase 7 테스트] discovery/tests/test_engine_v2.py — 14종 자동화(유니버스779·해시·R4게이트·BH수학·ρ단조성·펀딩수학·로더·state원자성+재구성·재검증수명주기·종료코드/락·룩어헤드·잠금배제·품질보고) → **14/14 PASS**. 시행 중 테스트 자체 결함 5건(기대치 4·경로 1) 발견·수정 — 전부 기록
+- [최종 실측] cycle 14 CYCLE_OK: tested 106/779·runs 123·생존 0·재검증 큐 5(데이터 보강 대기)·data_missing 0
+- [문서·보고] AUDIT_FINAL_감사보고서.md 작성(A~H 규격: 25건 판정·16건 수정·점수표·남은 문제 6건). 크론 458843 재등록(v2 상태 인식 payload)
+
+Stage Summary:
+- 감사 프로젝트 7단계 전부 완료. 이전 검토 25건: 확인 21·기각 3, 수정 16건 전부 자동 테스트로 검증. 잔여: 원본 costs.py 접근 불가·agentTurn LLM 의존·순차 FDR 근사성·체결 실측 부재·생존 편향 — 전부 보고서에 명시
+- 엔진은 v2-audit2로 운영 재개(3시간 주기). 생존자 0은 정상 — 비용 벽 하에서 통과할 전략이 실존할 때만 승격 큐가 움직임

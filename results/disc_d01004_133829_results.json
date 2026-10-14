@@ -1,0 +1,22 @@
+{
+ "cid": "d01004_133829",
+ "ts": "2026-10-14T13:38:29Z",
+ "family": "vol_break",
+ "symbols": [
+  "BNBUSDT",
+  "ADAUSDT"
+ ],
+ "params": {
+  "Lv": 96,
+  "thr": 1.5,
+  "horizons": [
+   16
+  ]
+ },
+ "variant": null,
+ "kind": "base",
+ "verdict": "DATA_MISSING",
+ "cells": [],
+ "prereg": "/home/z/my-project/NEW2_run/PREREG_discd01004_133829_2026-10-14.md",
+ "engine": "NEW2-discovery-v2-audit1"
+}

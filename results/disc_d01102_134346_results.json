@@ -1,0 +1,22 @@
+{
+ "cid": "d01102_134346",
+ "ts": "2026-10-14T13:43:46Z",
+ "family": "ret_rev",
+ "symbols": [
+  "DOGEUSDT",
+  "LINKUSDT"
+ ],
+ "params": {
+  "k": 4,
+  "thr": 1.6449,
+  "horizons": [
+   48
+  ]
+ },
+ "variant": null,
+ "kind": "base",
+ "verdict": "DATA_MISSING",
+ "cells": [],
+ "prereg": "/home/z/my-project/NEW2_run/PREREG_discd01102_134346_2026-10-14.md",
+ "engine": "NEW2-discovery-v2-audit1"
+}

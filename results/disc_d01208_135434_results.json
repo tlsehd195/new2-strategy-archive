@@ -1,0 +1,23 @@
+{
+ "cid": "d01208_135434",
+ "ts": "2026-10-14T13:54:34Z",
+ "family": "flow_z",
+ "symbols": [
+  "BNBUSDT",
+  "ADAUSDT"
+ ],
+ "params": {
+  "L": 16,
+  "thr": 1.2816,
+  "mode": "mom",
+  "horizons": [
+   96
+  ]
+ },
+ "variant": null,
+ "kind": "base",
+ "verdict": "DATA_MISSING",
+ "cells": [],
+ "prereg": "/home/z/my-project/NEW2_run/PREREG_discd01208_135434_2026-10-14.md",
+ "engine": "NEW2-discovery-v2-audit2"
+}

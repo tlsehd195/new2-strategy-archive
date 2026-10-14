@@ -1,0 +1,22 @@
+{
+ "cid": "d01104_134347",
+ "ts": "2026-10-14T13:43:47Z",
+ "family": "vol_break",
+ "symbols": [
+  "DOGEUSDT",
+  "LINKUSDT"
+ ],
+ "params": {
+  "Lv": 96,
+  "thr": 1.5,
+  "horizons": [
+   16
+  ]
+ },
+ "variant": null,
+ "kind": "base",
+ "verdict": "DATA_MISSING",
+ "cells": [],
+ "prereg": "/home/z/my-project/NEW2_run/PREREG_discd01104_134347_2026-10-14.md",
+ "engine": "NEW2-discovery-v2-audit1"
+}
