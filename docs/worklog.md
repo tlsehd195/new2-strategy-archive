@@ -1157,3 +1157,23 @@ Stage Summary:
 - 오프사이트 백업이 "진짜" 재가동: 현재 원격=daa5ca6(로컬 완전 동기), 이후 매일 09:00 KST 크론이 실측 검증판으로 운영
 - 감사 25건 외 신규 결함 F-25(높음) 1건 추가 발견·수정·검증 완료 — 감사 보고서 부록 참조
 - 엔진 운영 정상: v2-audit2, cycle 15, tested 116/779, 생존자 0, 재검증 큐 정상 축적
+
+---
+Task ID: 53
+Agent: Z.ai Code (main, cron Job 459256 정기 자율탐색 루프 — 2차 플랫폼 디스크 복원 사고 대응 병행)
+Task: [2차 사고 복구] 2026-10-14 ~17:49Z 플랫폼 재초기화로 /home/z 최신분 재소실 → /tmp 생존본(14:57Z 상태) 전면 재복원 → 정기 사이클 정상 재개
+
+Work Log:
+- [사고 인지] cron 459256 기동 시 discovery/(state.json·cycles.md·run_cycle.sh)·gitssh/·backup 스크립트 전체 부재 실측 → /home/z가 10-13 20:51Z 플랫폼 스냅샷(51435fb)으로 재초기화 확인(당일 2번째 디스크 복원 — Task 48 동일 패턴). 13:21~14:57Z의 복구 완결·감사 7단계·엔진 v2-audit2·F-25 수정분이 로컬에서 재소실
+- [복구원 확정] /tmp/my-project가 14:57Z 상태로 생존(플랫폼 스냅샷 매니페스트 .initial_snapshot.json 142KB 동봉 — 전체 파일 mtime 목록) 확인. GitHub 원격(daa5ca6 = Task 52 검증 push분)과 동세대 → 네트워크 리스크 없는 /tmp를 1차 복구원으로 선택(GitHub은 예비)
+- [파일 복원] rsync -a로 /tmp/my-project → /home/z/my-project 전면 복사(플랫폼 자산 .git·.next·node_modules·db·.zscripts·tool-results 제외, 시세 캐시 3.7G 포함). 매니페스트는 NEW2_run/audit/platform_snapshot_manifest_2026-10-14T1457Z.json으로 증거 보관. 복구 스크립트 scripts/restore_second_incident_20261014.sh 저장(재실행 가능)
+- [라이브 DB 무손실 병합] 복원 전 라이브 청산 DB(2,043행 = 10-13 스냅샷분 + 부팅 후 실시간)를 VACUUM 스냅샷으로 확보 → 수집기 PID 한정 kill(교훈 §7.1) → /tmp판 4,767행(14:55Z)으로 교체 → anti-join 병합(Task 48 방식 재사용) → **최종 5,045행(inserted=278), integrity_check=ok, WAL checkpoint 완료**
+- [서비스 재기동] 3020/3021/3022 수동 스폰(setsid nohup bun run dev, service.log append) — 10-13 스냅샷엔 instrumentation.ts가 없어 워치독 부재(3021/3022 다운, 3020만 플랫폼 부팅 스폰 상태). 스폰 후 3포트 /stats 정상 응답 확인. 복원된 instrumentation.ts는 다음 next dev 재시작 시 3중 방어(부팅 스폰·5분 워치독·service.log) 재가동
+- [정기 사이클] run_cycle.sh 실행 → **CYCLE_OK exit 0**: cycle 16, proposed=17 processed=17, FAIL_COST 11·UNDETERMINED_POWER 6·data_missing 0(F-24 ADA/LINK 보강분 반영 확인)·errors 0, 생존자 0, tested 126/779, 12초. DISC-auto 트리거 4종(생존자/실패/소진/데이터 큐 급증) 해당 없음 → cycles.md 자동 기록만으로 종료(규정 준수)
+- [오프사이트 복구 push] ssh2 패키지 소실로 2회 실패(180920Z ssh2 부재·180952Z non-FF — git_log.md에 실패 기록 유지) → gitssh/에서 bun install(ssh2 1.17.0) 후 NEW2_gitbackup가 신규 init 히스토리라 생긴 non-fast-forward를 원격 히스토리 기준 reset --soft로 정렬 → 수동 복구 push 성공: **원격 daa5ca6 → bf177c9, ls-remote SHA 실측 일치, 히스토리 보존 확인**. 직후 수정판 스크립트 end-to-end 재실행으로 GITBK_OK 실측(Task 52 선례 준용 — 결과는 backup/git_log.md)
+
+Stage Summary:
+- 2차 플랫폼 복원 사고 전면 복구 완료 — 프로젝트 데이터 추가 소실 0바이트(기존 확정 손실 유지: 13:05 사고의 11:37~13:05Z 청산 ~1.5h + 오늘 14:57~17:49Z 실시간 청산 ~2.9h)
+- 오프사이트 3중 방어 복원: GitHub 원격(=로컬 SHA 실측 일치) + /tmp 생존본 존속 + 로컬
+- 엔진 운영 정상 재개: v2-audit2, cycle 16, tested 126/779, 생존자 0(정상 — 비용 벽), 재검증 큐 6건(undetermined_power 정상 축적, data_missing 0)
+- 잔여 참고: next dev 재시작 시 instrumentation 부트 가드가 서비스 관리 인수(포트 헬스체크로 수동 스폰분과 중복 없이 공존)
