@@ -1177,3 +1177,4 @@ Stage Summary:
 - 오프사이트 3중 방어 복원: GitHub 원격(=로컬 SHA 실측 일치) + /tmp 생존본 존속 + 로컬
 - 엔진 운영 정상 재개: v2-audit2, cycle 16, tested 126/779, 생존자 0(정상 — 비용 벽), 재검증 큐 6건(undetermined_power 정상 축적, data_missing 0)
 - 잔여 참고: next dev 재시작 시 instrumentation 부트 가드가 서비스 관리 인수(포트 헬스체크로 수동 스폰분과 중복 없이 공존)
+- [Task 53 추가 실측 — 서비스 영속성] setsid+nohup 스폰분(3020/3021/3022+next dev)이 Bash 호출 경계에서 전부 회수됨을 재실측(교훈 §7.3 확장: 크론 턴에서는 어떤 detach 트릭으로도 영속 스폰 불가 — 부팅 트리 소속 프로세스만 생존). 조치 불필요: 복원된 src/instrumentation.ts 부트 가드가 다음 next dev 기동 시 3종을 detached 스폰(부팅 트리 소속 → 영속, 오늘 아침 3020 생존 메커니즘과 동일). 데이터 공백: 3종 장부 18:03Z→다음 기동까지(청산·F&G 일일 행·maker fill), 다음 기동 시점은 플랫폼 재부팅 또는 워크스페이스 진입
