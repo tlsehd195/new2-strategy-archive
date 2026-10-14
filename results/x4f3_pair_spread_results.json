@@ -1,0 +1,2842 @@
+{
+ "report": {
+  "prereg": "PREREG_x4f3_pair_spread_2026-10-12.md",
+  "family_size": 96,
+  "signal": "S=ln(ETH)-ln(BTC) z |z|>=thr -> mean-reversion 1-leg, entry t+1 open, h in {4,16,48}",
+  "spans": {
+   "ETHUSDT_span1": {
+    "signal_bars": 45312
+   },
+   "ETHUSDT_span2": {
+    "signal_bars": 0
+   },
+   "BTCUSDT_span1": {
+    "signal_bars": 45312
+   },
+   "BTCUSDT_span2": {
+    "signal_bars": 0
+   }
+  },
+  "cells": [
+   {
+    "n": 18822,
+    "valid_n": 4705.5,
+    "total_bp": -1.105149051437819,
+    "net12": -13.105149051437818,
+    "net16": -17.10514905143782,
+    "net20": -21.10514905143782,
+    "t": -9.99234366706633,
+    "p": 2.8051528384668333e-23,
+    "oppose_net16": -14.894850948562182,
+    "p_ctrl": 0.93,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 96,
+    "thr": 1.2816,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 2.4965860262354815e-21
+   },
+   {
+    "n": 18822,
+    "valid_n": 1176.375,
+    "total_bp": -5.408010109767104,
+    "net12": -17.4080101097671,
+    "net16": -21.408010109767105,
+    "net20": -25.408010109767105,
+    "t": -3.290799505411966,
+    "p": 0.0010286931355529554,
+    "oppose_net16": -10.591989890232899,
+    "p_ctrl": 1.0,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 96,
+    "thr": 1.2816,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 0.0781806783020246
+   },
+   {
+    "n": 18819,
+    "valid_n": 392.0625,
+    "total_bp": -5.218881807931363,
+    "net12": -17.21888180793136,
+    "net16": -21.218881807931364,
+    "net20": -25.218881807931364,
+    "t": -1.1544741135024577,
+    "p": 0.24901083690038306,
+    "oppose_net16": -10.78111819206864,
+    "p_ctrl": 0.97,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 96,
+    "thr": 1.2816,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 3
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 11591,
+    "valid_n": 2897.75,
+    "total_bp": -0.17292904382440807,
+    "net12": -12.172929043824407,
+    "net16": -16.17292904382441,
+    "net20": -20.172929043824407,
+    "t": -6.9251469429626145,
+    "p": 5.343297685012483e-12,
+    "oppose_net16": -15.827070956175593,
+    "p_ctrl": 0.58,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 96,
+    "thr": 1.6449,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 4.381504101710236e-10
+   },
+   {
+    "n": 11591,
+    "valid_n": 724.4375,
+    "total_bp": -2.0884669737104797,
+    "net12": -14.08846697371048,
+    "net16": -18.08846697371048,
+    "net20": -22.08846697371048,
+    "t": -2.1096320197329526,
+    "p": 0.035232959037647255,
+    "oppose_net16": -13.91153302628952,
+    "p_ctrl": 0.84,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 96,
+    "thr": 1.6449,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 11590,
+    "valid_n": 241.45833333333334,
+    "total_bp": -0.599514043223662,
+    "net12": -12.59951404322366,
+    "net16": -16.59951404322366,
+    "net20": -20.599514043223664,
+    "t": -0.7100778739928668,
+    "p": 0.47834389633778107,
+    "oppose_net16": -15.40048595677634,
+    "p_ctrl": 0.49,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 96,
+    "thr": 1.6449,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 1
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 18848,
+    "valid_n": 4712.0,
+    "total_bp": -1.3180291809525762,
+    "net12": -13.318029180952577,
+    "net16": -17.31802918095258,
+    "net20": -21.31802918095258,
+    "t": -9.83036348684633,
+    "p": 1.3722996598968422e-22,
+    "oppose_net16": -14.681970819047423,
+    "p_ctrl": 0.94,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 288,
+    "thr": 1.2816,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.2076237007092212e-20
+   },
+   {
+    "n": 18848,
+    "valid_n": 1178.0,
+    "total_bp": -1.7863053513841576,
+    "net12": -13.786305351384156,
+    "net16": -17.786305351384158,
+    "net20": -21.786305351384158,
+    "t": -2.656872606201752,
+    "p": 0.007993629976955251,
+    "oppose_net16": -14.213694648615844,
+    "p_ctrl": 0.85,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 288,
+    "thr": 1.2816,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 0.5755413583407781
+   },
+   {
+    "n": 18848,
+    "valid_n": 392.6666666666667,
+    "total_bp": -2.8024249507915773,
+    "net12": -14.802424950791577,
+    "net16": -18.80242495079158,
+    "net20": -22.80242495079158,
+    "t": -1.0244591157009906,
+    "p": 0.30625077941338874,
+    "oppose_net16": -13.197575049208423,
+    "p_ctrl": 0.86,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 288,
+    "thr": 1.2816,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 11988,
+    "valid_n": 2997.0,
+    "total_bp": -1.6596307505873273,
+    "net12": -13.659630750587327,
+    "net16": -17.65963075058733,
+    "net20": -21.659630750587326,
+    "t": -7.543178302679969,
+    "p": 6.04506623266503e-14,
+    "oppose_net16": -14.340369249412673,
+    "p_ctrl": 0.93,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 288,
+    "thr": 1.6449,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 5.017404973111975e-12
+   },
+   {
+    "n": 11988,
+    "valid_n": 749.25,
+    "total_bp": -2.646624672242379,
+    "net12": -14.646624672242378,
+    "net16": -18.646624672242382,
+    "net20": -22.64662467224238,
+    "t": -2.139176597741286,
+    "p": 0.032744383865685595,
+    "oppose_net16": -13.353375327757622,
+    "p_ctrl": 0.89,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 288,
+    "thr": 1.6449,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 11988,
+    "valid_n": 249.75,
+    "total_bp": 1.7094706997113243,
+    "net12": -10.290529300288675,
+    "net16": -14.290529300288677,
+    "net20": -18.290529300288675,
+    "t": -0.6199606353004484,
+    "p": 0.5358511982255205,
+    "oppose_net16": -17.709470699711325,
+    "p_ctrl": 0.27,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 288,
+    "thr": 1.6449,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 19939,
+    "valid_n": 4984.75,
+    "total_bp": -0.40494809205483445,
+    "net12": -12.404948092054834,
+    "net16": -16.404948092054838,
+    "net20": -20.404948092054834,
+    "t": -9.66489497010108,
+    "p": 6.610047912626544e-22,
+    "oppose_net16": -15.595051907945166,
+    "p_ctrl": 0.64,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 960,
+    "thr": 1.2816,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 5.750741683985093e-20
+   },
+   {
+    "n": 19939,
+    "valid_n": 1246.1875,
+    "total_bp": -0.713100877533747,
+    "net12": -12.713100877533746,
+    "net16": -16.713100877533748,
+    "net20": -20.713100877533748,
+    "t": -2.6142660884435234,
+    "p": 0.009049838680226827,
+    "oppose_net16": -15.286899122466254,
+    "p_ctrl": 0.71,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 960,
+    "thr": 1.2816,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 0.624438868935651
+   },
+   {
+    "n": 19939,
+    "valid_n": 415.3958333333333,
+    "total_bp": -2.132432071098877,
+    "net12": -14.132432071098876,
+    "net16": -18.13243207109888,
+    "net20": -22.132432071098876,
+    "t": -0.9997514962693235,
+    "p": 0.3180141987354581,
+    "oppose_net16": -13.867567928901124,
+    "p_ctrl": 0.84,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 960,
+    "thr": 1.2816,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 12046,
+    "valid_n": 3011.5,
+    "total_bp": 0.6998058450058654,
+    "net12": -11.300194154994134,
+    "net16": -15.300194154994136,
+    "net20": -19.300194154994134,
+    "t": -6.562707659199015,
+    "p": 6.19839619385008e-11,
+    "oppose_net16": -16.699805845005866,
+    "p_ctrl": 0.31,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 960,
+    "thr": 1.6449,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 5.020700917018565e-09
+   },
+   {
+    "n": 12046,
+    "valid_n": 752.875,
+    "total_bp": 0.9165055417216087,
+    "net12": -11.083494458278391,
+    "net16": -15.083494458278393,
+    "net20": -19.08349445827839,
+    "t": -1.7109884251251435,
+    "p": 0.08749571375729674,
+    "oppose_net16": -16.91650554172161,
+    "p_ctrl": 0.38,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 960,
+    "thr": 1.6449,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 12046,
+    "valid_n": 250.95833333333334,
+    "total_bp": -3.305353610906599,
+    "net12": -15.305353610906597,
+    "net16": -19.3053536109066,
+    "net20": -23.3053536109066,
+    "t": -0.7890563094713079,
+    "p": 0.43082687695888466,
+    "oppose_net16": -12.694646389093402,
+    "p_ctrl": 0.88,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 960,
+    "thr": 1.6449,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 20047,
+    "valid_n": 5011.75,
+    "total_bp": -1.8316945320148452,
+    "net12": -13.831694532014845,
+    "net16": -17.831694532014847,
+    "net20": -21.831694532014847,
+    "t": -11.572941140892446,
+    "p": 1.3795554004548327e-30,
+    "oppose_net16": -14.168305467985155,
+    "p_ctrl": 1.0,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 2880,
+    "thr": 1.2816,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 1,
+     "gap": 0,
+     "outside": 4
+    },
+    "p_holm": 1.2691909684184462e-28
+   },
+   {
+    "n": 20035,
+    "valid_n": 1252.1875,
+    "total_bp": -7.075664617119937,
+    "net12": -19.075664617119937,
+    "net16": -23.075664617119937,
+    "net20": -27.07566461711994,
+    "t": -3.7804319370746753,
+    "p": 0.00016393551819651205,
+    "oppose_net16": -8.924335382880065,
+    "p_ctrl": 1.0,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 2880,
+    "thr": 1.2816,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 1,
+     "gap": 0,
+     "outside": 16
+    },
+    "p_holm": 0.012950905937524453
+   },
+   {
+    "n": 20003,
+    "valid_n": 416.7291666666667,
+    "total_bp": -16.399130405783062,
+    "net12": -28.39913040578306,
+    "net16": -32.39913040578306,
+    "net20": -36.39913040578306,
+    "t": -1.7936152996138475,
+    "p": 0.07360122997129856,
+    "oppose_net16": 0.3991304057830605,
+    "p_ctrl": 1.0,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 2880,
+    "thr": 1.2816,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 1,
+     "gap": 0,
+     "outside": 48
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 12994,
+    "valid_n": 3248.5,
+    "total_bp": -2.347850020290696,
+    "net12": -14.347850020290695,
+    "net16": -18.347850020290696,
+    "net20": -22.347850020290696,
+    "t": -9.132069144364973,
+    "p": 1.15204645698095e-19,
+    "oppose_net16": -13.652149979709305,
+    "p_ctrl": 0.99,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 2880,
+    "thr": 1.6449,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 9.792394884338075e-18
+   },
+   {
+    "n": 12994,
+    "valid_n": 812.125,
+    "total_bp": -9.546906912694931,
+    "net12": -21.54690691269493,
+    "net16": -25.546906912694933,
+    "net20": -29.546906912694933,
+    "t": -3.30390399023298,
+    "p": 0.000995289022510461,
+    "oppose_net16": -6.453093087305069,
+    "p_ctrl": 1.0,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 2880,
+    "thr": 1.6449,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 0.0766372547333055
+   },
+   {
+    "n": 12993,
+    "valid_n": 270.6875,
+    "total_bp": -26.41973709430243,
+    "net12": -38.419737094302434,
+    "net16": -42.419737094302434,
+    "net20": -46.41973709430243,
+    "t": -1.9109711589045661,
+    "p": 0.057068422397961255,
+    "oppose_net16": 10.419737094302429,
+    "p_ctrl": 1.0,
+    "leg": "ETHUSDT",
+    "span_idx": 0,
+    "L": 2880,
+    "thr": 1.6449,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 1
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 96,
+    "thr": 1.2816,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 96,
+    "thr": 1.2816,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 96,
+    "thr": 1.2816,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 96,
+    "thr": 1.6449,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 96,
+    "thr": 1.6449,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 96,
+    "thr": 1.6449,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 288,
+    "thr": 1.2816,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 288,
+    "thr": 1.2816,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 288,
+    "thr": 1.2816,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 288,
+    "thr": 1.6449,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 288,
+    "thr": 1.6449,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 288,
+    "thr": 1.6449,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 960,
+    "thr": 1.2816,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 960,
+    "thr": 1.2816,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 960,
+    "thr": 1.2816,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 960,
+    "thr": 1.6449,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 960,
+    "thr": 1.6449,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 960,
+    "thr": 1.6449,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 2880,
+    "thr": 1.2816,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 2880,
+    "thr": 1.2816,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 2880,
+    "thr": 1.2816,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 2880,
+    "thr": 1.6449,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 2880,
+    "thr": 1.6449,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "ETHUSDT",
+    "span_idx": 1,
+    "L": 2880,
+    "thr": 1.6449,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 18822,
+    "valid_n": 4705.5,
+    "total_bp": -0.05409106101903327,
+    "net12": -12.054091061019033,
+    "net16": -16.054091061019033,
+    "net20": -20.054091061019033,
+    "t": -12.61691504550211,
+    "p": 6.464583881126669e-36,
+    "oppose_net16": -15.945908938980967,
+    "p_ctrl": 0.61,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 96,
+    "thr": 1.2816,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 6.076708848259069e-34
+   },
+   {
+    "n": 18822,
+    "valid_n": 1176.375,
+    "total_bp": 1.121150905648531,
+    "net12": -10.87884909435147,
+    "net16": -14.878849094351471,
+    "net20": -18.87884909435147,
+    "t": -3.0546519455977044,
+    "p": 0.002303948589692286,
+    "oppose_net16": -17.12115090564853,
+    "p_ctrl": 0.16,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 96,
+    "thr": 1.2816,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 0.17049219563722917
+   },
+   {
+    "n": 18819,
+    "valid_n": 392.0625,
+    "total_bp": -6.591426915277731,
+    "net12": -18.59142691527773,
+    "net16": -22.59142691527773,
+    "net20": -26.591426915277733,
+    "t": -1.5963458421435075,
+    "p": 0.11121934013553637,
+    "oppose_net16": -9.408573084722269,
+    "p_ctrl": 1.0,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 96,
+    "thr": 1.2816,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 3
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 11591,
+    "valid_n": 2897.75,
+    "total_bp": -0.10539549661142852,
+    "net12": -12.105395496611429,
+    "net16": -16.10539549661143,
+    "net20": -20.10539549661143,
+    "t": -9.435185972524183,
+    "p": 7.745148411608209e-21,
+    "oppose_net16": -15.894604503388571,
+    "p_ctrl": 0.57,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 96,
+    "thr": 1.6449,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 6.66082763398306e-19
+   },
+   {
+    "n": 11591,
+    "valid_n": 724.4375,
+    "total_bp": -0.8879383364835605,
+    "net12": -12.88793833648356,
+    "net16": -16.88793833648356,
+    "net20": -20.887938336483558,
+    "t": -2.6309463186049125,
+    "p": 0.008696010473090028,
+    "oppose_net16": -15.11206166351644,
+    "p_ctrl": 0.7,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 96,
+    "thr": 1.6449,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 0.6087207331163019
+   },
+   {
+    "n": 11590,
+    "valid_n": 241.45833333333334,
+    "total_bp": -9.33803874023682,
+    "net12": -21.338038740236815,
+    "net16": -25.33803874023682,
+    "net20": -29.33803874023682,
+    "t": -1.3973476008407444,
+    "p": 0.16359705603518818,
+    "oppose_net16": -6.661961259763181,
+    "p_ctrl": 1.0,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 96,
+    "thr": 1.6449,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 1
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 18848,
+    "valid_n": 4712.0,
+    "total_bp": 0.015029733133490717,
+    "net12": -11.98497026686651,
+    "net16": -15.984970266866512,
+    "net20": -19.984970266866508,
+    "t": -12.267878900851247,
+    "p": 4.440760970848148e-34,
+    "oppose_net16": -16.015029733133492,
+    "p_ctrl": 0.52,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 288,
+    "thr": 1.2816,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 4.129907702888778e-32
+   },
+   {
+    "n": 18848,
+    "valid_n": 1178.0,
+    "total_bp": -2.155048204964288,
+    "net12": -14.155048204964288,
+    "net16": -18.155048204964288,
+    "net20": -22.155048204964288,
+    "t": -3.617144217886162,
+    "p": 0.00031049032132715257,
+    "oppose_net16": -13.844951795035712,
+    "p_ctrl": 0.91,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 288,
+    "thr": 1.2816,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 0.0242182450635179
+   },
+   {
+    "n": 18848,
+    "valid_n": 392.6666666666667,
+    "total_bp": -6.578550942759436,
+    "net12": -18.578550942759435,
+    "net16": -22.578550942759435,
+    "net20": -26.578550942759435,
+    "t": -1.5484900862083564,
+    "p": 0.12231195866620803,
+    "oppose_net16": -9.421449057240565,
+    "p_ctrl": 1.0,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 288,
+    "thr": 1.2816,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 11988,
+    "valid_n": 2997.0,
+    "total_bp": 0.44492968685595613,
+    "net12": -11.555070313144043,
+    "net16": -15.555070313144045,
+    "net20": -19.555070313144046,
+    "t": -9.033556916353513,
+    "p": 2.906842008018243e-19,
+    "oppose_net16": -16.444929686855957,
+    "p_ctrl": 0.35,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 288,
+    "thr": 1.6449,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 2.441747286735324e-17
+   },
+   {
+    "n": 11988,
+    "valid_n": 749.25,
+    "total_bp": -1.0799576672120879,
+    "net12": -13.079957667212087,
+    "net16": -17.07995766721209,
+    "net20": -21.07995766721209,
+    "t": -2.645149781272752,
+    "p": 0.008336796644029367,
+    "oppose_net16": -14.920042332787913,
+    "p_ctrl": 0.7,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 288,
+    "thr": 1.6449,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 0.5919125617260851
+   },
+   {
+    "n": 11988,
+    "valid_n": 249.75,
+    "total_bp": -10.957580575834518,
+    "net12": -22.957580575834516,
+    "net16": -26.95758057583452,
+    "net20": -30.957580575834516,
+    "t": -1.4713809561498723,
+    "p": 0.1424520468470492,
+    "oppose_net16": -5.042419424165483,
+    "p_ctrl": 1.0,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 288,
+    "thr": 1.6449,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 19939,
+    "valid_n": 4984.75,
+    "total_bp": -0.3936820253847114,
+    "net12": -12.393682025384711,
+    "net16": -16.393682025384713,
+    "net20": -20.39368202538471,
+    "t": -13.258915398020667,
+    "p": 1.8540915007928368e-39,
+    "oppose_net16": -15.606317974615289,
+    "p_ctrl": 0.7,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 960,
+    "thr": 1.2816,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.761386925753195e-37
+   },
+   {
+    "n": 19939,
+    "valid_n": 1246.1875,
+    "total_bp": -3.5384105851154795,
+    "net12": -15.538410585115479,
+    "net16": -19.538410585115482,
+    "net20": -23.53841058511548,
+    "t": -4.126342074679105,
+    "p": 3.930712162161625e-05,
+    "oppose_net16": -12.461589414884521,
+    "p_ctrl": 1.0,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 960,
+    "thr": 1.2816,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 0.0031445697297293
+   },
+   {
+    "n": 19939,
+    "valid_n": 415.3958333333333,
+    "total_bp": -9.539949455439022,
+    "net12": -21.53994945543902,
+    "net16": -25.53994945543902,
+    "net20": -29.539949455439025,
+    "t": -1.87778793445273,
+    "p": 0.061112252889147956,
+    "oppose_net16": -6.460050544560979,
+    "p_ctrl": 1.0,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 960,
+    "thr": 1.2816,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 12046,
+    "valid_n": 3011.5,
+    "total_bp": -0.9041961890480189,
+    "net12": -12.904196189048019,
+    "net16": -16.90419618904802,
+    "net20": -20.90419618904802,
+    "t": -10.131541588590794,
+    "p": 9.576364508411966e-24,
+    "oppose_net16": -15.095803810951981,
+    "p_ctrl": 0.85,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 960,
+    "thr": 1.6449,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 8.61872805757077e-22
+   },
+   {
+    "n": 12046,
+    "valid_n": 752.875,
+    "total_bp": -2.9360656916920522,
+    "net12": -14.93606569169205,
+    "net16": -18.93606569169205,
+    "net20": -22.936065691692054,
+    "t": -2.9301615153701595,
+    "p": 0.003490471950751603,
+    "oppose_net16": -13.06393430830795,
+    "p_ctrl": 0.94,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 960,
+    "thr": 1.6449,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 0.25480445240486704
+   },
+   {
+    "n": 12046,
+    "valid_n": 250.95833333333334,
+    "total_bp": -7.144807390943202,
+    "net12": -19.1448073909432,
+    "net16": -23.144807390943203,
+    "net20": -27.144807390943203,
+    "t": -1.2424497710296087,
+    "p": 0.21523500688518926,
+    "oppose_net16": -8.855192609056799,
+    "p_ctrl": 0.98,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 960,
+    "thr": 1.6449,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 20047,
+    "valid_n": 5011.75,
+    "total_bp": 0.11928670115298175,
+    "net12": -11.880713298847018,
+    "net16": -15.88071329884702,
+    "net20": -19.880713298847017,
+    "t": -13.52299023281499,
+    "p": 5.939619136361001e-41,
+    "oppose_net16": -16.119286701152983,
+    "p_ctrl": 0.38,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 2880,
+    "thr": 1.2816,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 1,
+     "gap": 0,
+     "outside": 4
+    },
+    "p_holm": 5.7020343709065607e-39
+   },
+   {
+    "n": 20035,
+    "valid_n": 1252.1875,
+    "total_bp": 0.629561581571572,
+    "net12": -11.370438418428428,
+    "net16": -15.37043841842843,
+    "net20": -19.370438418428428,
+    "t": -3.271085030192004,
+    "p": 0.0011005602480549906,
+    "oppose_net16": -16.629561581571572,
+    "p_ctrl": 0.28,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 2880,
+    "thr": 1.2816,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 1,
+     "gap": 0,
+     "outside": 16
+    },
+    "p_holm": 0.0825420186041243
+   },
+   {
+    "n": 20003,
+    "valid_n": 416.7291666666667,
+    "total_bp": 0.033816506064219605,
+    "net12": -11.966183493935779,
+    "net16": -15.96618349393578,
+    "net20": -19.966183493935784,
+    "t": -1.155690482671755,
+    "p": 0.24847153630818453,
+    "oppose_net16": -16.03381650606422,
+    "p_ctrl": 0.47,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 2880,
+    "thr": 1.2816,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 1,
+     "gap": 0,
+     "outside": 48
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 12994,
+    "valid_n": 3248.5,
+    "total_bp": 0.39532525642625704,
+    "net12": -11.604674743573742,
+    "net16": -15.604674743573744,
+    "net20": -19.604674743573742,
+    "t": -10.43292593868135,
+    "p": 4.351353307634758e-25,
+    "oppose_net16": -16.395325256426258,
+    "p_ctrl": 0.33,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 2880,
+    "thr": 1.6449,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 3.95973150994763e-23
+   },
+   {
+    "n": 12994,
+    "valid_n": 812.125,
+    "total_bp": 1.7376203149551257,
+    "net12": -10.262379685044873,
+    "net16": -14.262379685044875,
+    "net20": -18.262379685044873,
+    "t": -2.4621197711220444,
+    "p": 0.014018803652855549,
+    "oppose_net16": -17.737620314955127,
+    "p_ctrl": 0.13,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 2880,
+    "thr": 1.6449,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 0.9532786483941773
+   },
+   {
+    "n": 12993,
+    "valid_n": 270.6875,
+    "total_bp": 4.0744508523666445,
+    "net12": -7.925549147633354,
+    "net16": -11.925549147633356,
+    "net20": -15.925549147633355,
+    "t": -0.7138345546610746,
+    "p": 0.4759468053246928,
+    "oppose_net16": -20.074450852366645,
+    "p_ctrl": 0.01,
+    "leg": "BTCUSDT",
+    "span_idx": 0,
+    "L": 2880,
+    "thr": 1.6449,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 1
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 96,
+    "thr": 1.2816,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 96,
+    "thr": 1.2816,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 96,
+    "thr": 1.2816,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 96,
+    "thr": 1.6449,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 96,
+    "thr": 1.6449,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 96,
+    "thr": 1.6449,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 288,
+    "thr": 1.2816,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 288,
+    "thr": 1.2816,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 288,
+    "thr": 1.2816,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 288,
+    "thr": 1.6449,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 288,
+    "thr": 1.6449,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 288,
+    "thr": 1.6449,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 960,
+    "thr": 1.2816,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 960,
+    "thr": 1.2816,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 960,
+    "thr": 1.2816,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 960,
+    "thr": 1.6449,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 960,
+    "thr": 1.6449,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 960,
+    "thr": 1.6449,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 2880,
+    "thr": 1.2816,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 2880,
+    "thr": 1.2816,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 2880,
+    "thr": 1.2816,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 2880,
+    "thr": 1.6449,
+    "horizon": 4,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 2880,
+    "thr": 1.6449,
+    "horizon": 16,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "leg": "BTCUSDT",
+    "span_idx": 1,
+    "L": 2880,
+    "thr": 1.6449,
+    "horizon": 48,
+    "dropped": {
+     "no_next": 0,
+     "gap": 0,
+     "outside": 0
+    },
+    "p_holm": 1.0
+   }
+  ],
+  "drift_baseline": {
+   "ETHUSDT_span1": {
+    "4": {
+     "n": 472,
+     "total_bp": -0.9617249353913121
+    },
+    "16": {
+     "n": 472,
+     "total_bp": -22.168349521135926
+    },
+    "48": {
+     "n": 472,
+     "total_bp": -12.116774975297801
+    }
+   },
+   "ETHUSDT_span2": {
+    "4": {
+     "n": 496,
+     "total_bp": -3.143637419444938
+    },
+    "16": {
+     "n": 496,
+     "total_bp": 2.0463308606726476
+    },
+    "48": {
+     "n": 496,
+     "total_bp": 1.574904228812941
+    }
+   },
+   "BTCUSDT_span1": {
+    "4": {
+     "n": 472,
+     "total_bp": 0.45271992813649126
+    },
+    "16": {
+     "n": 472,
+     "total_bp": -12.801964783076269
+    },
+    "48": {
+     "n": 472,
+     "total_bp": -9.184186414056477
+    }
+   },
+   "BTCUSDT_span2": {
+    "4": {
+     "n": 346,
+     "total_bp": 1.8675531602436695
+    },
+    "16": {
+     "n": 346,
+     "total_bp": 1.079946743067937
+    },
+    "48": {
+     "n": 346,
+     "total_bp": 13.14493062839952
+    }
+   }
+  },
+  "family_precheck": {},
+  "verdict": {
+   "holm_pass_cells": [
+    {
+     "cell": "ETHUSDT s1 L96 t1.2816 h4",
+     "p_holm": 2.4965860262354815e-21,
+     "net16": -17.10514905143782,
+     "config_pos_of_4": 0,
+     "valid_n": 4705.5
+    },
+    {
+     "cell": "ETHUSDT s1 L96 t1.6449 h4",
+     "p_holm": 4.381504101710236e-10,
+     "net16": -16.17292904382441,
+     "config_pos_of_4": 0,
+     "valid_n": 2897.75
+    },
+    {
+     "cell": "ETHUSDT s1 L288 t1.2816 h4",
+     "p_holm": 1.2076237007092212e-20,
+     "net16": -17.31802918095258,
+     "config_pos_of_4": 0,
+     "valid_n": 4712.0
+    },
+    {
+     "cell": "ETHUSDT s1 L288 t1.6449 h4",
+     "p_holm": 5.017404973111975e-12,
+     "net16": -17.65963075058733,
+     "config_pos_of_4": 0,
+     "valid_n": 2997.0
+    },
+    {
+     "cell": "ETHUSDT s1 L960 t1.2816 h4",
+     "p_holm": 5.750741683985093e-20,
+     "net16": -16.404948092054838,
+     "config_pos_of_4": 0,
+     "valid_n": 4984.75
+    },
+    {
+     "cell": "ETHUSDT s1 L960 t1.6449 h4",
+     "p_holm": 5.020700917018565e-09,
+     "net16": -15.300194154994136,
+     "config_pos_of_4": 0,
+     "valid_n": 3011.5
+    },
+    {
+     "cell": "ETHUSDT s1 L2880 t1.2816 h4",
+     "p_holm": 1.2691909684184462e-28,
+     "net16": -17.831694532014847,
+     "config_pos_of_4": 0,
+     "valid_n": 5011.75
+    },
+    {
+     "cell": "ETHUSDT s1 L2880 t1.2816 h16",
+     "p_holm": 0.012950905937524453,
+     "net16": -23.075664617119937,
+     "config_pos_of_4": 0,
+     "valid_n": 1252.1875
+    },
+    {
+     "cell": "ETHUSDT s1 L2880 t1.6449 h4",
+     "p_holm": 9.792394884338075e-18,
+     "net16": -18.347850020290696,
+     "config_pos_of_4": 0,
+     "valid_n": 3248.5
+    },
+    {
+     "cell": "BTCUSDT s1 L96 t1.2816 h4",
+     "p_holm": 6.076708848259069e-34,
+     "net16": -16.054091061019033,
+     "config_pos_of_4": 0,
+     "valid_n": 4705.5
+    },
+    {
+     "cell": "BTCUSDT s1 L96 t1.6449 h4",
+     "p_holm": 6.66082763398306e-19,
+     "net16": -16.10539549661143,
+     "config_pos_of_4": 0,
+     "valid_n": 2897.75
+    },
+    {
+     "cell": "BTCUSDT s1 L288 t1.2816 h4",
+     "p_holm": 4.129907702888778e-32,
+     "net16": -15.984970266866512,
+     "config_pos_of_4": 0,
+     "valid_n": 4712.0
+    },
+    {
+     "cell": "BTCUSDT s1 L288 t1.2816 h16",
+     "p_holm": 0.0242182450635179,
+     "net16": -18.155048204964288,
+     "config_pos_of_4": 0,
+     "valid_n": 1178.0
+    },
+    {
+     "cell": "BTCUSDT s1 L288 t1.6449 h4",
+     "p_holm": 2.441747286735324e-17,
+     "net16": -15.555070313144045,
+     "config_pos_of_4": 0,
+     "valid_n": 2997.0
+    },
+    {
+     "cell": "BTCUSDT s1 L960 t1.2816 h4",
+     "p_holm": 1.761386925753195e-37,
+     "net16": -16.393682025384713,
+     "config_pos_of_4": 0,
+     "valid_n": 4984.75
+    },
+    {
+     "cell": "BTCUSDT s1 L960 t1.2816 h16",
+     "p_holm": 0.0031445697297293,
+     "net16": -19.538410585115482,
+     "config_pos_of_4": 0,
+     "valid_n": 1246.1875
+    },
+    {
+     "cell": "BTCUSDT s1 L960 t1.6449 h4",
+     "p_holm": 8.61872805757077e-22,
+     "net16": -16.90419618904802,
+     "config_pos_of_4": 0,
+     "valid_n": 3011.5
+    },
+    {
+     "cell": "BTCUSDT s1 L2880 t1.2816 h4",
+     "p_holm": 5.7020343709065607e-39,
+     "net16": -15.88071329884702,
+     "config_pos_of_4": 0,
+     "valid_n": 5011.75
+    },
+    {
+     "cell": "BTCUSDT s1 L2880 t1.6449 h4",
+     "p_holm": 3.95973150994763e-23,
+     "net16": -15.604674743573744,
+     "config_pos_of_4": 0,
+     "valid_n": 3248.5
+    }
+   ],
+   "PASS": false,
+   "best_config": {
+    "cell": "ETHUSDT s1 L96 t1.2816 h4",
+    "p_holm": 2.4965860262354815e-21,
+    "net16": -17.10514905143782,
+    "config_pos_of_4": 0,
+    "valid_n": 4705.5
+   }
+  },
+  "oos": {
+   "executed": true,
+   "segments": [
+    {
+     "leg": "ETHUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 96,
+     "thr": 1.2816,
+     "horizon": 4,
+     "n": 7277,
+     "net16": -17.059506830883965
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 96,
+     "thr": 1.6449,
+     "horizon": 4,
+     "n": 4460,
+     "net16": -16.99871090187622
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 288,
+     "thr": 1.2816,
+     "horizon": 4,
+     "n": 7228,
+     "net16": -18.6942397062014
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 288,
+     "thr": 1.2816,
+     "horizon": 16,
+     "n": 7228,
+     "net16": -23.202291241091142
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 288,
+     "thr": 1.6449,
+     "horizon": 4,
+     "n": 4469,
+     "net16": -18.25421409403148
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 960,
+     "thr": 1.2816,
+     "horizon": 4,
+     "n": 7003,
+     "net16": -17.826321372418235
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 960,
+     "thr": 1.2816,
+     "horizon": 16,
+     "n": 7003,
+     "net16": -23.455723671555145
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 960,
+     "thr": 1.6449,
+     "horizon": 4,
+     "n": 4572,
+     "net16": -18.963456817511833
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 2880,
+     "thr": 1.2816,
+     "horizon": 4,
+     "n": 9126,
+     "net16": -19.63433120187478
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 2880,
+     "thr": 1.2816,
+     "horizon": 16,
+     "n": 9114,
+     "net16": -31.03736551045763
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 2880,
+     "thr": 1.6449,
+     "horizon": 4,
+     "n": 5440,
+     "net16": -19.414520999385935
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2024-12-10~2026-04-20",
+     "L": 96,
+     "thr": 1.2816,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2024-12-10~2026-04-20",
+     "L": 96,
+     "thr": 1.6449,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2024-12-10~2026-04-20",
+     "L": 288,
+     "thr": 1.2816,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2024-12-10~2026-04-20",
+     "L": 288,
+     "thr": 1.2816,
+     "horizon": 16,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2024-12-10~2026-04-20",
+     "L": 288,
+     "thr": 1.6449,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2024-12-10~2026-04-20",
+     "L": 960,
+     "thr": 1.2816,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2024-12-10~2026-04-20",
+     "L": 960,
+     "thr": 1.2816,
+     "horizon": 16,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2024-12-10~2026-04-20",
+     "L": 960,
+     "thr": 1.6449,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2024-12-10~2026-04-20",
+     "L": 2880,
+     "thr": 1.2816,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2024-12-10~2026-04-20",
+     "L": 2880,
+     "thr": 1.2816,
+     "horizon": 16,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "ETHUSDT",
+     "span": "2024-12-10~2026-04-20",
+     "L": 2880,
+     "thr": 1.6449,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 96,
+     "thr": 1.2816,
+     "horizon": 4,
+     "n": 7277,
+     "net16": -14.072470963769115
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 96,
+     "thr": 1.6449,
+     "horizon": 4,
+     "n": 4460,
+     "net16": -13.730651717643775
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 288,
+     "thr": 1.2816,
+     "horizon": 4,
+     "n": 7228,
+     "net16": -13.134687558467263
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 288,
+     "thr": 1.2816,
+     "horizon": 16,
+     "n": 7228,
+     "net16": -7.887575468715037
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 288,
+     "thr": 1.6449,
+     "horizon": 4,
+     "n": 4469,
+     "net16": -12.841867035897653
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 960,
+     "thr": 1.2816,
+     "horizon": 4,
+     "n": 7003,
+     "net16": -13.563026112708878
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 960,
+     "thr": 1.2816,
+     "horizon": 16,
+     "n": 7003,
+     "net16": -7.790326961703937
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 960,
+     "thr": 1.6449,
+     "horizon": 4,
+     "n": 4572,
+     "net16": -13.184706903327866
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 2880,
+     "thr": 1.2816,
+     "horizon": 4,
+     "n": 9126,
+     "net16": -13.780682473773956
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 2880,
+     "thr": 1.2816,
+     "horizon": 16,
+     "n": 9114,
+     "net16": -6.0840979880032435
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "L": 2880,
+     "thr": 1.6449,
+     "horizon": 4,
+     "n": 5440,
+     "net16": -12.906332555309994
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2023-04-07~2024-03-18",
+     "L": 96,
+     "thr": 1.2816,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2023-04-07~2024-03-18",
+     "L": 96,
+     "thr": 1.6449,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2023-04-07~2024-03-18",
+     "L": 288,
+     "thr": 1.2816,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2023-04-07~2024-03-18",
+     "L": 288,
+     "thr": 1.2816,
+     "horizon": 16,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2023-04-07~2024-03-18",
+     "L": 288,
+     "thr": 1.6449,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2023-04-07~2024-03-18",
+     "L": 960,
+     "thr": 1.2816,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2023-04-07~2024-03-18",
+     "L": 960,
+     "thr": 1.2816,
+     "horizon": 16,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2023-04-07~2024-03-18",
+     "L": 960,
+     "thr": 1.6449,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2023-04-07~2024-03-18",
+     "L": 2880,
+     "thr": 1.2816,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2023-04-07~2024-03-18",
+     "L": 2880,
+     "thr": 1.2816,
+     "horizon": 16,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "leg": "BTCUSDT",
+     "span": "2023-04-07~2024-03-18",
+     "L": 2880,
+     "thr": 1.6449,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    }
+   ]
+  }
+ },
+ "quality": {
+  "common_bars": 49728,
+  "eth_only": 52416,
+  "btc_only": 38112,
+  "spread_nan": 0
+ }
+}

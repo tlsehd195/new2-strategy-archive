@@ -1,0 +1,64 @@
+{
+ "probe": "X11 Binance futures positioning ratio endpoints \u2014 history depth",
+ "ts": "2026-10-13T01:39:24Z",
+ "tests": [
+  {
+   "days_ago": 0,
+   "ep": "globalLongShortAccountRatio",
+   "res": {
+    "status": 200,
+    "rows": 0,
+    "first_ts": null
+   }
+  },
+  {
+   "days_ago": 20,
+   "ep": "globalLongShortAccountRatio",
+   "res": {
+    "status": 200,
+    "rows": 4,
+    "first_ts": 1790127900000
+   }
+  },
+  {
+   "days_ago": 35,
+   "ep": "globalLongShortAccountRatio",
+   "res": {
+    "status": "ERR",
+    "err": "<HTTPError 400: ''>"
+   }
+  },
+  {
+   "days_ago": 60,
+   "ep": "globalLongShortAccountRatio",
+   "res": {
+    "status": "ERR",
+    "err": "<HTTPError 400: ''>"
+   }
+  },
+  {
+   "ep": "takerlongshortRatio recent",
+   "res": {
+    "status": 200,
+    "rows": 3,
+    "first_ts": 1791852300000
+   }
+  },
+  {
+   "ep": "topLongShortPositionRatio recent",
+   "res": {
+    "status": 200,
+    "rows": 3,
+    "first_ts": 1791853200000
+   }
+  },
+  {
+   "ep": "old-range 2021",
+   "res": {
+    "status": "ERR",
+    "err": "<HTTPError 400: ''>"
+   }
+  }
+ ],
+ "verdict": "history retention ~30 days only (20d OK / 35d+ HTTP 400 / 2021 HTTP 400) -> 4-segment+OOS structure impossible -> DATA_IMPOSSIBLE (L2 precedent: capability vs promotability separated, no download, no measurement)"
+}

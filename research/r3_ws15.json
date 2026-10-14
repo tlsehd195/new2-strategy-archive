@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.sciencedirect.com",
+    "name": "Volatility of Liquidity and Cross-Section of Cryptocurrency",
+    "snippet": "Sep 29, 2026 — The volatility of the Amihud's illiquidity ratio is a priced factor in the cryptocurrency cross-section. factor alphas up to 1.70%. Across 1, ...",
+    "host_name": "www.sciencedirect.com",
+    "rank": 0,
+    "date": "Sep 29, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.cis.upenn.edu",
+    "name": "Illiquidity and stock returns: cross-section and time-series effects",
+    "snippet": "by Y Amihud · 2002 · Cited by 16316 — The hypothesis on the relationship between stock return and stock liquidity is that return increases in illiquidity , as proposed by Amihud and Mendelson (1986). 26 pages",
+    "host_name": "www.cis.upenn.edu",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.researchgate.net",
+    "name": "Amihud illiquidity of the Bitcoin, gold, S&P 500, and USD",
+    "snippet": "Following Amihud ⁶³, the monthly illiquidity is estimated using the daily history of trades. The smaller the calculated illiquidity value, the greater the ... Read more",
+    "host_name": "www.researchgate.net",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://alphaarchitect.com",
+    "name": "How to Measure the Liquidity of Cryptocurrency?",
+    "snippet": "Mar 15, 2021 — The measures that perform best in the cross-sectional analysis are the Amihud (2002) illiquidity ratio",
+    "host_name": "alphaarchitect.com",
+    "rank": 3,
+    "date": "Mar 15, 2021",
+    "favicon": ""
+  },
+  {
+    "url": "https://ba-odegaard.no",
+    "name": "Liquidity – The Amihud illiquidity estimator",
+    "snippet": "by BA Ødegaard · 2026 · Cited by 3 — Amihud (2002) proposes to measure illiquidity by the ratio of absolute stock return to its dollar volume. 7 pages",
+    "host_name": "ba-odegaard.no",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://vlab.stern.nyu.edu",
+    "name": "Liquidity Analysis Documentation - V-Lab - NYU",
+    "snippet": "Amihud (2002) develops a measure of illiquidity of a security at time. Illiquidity and stock returns : cross-section and time-series effects.",
+    "host_name": "vlab.stern.nyu.edu",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://papers.ssrn.com",
+    "name": "ILLIQUIDITY AND STOCK RETURNS: - Cross-Section and",
+    "snippet": "The hypothesis on the return-liquidity relationship is that stock expected return is an increasing function of stock illiquidity , as proposed by Amihud and ... Read more",
+    "host_name": "papers.ssrn.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.icmagroup.org",
+    "name": "Why is the Amihud (2002) Illiquidity Measure Priced?",
+    "snippet": "by X LOU · 2016 · Cited by 35 — The return premium associated with the Amihud (2002) measure is generally considered a liquidity premium that compensates for price impact. 72 pages",
+    "host_name": "www.icmagroup.org",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

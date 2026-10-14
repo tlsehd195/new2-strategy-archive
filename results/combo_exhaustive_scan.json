@@ -1,0 +1,326 @@
+{
+ "generated": "2026-10-14T07:18:56.368159+00:00",
+ "nature": "조합 공간 소진 스캔 — 파워 분석·기술 통계 (승격 주장 없음·신규 다운로드 0바이트)",
+ "question": "지금까지 조사한 모든 전략을 전부 조합·테스트했는가?",
+ "honest_answer_before": "정식 파이프라인 측정은 C-COMBO(X1-R+F2/X6-R 2성분) 1건뿐 — 본 스캔이 전 공간 소진 보완",
+ "total_cells_extracted": 618,
+ "total_measurement_files": 26,
+ "pos_cells": 35,
+ "pos_cells_vn30": 14,
+ "pos_lowvn": 21,
+ "neg_cells": 583,
+ "scan_primary": {
+  "universe_label": "양수 셀 & valid_n>=30 (승격 게이트 준용)",
+  "n_cells": 14,
+  "n_families": 5,
+  "families": [
+   {
+    "family": "C9",
+    "label": "symbol=ETHUSDT,span=2021-03-25~2026-04-28,L=90,bucket=B90,horizon=288",
+    "net_bp": 60.86970736025827,
+    "t": 1.1479653949240842,
+    "valid_n": 115.78125,
+    "n": 33345.0
+   },
+   {
+    "family": "A1",
+    "label": "symbol=BTCUSDT,span=2021-05-02~2022-08-17,lookback=96,bucket=B90,horizon=48",
+    "net_bp": 19.73751904852214,
+    "t": 0.8412787758354439,
+    "valid_n": 148.89583333333334,
+    "n": 7147.0
+   },
+   {
+    "family": "F2/X6-R(C-B)",
+    "label": "C-B maker $10k",
+    "net_bp": 53.29,
+    "t": 0.6849,
+    "valid_n": 59.0,
+    "n": 177.0
+   },
+   {
+    "family": "X1-R(union C-A)",
+    "label": "C-A maker $10k",
+    "net_bp": 12.09,
+    "t": 0.2822,
+    "valid_n": 51.17,
+    "n": 2456.0
+   },
+   {
+    "family": "X8",
+    "label": "symbol=BTCUSDT,span=2021-05-02~2022-08-17,lookback=96,bucket=B90,horizon=48",
+    "net_bp": 0.5393612244809602,
+    "t": 0.02282549202917241,
+    "valid_n": 133.02083333333334,
+    "n": 6385.0
+   }
+  ],
+  "subsets_scanned": 31,
+  "best": {
+   "z_pool": 1.5439178568398821,
+   "rho": 0.0,
+   "members": [
+    "C9",
+    "A1",
+    "F2/X6-R(C-B)"
+   ]
+  }
+ },
+ "scan_allpos": {
+  "universe_label": "양수 셀 전체 (vn 필터 없음 — 낮은 vn 셀 포함, 참고용)",
+  "n_cells": 35,
+  "n_families": 8,
+  "families": [
+   {
+    "family": "C9",
+    "label": "symbol=ETHUSDT,span=2026-09-01~2026-10-12,L=30,bucket=B90,horizon=672",
+    "net_bp": 616.727221893789,
+    "t": 10.845033364363681,
+    "valid_n": 0.14136904761904762,
+    "n": 95.0
+   },
+   {
+    "family": "A1",
+    "label": "symbol=BTCUSDT,span=2021-05-02~2022-08-17,lookback=96,bucket=B90,horizon=48",
+    "net_bp": 19.73751904852214,
+    "t": 0.8412787758354439,
+    "valid_n": 148.89583333333334,
+    "n": 7147.0
+   },
+   {
+    "family": "F2/X6-R(C-B)",
+    "label": "C-B maker $10k",
+    "net_bp": 53.29,
+    "t": 0.6849,
+    "valid_n": 59.0,
+    "n": 177.0
+   },
+   {
+    "family": "X1-R(cfg)",
+    "label": "cfgB ES_L24_h48",
+    "net_bp": 48.164648717629966,
+    "t": 0.438568548810775,
+    "valid_n": 1.6458333333333333,
+    "n": 79.0
+   },
+   {
+    "family": "ALT-P1-R2",
+    "label": "ZECUSDT 2024-12-10~2026-10-01 B80 h96",
+    "net_bp": 301.0764836683128,
+    "t": 0.32744570068006995,
+    "valid_n": 2.8020833333333335,
+    "n": 269.0
+   },
+   {
+    "family": "X1-R(union C-A)",
+    "label": "C-A maker $10k",
+    "net_bp": 12.09,
+    "t": 0.2822,
+    "valid_n": 51.17,
+    "n": 2456.0
+   },
+   {
+    "family": "FR",
+    "label": "symbol=BTCUSDT,span=2021-05-02~2022-08-17,bucket=B80,horizon=48",
+    "net_bp": 26.885350679617375,
+    "t": 0.20222189483140462,
+    "valid_n": 4.416666666666667,
+    "n": 212.0
+   },
+   {
+    "family": "X8",
+    "label": "symbol=BTCUSDT,span=2021-05-02~2022-08-17,lookback=96,bucket=B90,horizon=48",
+    "net_bp": 0.5393612244809602,
+    "t": 0.02282549202917241,
+    "valid_n": 133.02083333333334,
+    "n": 6385.0
+   }
+  ],
+  "subsets_scanned": 255,
+  "best": {
+   "z_pool": 10.845033364363681,
+   "rho": 0.0,
+   "members": [
+    "C9"
+   ]
+  }
+ },
+ "negative_addition_proof": [
+  {
+   "added_family": "KP",
+   "added_t": 1.0368175315661947,
+   "z_after": 1.4172650188388562,
+   "z_drop": 0.1266528380010259,
+   "worse": true
+  },
+  {
+   "added_family": "ALT-P1",
+   "added_t": -0.0003770769638858316,
+   "z_after": 1.0211467739438245,
+   "z_drop": 0.5227710828960577,
+   "worse": true
+  },
+  {
+   "added_family": "X1-R(union C-A)",
+   "added_t": -0.004815192965066834,
+   "z_after": 1.0194517991468384,
+   "z_drop": 0.5244660576930438,
+   "worse": true
+  },
+  {
+   "added_family": "X1-R(cfg)",
+   "added_t": -0.03395768068694716,
+   "z_after": 1.0083219002895483,
+   "z_drop": 0.5355959565503339,
+   "worse": true
+  },
+  {
+   "added_family": "ALT-P1-R2",
+   "added_t": -0.08312996361613868,
+   "z_after": 0.9895423595445405,
+   "z_drop": 0.5543754972953416,
+   "worse": true
+  },
+  {
+   "added_family": "A1",
+   "added_t": -0.1244575713783825,
+   "z_after": 0.9737588032882165,
+   "z_drop": 0.5701590535516656,
+   "worse": true
+  },
+  {
+   "added_family": "ALT-P1-R3",
+   "added_t": -0.13308532329343442,
+   "z_after": 0.970463751503457,
+   "z_drop": 0.5734541053364252,
+   "worse": true
+  },
+  {
+   "added_family": "C9",
+   "added_t": -0.15291203236278075,
+   "z_after": 0.9628916708794318,
+   "z_drop": 0.5810261859604503,
+   "worse": true
+  },
+  {
+   "added_family": "X1",
+   "added_t": -0.15752007040742666,
+   "z_after": 0.9611318006220638,
+   "z_drop": 0.5827860562178183,
+   "worse": true
+  },
+  {
+   "added_family": "FR",
+   "added_t": -0.19246272128658262,
+   "z_after": 0.9477867432679311,
+   "z_drop": 0.596131113571951,
+   "worse": true
+  },
+  {
+   "added_family": "C5",
+   "added_t": -0.342330270859737,
+   "z_after": 0.8905503575256546,
+   "z_drop": 0.6533674993142276,
+   "worse": true
+  },
+  {
+   "added_family": "X3",
+   "added_t": -0.3487212011289258,
+   "z_after": 0.8881095773088491,
+   "z_drop": 0.655808279531033,
+   "worse": true
+  }
+ ],
+ "pool_calc": {
+  "members": [
+   "C9",
+   "A1",
+   "F2/X6-R(C-B)"
+  ],
+  "n_total": 40669.0,
+  "mean_bp_pool": 53.60832011034448,
+  "vn_pool_sum": 323.67708333333337,
+  "t_pool_range": [
+   1.9435464830889124,
+   2.0498666967681665
+  ],
+  "note": "vn_pool 합산은 상한(이벤트 중복 과소 차감) — 보수 해석 필요"
+ },
+ "promotion_distance": {
+  "mean_bp": 53.60832011034448,
+  "sd_bp_pool": 483.02979782315236,
+  "t_pool_mid": 1.9967065899285394,
+  "rows": [
+   {
+    "gate": "m=1 a0.05·점추정",
+    "z_crit": 1.959964,
+    "mean_bp_used": 53.60832011034448,
+    "req_valid_n": 311.87433599977953,
+    "extra_valid_n_needed": 0.0,
+    "years_at_hist_vn_rate": 0.0
+   },
+   {
+    "gate": "m=2 Holm a0.025·점추정",
+    "z_crit": 2.241403,
+    "mean_bp_used": 53.60832011034448,
+    "req_valid_n": 407.87148790373334,
+    "extra_valid_n_needed": 84.19440457039997,
+    "years_at_hist_vn_rate": 0.46412670474208856
+   },
+   {
+    "gate": "m=1 a0.05·반효과(승자의 저주 보수)",
+    "z_crit": 1.959964,
+    "mean_bp_used": 26.80416005517224,
+    "req_valid_n": 1247.4973439991181,
+    "extra_valid_n_needed": 923.8202606657848,
+    "years_at_hist_vn_rate": 5.092614592912383
+   },
+   {
+    "gate": "m=2 Holm a0.025·반효과(승자의 저주 보수)",
+    "z_crit": 2.241403,
+    "mean_bp_used": 26.80416005517224,
+    "req_valid_n": 1631.4859516149334,
+    "extra_valid_n_needed": 1307.8088682816,
+    "years_at_hist_vn_rate": 7.20937482205815
+   }
+  ],
+  "vn_rate_rows": [
+   {
+    "family": "A1",
+    "span": "2021-05-02~2022-08-17",
+    "days": 472,
+    "valid_n": 148.89583333333334,
+    "vn_per_day": 0.31545727401129947
+   },
+   {
+    "family": "C9",
+    "span": "2021-03-25~2026-04-28",
+    "days": 1860,
+    "valid_n": 115.78125,
+    "vn_per_day": 0.06224798387096774
+   },
+   {
+    "family": "F2/X6-R(C-B)",
+    "span": "ETH s2 2024-12-10~2026-04-20 (원기록 496일)",
+    "days": 496.0,
+    "valid_n": 59.0,
+    "vn_per_day": 0.11895161290322581
+   }
+  ],
+  "vn_per_day_total": 0.49665687078549303,
+  "note": "sd_pool=mean·sqrt(vn합)/t_mid 역산·vn 합산 상한 가정 — 정밀치 아님·구조 파악용. 추가 유효표본을 역사적 vn/day 도래율로 환산(Task 36 방법). 반효과 가정은 618셀 중 최대값 선택에 따른 승자의 저주 보정 시나리오"
+ },
+ "gates": {
+  "Z_m1": 1.959964,
+  "Z_m2_holm": 2.241403,
+  "rho_grid": [
+   0.0,
+   0.119,
+   0.238,
+   0.5
+  ],
+  "vn_min": 30.0,
+  "family_rep_rule": "동일 family 최강 셀 1개 대표(발견 ㊷ union 희석 방지 — 보수적)"
+ },
+ "verdict": "최고 Z_pool=1.544 < Holm 필요치 2.241 (m=2) — 기존 전 측정의 어떤 조합도 유의성 게이트 통과 불가 실측 확정"
+}

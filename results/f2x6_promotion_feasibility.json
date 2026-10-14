@@ -1,0 +1,217 @@
+{
+  "generated": "2026-10-14T05:17:17.571976+00:00",
+  "prereg_basis": "PREREG_f2x6_fng_2026-10-12.md + PREREG_combo_stress_bounce_2026-10-14.md",
+  "nature": "파워 분석 + 기술 통계 — 승격 주장 없음, 신규 다운로드 0바이트",
+  "cells": {
+    "F2X6R_taker_10k": {
+      "mean_bp": 36.19,
+      "t": 0.465,
+      "valid_n": 59.0,
+      "implied_std_bp": 597.8
+    },
+    "F2X6R_maker_10k": {
+      "mean_bp": 53.29,
+      "t": 0.6849,
+      "valid_n": 59.0,
+      "implied_std_bp": 597.6
+    },
+    "X1R_maker_10k": {
+      "mean_bp": 12.09,
+      "t": 0.2822,
+      "valid_n": 51.17,
+      "implied_std_bp": 306.5
+    }
+  },
+  "fng": {
+    "range": [
+      "2018-02-01",
+      "2026-10-12"
+    ],
+    "days": 3172,
+    "sig25_75_days": 1070,
+    "rate_per_day_alltime": 0.3373,
+    "latest_5": [
+      [
+        "2026-10-08",
+        64
+      ],
+      [
+        "2026-10-09",
+        59
+      ],
+      [
+        "2026-10-10",
+        64
+      ],
+      [
+        "2026-10-11",
+        61
+      ],
+      [
+        "2026-10-12",
+        69
+      ]
+    ],
+    "spell_count": 188,
+    "spell_len_mean_max": [
+      5.7,
+      77
+    ],
+    "gap_days_median_max": [
+      4,
+      330
+    ],
+    "byyear": {
+      "2018": 138,
+      "2019": 83,
+      "2020": 142,
+      "2021": 165,
+      "2022": 207,
+      "2023": 4,
+      "2024": 110,
+      "2025": 83,
+      "2026": 138
+    },
+    "cond_neutral_hit_next75": {
+      "tries": 238,
+      "hits": 84,
+      "prob": 0.353
+    },
+    "cond_neutral_hit_next180": {
+      "tries": 238,
+      "hits": 148,
+      "prob": 0.622
+    },
+    "cond_neutral_hit_next365": {
+      "tries": 238,
+      "hits": 238,
+      "prob": 1.0
+    }
+  },
+  "timeline": {
+    "note": "E[t]는 true effect=점추정치 가정. 승자의 저주 보수로 절반 효과 가정도 병기.",
+    "maker_hist_rate": {
+      "rate": 0.4215,
+      "rows": [
+        {
+          "to": "2027-01-11",
+          "days": 89,
+          "exp_new_raw": 37.5,
+          "valid_n_total": 71.5,
+          "E_t": 0.754,
+          "p_pass_pct": 6.8
+        },
+        {
+          "to": "2027-06-30",
+          "days": 259,
+          "exp_new_raw": 109.2,
+          "valid_n_total": 95.4,
+          "E_t": 0.871,
+          "p_pass_pct": 8.5
+        },
+        {
+          "to": "2028-12-31",
+          "days": 809,
+          "exp_new_raw": 341.0,
+          "valid_n_total": 172.7,
+          "E_t": 1.172,
+          "p_pass_pct": 14.2
+        }
+      ]
+    },
+    "maker_half_effect": {
+      "mean_bp": 26.64,
+      "rows": [
+        {
+          "to": "2027-01-11",
+          "days": 89,
+          "exp_new_raw": 37.5,
+          "valid_n_total": 71.5,
+          "E_t": 0.377,
+          "p_pass_pct": 3.1
+        },
+        {
+          "to": "2027-06-30",
+          "days": 259,
+          "exp_new_raw": 109.2,
+          "valid_n_total": 95.4,
+          "E_t": 0.435,
+          "p_pass_pct": 3.5
+        },
+        {
+          "to": "2028-12-31",
+          "days": 809,
+          "exp_new_raw": 341.0,
+          "valid_n_total": 172.7,
+          "E_t": 0.586,
+          "p_pass_pct": 4.9
+        }
+      ]
+    },
+    "neutral_regime": "도래 0건 가정 → t 불변(0.685) → 통과 확률 0%",
+    "need_mean_if_30_new": 161.3,
+    "years_to_requirement_hist_rate": 11.2,
+    "x1r_years_hist_rate": 83.9
+  },
+  "cell_arrival": {
+    "spans": [
+      {
+        "span": "BTCUSDT_span1_2021-05-02~2022-08-17",
+        "n": 231,
+        "days": 472
+      },
+      {
+        "span": "ETHUSDT_span2_2024-12-10~2026-04-20",
+        "n": 177,
+        "days": 496
+      }
+    ],
+    "eth_total_events": 408,
+    "eth_total_days": 968,
+    "rate_per_day": 0.4215
+  },
+  "required_sample_f2x6r": {
+    "m1_a0.05": {
+      "taker": {
+        "t_crit": 1.959964,
+        "req_valid_n": 1048.1,
+        "req_raw_events": 3145,
+        "add_raw_events": 2968
+      },
+      "maker": {
+        "t_crit": 1.959964,
+        "req_valid_n": 483.2,
+        "req_raw_events": 1450,
+        "add_raw_events": 1273
+      }
+    },
+    "m2_holm_a0.025": {
+      "taker": {
+        "t_crit": 2.241403,
+        "req_valid_n": 1370.7,
+        "req_raw_events": 4113,
+        "add_raw_events": 3936
+      },
+      "maker": {
+        "t_crit": 2.241403,
+        "req_valid_n": 631.9,
+        "req_raw_events": 1896,
+        "add_raw_events": 1719
+      }
+    }
+  },
+  "required_sample_x1r": {
+    "m1_a0.05": {
+      "t_crit": 1.959964,
+      "req_valid_n": 2468.5,
+      "req_raw_events": 118490,
+      "add_raw_events": 116021
+    },
+    "m2_holm_a0.025": {
+      "t_crit": 2.241403,
+      "req_valid_n": 3228.4,
+      "req_raw_events": 154963,
+      "add_raw_events": 152494
+    }
+  }
+}

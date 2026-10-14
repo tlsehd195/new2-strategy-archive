@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.sciencedirect.com/article/abs/pii",
+    "name": "Good volatility, bad volatility, and the cross section of",
+    "snippet": "by Z Zhang · 2023 · Cited by 29 — This paper examines the predictability of realized volatility measures (RVM), especially the realized signed jumps (RSJ), on future volatility and returns . Read more",
+    "host_name": "www.sciencedirect.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://papers.ssrn.com/sol3/Delivery.cfm",
+    "name": "Good Volatility, Bad Volatility, and the Cross Section of",
+    "snippet": "This paper examines the distributional properties of cryptocurrency realized variation measures (RVM) and the predictability of RVM on future returns . Read more",
+    "host_name": "papers.ssrn.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9986043",
+    "name": "The predictive power of Bitcoin prices for the realized volatility",
+    "snippet": "by E Bouri · 2023 · Cited by 41 — The findings show that Bitcoin prices have significant predictive power for US stock volatility , with an inverse relationship between Bitcoin prices and stock ... Read more",
+    "host_name": "pmc.ncbi.nlm.nih.gov",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.scheller.gatech.edu/lee/pdf",
+    "name": "Variance Decomposition and Cryptocurrency Return",
+    "snippet": "by SS Lee · 2024 · Cited by 17 — This paper examines how realized variances predict cryptocurrency returns . We find that cryptocurrencies with higher variances exhibit lower returns in ... 72 pages",
+    "host_name": "www.scheller.gatech.edu",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.kellogg.northwestern.edu/tvt_pred",
+    "name": "Tail Risk Premia and Return Predictability",
+    "snippet": "by T Bollerslev · Cited by 555 — Relying on new essentially model-free estimation procedure, we show that much of this predictability may be attributed to time variation in the part of the. Read more 49 pages",
+    "host_name": "www.kellogg.northwestern.edu",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://arxiv.org/html",
+    "name": "Risk Premia in the Bitcoin Market",
+    "snippet": "Aug 1, 2025 — We analyze the first and second moment risk premia in the Bitcoin market based on options and realized returns and contrast them to the premia ... Read more",
+    "host_name": "arxiv.org",
+    "rank": 5,
+    "date": "Aug 1, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.netspar.nl/uploads/035_Bekaert",
+    "name": "The VIX, the Variance Premium and Stock Market Volatility",
+    "snippet": "by G Bekaert · 2013 · Cited by 1183 — The variance premium predicts stock returns while the conditional stock market variance predicts economic activity and has a relatively higher predictive power 36 pages",
+    "host_name": "www.netspar.nl",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.mdpi.com",
+    "name": "Regime-Dependent Good and Bad Volatility of Bitcoin",
+    "snippet": "by KK Jha · 2020 · Cited by 7 — This paper analyzes high-frequency estimates of good and bad realized volatility of Bitcoin . We show that volatility asymmetry depends on the volatility regime ...",
+    "host_name": "www.mdpi.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

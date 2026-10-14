@@ -1,0 +1,46 @@
+{
+  "probe_time_utc": "2026-10-13T00:41:34.967953Z",
+  "sources": {
+    "okx_liq_v5_public": {
+      "http": 200,
+      "code": "0",
+      "msg": "",
+      "n_groups": 1,
+      "sample": [
+        {
+          "bkLoss": "0",
+          "bkPx": "81587.5",
+          "ccy": "",
+          "posSide": "long",
+          "side": "sell",
+          "sz": "3.45",
+          "time": 1791851853004,
+          "ts": "1791851853004"
+        },
+        {
+          "bkLoss": "0",
+          "bkPx": "81224.1",
+          "ccy": "",
+          "posSide": "long",
+          "side": "sell",
+          "sz": "0.22",
+          "time": 1791851640333,
+          "ts": "1791851640333"
+        }
+      ]
+    },
+    "okx_liq_history": {
+      "error": "<HTTPError 404: 'Not Found'>"
+    },
+    "bitmex_liquidation_oldest": {
+      "http": 200,
+      "resp": "[]"
+    },
+    "binance_allForceOrders": {
+      "error": "<HTTPError 404: 'Not Found'>"
+    },
+    "coinglass_v3_nokey": {
+      "error": "<HTTPError 500: 'Internal Server Error'>"
+    }
+  }
+}

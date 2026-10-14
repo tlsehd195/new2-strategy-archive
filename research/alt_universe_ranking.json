@@ -1,0 +1,46 @@
+{
+  "fixed_at": "2026-10-14T00:40:00+09:00",
+  "task": 33,
+  "purpose": "ALT-P1 universe selection rule output - fixed before download/measurement (PREREG_alt_funding_extreme_2026-10-14.md SS1)",
+  "rule": "Binance USD-M USDT perpetual listed <= 2021-08-01, top market cap as of 2026-10-14, excluding BTC/ETH/stables/wrapped-staked/delisted-from-binance-futures(XMR), take top 4",
+  "source": "CoinGecko /coins/markets top20 fetched 2026-10-14 (curl, HTTP 200)",
+  "coingecko_top20_raw": [
+    {"rank": 1, "symbol": "BTC", "mcap_b": 1676.4},
+    {"rank": 2, "symbol": "ETH", "mcap_b": 307.6},
+    {"rank": 3, "symbol": "USDT", "mcap_b": 184.1},
+    {"rank": 4, "symbol": "BNB", "mcap_b": 99.2},
+    {"rank": 5, "symbol": "XRP", "mcap_b": 86.7},
+    {"rank": 6, "symbol": "USDC", "mcap_b": 72.6},
+    {"rank": 7, "symbol": "SOL", "mcap_b": 63.4},
+    {"rank": 8, "symbol": "TRX", "mcap_b": 31.1},
+    {"rank": 9, "symbol": "FIGR_HELOC", "mcap_b": 25.0},
+    {"rank": 10, "symbol": "ZEC", "mcap_b": 20.3},
+    {"rank": 11, "symbol": "HYPE", "mcap_b": 18.0},
+    {"rank": 12, "symbol": "DOGE", "mcap_b": 13.2},
+    {"rank": 13, "symbol": "USDS", "mcap_b": 10.3},
+    {"rank": 14, "symbol": "XMR", "mcap_b": 10.0},
+    {"rank": 15, "symbol": "LINK", "mcap_b": 9.9},
+    {"rank": 16, "symbol": "WBT", "mcap_b": 9.7},
+    {"rank": 17, "symbol": "ADA", "mcap_b": 8.8},
+    {"rank": 18, "symbol": "LEO", "mcap_b": 8.2},
+    {"rank": 19, "symbol": "RAIN", "mcap_b": 7.1},
+    {"rank": 20, "symbol": "XLM", "mcap_b": 6.7}
+  ],
+  "exclusions": {
+    "BTC": "existing coverage (25 measurements)",
+    "ETH": "existing coverage (25 measurements)",
+    "USDT/USDC/USDS": "stablecoin",
+    "FIGR_HELOC/RAIN": "tokenized RWA, no Binance UM perp (auto-excluded by listing rule)",
+    "HYPE": "listed 2024-11 < 2021-08-01 rule (auto-excluded)",
+    "XMR": "delisted from Binance 2024-02, data truncation",
+    "WBT/LEO": "exchange tokens ranked below cutoff anyway"
+  },
+  "selected": [
+    {"symbol": "BNB", "perp": "BNBUSDT", "perp_listed": "2020-02", "mcap_b": 99.2, "rank_after_excl": 1},
+    {"symbol": "XRP", "perp": "XRPUSDT", "perp_listed": "2020-01", "mcap_b": 86.7, "rank_after_excl": 2},
+    {"symbol": "SOL", "perp": "SOLUSDT", "perp_listed": "2020-09", "mcap_b": 63.4, "rank_after_excl": 3},
+    {"symbol": "TRX", "perp": "TRXUSDT", "perp_listed": "2019-09", "mcap_b": 31.1, "rank_after_excl": 4}
+  ],
+  "not_selected_rule_5_6": ["ZEC(#10, $20.3B)", "DOGE(#12, $13.2B)"],
+  "probes_2021_04_kline_http200": ["BNBUSDT (verified in download)", "XRPUSDT", "SOLUSDT", "TRXUSDT (verified in download)", "DOGEUSDT", "ADAUSDT"]
+}

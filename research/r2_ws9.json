@@ -1,0 +1,38 @@
+[
+  {
+    "url": "https://github.com",
+    "name": "Liquidation Data Endpoint /fapi/v1/forceOrders and",
+    "snippet": "May 16, 2025 — Historical liquidation snapshot data has been restored at \"https:// data . binance .vision/?prefix= data /futures/cm/daily/liquidationSnapshot/\".",
+    "host_name": "github.com",
+    "rank": 0,
+    "date": "May 16, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.binance.com",
+    "name": "How to Retrieve Binance Spot Market Data Efficiently?",
+    "snippet": "Apr 22, 2025 — The data can be downloaded programmatically using scripts available at Binance's Public Data Github Repository. Examples. Below are two ways to ... Read more",
+    "host_name": "www.binance.com",
+    "rank": 1,
+    "date": "Apr 22, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://coinank.com",
+    "name": "Crypto exchange Binance 5 minutes liquidation data ACT",
+    "snippet": "CoinAnk offers comprehensive liquidation data statistics for crypto exchanges including Binance, OKX, and Bybit. Track liquidation data across various time ...",
+    "host_name": "coinank.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://finazon.io",
+    "name": "Binance",
+    "snippet": "On top of open, high, low, and close prices, the Binance dataset contains information about quote, base, asset volumes, and the number of trades for each period ... Read more",
+    "host_name": "finazon.io",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  }
+]

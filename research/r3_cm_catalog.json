@@ -1,0 +1,6 @@
+{
+  "error" : {
+    "type" : "unsupported_parameter",
+    "message" : "Unsupported parameter 'assets'."
+  }
+}

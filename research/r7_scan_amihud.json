@@ -1,0 +1,65 @@
+[
+  {
+    "url": "https://www.stern.nyu.edu",
+    "name": "Yakov Amihud",
+    "snippet": "The focus of his research is the effects of liquidity of assets on their returns and values, and the design and evaluation of securities markets' trading ... Read more",
+    "host_name": "www.stern.nyu.edu",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://ba-odegaard.no",
+    "name": "Liquidity – The Amihud illiquidity estimator",
+    "snippet": "by BA Ødegaard · 2026 · Cited by 3 — Amihud (2002) proposes to measure illiquidity by the ratio of absolute stock return to its dollar volume. 7 pages",
+    "host_name": "ba-odegaard.no",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.sciencedirect.com",
+    "name": "Illiquidity and stock returns: cross-section and time-series",
+    "snippet": "by Y Amihud · 2002 · Cited by 16316 — The hypothesis on the relationship between stock return and stock liquidity is that return increases in illiquidity , as proposed by Amihud and Mendelson (1986). Read more",
+    "host_name": "www.sciencedirect.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://scholar.google.com/citations?user=oCFp4LIAAAAJ&hl=en",
+    "name": "Yakov Amihud",
+    "snippet": "Illiquidity and stock returns: cross-section and time-series effects Y Amihud Journal of financial markets. Liquidity and asset prices. Liquidity and stock ...",
+    "host_name": "scholar.google.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.icmagroup.org",
+    "name": "Why is the Amihud (2002) Illiquidity Measure Priced?",
+    "snippet": "by X LOU · 2016 · Cited by 35 — A “constant” measure using only the trading volume component exhibits a return predictability matching that of the Amihud (2002) measure , and the return premium. Read more 72 pages",
+    "host_name": "www.icmagroup.org",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://papers.ssrn.com",
+    "name": "Mutual Fund's R2 as Predictor of Performance",
+    "snippet": "by Y Amihud · 2012 · Cited by 830 — We propose that fund performance can be predicted by its R2, obtained from a regression of its returns on a multi-factor benchmark model.",
+    "host_name": "papers.ssrn.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://communities.sas.com",
+    "name": "Solved: Amihud (2002) Liquidity Measure",
+    "snippet": "Mar 22, 2017 — I am having difficulty in calculating no of valid days in a month. kindly give me some code which can calculate no of valid days in a month. so ... Read more",
+    "host_name": "communities.sas.com",
+    "rank": 6,
+    "date": "Mar 22, 2017",
+    "favicon": ""
+  }
+]

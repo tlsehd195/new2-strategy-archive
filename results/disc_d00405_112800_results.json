@@ -1,0 +1,61 @@
+{
+ "cid": "d00405_112800",
+ "ts": "2026-10-14T11:28:00Z",
+ "family": "tod",
+ "symbols": [
+  "BNBUSDT",
+  "ADAUSDT"
+ ],
+ "params": {
+  "sess": "ASIA",
+  "dir": "long",
+  "horizons": [
+   16
+  ]
+ },
+ "variant": null,
+ "kind": "base",
+ "verdict": "FAIL_COST",
+ "cells": [
+  {
+   "sym": "BNBUSDT",
+   "h": 16,
+   "n_raw": 39904,
+   "vn_nonov": 2104,
+   "fail_closed_o10k": 0,
+   "mean_net_bp": -110.09979710874963,
+   "se": 3.7134415578921587,
+   "t": -29.648991479280205,
+   "p": 1.0,
+   "span_means": [
+    -103.72864364691733,
+    -116.25659400551092
+   ],
+   "raw_mean_bp": -111.73086760919524,
+   "raw_n": 33664,
+   "mean_net_o100k_bp": -276.835419110415,
+   "p_holm": 1.0
+  },
+  {
+   "sym": "ADAUSDT",
+   "h": 16,
+   "n_raw": 39904,
+   "vn_nonov": 2104,
+   "fail_closed_o10k": 29,
+   "mean_net_bp": -112.82889241651954,
+   "se": 4.871984424691813,
+   "t": -23.158713694709064,
+   "p": 1.0,
+   "span_means": [
+    -96.02005211573736,
+    -129.0722016417614
+   ],
+   "raw_mean_bp": -115.74064332788652,
+   "raw_n": 33662,
+   "mean_net_o100k_bp": -275.0206696701345,
+   "p_holm": 1.0
+  }
+ ],
+ "prereg": "/home/z/my-project/NEW2_run/PREREG_discd00405_112800_2026-10-14.md",
+ "engine": "NEW2-discovery-v1"
+}

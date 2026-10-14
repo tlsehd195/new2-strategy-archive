@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://quantpedia.com/can-google-trends-sentiment-be-useful-as-a-predictor-for-cryptocurrency-returns",
+    "name": "Can Google Trends Sentiment Be Useful as a Predictor for",
+    "snippet": "This blog post delves into the intricacies of using Google Trends as a sentiment predictor, exploring its potential to forecast Bitcoin prices",
+    "host_name": "quantpedia.com",
+    "rank": 0,
+    "date": "Apr 17, 2024",
+    "favicon": ""
+  },
+  {
+    "url": "https://trends.google.com/trends/explore?date=today%205-y&q=bitcoin",
+    "name": "Bitcoin Google Trends",
+    "snippet": "No information is available for this page.",
+    "host_name": "trends.google.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=pB5XsOaDeAM",
+    "name": "Crypto Trading Using Google Trends",
+    "snippet": "This video will discuss Crypto Trading Using Google Trends, introduced by the CEO of Quantpedia.com, Radovan Vojtko.",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://colab.research.google.com/drive/135eOHIt517044FKk6VRDdw_c-UqoqZGt?usp=sharing",
+    "name": "Backtesting Crypto Trading Strategies with Python",
+    "snippet": "This tutorial will walk you through the process of backtesting crypto trading strategies with Python, covering everything from setting up your environment to ...",
+    "host_name": "colab.research.google.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/algotrading/comments/1lmu1qp/bitcoin_strategy_that_outperformed_buy_hold",
+    "name": "Bitcoin Strategy That Outperformed Buy & Hold (Backtested",
+    "snippet": "I recently backtested a long-only Bitcoin strategy using a combination of price action, moving averages, RSI, and ADX.",
+    "host_name": "www.reddit.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.researchgate.net/publication/342096129_Backtesting_of_Algorithmic_Cryptocurrency_Trading_Strategies",
+    "name": "Backtesting of Algorithmic Cryptocurrency Trading Strategies",
+    "snippet": "This thesis presents a tool for backtesting algorithmic trading strategies for cryptocurrencies. The tool, called quantbacktest, provides a convenient way ...",
+    "host_name": "www.researchgate.net",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.coinbase.com/learn/tips-and-tutorials/how-to-backtest-a-crypto-trading-strategy",
+    "name": "How to backtest a crypto trading strategy?",
+    "snippet": "There are three main methods to backtest a crypto trading strategy: manual backtesting, backtesting with code, and using automated backtesting tools.",
+    "host_name": "www.coinbase.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://coinrule.com/free-backtesting",
+    "name": "Free Backtesting",
+    "snippet": "Test your trading strategies with free backtesting across crypto and stock markets. Validate rules on historical data from Binance, Coinbase, and major brokers",
+    "host_name": "coinrule.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

@@ -1,0 +1,65 @@
+[
+  {
+    "url": "https://en.wikipedia.org",
+    "name": "Bitcoin",
+    "snippet": "In May and June 2022, the bitcoin price fell following the collapses of TerraUSD, a stablecoin , [59] and the Celsius Network, a cryptocurrency loan company.",
+    "host_name": "en.wikipedia.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://bitcoin.org",
+    "name": "Bitcoin - Open source P2P money",
+    "snippet": "Bitcoin is an innovative payment network and a new kind of money. Find all you need to know and get started with Bitcoin on bitcoin.org. Price Fees FAQ English",
+    "host_name": "bitcoin.org",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://coinmarketcap.com",
+    "name": "Bitcoin price today, BTC to USD live",
+    "snippet": "The live Bitcoin price today is $83541.86 USD. It has a circulating supply of 20,096,803 BTC coins supply of 21,000,000 BTC coins.",
+    "host_name": "coinmarketcap.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.investopedia.com",
+    "name": "What Is Bitcoin? How to Buy, Mine, and Use It",
+    "snippet": "Bitcoin is a decentralized digital currency that allows people to send, receive, and store value without relying on a bank or central authority. Read more",
+    "host_name": "www.investopedia.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.coindesk.com",
+    "name": "Bitcoin price today, BTC to USD live",
+    "snippet": "The price of Bitcoin (BTC) is $ 83670.37 today as of Oct 11, 2026, 7:36 pm EDT, with a 24-hour trading volume of $5.89B.",
+    "host_name": "www.coindesk.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://finance.yahoo.com",
+    "name": "Bitcoin USD PRICE (BTC-USD)",
+    "snippet": "Bitcoin has a current supply of 20,096,675 . The last known price of Bitcoin is 83,052.0721463 USD and is up 0.10 over the last 24 hours. It is currently ... Read more",
+    "host_name": "finance.yahoo.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://ccaf.io",
+    "name": "Cambridge Blockchain Network Sustainability Index: CBECI",
+    "snippet": "The Cambridge Blockchain Network Sustainability Index (CBNSI) is created and maintained by the Cambridge Digital Assets Programme (CDAP) Team at the ...",
+    "host_name": "ccaf.io",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  }
+]

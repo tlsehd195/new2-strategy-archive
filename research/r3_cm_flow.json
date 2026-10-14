@@ -1,0 +1,6 @@
+{
+  "error" : {
+    "type" : "unauthorized",
+    "message" : "Requested resource requires authorization."
+  }
+}

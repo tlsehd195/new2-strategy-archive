@@ -1,0 +1,132 @@
+{
+ "prereg": "PREREG_combo_stress_bounce_2026-10-14.md \u00a75",
+ "t_standard": "valid_n = \uc131\ubd84 \uaddc\uc57d (\uad50\ud6c8 \u2467)",
+ "cells": [
+  {
+   "n_used": 2469,
+   "fc": 0,
+   "engine_net_bp": -0.20688597442746884,
+   "engine_cost_bp": 32.68841983991689,
+   "valid_n": 51.4375,
+   "t": -0.004815192965066834,
+   "p": 0.9961770417964813,
+   "component": "C-A",
+   "size": "$10k",
+   "arm": "taker",
+   "gross_bp": 32.48153386548942
+  },
+  {
+   "n_valid": 2469,
+   "n_filled": 2456,
+   "unfilled": 13,
+   "fc": 0,
+   "fill_rate": 0.9947347104090725,
+   "promo_net_bp": 12.09089329952278,
+   "valid_n_filled": 51.166666666666664,
+   "t": 0.28218134484094143,
+   "p": 0.7789653746618403,
+   "component": "C-A",
+   "size": "$10k",
+   "arm": "maker",
+   "gross_bp": 32.48153386548942
+  },
+  {
+   "n_used": 177,
+   "fc": 0,
+   "engine_net_bp": 36.191462447438035,
+   "engine_cost_bp": 38.58559182742018,
+   "valid_n": 59.0,
+   "t": 0.4650236083363779,
+   "p": 0.6436557557578285,
+   "component": "C-B",
+   "size": "$10k",
+   "arm": "taker",
+   "gross_bp": 74.77705427485822
+  },
+  {
+   "n_valid": 177,
+   "n_filled": 177,
+   "unfilled": 0,
+   "fc": 0,
+   "fill_rate": 1.0,
+   "promo_net_bp": 53.28607471905754,
+   "valid_n_filled": 59.0,
+   "t": 0.6849135992889066,
+   "p": 0.49612656860199633,
+   "component": "C-B",
+   "size": "$10k",
+   "arm": "maker",
+   "gross_bp": 74.77705427485822
+  },
+  {
+   "n_used": 2469,
+   "fc": 0,
+   "engine_net_bp": -40.616438698127276,
+   "engine_cost_bp": 73.0979725636167,
+   "valid_n": 51.4375,
+   "t": -0.9470551725781131,
+   "p": 0.34812612692987244,
+   "component": "C-A",
+   "size": "$100k",
+   "arm": "taker",
+   "gross_bp": 32.48153386548942
+  },
+  {
+   "n_valid": 2469,
+   "n_filled": 2456,
+   "unfilled": 13,
+   "fc": 0,
+   "fill_rate": 0.9947347104090725,
+   "promo_net_bp": -8.554041357129421,
+   "valid_n_filled": 51.166666666666664,
+   "t": -0.20014820194823602,
+   "p": 0.8421738367177645,
+   "component": "C-A",
+   "size": "$100k",
+   "arm": "maker",
+   "gross_bp": 32.48153386548942
+  },
+  {
+   "n_used": 177,
+   "fc": 0,
+   "engine_net_bp": -16.969413523010893,
+   "engine_cost_bp": 91.74646779786912,
+   "valid_n": 59.0,
+   "t": -0.2176013399737065,
+   "p": 0.8285034607832539,
+   "component": "C-B",
+   "size": "$100k",
+   "arm": "taker",
+   "gross_bp": 74.77705427485822
+  },
+  {
+   "n_valid": 177,
+   "n_filled": 177,
+   "unfilled": 0,
+   "fc": 0,
+   "fill_rate": 1.0,
+   "promo_net_bp": 26.38110027849064,
+   "valid_n_filled": 59.0,
+   "t": 0.3385617445289266,
+   "p": 0.7361625042961015,
+   "component": "C-B",
+   "size": "$100k",
+   "arm": "maker",
+   "gross_bp": 74.77705427485822
+  }
+ ],
+ "pool_stouffer_$10k": {
+  "taker_Z": 0.2924685929443954,
+  "maker_Z": 0.6146017502202495,
+  "rho_note": "diag \uc2e4\uce21 \u03c1\u0302=0.238 \uc0ac\uc6a9"
+ },
+ "pool_stouffer_$100k": {
+  "taker_Z": -0.7401547649117404,
+  "maker_Z": 0.08796365448980734,
+  "rho_note": "diag \uc2e4\uce21 \u03c1\u0302=0.238 \uc0ac\uc6a9"
+ },
+ "verdict": {
+  "G-C2 taker \uc5d4\uc9c4\uc591\uc218($10k)": "FAIL",
+  "G-C2 maker promo\uc591\uc218($10k)": "PASS"
+ }
+}

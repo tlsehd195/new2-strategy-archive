@@ -1,0 +1,61 @@
+{
+ "cid": "d00607_113310",
+ "ts": "2026-10-14T11:33:10Z",
+ "family": "fng",
+ "symbols": [
+  "TRXUSDT",
+  "ZECUSDT"
+ ],
+ "params": {
+  "lo": 5,
+  "hi": 95,
+  "horizons": [
+   4
+  ]
+ },
+ "variant": null,
+ "kind": "base",
+ "verdict": "UNDETERMINED_POWER",
+ "cells": [
+  {
+   "sym": "TRXUSDT",
+   "h": 4,
+   "n_raw": 2,
+   "vn_nonov": 2,
+   "fail_closed_o10k": 0,
+   "mean_net_bp": -298.12277966400507,
+   "se": 66.49678963485853,
+   "t": -4.4832657531443445,
+   "p": 0.9301439542095941,
+   "span_means": [
+    null,
+    -298.12277966400507
+   ],
+   "raw_mean_bp": -298.12277966400507,
+   "raw_n": 2,
+   "mean_net_o100k_bp": null,
+   "p_holm": 1.0
+  },
+  {
+   "sym": "ZECUSDT",
+   "h": 4,
+   "n_raw": 2,
+   "vn_nonov": 2,
+   "fail_closed_o10k": 0,
+   "mean_net_bp": -167.63371865620758,
+   "se": 37.537267271475514,
+   "t": -4.465794418220531,
+   "p": 0.9298793994043157,
+   "span_means": [
+    null,
+    -167.63371865620758
+   ],
+   "raw_mean_bp": -167.63371865620758,
+   "raw_n": 2,
+   "mean_net_o100k_bp": null,
+   "p_holm": 1.0
+  }
+ ],
+ "prereg": "/home/z/my-project/NEW2_run/PREREG_discd00607_113310_2026-10-14.md",
+ "engine": "NEW2-discovery-v1"
+}

@@ -1,0 +1,1441 @@
+{
+ "fomc": [
+  {
+   "date": "2021-01-27",
+   "ts_utc": 1611774000000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2021-03-17",
+   "ts_utc": 1616004000000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2021-04-28",
+   "ts_utc": 1619632800000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2021-06-16",
+   "ts_utc": 1623866400000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2021-07-28",
+   "ts_utc": 1627495200000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2021-09-22",
+   "ts_utc": 1632333600000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2021-11-03",
+   "ts_utc": 1635962400000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2021-12-15",
+   "ts_utc": 1639594800000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2022-01-26",
+   "ts_utc": 1643223600000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2022-03-16",
+   "ts_utc": 1647453600000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2022-05-04",
+   "ts_utc": 1651687200000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2022-06-15",
+   "ts_utc": 1655316000000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2022-07-27",
+   "ts_utc": 1658944800000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2022-09-21",
+   "ts_utc": 1663783200000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2022-11-02",
+   "ts_utc": 1667412000000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2022-12-14",
+   "ts_utc": 1671044400000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2023-02-01",
+   "ts_utc": 1675278000000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2023-03-22",
+   "ts_utc": 1679508000000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2023-05-03",
+   "ts_utc": 1683136800000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2023-06-14",
+   "ts_utc": 1686765600000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2023-07-26",
+   "ts_utc": 1690394400000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2023-09-20",
+   "ts_utc": 1695232800000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2023-11-01",
+   "ts_utc": 1698861600000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2023-12-13",
+   "ts_utc": 1702494000000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2024-01-31",
+   "ts_utc": 1706727600000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2024-03-20",
+   "ts_utc": 1710957600000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2024-05-01",
+   "ts_utc": 1714586400000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2024-06-12",
+   "ts_utc": 1718215200000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2024-07-31",
+   "ts_utc": 1722448800000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2024-09-18",
+   "ts_utc": 1726682400000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2024-11-07",
+   "ts_utc": 1731006000000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2024-12-18",
+   "ts_utc": 1734548400000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2025-01-29",
+   "ts_utc": 1738177200000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2025-03-19",
+   "ts_utc": 1742407200000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2025-05-07",
+   "ts_utc": 1746640800000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2025-06-18",
+   "ts_utc": 1750269600000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2025-07-30",
+   "ts_utc": 1753898400000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2025-09-17",
+   "ts_utc": 1758132000000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2025-10-29",
+   "ts_utc": 1761760800000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2025-12-10",
+   "ts_utc": 1765393200000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2026-01-28",
+   "ts_utc": 1769626800000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2026-03-18",
+   "ts_utc": 1773856800000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2026-04-29",
+   "ts_utc": 1777485600000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2026-06-17",
+   "ts_utc": 1781719200000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2026-07-29",
+   "ts_utc": 1785348000000,
+   "src": "federalreserve.gov statement PDF filename"
+  },
+  {
+   "date": "2026-09-16",
+   "ts_utc": 1789581600000,
+   "src": "federalreserve.gov statement PDF filename"
+  }
+ ],
+ "cpi": [
+  {
+   "date": "2010-01-15",
+   "ts_utc": 1263562200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for December 2009"
+  },
+  {
+   "date": "2010-02-19",
+   "ts_utc": 1266586200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for January 2010"
+  },
+  {
+   "date": "2010-03-18",
+   "ts_utc": 1268915400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for February 2010"
+  },
+  {
+   "date": "2010-04-14",
+   "ts_utc": 1271248200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for March 2010"
+  },
+  {
+   "date": "2010-05-19",
+   "ts_utc": 1274272200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for April 2010"
+  },
+  {
+   "date": "2010-06-17",
+   "ts_utc": 1276777800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for May 2010"
+  },
+  {
+   "date": "2010-07-16",
+   "ts_utc": 1279283400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for June 2010"
+  },
+  {
+   "date": "2010-08-13",
+   "ts_utc": 1281702600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for July 2010"
+  },
+  {
+   "date": "2010-09-17",
+   "ts_utc": 1284726600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for August 2010"
+  },
+  {
+   "date": "2010-10-15",
+   "ts_utc": 1287145800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for September 2010"
+  },
+  {
+   "date": "2010-11-17",
+   "ts_utc": 1290000600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for October 2010"
+  },
+  {
+   "date": "2010-12-15",
+   "ts_utc": 1292419800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for November 2010"
+  },
+  {
+   "date": "2011-01-14",
+   "ts_utc": 1295011800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for December 2010"
+  },
+  {
+   "date": "2011-02-17",
+   "ts_utc": 1297949400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for January 2011"
+  },
+  {
+   "date": "2011-03-17",
+   "ts_utc": 1300365000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for February 2011"
+  },
+  {
+   "date": "2011-04-15",
+   "ts_utc": 1302870600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for March 2011"
+  },
+  {
+   "date": "2011-05-13",
+   "ts_utc": 1305289800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for April 2011"
+  },
+  {
+   "date": "2011-06-15",
+   "ts_utc": 1308141000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for May 2011"
+  },
+  {
+   "date": "2011-07-15",
+   "ts_utc": 1310733000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for June 2011"
+  },
+  {
+   "date": "2011-08-18",
+   "ts_utc": 1313670600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for July 2011"
+  },
+  {
+   "date": "2011-09-15",
+   "ts_utc": 1316089800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for August 2011"
+  },
+  {
+   "date": "2011-10-19",
+   "ts_utc": 1319027400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for September 2011"
+  },
+  {
+   "date": "2011-11-16",
+   "ts_utc": 1321450200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for October 2011"
+  },
+  {
+   "date": "2011-12-16",
+   "ts_utc": 1324042200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for November 2011"
+  },
+  {
+   "date": "2012-01-19",
+   "ts_utc": 1326979800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for December 2011"
+  },
+  {
+   "date": "2012-02-17",
+   "ts_utc": 1329485400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for January 2012"
+  },
+  {
+   "date": "2012-03-16",
+   "ts_utc": 1331901000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for February 2012"
+  },
+  {
+   "date": "2012-04-13",
+   "ts_utc": 1334320200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for March 2012"
+  },
+  {
+   "date": "2012-05-15",
+   "ts_utc": 1337085000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for April 2012"
+  },
+  {
+   "date": "2012-06-14",
+   "ts_utc": 1339677000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for May 2012"
+  },
+  {
+   "date": "2012-07-17",
+   "ts_utc": 1342528200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for June 2012"
+  },
+  {
+   "date": "2012-08-15",
+   "ts_utc": 1345033800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for July 2012"
+  },
+  {
+   "date": "2012-09-14",
+   "ts_utc": 1347625800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for August 2012"
+  },
+  {
+   "date": "2012-10-16",
+   "ts_utc": 1350390600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for September 2012"
+  },
+  {
+   "date": "2012-11-15",
+   "ts_utc": 1352986200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for October 2012"
+  },
+  {
+   "date": "2012-12-14",
+   "ts_utc": 1355491800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for November 2012"
+  },
+  {
+   "date": "2013-01-16",
+   "ts_utc": 1358343000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for December 2012"
+  },
+  {
+   "date": "2013-02-21",
+   "ts_utc": 1361453400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for January 2013"
+  },
+  {
+   "date": "2013-03-15",
+   "ts_utc": 1363350600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for February 2013"
+  },
+  {
+   "date": "2013-04-16",
+   "ts_utc": 1366115400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for March 2013"
+  },
+  {
+   "date": "2013-05-16",
+   "ts_utc": 1368707400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for April 2013"
+  },
+  {
+   "date": "2013-06-18",
+   "ts_utc": 1371558600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for May 2013"
+  },
+  {
+   "date": "2013-07-16",
+   "ts_utc": 1373977800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for June 2013"
+  },
+  {
+   "date": "2013-08-15",
+   "ts_utc": 1376569800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for July 2013"
+  },
+  {
+   "date": "2013-09-17",
+   "ts_utc": 1379421000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for August 2013"
+  },
+  {
+   "date": "2013-10-30",
+   "ts_utc": 1383136200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for September 2013"
+  },
+  {
+   "date": "2013-11-20",
+   "ts_utc": 1384954200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for October 2013"
+  },
+  {
+   "date": "2013-12-17",
+   "ts_utc": 1387287000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for November 2013"
+  },
+  {
+   "date": "2014-01-16",
+   "ts_utc": 1389879000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for December 2013"
+  },
+  {
+   "date": "2014-02-20",
+   "ts_utc": 1392903000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for January 2014"
+  },
+  {
+   "date": "2014-03-18",
+   "ts_utc": 1395145800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for February 2014"
+  },
+  {
+   "date": "2014-04-15",
+   "ts_utc": 1397565000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for March 2014"
+  },
+  {
+   "date": "2014-05-15",
+   "ts_utc": 1400157000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for April 2014"
+  },
+  {
+   "date": "2014-06-17",
+   "ts_utc": 1403008200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for May 2014"
+  },
+  {
+   "date": "2014-07-22",
+   "ts_utc": 1406032200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for June 2014"
+  },
+  {
+   "date": "2014-08-19",
+   "ts_utc": 1408451400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for July 2014"
+  },
+  {
+   "date": "2014-09-17",
+   "ts_utc": 1410957000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for August 2014"
+  },
+  {
+   "date": "2014-10-22",
+   "ts_utc": 1413981000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for September 2014"
+  },
+  {
+   "date": "2014-11-20",
+   "ts_utc": 1416490200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for October 2014"
+  },
+  {
+   "date": "2014-12-17",
+   "ts_utc": 1418823000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for November 2014"
+  },
+  {
+   "date": "2015-01-16",
+   "ts_utc": 1421415000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for December 2014"
+  },
+  {
+   "date": "2015-02-26",
+   "ts_utc": 1424957400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for January 2015"
+  },
+  {
+   "date": "2015-03-24",
+   "ts_utc": 1427200200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for February 2015"
+  },
+  {
+   "date": "2015-04-17",
+   "ts_utc": 1429273800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for March 2015"
+  },
+  {
+   "date": "2015-05-22",
+   "ts_utc": 1432297800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for April 2015"
+  },
+  {
+   "date": "2015-06-18",
+   "ts_utc": 1434630600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for May 2015"
+  },
+  {
+   "date": "2015-07-17",
+   "ts_utc": 1437136200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for June 2015"
+  },
+  {
+   "date": "2015-08-19",
+   "ts_utc": 1439987400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for July 2015"
+  },
+  {
+   "date": "2015-09-16",
+   "ts_utc": 1442406600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for August 2015"
+  },
+  {
+   "date": "2015-10-15",
+   "ts_utc": 1444912200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for September 2015"
+  },
+  {
+   "date": "2015-11-17",
+   "ts_utc": 1447767000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for October 2015"
+  },
+  {
+   "date": "2015-12-15",
+   "ts_utc": 1450186200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for November 2015"
+  },
+  {
+   "date": "2016-01-20",
+   "ts_utc": 1453296600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for December 2015"
+  },
+  {
+   "date": "2016-02-19",
+   "ts_utc": 1455888600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for January 2016"
+  },
+  {
+   "date": "2016-03-16",
+   "ts_utc": 1458131400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for February 2016"
+  },
+  {
+   "date": "2016-04-14",
+   "ts_utc": 1460637000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for March 2016"
+  },
+  {
+   "date": "2016-05-17",
+   "ts_utc": 1463488200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for April 2016"
+  },
+  {
+   "date": "2016-06-16",
+   "ts_utc": 1466080200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for May 2016"
+  },
+  {
+   "date": "2016-07-15",
+   "ts_utc": 1468585800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for June 2016"
+  },
+  {
+   "date": "2016-08-16",
+   "ts_utc": 1471350600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for July 2016"
+  },
+  {
+   "date": "2016-09-16",
+   "ts_utc": 1474029000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for August 2016"
+  },
+  {
+   "date": "2016-10-18",
+   "ts_utc": 1476793800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for September 2016"
+  },
+  {
+   "date": "2016-11-17",
+   "ts_utc": 1479389400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for October 2016"
+  },
+  {
+   "date": "2016-12-15",
+   "ts_utc": 1481808600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for November 2016"
+  },
+  {
+   "date": "2017-01-18",
+   "ts_utc": 1484746200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for December 2016"
+  },
+  {
+   "date": "2017-02-15",
+   "ts_utc": 1487165400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for January 2017"
+  },
+  {
+   "date": "2017-03-15",
+   "ts_utc": 1489581000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for February 2017"
+  },
+  {
+   "date": "2017-04-14",
+   "ts_utc": 1492173000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for March 2017"
+  },
+  {
+   "date": "2017-05-12",
+   "ts_utc": 1494592200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for April 2017"
+  },
+  {
+   "date": "2017-06-14",
+   "ts_utc": 1497443400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for May 2017"
+  },
+  {
+   "date": "2017-07-14",
+   "ts_utc": 1500035400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for June 2017"
+  },
+  {
+   "date": "2017-08-11",
+   "ts_utc": 1502454600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for July 2017"
+  },
+  {
+   "date": "2017-09-14",
+   "ts_utc": 1505392200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for August 2017"
+  },
+  {
+   "date": "2017-10-13",
+   "ts_utc": 1507897800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for September 2017"
+  },
+  {
+   "date": "2017-11-15",
+   "ts_utc": 1510752600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for October 2017"
+  },
+  {
+   "date": "2017-12-13",
+   "ts_utc": 1513171800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for November 2017"
+  },
+  {
+   "date": "2018-01-12",
+   "ts_utc": 1515763800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for December 2017"
+  },
+  {
+   "date": "2018-02-14",
+   "ts_utc": 1518615000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for January 2018"
+  },
+  {
+   "date": "2018-03-13",
+   "ts_utc": 1520944200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for February 2018"
+  },
+  {
+   "date": "2018-04-11",
+   "ts_utc": 1523449800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for March 2018"
+  },
+  {
+   "date": "2018-05-10",
+   "ts_utc": 1525955400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for April 2018"
+  },
+  {
+   "date": "2018-06-12",
+   "ts_utc": 1528806600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for May 2018"
+  },
+  {
+   "date": "2018-07-12",
+   "ts_utc": 1531398600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for June 2018"
+  },
+  {
+   "date": "2018-08-10",
+   "ts_utc": 1533904200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for July 2018"
+  },
+  {
+   "date": "2018-09-13",
+   "ts_utc": 1536841800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for August 2018"
+  },
+  {
+   "date": "2018-10-11",
+   "ts_utc": 1539261000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for September 2018"
+  },
+  {
+   "date": "2018-11-14",
+   "ts_utc": 1542202200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for October 2018"
+  },
+  {
+   "date": "2018-12-12",
+   "ts_utc": 1544621400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for November 2018"
+  },
+  {
+   "date": "2019-01-11",
+   "ts_utc": 1547213400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for December 2018"
+  },
+  {
+   "date": "2019-02-13",
+   "ts_utc": 1550064600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for January 2019"
+  },
+  {
+   "date": "2019-03-12",
+   "ts_utc": 1552393800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for February 2019"
+  },
+  {
+   "date": "2019-04-10",
+   "ts_utc": 1554899400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for March 2019"
+  },
+  {
+   "date": "2019-05-10",
+   "ts_utc": 1557491400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for April 2019"
+  },
+  {
+   "date": "2019-06-12",
+   "ts_utc": 1560342600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for May 2019"
+  },
+  {
+   "date": "2019-07-11",
+   "ts_utc": 1562848200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for June 2019"
+  },
+  {
+   "date": "2019-08-13",
+   "ts_utc": 1565699400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for July 2019"
+  },
+  {
+   "date": "2019-09-12",
+   "ts_utc": 1568291400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for August 2019"
+  },
+  {
+   "date": "2019-10-10",
+   "ts_utc": 1570710600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for September 2019"
+  },
+  {
+   "date": "2019-11-13",
+   "ts_utc": 1573651800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for October 2019"
+  },
+  {
+   "date": "2019-12-11",
+   "ts_utc": 1576071000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for November 2019"
+  },
+  {
+   "date": "2020-01-14",
+   "ts_utc": 1579008600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for December 2019"
+  },
+  {
+   "date": "2020-02-13",
+   "ts_utc": 1581600600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for January 2020"
+  },
+  {
+   "date": "2020-03-11",
+   "ts_utc": 1583929800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for February 2020"
+  },
+  {
+   "date": "2020-04-10",
+   "ts_utc": 1586521800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for March 2020"
+  },
+  {
+   "date": "2020-05-12",
+   "ts_utc": 1589286600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for April 2020"
+  },
+  {
+   "date": "2020-06-10",
+   "ts_utc": 1591792200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for May 2020"
+  },
+  {
+   "date": "2020-07-14",
+   "ts_utc": 1594729800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for June 2020"
+  },
+  {
+   "date": "2020-08-12",
+   "ts_utc": 1597235400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for July 2020"
+  },
+  {
+   "date": "2020-09-11",
+   "ts_utc": 1599827400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for August 2020"
+  },
+  {
+   "date": "2020-10-13",
+   "ts_utc": 1602592200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for September 2020"
+  },
+  {
+   "date": "2020-11-12",
+   "ts_utc": 1605187800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for October 2020"
+  },
+  {
+   "date": "2020-12-10",
+   "ts_utc": 1607607000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for November 2020"
+  },
+  {
+   "date": "2021-01-13",
+   "ts_utc": 1610544600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for December 2020"
+  },
+  {
+   "date": "2021-02-10",
+   "ts_utc": 1612963800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for January 2021"
+  },
+  {
+   "date": "2021-03-10",
+   "ts_utc": 1615383000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for February 2021"
+  },
+  {
+   "date": "2021-04-13",
+   "ts_utc": 1618317000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for March 2021"
+  },
+  {
+   "date": "2021-05-12",
+   "ts_utc": 1620822600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for April 2021"
+  },
+  {
+   "date": "2021-06-10",
+   "ts_utc": 1623328200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for May 2021"
+  },
+  {
+   "date": "2021-07-13",
+   "ts_utc": 1626179400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for June 2021"
+  },
+  {
+   "date": "2021-08-11",
+   "ts_utc": 1628685000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for July 2021"
+  },
+  {
+   "date": "2021-09-14",
+   "ts_utc": 1631622600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for August 2021"
+  },
+  {
+   "date": "2021-10-13",
+   "ts_utc": 1634128200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for September 2021"
+  },
+  {
+   "date": "2021-11-10",
+   "ts_utc": 1636551000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for October 2021"
+  },
+  {
+   "date": "2021-12-10",
+   "ts_utc": 1639143000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for November 2021"
+  },
+  {
+   "date": "2022-01-12",
+   "ts_utc": 1641994200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for December 2021"
+  },
+  {
+   "date": "2022-02-10",
+   "ts_utc": 1644499800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for January 2022"
+  },
+  {
+   "date": "2022-03-10",
+   "ts_utc": 1646919000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for February 2022"
+  },
+  {
+   "date": "2022-04-12",
+   "ts_utc": 1649766600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for March 2022"
+  },
+  {
+   "date": "2022-05-11",
+   "ts_utc": 1652272200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for April 2022"
+  },
+  {
+   "date": "2022-06-10",
+   "ts_utc": 1654864200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for May 2022"
+  },
+  {
+   "date": "2022-07-13",
+   "ts_utc": 1657715400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for June 2022"
+  },
+  {
+   "date": "2022-08-10",
+   "ts_utc": 1660134600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for July 2022"
+  },
+  {
+   "date": "2022-09-13",
+   "ts_utc": 1663072200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for August 2022"
+  },
+  {
+   "date": "2022-10-13",
+   "ts_utc": 1665664200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for September 2022"
+  },
+  {
+   "date": "2022-11-10",
+   "ts_utc": 1668087000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for October 2022"
+  },
+  {
+   "date": "2022-12-13",
+   "ts_utc": 1670938200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for November 2022"
+  },
+  {
+   "date": "2023-01-12",
+   "ts_utc": 1673530200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for December 2022"
+  },
+  {
+   "date": "2023-02-14",
+   "ts_utc": 1676381400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for January 2023"
+  },
+  {
+   "date": "2023-03-14",
+   "ts_utc": 1678797000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for February 2023"
+  },
+  {
+   "date": "2023-04-12",
+   "ts_utc": 1681302600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for March 2023"
+  },
+  {
+   "date": "2023-05-10",
+   "ts_utc": 1683721800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for April 2023"
+  },
+  {
+   "date": "2023-06-13",
+   "ts_utc": 1686659400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for May 2023"
+  },
+  {
+   "date": "2023-07-12",
+   "ts_utc": 1689165000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for June 2023"
+  },
+  {
+   "date": "2023-08-10",
+   "ts_utc": 1691670600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for July 2023"
+  },
+  {
+   "date": "2023-09-13",
+   "ts_utc": 1694608200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for August 2023"
+  },
+  {
+   "date": "2023-10-12",
+   "ts_utc": 1697113800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for September 2023"
+  },
+  {
+   "date": "2023-11-14",
+   "ts_utc": 1699968600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for October 2023"
+  },
+  {
+   "date": "2023-12-12",
+   "ts_utc": 1702387800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for November 2023"
+  },
+  {
+   "date": "2024-01-11",
+   "ts_utc": 1704979800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for December 2023"
+  },
+  {
+   "date": "2024-02-13",
+   "ts_utc": 1707831000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for January 2024"
+  },
+  {
+   "date": "2024-03-12",
+   "ts_utc": 1710246600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for February 2024"
+  },
+  {
+   "date": "2024-04-10",
+   "ts_utc": 1712752200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for March 2024"
+  },
+  {
+   "date": "2024-05-15",
+   "ts_utc": 1715776200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for April 2024"
+  },
+  {
+   "date": "2024-06-12",
+   "ts_utc": 1718195400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for May 2024"
+  },
+  {
+   "date": "2024-07-11",
+   "ts_utc": 1720701000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for June 2024"
+  },
+  {
+   "date": "2024-08-14",
+   "ts_utc": 1723638600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for July 2024"
+  },
+  {
+   "date": "2024-09-11",
+   "ts_utc": 1726057800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for August 2024"
+  },
+  {
+   "date": "2024-10-10",
+   "ts_utc": 1728563400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for September 2024"
+  },
+  {
+   "date": "2024-11-13",
+   "ts_utc": 1731504600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for October 2024"
+  },
+  {
+   "date": "2024-12-11",
+   "ts_utc": 1733923800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for November 2024"
+  },
+  {
+   "date": "2025-01-15",
+   "ts_utc": 1736947800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for December 2024"
+  },
+  {
+   "date": "2025-02-12",
+   "ts_utc": 1739367000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for January 2025"
+  },
+  {
+   "date": "2025-03-12",
+   "ts_utc": 1741782600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for February 2025"
+  },
+  {
+   "date": "2025-04-10",
+   "ts_utc": 1744288200000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for March 2025"
+  },
+  {
+   "date": "2025-05-13",
+   "ts_utc": 1747139400000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for April 2025"
+  },
+  {
+   "date": "2025-06-11",
+   "ts_utc": 1749645000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for May 2025"
+  },
+  {
+   "date": "2025-07-15",
+   "ts_utc": 1752582600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for June 2025"
+  },
+  {
+   "date": "2025-08-12",
+   "ts_utc": 1755001800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for July 2025"
+  },
+  {
+   "date": "2025-09-11",
+   "ts_utc": 1757593800000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule)",
+   "covers": "Consumer Price Index for August 2025"
+  },
+  {
+   "date": "2025-10-24",
+   "ts_utc": 1761309000000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule) | \uc167\ub2e4\uc6b4 \uc9c0\uc5f0: 9\uc6d4 CPI \uc2e4\ubc1c\ud45c 2025-10-24 (\uc6f9 \ub2e4\uc911 \ucd9c\ucc98 \uc2e4\uce21)",
+   "covers": "Consumer Price Index for September 2025"
+  },
+  {
+   "date": "2025-12-18",
+   "ts_utc": 1766064600000,
+   "src": "github abusadat/CPI-release-dates (BLS schedule) | \uc167\ub2e4\uc6b4 \ud6c4 \uc218\uc815 \uc77c\uc815: 11\uc6d4 CPI \uc2e4\ubc1c\ud45c 2025-12-18 08:30 ET (\uc6f9 \ub2e4\uc911 \ucd9c\ucc98 \uc2e4\uce21)",
+   "covers": "Consumer Price Index for November 2025"
+  },
+  {
+   "date": "2026-01-13",
+   "ts_utc": 1768311000000,
+   "src": "FRED release calendar (\uc6f9 \uc2e4\uce21)",
+   "covers": "December 2025"
+  },
+  {
+   "date": "2026-02-13",
+   "ts_utc": 1770989400000,
+   "src": "FRED release calendar (\uc6f9 \uc2e4\uce21)",
+   "covers": "January 2026"
+  },
+  {
+   "date": "2026-03-11",
+   "ts_utc": 1773232200000,
+   "src": "FRED release calendar (\uc6f9 \uc2e4\uce21)",
+   "covers": "February 2026"
+  },
+  {
+   "date": "2026-04-10",
+   "ts_utc": 1775824200000,
+   "src": "FRED release calendar (\uc6f9 \uc2e4\uce21)",
+   "covers": "March 2026"
+  }
+ ],
+ "quality": {
+  "fomc_n": 46,
+  "fomc_years": [
+   "2021",
+   "2022",
+   "2023",
+   "2024",
+   "2025",
+   "2026"
+  ],
+  "cpi_n": 195,
+  "cpi_range": [
+   "2010-01-15",
+   "2026-04-10"
+  ],
+  "schedule_overrides": [
+   {
+    "old": "2025-10-15",
+    "new": "2025-10-24",
+    "why": "\uc167\ub2e4\uc6b4 \uc9c0\uc5f0: 9\uc6d4 CPI \uc2e4\ubc1c\ud45c 2025-10-24 (\uc6f9 \ub2e4\uc911 \ucd9c\ucc98 \uc2e4\uce21)"
+   },
+   {
+    "old": "2025-12-10",
+    "new": "2025-12-18",
+    "why": "\uc167\ub2e4\uc6b4 \ud6c4 \uc218\uc815 \uc77c\uc815: 11\uc6d4 CPI \uc2e4\ubc1c\ud45c 2025-12-18 08:30 ET (\uc6f9 \ub2e4\uc911 \ucd9c\ucc98 \uc2e4\uce21)"
+   }
+  ],
+  "dropped": [
+   {
+    "date": "2025-11-13",
+    "why": "10\uc6d4 CPI \ubbf8\ubc1c\ud45c(\uc167\ub2e4\uc6b4 \uc218\uc9d1 \uc911\ub2e8, 11-18\uc77c \ubcf4\ub3c4 \uc2e4\uce21) \u2014 \uc81c\uc678"
+   }
+  ],
+  "note": "\ubaa8\ub4e0 \uc2dc\uac01 ET\u2192UTC zoneinfo \ubcc0\ud658(\uc11c\uba38\ud0c0\uc784 \uc790\ub3d9). \uac80\uc99d \ubd88\uac00 \ub0a0\uc9dc \ubc30\uc81c \uc6d0\uce59 \uc801\uc6a9"
+ }
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://quantpedia.com",
+    "name": "Can Google Trends Sentiment Be Useful as a Predictor for",
+    "snippet": "Apr 17, 2024 — This blog post delves into the intricacies of using Google Trends as a sentiment predictor , exploring its potential to forecast Bitcoin prices ... Read more\nNov 13, 2025 — Our goal is to design a trend-following strategy for Bitcoin using hourly (1H) price data. Trend-following models are well suited for volatile ... Read more\nSep 3, 2024 — We developed the GSI from Google Trends to measure public interest in geopolitical issues because it provides free real-time data and is simple ... Read more",
+    "host_name": "quantpedia.com",
+    "rank": 0,
+    "date": "Apr 17, 2024",
+    "favicon": ""
+  },
+  {
+    "url": "https://quantpedia.com/cryptocurrency-trading-research",
+    "name": "Cryptocurrency Trading Research",
+    "snippet": "The trend-following and mean-reversion strategies are some of the most favored in quantitative finance. This study examines how Bitcoin's price is affected by ... Read more",
+    "host_name": "quantpedia.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://trends.google.com/trends/explore?date=today%205-y&q=bitcoin",
+    "name": "Bitcoin Google Trends",
+    "snippet": "No information is available for this page. Learn why",
+    "host_name": "trends.google.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://vvv.quantpedia.com/tag/momentum/page",
+    "name": "momentum – Page 8",
+    "snippet": "One such method involves leveraging Google Trends data to gauge public interest and sentiment towards Bitcoin. This approach assumes that search volume on ... Read more",
+    "host_name": "vvv.quantpedia.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://open.spotify.com/show",
+    "name": "Quantpedia Explains (Trading Strategies)",
+    "snippet": "This video will discuss Geopolitical Sentiment Index Trading Strategy, introduced by the CEO of Quantpedia .com, Radovan Vojtko. Read more",
+    "host_name": "open.spotify.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.researchgate.net",
+    "name": "Bitcoin Investment Strategies Based on Google Trends and",
+    "snippet": "Mar 3, 2026 — Given that the price is linked to expectations, we propose, in this paper, to predict the trend of bitcoin using Google Trends as an explanatory ... Read more",
+    "host_name": "www.researchgate.net",
+    "rank": 5,
+    "date": "Mar 3, 2026",
+    "favicon": ""
+  }
+]

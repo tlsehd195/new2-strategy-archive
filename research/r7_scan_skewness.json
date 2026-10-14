@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://www.merriam-webster.com",
+    "name": "EFFECT Definition & Meaning",
+    "snippet": "5 days ago — The meaning of EFFECT is an event, condition, or state of affairs that is produced by a cause : result, outcome.",
+    "host_name": "www.merriam-webster.com",
+    "rank": 0,
+    "date": "Oct 8, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://svelte.dev",
+    "name": "$effect • Svelte Docs",
+    "snippet": "An effect only depends on the values that it read the last time it ran. This has interesting implications for effects that have conditional code. For ... Read more",
+    "host_name": "svelte.dev",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.nationaltheatre.org.uk",
+    "name": "The Effect",
+    "snippet": "As two young volunteers in a clinical drug trial, their illicit romance poses startling dilemmas for the supervising doctors. Lucy Prebble's (Succession) ... Read more",
+    "host_name": "www.nationaltheatre.org.uk",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://pubmed.ncbi.nlm.nih.gov",
+    "name": "Survival effect of maximal cytoreductive surgery for",
+    "snippet": "by RE Bristow · 2002 · Cited by 3396 — Purpose: To evaluate the relative effect of percent maximal cytoreductive surgery and other prognostic variables on survival among cohorts of patients with ... Read more",
+    "host_name": "pubmed.ncbi.nlm.nih.gov",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://docs.aws.amazon.com",
+    "name": "IAM JSON policy elements: Effect",
+    "snippet": "Sep 25, 2026 — Describes the Effect element of the IAM JSON policy language. To allow access to a resource, you must set the Effect element to Allow .",
+    "host_name": "docs.aws.amazon.com",
+    "rank": 4,
+    "date": "Sep 25, 2026",
+    "favicon": ""
+  }
+]

@@ -1,0 +1,995 @@
+{
+ "files": [
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2021-04",
+   "bytes": 133445
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2021-04",
+   "bytes": 963
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2021-05",
+   "bytes": 139940
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2021-05",
+   "bytes": 930
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2021-06",
+   "bytes": 132459
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2021-06",
+   "bytes": 746
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2021-07",
+   "bytes": 134314
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2021-07",
+   "bytes": 781
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2021-08",
+   "bytes": 136310
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2021-08",
+   "bytes": 869
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2021-09",
+   "bytes": 132822
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2021-09",
+   "bytes": 791
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2021-10",
+   "bytes": 135831
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2021-10",
+   "bytes": 923
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2021-11",
+   "bytes": 131150
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2021-11",
+   "bytes": 857
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2021-12",
+   "bytes": 135529
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2021-12",
+   "bytes": 746
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2022-01",
+   "bytes": 138115
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2022-01",
+   "bytes": 799
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2022-02",
+   "bytes": 121692
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2022-02",
+   "bytes": 854
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2022-03",
+   "bytes": 132397
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2022-03",
+   "bytes": 770
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2022-04",
+   "bytes": 126847
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2022-04",
+   "bytes": 797
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2022-05",
+   "bytes": 131016
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2022-05",
+   "bytes": 999
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2022-06",
+   "bytes": 129237
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2022-06",
+   "bytes": 967
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2022-07",
+   "bytes": 129936
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2022-07",
+   "bytes": 828
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2022-08",
+   "bytes": 129694
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2022-08",
+   "bytes": 903
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2022-09",
+   "bytes": 126564
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2022-09",
+   "bytes": 924
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2024-11",
+   "bytes": 130101
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2024-11",
+   "bytes": 803
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2024-12",
+   "bytes": 138947
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2024-12",
+   "bytes": 815
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2025-01",
+   "bytes": 136451
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2025-01",
+   "bytes": 765
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2025-02",
+   "bytes": 122291
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2025-02",
+   "bytes": 852
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2025-03",
+   "bytes": 134260
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2025-03",
+   "bytes": 896
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2025-04",
+   "bytes": 128460
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2025-04",
+   "bytes": 832
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2025-05",
+   "bytes": 133502
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2025-05",
+   "bytes": 891
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2025-06",
+   "bytes": 127488
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2025-06",
+   "bytes": 953
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2025-07",
+   "bytes": 134073
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2025-07",
+   "bytes": 791
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2025-08",
+   "bytes": 137597
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2025-08",
+   "bytes": 865
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2025-09",
+   "bytes": 130317
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2025-09",
+   "bytes": 819
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2025-10",
+   "bytes": 135236
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2025-10",
+   "bytes": 905
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2025-11",
+   "bytes": 129233
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2025-11",
+   "bytes": 896
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2025-12",
+   "bytes": 130320
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2025-12",
+   "bytes": 942
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2026-01",
+   "bytes": 129456
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2026-01",
+   "bytes": 922
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2026-02",
+   "bytes": 116778
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2026-02",
+   "bytes": 914
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2026-03",
+   "bytes": 127348
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2026-03",
+   "bytes": 961
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2026-04",
+   "bytes": 121678
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2026-04",
+   "bytes": 928
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2026-05",
+   "bytes": 126947
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2026-05",
+   "bytes": 933
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2026-06",
+   "bytes": 122328
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2026-06",
+   "bytes": 964
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2026-07",
+   "bytes": 124400
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2026-07",
+   "bytes": 911
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2026-08",
+   "bytes": 127458
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2026-08",
+   "bytes": 857
+  },
+  {
+   "kind": "kline",
+   "sym": "LINKUSDT",
+   "ym": "2026-09",
+   "bytes": 127452
+  },
+  {
+   "kind": "funding",
+   "sym": "LINKUSDT",
+   "ym": "2026-09",
+   "bytes": 862
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2021-04",
+   "bytes": 133918
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2021-04",
+   "bytes": 948
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2021-05",
+   "bytes": 138995
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2021-05",
+   "bytes": 948
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2021-06",
+   "bytes": 128067
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2021-06",
+   "bytes": 827
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2021-07",
+   "bytes": 128777
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2021-07",
+   "bytes": 911
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2021-08",
+   "bytes": 133966
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2021-08",
+   "bytes": 895
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2021-09",
+   "bytes": 129341
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2021-09",
+   "bytes": 837
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2021-10",
+   "bytes": 129150
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2021-10",
+   "bytes": 953
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2021-11",
+   "bytes": 125743
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2021-11",
+   "bytes": 891
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2021-12",
+   "bytes": 129767
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2021-12",
+   "bytes": 847
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2022-01",
+   "bytes": 130811
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2022-01",
+   "bytes": 904
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2022-02",
+   "bytes": 117203
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2022-02",
+   "bytes": 915
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2022-03",
+   "bytes": 128274
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2022-03",
+   "bytes": 927
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2022-04",
+   "bytes": 123100
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2022-04",
+   "bytes": 898
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2022-05",
+   "bytes": 129073
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2022-05",
+   "bytes": 1016
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2022-06",
+   "bytes": 125633
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2022-06",
+   "bytes": 983
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2022-07",
+   "bytes": 126469
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2022-07",
+   "bytes": 922
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2022-08",
+   "bytes": 125379
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2022-08",
+   "bytes": 954
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2022-09",
+   "bytes": 121430
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2022-09",
+   "bytes": 972
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2024-11",
+   "bytes": 126997
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2024-11",
+   "bytes": 787
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2024-12",
+   "bytes": 131096
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2024-12",
+   "bytes": 829
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2025-01",
+   "bytes": 130434
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2025-01",
+   "bytes": 697
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2025-02",
+   "bytes": 117114
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2025-02",
+   "bytes": 871
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2025-03",
+   "bytes": 130207
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2025-03",
+   "bytes": 924
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2025-04",
+   "bytes": 123302
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2025-04",
+   "bytes": 896
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2025-05",
+   "bytes": 128193
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2025-05",
+   "bytes": 905
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2025-06",
+   "bytes": 121731
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2025-06",
+   "bytes": 906
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2025-07",
+   "bytes": 128990
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2025-07",
+   "bytes": 784
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2025-08",
+   "bytes": 129662
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2025-08",
+   "bytes": 858
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2025-09",
+   "bytes": 122635
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2025-09",
+   "bytes": 808
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2025-10",
+   "bytes": 127028
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2025-10",
+   "bytes": 913
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2025-11",
+   "bytes": 121500
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2025-11",
+   "bytes": 932
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2025-12",
+   "bytes": 123511
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2025-12",
+   "bytes": 954
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2026-01",
+   "bytes": 123394
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2026-01",
+   "bytes": 930
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2026-02",
+   "bytes": 111286
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2026-02",
+   "bytes": 946
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2026-03",
+   "bytes": 121479
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2026-03",
+   "bytes": 974
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2026-04",
+   "bytes": 116085
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2026-04",
+   "bytes": 896
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2026-05",
+   "bytes": 119028
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2026-05",
+   "bytes": 941
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2026-06",
+   "bytes": 117144
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2026-06",
+   "bytes": 987
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2026-07",
+   "bytes": 119122
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2026-07",
+   "bytes": 897
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2026-08",
+   "bytes": 120114
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2026-08",
+   "bytes": 869
+  },
+  {
+   "kind": "kline",
+   "sym": "ADAUSDT",
+   "ym": "2026-09",
+   "bytes": 118385
+  },
+  {
+   "kind": "funding",
+   "sym": "ADAUSDT",
+   "ym": "2026-09",
+   "bytes": 837
+  }
+ ],
+ "failed": [],
+ "ts_fix": {
+  "LINKUSDT-2021-04": "1617235200000",
+  "LINKUSDT-2026-08": "1785542400000",
+  "ADAUSDT-2021-04": "1617235200000",
+  "ADAUSDT-2026-08": "1785542400000"
+ }
+}

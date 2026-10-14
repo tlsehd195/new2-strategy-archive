@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://coinmarketcap.com/charts",
+    "name": "CMC Crypto Fear and Greed Index",
+    "snippet": "If the index shows extreme greed , it might be a signal to consider selling assets, while extreme fear could indicate a buying opportunity.",
+    "host_name": "coinmarketcap.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://finance.yahoo.com/markets/crypto/articles",
+    "name": "Why I'm Watching the Crypto Fear and Greed Index for My",
+    "snippet": "Jun 18, 2026 — Anything below 25 represents \"extreme fear \" while values above 75 indicate \"extreme greed .\" The best buying opportunities usually feel terrible, ... Read more",
+    "host_name": "finance.yahoo.com",
+    "rank": 1,
+    "date": "Jun 18, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://link.springer.com/Digital%20Finance",
+    "name": "Fear, greed and bitcoin return distributions - Springer Nature",
+    "snippet": "by A Szeberényi · 2026 — Crypto Fear and Greed Index is often treated as a simple trading signal , although it may be more relevant for identifying market states and ...",
+    "host_name": "link.springer.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.binance.com/square",
+    "name": "Crypto Fear & Greed Index | Bitcoin Sentiment",
+    "snippet": "The index ranges from 0 (Extreme Fear ) to 100 (Extreme Greed ), reflecting crypto market sentiment. A low value signals over-selling, while a high value warns ...",
+    "host_name": "www.binance.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://changelly.com/blog/fear-and-greed-index",
+    "name": "What Is the Crypto Fear and Greed Index?",
+    "snippet": "Jun 12, 2026 — The crypto Fear and Greed Index is a sentiment indicator that tracks crypto market sentiment on a 0–100 scale . Lower values point to fear, ...",
+    "host_name": "changelly.com",
+    "rank": 4,
+    "date": "Jun 12, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.cnn.com/markets/fear-and-greed",
+    "name": "Fear and Greed Index - Investor Sentiment",
+    "snippet": "The Fear & Greed Index uses slowing momentum as a signal for Fear and a growing momentum for Greed. Read more",
+    "host_name": "www.cnn.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.thinkmarkets.com/trading-academy",
+    "name": "Fear and greed index: How to trade the fear-greed indicator",
+    "snippet": "Mar 3, 2026 — Extreme fear can signal a buying opportunity ; extreme greed can signal an overheated market; Contrarian traders use the index to trade against ... Read more",
+    "host_name": "www.thinkmarkets.com",
+    "rank": 6,
+    "date": "Mar 3, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://cfgi.io",
+    "name": "Fear and Greed Index: Live Crypto & Stock Sentiment | CFGI",
+    "snippet": "The Fear and Greed Index is a simple way to read market emotion. It scores sentiment from 0 to 100, where low readings show fear , high readings show greed, and ... Read more",
+    "host_name": "cfgi.io",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

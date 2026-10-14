@@ -1,0 +1,24 @@
+{
+  "errors": {
+    "BTCUSDT_daily_2026-10-12": "<HTTPError 404: 'Not Found'>",
+    "ETHUSDT_daily_2026-10-12": "<HTTPError 404: 'Not Found'>"
+  },
+  "BTCUSDT": {
+    "rows": 2020,
+    "span": [
+      "2021-04-01",
+      "2026-10-11"
+    ],
+    "gap_jumps": 0,
+    "fetch_errs": 1
+  },
+  "ETHUSDT": {
+    "rows": 2020,
+    "span": [
+      "2021-04-01",
+      "2026-10-11"
+    ],
+    "gap_jumps": 0,
+    "fetch_errs": 1
+  }
+}

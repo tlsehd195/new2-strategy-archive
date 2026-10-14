@@ -1,0 +1,139 @@
+{
+ "prereg": "PREREG_combo_stress_bounce_2026-10-14.md",
+ "type": "C-COMBO \ud1b5\ud569 \ud480 \uc9c4\ub2e8 (Phase A \u2014 \uc7a5\ubd80 \ubb34\uc218\uc815)",
+ "span": "2024-12-10~2026-04-20",
+ "cut_rule": "s+0.6*(e-s)",
+ "quality": {
+  "eth_bars_total": 167424,
+  "eth_bars_in_span": 47616,
+  "eth_expected_bars": 47616,
+  "span_contiguous": true,
+  "fng_days": 3172
+ },
+ "components": {
+  "C-A": {
+   "raw_n_by_cfg": {
+    "ES_L24": 1138,
+    "ES_L120": 1070,
+    "NQ_L24": 1231,
+    "NQ_L120": 1120
+   },
+   "repro_check": {
+    "ES_L24": {
+     "n": 1138,
+     "total_bp": 54.25879079099263
+    },
+    "ES_L120": {
+     "n": 1070,
+     "total_bp": 47.84752875725286
+    },
+    "NQ_L24": {
+     "n": 1231,
+     "total_bp": 36.13323188752897
+    },
+    "NQ_L120": {
+     "n": 1120,
+     "total_bp": 34.76105450733883
+    }
+   },
+   "union_n": 2469,
+   "repro_ok": true
+  },
+  "C-B": {
+   "n": 177,
+   "dropped_gap": 0,
+   "total_bp": 74.77705427485822,
+   "repro_ok": true
+  }
+ },
+ "arms": {
+  "taker": {
+   "C-A": {
+    "n": 2469,
+    "valid_n": 51.4375,
+    "total_bp": 32.48153386548942,
+    "net16": 16.481533865489418,
+    "t": 0.38308865337858883,
+    "p": 0.7032639055845841
+   },
+   "C-B": {
+    "n": 177,
+    "valid_n": 59.0,
+    "total_bp": 74.77705427485822,
+    "net16": 58.777054274858216,
+    "t": 0.7557562337639364,
+    "p": 0.45285386979683595
+   },
+   "rho_hat": 0.23752221368732657,
+   "rho_match_days": 100,
+   "rho_note": "empirical(\ud558\ud55c 0 \uc808\ub2e8)",
+   "z_pool": 0.7238908328404725,
+   "p_pool_one_sided": 0.23534578195775818,
+   "pooled_net16_bp": 19.31082604706851,
+   "p_holm": 0.47069156391551636,
+   "p_random_ctrl": 0.0,
+   "seg6040": {
+    "first60": {
+     "pooled_net16_bp": 15.20031143084913,
+     "n_ca": 1302,
+     "n_cb": 42
+    },
+    "last40": {
+     "pooled_net16_bp": 23.553937908972383,
+     "n_ca": 1167,
+     "n_cb": 135
+    }
+   },
+   "oos_new_window": {
+    "segs": [
+     "2026-04-21~2026-04-27",
+     "2026-09-01~2026-10-12"
+    ],
+    "n_ca": 163,
+    "n_cb": 1,
+    "valid_n": 3.729166666666667,
+    "pooled_net16_bp": 47.573996693410095,
+    "verdict": "PASS(\ubc29\ud5a5 \uc591\uc218)"
+   }
+  },
+  "maker": {
+   "spec": "N2 \u03b4=0bp K=16\ubd09, maker 2bp \uc9c4\uc785 + taker \uc5d4\uc9c4 1\uba74 \uccad\uc0b0, promotion-basis",
+   "C-A": {
+    "n_events": 2469,
+    "n_filled": 2456,
+    "n_fc_drop": 0,
+    "fill_rate": 0.9947347104090725,
+    "promo_net_bp": 12.09089329952278,
+    "mean_net_filled_bp": 12.154892327574,
+    "valid_n_filled": 51.166666666666664,
+    "t": 0.28218134484094143,
+    "p": 0.7789653746618403
+   },
+   "C-B": {
+    "n_events": 177,
+    "n_filled": 177,
+    "n_fc_drop": 0,
+    "fill_rate": 1.0,
+    "promo_net_bp": 53.28607471905754,
+    "mean_net_filled_bp": 53.28607471905754,
+    "valid_n_filled": 59.0,
+    "t": 0.6849135992889066,
+    "p": 0.49612656860199633
+   },
+   "rho_hat": 0.11889873240813449,
+   "rho_match_days": 100,
+   "rho_note": "empirical(\ud558\ud55c 0 \uc808\ub2e8)",
+   "z_pool": 0.6464854040570108,
+   "p_pool_one_sided": 0.259667215798553,
+   "pooled_promo_bp": 14.919882560499403,
+   "p_holm": 0.47069156391551636
+  }
+ },
+ "gates": {
+  "G-C1 \uc720\uc758\uc131+\uacbd\uc81c\uc131": "FAIL (arm=None)",
+  "G-C2 \uc5d4\uc9c4": "combo_engine_crosscheck.py \ucc38\uc870",
+  "G-C3 60/40": "PASS (first60=15.2bp, last40=23.55bp)",
+  "G-C4 \uc2e0\uaddc\uad6c\uac04": "PASS(\ubc29\ud5a5 \uc591\uc218)",
+  "\ucd5c\uc885": "CONDITIONAL_CANDIDATE \uc694\uac74: G-C1~G-C4 \uc804 \ud1b5\uacfc + \uc5d4\uc9c4 \uc591\uc218 \u2014 \uadf8 \uc678 FAIL/\ub300\uae30"
+ }
+}

@@ -1,0 +1,65 @@
+[
+  {
+    "url": "https://ethereum.org",
+    "name": "Ethereum - The complete guide from ethereum.org",
+    "snippet": "Ethereum is a decentralized platform for resilient apps and infrastructure. Control your money, data, and identity, with no bank or middleman needed.",
+    "host_name": "ethereum.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://en.wikipedia.org/wiki/Ethereum",
+    "name": "Ethereum",
+    "snippet": "Ethereum is a decentralized blockchain. Among cryptocurrencies, ether is second only to bitcoin in market capitalization. borrowing against cryptocurrency ...",
+    "host_name": "en.wikipedia.org",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://coinmarketcap.com/Cryptocurrency",
+    "name": "Ethereum price today, ETH to USD live price, marketcap",
+    "snippet": "The live Ethereum price today is $2541.62 USD with a 24-hour trading volume of $8192486834.87 USD. We update our ETH to USD price in real-time.",
+    "host_name": "coinmarketcap.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://finance.yahoo.com/markets/crypto/articles",
+    "name": "Ethereum Will Hit $6000 as CLARITY Act 'Supercharges'",
+    "snippet": "Aug 31, 2026 — Key Takeaways. Tom Lee said Ethereum could reach $6,000 if Bitcoin climbs to $150,000 and the ETH / BTC ratio rises to 0.04. Read more",
+    "host_name": "finance.yahoo.com",
+    "rank": 3,
+    "date": "Aug 31, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://entethalliance.org",
+    "name": "Enterprise Ethereum Alliance | Institutional Ethereum",
+    "snippet": "The Enterprise Ethereum Alliance (EEA) is the member-led nonprofit connecting institutions to Ethereum through intelligence, practitioners, open standards ...",
+    "host_name": "entethalliance.org",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.investopedia.com",
+    "name": "Ethereum - Blockchain, Smart Contracts, and Its Future",
+    "snippet": "Ethereum is a decentralized blockchain platform that enables the creation and execution of smart contracts and decentralized applications (dApps) using its ... Read more",
+    "host_name": "www.investopedia.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://ethereum-magicians.org/EIPs/EIPs%20core",
+    "name": "EIP-8363: Tapered Issuance Burn",
+    "snippet": "Aug 4, 2026 — Discussion topic for EIP-8363: Tapered Issuance Burn. This EIP implements a modification to the ETH issuance curve by way of a partial burn ... Read more",
+    "host_name": "ethereum-magicians.org",
+    "rank": 6,
+    "date": "Aug 4, 2026",
+    "favicon": ""
+  }
+]

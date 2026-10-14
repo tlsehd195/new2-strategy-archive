@@ -1,0 +1,25 @@
+{
+ "endpoint": "https://www.deribit.com/api/v2/public/get_volatility_index_data?currency={cur}&start_timestamp={s}&end_timestamp={e}&resolution=1D",
+ "resolution": "1D",
+ "end_ms": 1791763200000,
+ "currencies": {
+  "BTC": {
+   "rows": 2029,
+   "first": "2021-03-24",
+   "last": "2026-10-12",
+   "gaps": [],
+   "http_200": 69,
+   "http_other": [],
+   "csv": "/home/z/my-project/NEW2_run/data/dvol/c9_dvol_BTC_1d.csv"
+  },
+  "ETH": {
+   "rows": 2029,
+   "first": "2021-03-24",
+   "last": "2026-10-12",
+   "gaps": [],
+   "http_200": 69,
+   "http_other": [],
+   "csv": "/home/z/my-project/NEW2_run/data/dvol/c9_dvol_ETH_1d.csv"
+  }
+ }
+}

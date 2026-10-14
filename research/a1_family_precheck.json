@@ -1,0 +1,91 @@
+{
+  "date": "2026-10-13",
+  "principle": "A1 Amihud illiquidity |r|/qv (Amihud 2002, Lou 2016)",
+  "rule": "|rho|>=0.8 vs any family -> redundant DISCARD; else proceed to PREREG+measure",
+  "results": [
+    {
+      "symbol": "BTCUSDT",
+      "span": 0,
+      "window": "2021-05-02~2022-08-17",
+      "n": 45312,
+      "illiq_vs_rv": {
+        "pearson": 0.084,
+        "spearman": 0.0708,
+        "n": 43389
+      },
+      "illiq_vs_flow": {
+        "pearson": 0.0084,
+        "spearman": 0.0116,
+        "n": 43389
+      },
+      "illiq_vs_funding": {
+        "pearson": -0.0097,
+        "spearman": 0.0074,
+        "n": 15644
+      }
+    },
+    {
+      "symbol": "BTCUSDT",
+      "span": 1,
+      "window": "2023-04-07~2024-03-18",
+      "n": 33216,
+      "illiq_vs_rv": {
+        "pearson": -0.0218,
+        "spearman": -0.0151,
+        "n": 32251
+      },
+      "illiq_vs_flow": {
+        "pearson": -0.0775,
+        "spearman": -0.0646,
+        "n": 32251
+      },
+      "illiq_vs_funding": {
+        "pearson": -0.0315,
+        "spearman": -0.0243,
+        "n": 32251
+      }
+    },
+    {
+      "symbol": "ETHUSDT",
+      "span": 0,
+      "window": "2021-05-02~2022-08-17",
+      "n": 45312,
+      "illiq_vs_rv": {
+        "pearson": 0.0807,
+        "spearman": 0.0642,
+        "n": 43389
+      },
+      "illiq_vs_flow": {
+        "pearson": 0.0176,
+        "spearman": 0.0183,
+        "n": 43389
+      },
+      "illiq_vs_funding": {
+        "pearson": -0.0401,
+        "spearman": -0.0257,
+        "n": 15644
+      }
+    },
+    {
+      "symbol": "ETHUSDT",
+      "span": 1,
+      "window": "2024-12-10~2026-04-20",
+      "n": 47616,
+      "illiq_vs_rv": {
+        "pearson": -0.0075,
+        "spearman": -0.0034,
+        "n": 47616
+      },
+      "illiq_vs_flow": {
+        "pearson": -0.0398,
+        "spearman": -0.0372,
+        "n": 47616
+      },
+      "illiq_vs_funding": {
+        "pearson": -0.031,
+        "spearman": -0.0391,
+        "n": 47616
+      }
+    }
+  ]
+}
