@@ -1,0 +1,169 @@
+{
+ "prereg": "PREREG_x13_universe_extreme_reversal_2026-10-13.md",
+ "version": 2,
+ "fetched_utc": "2026-10-13T05:01:02.064621+00:00",
+ "rule": {
+  "min_quote_volume_24h_usd_snapshot": 500000000,
+  "max_extra_coins": 8,
+  "baseline": [
+   "BTCUSDT",
+   "ETHUSDT"
+  ],
+  "exclude_tokenized_tradfi": [
+   "BZUSDT",
+   "CLUSDT",
+   "KORUUSDT",
+   "MUUSDT",
+   "SKHYNIXUSDT",
+   "SNDKUSDT",
+   "SOXLUSDT",
+   "SPCXUSDT",
+   "XAGUSDT",
+   "XAUUSDT"
+  ],
+  "monthly_qv_recheck_usd": 500000000,
+  "recheck_note": "\uce21\uc815 \ub2e8\uacc4\uc5d0\uc11c \ucd5c\uadfc \uc644\uc804\uc6d4 \uc77c\ud3c9\uade0 qv \u2265 $500M \uc7ac\ud655\uc778 \u2014 \ubbf8\ub2ec \uc2dc \ud0c8\ub77d \uae30\ub85d"
+ },
+ "v1_record": {
+  "fetched_utc": "2026-10-13T05:00:36.033136+00:00",
+  "selected_v1": [
+   "BTCUSDT",
+   "ETHUSDT",
+   "SOLUSDT",
+   "ZECUSDT",
+   "NEARUSDT",
+   "XRPUSDT",
+   "KORUUSDT",
+   "CLUSDT",
+   "HYPEUSDT",
+   "WUSDT"
+  ],
+  "note": "v1: $1B \ud50c\ub85c\uc5b4\u00b7\ud1a0\ud070\ud654 \uc790\uc0b0 \ud3ec\ud568 \uc0c1\ud0dc\uc758 1\ucc28 \uc2e4\ud589 \uc6d0\uae30\ub85d"
+ },
+ "n_usdt_perps_seen": 745,
+ "n_eligible_ge_500M_crypto": 11,
+ "eligible_ranked": [
+  {
+   "symbol": "BTCUSDT",
+   "quoteVolume24h_usd": 14384760046.61,
+   "lastPrice": 83375.1
+  },
+  {
+   "symbol": "ETHUSDT",
+   "quoteVolume24h_usd": 11557547071.89,
+   "lastPrice": 2514.69
+  },
+  {
+   "symbol": "SOLUSDT",
+   "quoteVolume24h_usd": 2633881700.419,
+   "lastPrice": 107.94
+  },
+  {
+   "symbol": "ZECUSDT",
+   "quoteVolume24h_usd": 2173819156.2,
+   "lastPrice": 1213.54
+  },
+  {
+   "symbol": "NEARUSDT",
+   "quoteVolume24h_usd": 1260790505.796,
+   "lastPrice": 5.325
+  },
+  {
+   "symbol": "XRPUSDT",
+   "quoteVolume24h_usd": 1057131055.8284,
+   "lastPrice": 1.3672
+  },
+  {
+   "symbol": "HYPEUSDT",
+   "quoteVolume24h_usd": 732701864.5622,
+   "lastPrice": 82.499
+  },
+  {
+   "symbol": "WUSDT",
+   "quoteVolume24h_usd": 589413858.609038,
+   "lastPrice": 0.019312
+  },
+  {
+   "symbol": "RSRUSDT",
+   "quoteVolume24h_usd": 573519404.061238,
+   "lastPrice": 0.002096
+  },
+  {
+   "symbol": "STRKUSDT",
+   "quoteVolume24h_usd": 559596060.057997,
+   "lastPrice": 0.08795
+  },
+  {
+   "symbol": "DOGEUSDT",
+   "quoteVolume24h_usd": 532931264.5631,
+   "lastPrice": 0.08451
+  }
+ ],
+ "excluded_tokenized_ge_500M": [
+  {
+   "symbol": "XAUUSDT",
+   "quoteVolume24h_usd": 1755749913.1,
+   "lastPrice": 4201.68
+  },
+  {
+   "symbol": "SNDKUSDT",
+   "quoteVolume24h_usd": 1755447893.6083,
+   "lastPrice": 1437.51
+  },
+  {
+   "symbol": "SOXLUSDT",
+   "quoteVolume24h_usd": 1637063589.8945,
+   "lastPrice": 121.96
+  },
+  {
+   "symbol": "SPCXUSDT",
+   "quoteVolume24h_usd": 1572544802.6023,
+   "lastPrice": 162.69
+  },
+  {
+   "symbol": "SKHYNIXUSDT",
+   "quoteVolume24h_usd": 1351448227.047,
+   "lastPrice": 1078.76
+  },
+  {
+   "symbol": "KORUUSDT",
+   "quoteVolume24h_usd": 867338752.5663,
+   "lastPrice": 13.52
+  },
+  {
+   "symbol": "CLUSDT",
+   "quoteVolume24h_usd": 797942056.0591,
+   "lastPrice": 91.98
+  },
+  {
+   "symbol": "MUUSDT",
+   "quoteVolume24h_usd": 577097606.5751,
+   "lastPrice": 960.38
+  },
+  {
+   "symbol": "XAGUSDT",
+   "quoteVolume24h_usd": 575698928.2434,
+   "lastPrice": 60.69
+  },
+  {
+   "symbol": "BZUSDT",
+   "quoteVolume24h_usd": 540654521.0362,
+   "lastPrice": 102.76
+  }
+ ],
+ "selected": [
+  "BTCUSDT",
+  "ETHUSDT",
+  "SOLUSDT",
+  "ZECUSDT",
+  "NEARUSDT",
+  "XRPUSDT",
+  "HYPEUSDT",
+  "WUSDT",
+  "RSRUSDT",
+  "STRKUSDT"
+ ],
+ "dropped_beyond_max8": [
+  "DOGEUSDT"
+ ]
+}

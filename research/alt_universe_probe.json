@@ -1,0 +1,365 @@
+{
+ "probe_time_utc": "2026-10-13T14:20Z",
+ "candidates": {
+  "BNBUSDT": {
+   "first": "2021-01",
+   "last": "2026-09",
+   "n_months": 69,
+   "n_months_2104_2604": 61
+  },
+  "SOLUSDT": {
+   "first": "2021-01",
+   "last": "2026-09",
+   "n_months": 69,
+   "n_months_2104_2604": 61
+  },
+  "XRPUSDT": {
+   "first": "2021-01",
+   "last": "2026-09",
+   "n_months": 69,
+   "n_months_2104_2604": 61
+  },
+  "DOGEUSDT": {
+   "first": "2021-01",
+   "last": "2026-09",
+   "n_months": 69,
+   "n_months_2104_2604": 61
+  },
+  "LINKUSDT": {
+   "first": "2021-01",
+   "last": "2026-09",
+   "n_months": 69,
+   "n_months_2104_2604": 61
+  },
+  "ADAUSDT": {
+   "first": "2021-01",
+   "last": "2026-09",
+   "n_months": 69,
+   "n_months_2104_2604": 61
+  },
+  "LTCUSDT": {
+   "first": "2021-01",
+   "last": "2026-09",
+   "n_months": 69,
+   "n_months_2104_2604": 61
+  },
+  "TRXUSDT": {
+   "first": "2021-01",
+   "last": "2026-09",
+   "n_months": 69,
+   "n_months_2104_2604": 61
+  },
+  "BCHUSDT": {
+   "first": "2021-01",
+   "last": "2026-09",
+   "n_months": 69,
+   "n_months_2104_2604": 61
+  },
+  "SUIUSDT": {
+   "first": "2023-05",
+   "last": "2026-09",
+   "n_months": 41,
+   "n_months_2104_2604": 36
+  },
+  "DOTUSDT": {
+   "first": "2021-01",
+   "last": "2026-09",
+   "n_months": 69,
+   "n_months_2104_2604": 61
+  },
+  "AVAXUSDT": {
+   "first": "2021-01",
+   "last": "2026-09",
+   "n_months": 69,
+   "n_months_2104_2604": 61
+  },
+  "TONUSDT": {
+   "first": "2024-03",
+   "last": "2026-09",
+   "n_months": 31,
+   "n_months_2104_2604": 26
+  }
+ },
+ "coingecko_mcap_top40": [
+  {
+   "symbol": "BTC",
+   "name": "Bitcoin",
+   "mcap_usd": 1682494731996,
+   "rank": 1,
+   "perp_vol": 32150642901
+  },
+  {
+   "symbol": "ETH",
+   "name": "Ethereum",
+   "mcap_usd": 307924671818,
+   "rank": 2,
+   "perp_vol": 15044571825
+  },
+  {
+   "symbol": "USDT",
+   "name": "Tether",
+   "mcap_usd": 184053577370,
+   "rank": 3,
+   "perp_vol": 62147541230
+  },
+  {
+   "symbol": "BNB",
+   "name": "BNB",
+   "mcap_usd": 99139833305,
+   "rank": 4,
+   "perp_vol": 802101964
+  },
+  {
+   "symbol": "XRP",
+   "name": "XRP",
+   "mcap_usd": 86818328066,
+   "rank": 5,
+   "perp_vol": 2224759869
+  },
+  {
+   "symbol": "USDC",
+   "name": "USDC",
+   "mcap_usd": 72677619463,
+   "rank": 6,
+   "perp_vol": 19003014587
+  },
+  {
+   "symbol": "SOL",
+   "name": "Solana",
+   "mcap_usd": 63584448061,
+   "rank": 7,
+   "perp_vol": 4267548069
+  },
+  {
+   "symbol": "TRX",
+   "name": "TRON",
+   "mcap_usd": 31138696776,
+   "rank": 8,
+   "perp_vol": 357942074
+  },
+  {
+   "symbol": "FIGR_HELOC",
+   "name": "Figure Heloc",
+   "mcap_usd": 25300086245,
+   "rank": 9,
+   "perp_vol": 29926527
+  },
+  {
+   "symbol": "ZEC",
+   "name": "Zcash",
+   "mcap_usd": 20562918548,
+   "rank": 10,
+   "perp_vol": 1090064215
+  },
+  {
+   "symbol": "HYPE",
+   "name": "Hyperliquid",
+   "mcap_usd": 18279738705,
+   "rank": 11,
+   "perp_vol": 860382088
+  },
+  {
+   "symbol": "DOGE",
+   "name": "Dogecoin",
+   "mcap_usd": 13263223788,
+   "rank": 12,
+   "perp_vol": 818531833
+  },
+  {
+   "symbol": "USDS",
+   "name": "USDS",
+   "mcap_usd": 10342107110,
+   "rank": 13,
+   "perp_vol": 78132436
+  },
+  {
+   "symbol": "XMR",
+   "name": "Monero",
+   "mcap_usd": 10021084476,
+   "rank": 14,
+   "perp_vol": 99785891
+  },
+  {
+   "symbol": "LINK",
+   "name": "Chainlink",
+   "mcap_usd": 9996719791,
+   "rank": 15,
+   "perp_vol": 415216213
+  },
+  {
+   "symbol": "WBT",
+   "name": "WhiteBIT Coin",
+   "mcap_usd": 9759076803,
+   "rank": 16,
+   "perp_vol": 131188032
+  },
+  {
+   "symbol": "ADA",
+   "name": "Cardano",
+   "mcap_usd": 8937345224,
+   "rank": 17,
+   "perp_vol": 541779137
+  },
+  {
+   "symbol": "LEO",
+   "name": "LEO Token",
+   "mcap_usd": 8161257181,
+   "rank": 18,
+   "perp_vol": 29780
+  },
+  {
+   "symbol": "RAIN",
+   "name": "Rain",
+   "mcap_usd": 7127745074,
+   "rank": 19,
+   "perp_vol": 19659075
+  },
+  {
+   "symbol": "XLM",
+   "name": "Stellar",
+   "mcap_usd": 6759906441,
+   "rank": 20,
+   "perp_vol": 195036698
+  },
+  {
+   "symbol": "NEAR",
+   "name": "NEAR Protocol",
+   "mcap_usd": 6680899927,
+   "rank": 21,
+   "perp_vol": 1356516510
+  },
+  {
+   "symbol": "BCH",
+   "name": "Bitcoin Cash",
+   "mcap_usd": 5504016625,
+   "rank": 22,
+   "perp_vol": 200019693
+  },
+  {
+   "symbol": "BTW",
+   "name": "Bitway",
+   "mcap_usd": 5287446745,
+   "rank": 23,
+   "perp_vol": 109513533
+  },
+  {
+   "symbol": "CC",
+   "name": "Canton",
+   "mcap_usd": 5151652316,
+   "rank": 24,
+   "perp_vol": 26137425
+  },
+  {
+   "symbol": "LTC",
+   "name": "Litecoin",
+   "mcap_usd": 4777724156,
+   "rank": 25,
+   "perp_vol": 305737033
+  },
+  {
+   "symbol": "USDE",
+   "name": "Ethena USDe",
+   "mcap_usd": 4765012996,
+   "rank": 26,
+   "perp_vol": 52035383
+  },
+  {
+   "symbol": "UNI",
+   "name": "Uniswap",
+   "mcap_usd": 4748630583,
+   "rank": 27,
+   "perp_vol": 535442118
+  },
+  {
+   "symbol": "AVAX",
+   "name": "Avalanche",
+   "mcap_usd": 4583264808,
+   "rank": 28,
+   "perp_vol": 426364253
+  },
+  {
+   "symbol": "DAI",
+   "name": "Dai",
+   "mcap_usd": 4554083036,
+   "rank": 29,
+   "perp_vol": 358325552
+  },
+  {
+   "symbol": "SUI",
+   "name": "Sui",
+   "mcap_usd": 4345582791,
+   "rank": 30,
+   "perp_vol": 697111058
+  },
+  {
+   "symbol": "USD1",
+   "name": "USD1",
+   "mcap_usd": 4211908316,
+   "rank": 31,
+   "perp_vol": 903115695
+  },
+  {
+   "symbol": "GRAM",
+   "name": "Gram (prev. Toncoin)",
+   "mcap_usd": 3912080079,
+   "rank": 32,
+   "perp_vol": 43055496
+  },
+  {
+   "symbol": "HBAR",
+   "name": "Hedera",
+   "mcap_usd": 3900609936,
+   "rank": 33,
+   "perp_vol": 136701657
+  },
+  {
+   "symbol": "XAUT",
+   "name": "Tether Gold",
+   "mcap_usd": 3370250077,
+   "rank": 34,
+   "perp_vol": 144764121
+  },
+  {
+   "symbol": "TAO",
+   "name": "Bittensor",
+   "mcap_usd": 3180692259,
+   "rank": 35,
+   "perp_vol": 224135082
+  },
+  {
+   "symbol": "USDG",
+   "name": "Global Dollar",
+   "mcap_usd": 3112128520,
+   "rank": 36,
+   "perp_vol": 698404647
+  },
+  {
+   "symbol": "SHIB",
+   "name": "Shiba Inu",
+   "mcap_usd": 3080155077,
+   "rank": 37,
+   "perp_vol": 108381548
+  },
+  {
+   "symbol": "QNT",
+   "name": "Quant",
+   "mcap_usd": 3043200057,
+   "rank": 38,
+   "perp_vol": 141209612
+  },
+  {
+   "symbol": "CRO",
+   "name": "Cronos",
+   "mcap_usd": 2958601694,
+   "rank": 39,
+   "perp_vol": 9869991
+  },
+  {
+   "symbol": "PYUSD",
+   "name": "PayPal USD",
+   "mcap_usd": 2877513331,
+   "rank": 40,
+   "perp_vol": 67494670
+  }
+ ]
+}

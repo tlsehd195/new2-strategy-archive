@@ -1,0 +1,68 @@
+{
+ "prereg": "PREREG_combo2b_reversal_info_2026-10-14.md",
+ "type": "\uc815\ubcf4\uc131 \uc804\uc6a9 \u2014 era \ubc18\uc804 \ubb38\uc11c\ud654 (\uc2b9\uaca9 \ud310\uc815 \uc544\ub2d8, Holm \uc5c6\uc74c)",
+ "signal": "CME weekend gap \u22651.0% \u2192 \ub418\ub3cc\ub9bc(gap up\u2192\uc20f, gap down\u2192\ub871), maker \u03b40 K16, h48 taker \uccad\uc0b0",
+ "posthoc_basis": "COMBO-2 sB \ucd94\uc885 \uc720\uc758 \uc74c\uc218(-98.25bp p=0.0041) \uc9c1\ud6c4 \uc124\uacc4 \u2014 \ubd80\ud638 \ubc18\uc804 \uacb0\uacfc \uc0ac\uc804 \uc778\uc9c0 \uc0c1\ud0dc, \u00a70 \uc815\uc9c1 \uace0\uc9c0",
+ "cells": [
+  {
+   "tag": "sB",
+   "span": "2017-12-18~2021-05-02",
+   "n": 95,
+   "n_filled": 93,
+   "promo_bp": -30.779192352586207,
+   "t": -0.908525530426156,
+   "p": 0.36592408283871625,
+   "p_ctrl": 0.79
+  },
+  {
+   "tag": "s1",
+   "span": "2021-05-02~2022-08-17",
+   "n": 38,
+   "n_filled": 38,
+   "promo_bp": -104.65045927754494,
+   "t": -1.7238575737515924,
+   "p": 0.09308117281822803,
+   "p_ctrl": 0.98
+  },
+  {
+   "tag": "s2",
+   "span": "2023-04-07~2024-03-18",
+   "n": 17,
+   "n_filled": 17,
+   "promo_bp": -150.07269133136737,
+   "t": -3.2179149781527987,
+   "p": 0.005371567919524256,
+   "p_ctrl": 1.0
+  },
+  {
+   "tag": "s3",
+   "span": "2024-06-19~2026-04-20",
+   "n": 48,
+   "n_filled": 47,
+   "promo_bp": -65.93667077056493,
+   "t": -2.1988628750267476,
+   "p": 0.03284486353669362,
+   "p_ctrl": 0.99
+  },
+  {
+   "tag": "sF",
+   "span": "2026-04-21~2026-10-14",
+   "n": 10,
+   "n_filled": 9,
+   "promo_bp": -23.996428323827267,
+   "t": -0.49867890848818336,
+   "p": 0.6299656189646186,
+   "p_ctrl": 0.72
+  }
+ ],
+ "pooled_all": {
+  "n": 208,
+  "promo_bp": -61.81202384087033,
+  "t": -2.9764922032606216,
+  "p": 0.0032629037092168677
+ },
+ "era_flip_conclusion": {
+  "positive_spans": [],
+  "conclusion": "\ud328\ud134 \ud655\uc778 \ud544\uc694 \u2014 \uc6d0\uae30\ub85d \ucc38\uc870"
+ }
+}

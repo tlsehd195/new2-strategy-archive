@@ -1,0 +1,63 @@
+{
+ "cid": "d01615_180825",
+ "ts": "2026-10-14T18:08:25Z",
+ "family": "fng",
+ "symbols": [
+  "BTCUSDT",
+  "ETHUSDT"
+ ],
+ "params": {
+  "lo": 5,
+  "hi": 95,
+  "horizons": [
+   48
+  ]
+ },
+ "variant": null,
+ "kind": "reverify",
+ "verdict": "UNDETERMINED_POWER",
+ "cells": [
+  {
+   "sym": "BTCUSDT",
+   "h": 48,
+   "n_raw": 9,
+   "vn_nonov": 0,
+   "fail_closed_o10k": 0,
+   "mean_funding_bp": null,
+   "mean_net_bp": null,
+   "se": null,
+   "t": null,
+   "p": 1.0,
+   "span_means": [
+    null,
+    null
+   ],
+   "raw_mean_bp": null,
+   "raw_n": 0,
+   "mean_net_o100k_bp": null
+  },
+  {
+   "sym": "ETHUSDT",
+   "h": 48,
+   "n_raw": 15,
+   "vn_nonov": 2,
+   "fail_closed_o10k": 0,
+   "mean_funding_bp": -0.366,
+   "mean_net_bp": -116.07102491749485,
+   "se": 119.85679834682855,
+   "t": -0.96841419526009,
+   "p": 0.7448927359155929,
+   "mean_net_f_bp": -115.70502491749484,
+   "span_means": [
+    null,
+    -116.07102491749485
+   ],
+   "raw_mean_bp": -116.07102491749485,
+   "raw_n": 2,
+   "mean_net_o100k_bp": -173.56582048913108,
+   "p_holm": 0.7448927359155929
+  }
+ ],
+ "prereg": "/home/z/my-project/NEW2_run/PREREG_discd01615_180825_2026-10-14.md",
+ "engine": "NEW2-discovery-v2-audit2"
+}

@@ -1,9 +1,0 @@
-{
-  "name": "fng-watcher",
-  "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "bun index.ts",
-    "start": "bun index.ts"
-  }
-}

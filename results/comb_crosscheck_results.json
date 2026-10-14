@@ -1,0 +1,179 @@
+{
+ "prereg": "PREREG_comb_confluence_2026-10-14.md",
+ "gate": "G2(\uc5d4\uc9c4 $10k)\u00b7G3(\u22652/4 \uc2a4\ud32c)\u00b7G4(OOS) \ud3c9\uac00 \u2014 G1 \ud1b5\uacfc \uc140 \ud55c\uc815",
+ "cells": [
+  {
+   "cell": "BTCUSDT 2021-05-02~2022-08-17 F1 K1 h16 taker",
+   "n_trades": 1400,
+   "n_fc": 0,
+   "engine_net10k_bp": -38.05293136886655,
+   "engine_net100k_bp": -78.9858115583923,
+   "promo10k_bp": null,
+   "g4_oos_net16": -27.25369964695604,
+   "g2_pass": false,
+   "g4_pass": false,
+   "cell_pass": false
+  },
+  {
+   "cell": "BTCUSDT 2021-05-02~2022-08-17 F1 K1 h16 maker",
+   "n_trades": 1313,
+   "n_fc": 0,
+   "engine_net10k_bp": -26.838572206628868,
+   "engine_net100k_bp": -47.44837215609325,
+   "promo10k_bp": -26.838572206628868,
+   "g4_oos_net16": -30.30958526731452,
+   "g2_pass": false,
+   "g4_pass": false,
+   "cell_pass": false
+  },
+  {
+   "cell": "BTCUSDT 2021-05-02~2022-08-17 F1 K1 h48 taker",
+   "n_trades": 678,
+   "n_fc": 0,
+   "engine_net10k_bp": -52.366196905093155,
+   "engine_net100k_bp": -91.73584446197535,
+   "promo10k_bp": null,
+   "g4_oos_net16": -54.77325396330786,
+   "g2_pass": false,
+   "g4_pass": false,
+   "cell_pass": false
+  },
+  {
+   "cell": "BTCUSDT 2021-05-02~2022-08-17 F1 K1 h48 maker",
+   "n_trades": 653,
+   "n_fc": 0,
+   "engine_net10k_bp": -41.130632113468195,
+   "engine_net100k_bp": -60.57410498954086,
+   "promo10k_bp": -41.130632113468195,
+   "g4_oos_net16": -50.25601341840664,
+   "g2_pass": false,
+   "g4_pass": false,
+   "cell_pass": false
+  },
+  {
+   "cell": "BTCUSDT 2021-05-02~2022-08-17 F2 K1 h16 taker",
+   "n_trades": 1400,
+   "n_fc": 0,
+   "engine_net10k_bp": -38.05293136886655,
+   "engine_net100k_bp": -78.9858115583923,
+   "promo10k_bp": null,
+   "g4_oos_net16": -27.25369964695604,
+   "g2_pass": false,
+   "g4_pass": false,
+   "cell_pass": false
+  },
+  {
+   "cell": "BTCUSDT 2021-05-02~2022-08-17 F2 K1 h16 maker",
+   "n_trades": 1313,
+   "n_fc": 0,
+   "engine_net10k_bp": -26.838572206628868,
+   "engine_net100k_bp": -47.44837215609325,
+   "promo10k_bp": -26.838572206628868,
+   "g4_oos_net16": -30.30958526731452,
+   "g2_pass": false,
+   "g4_pass": false,
+   "cell_pass": false
+  },
+  {
+   "cell": "BTCUSDT 2021-05-02~2022-08-17 F2 K1 h48 taker",
+   "n_trades": 678,
+   "n_fc": 0,
+   "engine_net10k_bp": -52.366196905093155,
+   "engine_net100k_bp": -91.73584446197535,
+   "promo10k_bp": null,
+   "g4_oos_net16": -54.77325396330786,
+   "g2_pass": false,
+   "g4_pass": false,
+   "cell_pass": false
+  },
+  {
+   "cell": "BTCUSDT 2021-05-02~2022-08-17 F2 K1 h48 maker",
+   "n_trades": 653,
+   "n_fc": 0,
+   "engine_net10k_bp": -41.130632113468195,
+   "engine_net100k_bp": -60.57410498954086,
+   "promo10k_bp": -41.130632113468195,
+   "g4_oos_net16": -50.25601341840664,
+   "g2_pass": false,
+   "g4_pass": false,
+   "cell_pass": false
+  },
+  {
+   "cell": "BTCUSDT 2023-04-07~2024-03-18 F1 K1 h16 taker",
+   "n_trades": 967,
+   "n_fc": 0,
+   "engine_net10k_bp": -39.79704337716956,
+   "engine_net100k_bp": -96.70596692339143,
+   "promo10k_bp": null,
+   "g4_oos_net16": -17.78114019425182,
+   "g2_pass": false,
+   "g4_pass": false,
+   "cell_pass": false
+  },
+  {
+   "cell": "BTCUSDT 2023-04-07~2024-03-18 F1 K1 h16 maker",
+   "n_trades": 858,
+   "n_fc": 0,
+   "engine_net10k_bp": -23.89003005273716,
+   "engine_net100k_bp": -52.23707197347289,
+   "promo10k_bp": -23.89003005273716,
+   "g4_oos_net16": -21.997709224536194,
+   "g2_pass": false,
+   "g4_pass": false,
+   "cell_pass": false
+  },
+  {
+   "cell": "BTCUSDT 2023-04-07~2024-03-18 F2 K1 h16 taker",
+   "n_trades": 967,
+   "n_fc": 0,
+   "engine_net10k_bp": -39.79704337716956,
+   "engine_net100k_bp": -96.70596692339143,
+   "promo10k_bp": null,
+   "g4_oos_net16": -17.78114019425182,
+   "g2_pass": false,
+   "g4_pass": false,
+   "cell_pass": false
+  },
+  {
+   "cell": "BTCUSDT 2023-04-07~2024-03-18 F2 K1 h16 maker",
+   "n_trades": 858,
+   "n_fc": 0,
+   "engine_net10k_bp": -23.89003005273716,
+   "engine_net100k_bp": -52.23707197347289,
+   "promo10k_bp": -23.89003005273716,
+   "g4_oos_net16": -21.997709224536194,
+   "g2_pass": false,
+   "g4_pass": false,
+   "cell_pass": false
+  },
+  {
+   "cell": "ETHUSDT 2024-12-10~2026-04-20 F1 K1 h16 taker",
+   "n_trades": 1550,
+   "n_fc": 0,
+   "engine_net10k_bp": -34.940269481903194,
+   "engine_net100k_bp": -83.68883085113221,
+   "promo10k_bp": null,
+   "g4_oos_net16": -24.054467550715938,
+   "g2_pass": false,
+   "g4_pass": false,
+   "cell_pass": false
+  },
+  {
+   "cell": "ETHUSDT 2024-12-10~2026-04-20 F1 K1 h16 maker",
+   "n_trades": 1447,
+   "n_fc": 0,
+   "engine_net10k_bp": -19.066343686173447,
+   "engine_net100k_bp": -43.76952872617853,
+   "promo10k_bp": -19.066343686173447,
+   "g4_oos_net16": -22.912779569643707,
+   "g2_pass": false,
+   "g4_pass": false,
+   "cell_pass": false
+  }
+ ],
+ "verdict": {
+  "any_cell_pass": false,
+  "overall": "C-P1 CLOSED \u2014 G1 \ud1b5\uacfc \uc140 \uc804\uc6d0 G2/G4 \ubbf8\ub2ec, \uc2b9\uaca9 \uacbd\ub85c \ud3d0\uae30",
+  "g3_note": "G3 \uc77c\uad00\uc131\uc740 G2 \ud1b5\uacfc \uc140 \uc694\uac74 \u2014 G2 \ud1b5\uacfc \uc140 \ubd80\uc7ac\ub85c \ubbf8\ud3c9\uac00(\ub300\uc0c1 \ubd80\uc7ac)"
+ }
+}

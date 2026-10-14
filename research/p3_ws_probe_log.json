@@ -1,0 +1,46 @@
+{
+  "probe_started_utc": "2026-10-13T12:16:15.936Z",
+  "listen_s": 180,
+  "streams": {
+    "symbol_forceOrder_combined": {
+      "url": "wss://fstream.binance.com/stream?streams=btcusdt@forceOrder/ethusdt@forceOrder",
+      "open": true,
+      "msgs": 0,
+      "first_payload": null,
+      "first_msg_utc": null,
+      "events": [
+        "open",
+        "timeout_close_after_180s",
+        "closed:code=1000"
+      ],
+      "verdict": "CONNECTED_BUT_SILENT"
+    },
+    "all_market_forceOrder_arr": {
+      "url": "wss://fstream.binance.com/ws/!forceOrder@arr",
+      "open": true,
+      "msgs": 0,
+      "first_payload": null,
+      "first_msg_utc": null,
+      "events": [
+        "open",
+        "timeout_close_after_180s",
+        "closed:code=1000"
+      ],
+      "verdict": "CONNECTED_BUT_SILENT"
+    },
+    "control_markPrice_1s": {
+      "url": "wss://fstream.binance.com/ws/btcusdt@markPrice@1s",
+      "open": true,
+      "msgs": 0,
+      "first_payload": null,
+      "first_msg_utc": null,
+      "events": [
+        "open",
+        "timeout_close_after_180s",
+        "closed:code=1000"
+      ],
+      "verdict": "WS_DELIVERY_BROKEN"
+    }
+  },
+  "probe_ended_utc": "2026-10-13T12:19:17.938Z"
+}

@@ -1,0 +1,221 @@
+{
+ "meta": {
+  "prereg": "PREREG_x15_tokenized_tradfi_session_2026-10-13.md",
+  "family": "X15 — 토큰화 전통자산(미국 주식형) 세션 미시구조",
+  "assets": [
+   "SNDKUSDT",
+   "MUUSDT",
+   "SOXLUSDT",
+   "SPCXUSDT"
+  ],
+  "primary_direction": "follow first-30min return sign (Gao-Han-Li-Zhou 2018 prior)",
+  "horizons_bars": [
+   3,
+   12,
+   24
+  ],
+  "entry": "close of 13:45 UTC bar",
+  "fee_fixed_bp": 16,
+  "era_split": "60/40 by entry day",
+  "oos": "last 40% (=era2)",
+  "cluster": "entry day (UTC date)",
+  "closed_filter": "RTH qv < 0.2×asset median",
+  "spans": {
+   "min_day": "1970-01-01",
+   "max_day": "1970-01-01"
+  },
+  "new_download_bytes_after_prereg": 0
+ },
+ "quality": {
+  "SNDKUSDT": {
+   "days_total": 188,
+   "days_weekday": 134,
+   "days_closed_filtered": 38,
+   "days_entry_missing": 0,
+   "episodes_created": 96
+  },
+  "MUUSDT": {
+   "days_total": 188,
+   "days_weekday": 134,
+   "days_closed_filtered": 45,
+   "days_entry_missing": 0,
+   "episodes_created": 89
+  },
+  "SOXLUSDT": {
+   "days_total": 150,
+   "days_weekday": 106,
+   "days_closed_filtered": 31,
+   "days_entry_missing": 0,
+   "episodes_created": 75
+  },
+  "SPCXUSDT": {
+   "days_total": 144,
+   "days_weekday": 102,
+   "days_closed_filtered": 33,
+   "days_entry_missing": 0,
+   "episodes_created": 69
+  }
+ },
+ "cells": [
+  {
+   "h": 3,
+   "primary": {
+    "gross_bp": -21.34,
+    "net16_bp": -37.34,
+    "n_eps": 329,
+    "n_clusters": 97,
+    "t": -0.831,
+    "p": 0.40821,
+    "p_holm": 1.0
+   },
+   "mirror": {
+    "gross_bp": 21.34,
+    "net16_bp": 5.34,
+    "n_eps": 329,
+    "n_clusters": 97,
+    "t": 0.831,
+    "p": 0.40821
+   },
+   "era1": {
+    "net16_bp": -61.58,
+    "n_eps": 180
+   },
+   "era2": {
+    "net16_bp": -8.06,
+    "n_eps": 149
+   },
+   "oos": {
+    "net16_bp": -8.06,
+    "n_eps": 149
+   },
+   "p_ctrl": 0.95,
+   "rnd_net_p95": 5.21,
+   "by_asset": {
+    "SNDKUSDT": {
+     "net16_bp": -28.25,
+     "n_eps": 96
+    },
+    "MUUSDT": {
+     "net16_bp": -26.52,
+     "n_eps": 89
+    },
+    "SOXLUSDT": {
+     "net16_bp": -72.39,
+     "n_eps": 75
+    },
+    "SPCXUSDT": {
+     "net16_bp": -25.84,
+     "n_eps": 69
+    }
+   }
+  },
+  {
+   "h": 12,
+   "primary": {
+    "gross_bp": 2.3,
+    "net16_bp": -13.7,
+    "n_eps": 329,
+    "n_clusters": 97,
+    "t": 0.007,
+    "p": 0.99447,
+    "p_holm": 1.0
+   },
+   "mirror": {
+    "gross_bp": -2.3,
+    "net16_bp": -18.3,
+    "n_eps": 329,
+    "n_clusters": 97,
+    "t": -0.007,
+    "p": 0.99447
+   },
+   "era1": {
+    "net16_bp": -32.83,
+    "n_eps": 180
+   },
+   "era2": {
+    "net16_bp": 9.41,
+    "n_eps": 149
+   },
+   "oos": {
+    "net16_bp": 9.41,
+    "n_eps": 149
+   },
+   "p_ctrl": 0.46,
+   "rnd_net_p95": 16.24,
+   "by_asset": {
+    "SNDKUSDT": {
+     "net16_bp": -2.98,
+     "n_eps": 96
+    },
+    "MUUSDT": {
+     "net16_bp": 0.44,
+     "n_eps": 89
+    },
+    "SOXLUSDT": {
+     "net16_bp": -61.9,
+     "n_eps": 75
+    },
+    "SPCXUSDT": {
+     "net16_bp": 5.53,
+     "n_eps": 69
+    }
+   }
+  },
+  {
+   "h": 24,
+   "primary": {
+    "gross_bp": 4.68,
+    "net16_bp": -11.32,
+    "n_eps": 329,
+    "n_clusters": 97,
+    "t": 0.326,
+    "p": 0.74503,
+    "p_holm": 1.0
+   },
+   "mirror": {
+    "gross_bp": -4.68,
+    "net16_bp": -20.68,
+    "n_eps": 329,
+    "n_clusters": 97,
+    "t": -0.326,
+    "p": 0.74503
+   },
+   "era1": {
+    "net16_bp": -23.08,
+    "n_eps": 180
+   },
+   "era2": {
+    "net16_bp": 2.89,
+    "n_eps": 149
+   },
+   "oos": {
+    "net16_bp": 2.89,
+    "n_eps": 149
+   },
+   "p_ctrl": 0.49,
+   "rnd_net_p95": 18.26,
+   "by_asset": {
+    "SNDKUSDT": {
+     "net16_bp": 2.07,
+     "n_eps": 96
+    },
+    "MUUSDT": {
+     "net16_bp": 11.06,
+     "n_eps": 89
+    },
+    "SOXLUSDT": {
+     "net16_bp": -55.34,
+     "n_eps": 75
+    },
+    "SPCXUSDT": {
+     "net16_bp": -10.97,
+     "n_eps": 69
+    }
+   }
+  }
+ ],
+ "verdict": {
+  "holm_pass_cells": [],
+  "PASS": false
+ }
+}

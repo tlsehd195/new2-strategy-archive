@@ -1,0 +1,396 @@
+{
+ "spec": "PREREG_x2_macro_fomc_2026-10-12.md",
+ "grade": "diagnostic",
+ "event_source": "federalreserve.gov fomccalendars.htm minutes20YYMMDD.pdf filenames (46 decisions)",
+ "cpi_note": "BLS 403 \u2014 CPI \ubd88\ud3ec\ud568 \ud655\uc815",
+ "events": {
+  "BTCUSDT": 17,
+  "ETHUSDT": 21
+ },
+ "cells": [
+  {
+   "delta": 0,
+   "h": 4,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": -23.890830685716036,
+   "total_bp": -406.1441216571726,
+   "t": -0.4778674857105026,
+   "p": 0.6392078036067357,
+   "p_holm": 1.0,
+   "pass_holm": false
+  },
+  {
+   "delta": 0,
+   "h": 16,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": -31.69310421101501,
+   "total_bp": -538.7827715872552,
+   "t": -0.4110105550514505,
+   "p": 0.6865170290380593,
+   "p_holm": 1.0,
+   "pass_holm": false
+  },
+  {
+   "delta": 0,
+   "h": 48,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": 5.27019215570693,
+   "total_bp": 89.5932666470178,
+   "t": 0.07100871098551964,
+   "p": 0.9442708226997663,
+   "p_holm": 1.0,
+   "pass_holm": false
+  },
+  {
+   "delta": 4,
+   "h": 4,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": -6.78562831327285,
+   "total_bp": -115.35568132563846,
+   "t": -0.31542976272317763,
+   "p": 0.7565122561413846,
+   "p_holm": 1.0,
+   "pass_holm": false
+  },
+  {
+   "delta": 4,
+   "h": 16,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": 6.791965028584211,
+   "total_bp": 115.46340548593159,
+   "t": 0.14872513228704382,
+   "p": 0.8836288749002741,
+   "p_holm": 1.0,
+   "pass_holm": false
+  },
+  {
+   "delta": 4,
+   "h": 48,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": 17.409968139368537,
+   "total_bp": 295.9694583692651,
+   "t": 0.41088079783103626,
+   "p": 0.6866102538155419,
+   "p_holm": 1.0,
+   "pass_holm": false
+  },
+  {
+   "delta": 16,
+   "h": 4,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": 13.068814659449378,
+   "total_bp": 222.16984921063943,
+   "t": 1.261961979114633,
+   "p": 0.22504909566986492,
+   "p_holm": 1.0,
+   "pass_holm": false
+  },
+  {
+   "delta": 16,
+   "h": 16,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": -5.202402520473062,
+   "total_bp": -88.44084284804205,
+   "t": -0.37108629034897767,
+   "p": 0.715440931706622,
+   "p_holm": 1.0,
+   "pass_holm": false
+  },
+  {
+   "delta": 16,
+   "h": 48,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": 20.891468298754553,
+   "total_bp": 355.1549610788274,
+   "t": 0.5161721032759725,
+   "p": 0.6127939792228498,
+   "p_holm": 1.0,
+   "pass_holm": false
+  },
+  {
+   "delta": 0,
+   "h": 4,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": -22.259727253974898,
+   "total_bp": -467.45427233347283,
+   "t": -0.32499102082208553,
+   "p": 0.7485629126992297,
+   "p_holm": 1.0,
+   "pass_holm": false
+  },
+  {
+   "delta": 0,
+   "h": 16,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": -77.87147374132299,
+   "total_bp": -1635.3009485677828,
+   "t": -0.7937981880081659,
+   "p": 0.43663044630922954,
+   "p_holm": 1.0,
+   "pass_holm": false
+  },
+  {
+   "delta": 0,
+   "h": 48,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": -79.6894246806854,
+   "total_bp": -1673.4779182943935,
+   "t": -0.8202191203543646,
+   "p": 0.4217596671830802,
+   "p_holm": 1.0,
+   "pass_holm": false
+  },
+  {
+   "delta": 4,
+   "h": 4,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": -11.921374385684068,
+   "total_bp": -250.34886209936542,
+   "t": -0.5034458301536615,
+   "p": 0.6201507793483834,
+   "p_holm": 1.0,
+   "pass_holm": false
+  },
+  {
+   "delta": 4,
+   "h": 16,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": -39.49957730070532,
+   "total_bp": -829.4911233148117,
+   "t": -0.9447177047183027,
+   "p": 0.3560771506311632,
+   "p_holm": 1.0,
+   "pass_holm": false
+  },
+  {
+   "delta": 4,
+   "h": 48,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": -67.13409865126728,
+   "total_bp": -1409.8160716766129,
+   "t": -1.0659958631090365,
+   "p": 0.2991257113094719,
+   "p_holm": 1.0,
+   "pass_holm": false
+  },
+  {
+   "delta": 16,
+   "h": 4,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": 12.879786156646746,
+   "total_bp": 270.4755092895817,
+   "t": 0.8501333512901548,
+   "p": 0.405313654654883,
+   "p_holm": 1.0,
+   "pass_holm": false
+  },
+  {
+   "delta": 16,
+   "h": 16,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": -21.86274839876561,
+   "total_bp": -459.1177163740778,
+   "t": -0.6825873982634934,
+   "p": 0.5026979045317304,
+   "p_holm": 1.0,
+   "pass_holm": false
+  },
+  {
+   "delta": 16,
+   "h": 48,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": -29.63871657183687,
+   "total_bp": -622.4130480085743,
+   "t": -0.4453830793232433,
+   "p": 0.6608263755144883,
+   "p_holm": 1.0,
+   "pass_holm": false
+  }
+ ],
+ "controls_fade": [
+  {
+   "delta": 0,
+   "h": 4,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": 23.890830685716036
+  },
+  {
+   "delta": 0,
+   "h": 16,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": 31.69310421101501
+  },
+  {
+   "delta": 0,
+   "h": 48,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": -5.27019215570693
+  },
+  {
+   "delta": 4,
+   "h": 4,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": 6.78562831327285
+  },
+  {
+   "delta": 4,
+   "h": 16,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": -6.791965028584211
+  },
+  {
+   "delta": 4,
+   "h": 48,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": -17.409968139368537
+  },
+  {
+   "delta": 16,
+   "h": 4,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": -13.068814659449378
+  },
+  {
+   "delta": 16,
+   "h": 16,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": 5.202402520473062
+  },
+  {
+   "delta": 16,
+   "h": 48,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": -20.891468298754553
+  },
+  {
+   "delta": 0,
+   "h": 4,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": 22.259727253974898
+  },
+  {
+   "delta": 0,
+   "h": 16,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": 77.87147374132299
+  },
+  {
+   "delta": 0,
+   "h": 48,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": 79.6894246806854
+  },
+  {
+   "delta": 4,
+   "h": 4,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": 11.921374385684068
+  },
+  {
+   "delta": 4,
+   "h": 16,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": 39.49957730070532
+  },
+  {
+   "delta": 4,
+   "h": 48,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": 67.13409865126728
+  },
+  {
+   "delta": 16,
+   "h": 4,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": -12.879786156646746
+  },
+  {
+   "delta": 16,
+   "h": 16,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": 21.86274839876561
+  },
+  {
+   "delta": 16,
+   "h": 48,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": 29.63871657183687
+  }
+ ],
+ "controls_unconditional": [
+  {
+   "h": 4,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": 65.48249947076029
+  },
+  {
+   "h": 16,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": 102.84027532297831
+  },
+  {
+   "h": 48,
+   "symbol": "BTCUSDT",
+   "n": 17,
+   "mean_bp": 75.79654229536855
+  },
+  {
+   "h": 4,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": 72.14085980039442
+  },
+  {
+   "h": 16,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": 96.47577205759748
+  },
+  {
+   "h": 48,
+   "symbol": "ETHUSDT",
+   "n": 21,
+   "mean_bp": 83.48739844823146
+  }
+ ],
+ "n_pass_holm": 0,
+ "pass": false
+}

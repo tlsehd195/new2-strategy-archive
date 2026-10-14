@@ -1,0 +1,849 @@
+{
+ "prereg": "PREREG_combo3_fng_maker_virgin_2026-10-14.md",
+ "type": "combination measurement (F2/X6 신호 × N2 maker 실행계층 × 버진 스팬)",
+ "signal": "FG(D-1) 극단 → 일 D 15m 신호봉 역발상(B90 ≤10롱/≥90숏, B80 ≤20롱/≥80숏), maker δ0 K16 진입, h봉 후 엔진 taker 청산",
+ "family": "12셀 (BTC sB/sF × B90/B80 × h4/16/48) Holm-12",
+ "quality": {
+  "BTCUSDT_bars_total": 295957,
+  "ETHUSDT_bars_total": 280974,
+  "BTCUSDT_2018-02-01_span": {
+   "kline_bars_in_span": 104667,
+   "expected_bars": 113760,
+   "kline_missing": 9093,
+   "n_entry_drop": 23
+  },
+  "BTCUSDT_2026-04-21_span": {
+   "kline_bars_in_span": 16862,
+   "expected_bars": 16896,
+   "kline_missing": 34,
+   "n_entry_drop": 1
+  },
+  "ETHUSDT_sB_span": {
+   "kline_bars_in_span": 113296,
+   "expected_bars": 113760,
+   "kline_missing": 464,
+   "n_entry_drop": 24
+  }
+ },
+ "family_cells": [
+  {
+   "n_bars": 5167,
+   "valid_n": 1291.75,
+   "n_filled": 5139,
+   "n_fc": 11,
+   "fill_rate": 0.9945809947745307,
+   "n_fear_long": 1344,
+   "n_greed_short": 3823,
+   "promo_bp": -47.11009981372884,
+   "mean_net_filled_bp": -47.36678064556079,
+   "mean_wait_bars": 0.04845300642148278,
+   "t": -16.46063177196432,
+   "p": 2.0723135949636983e-55,
+   "p_ctrl": 1.0,
+   "fear_long_promo_bp": -63.23095129458007,
+   "greed_short_promo_bp": -41.44271179639584,
+   "seg": {
+    "first60": {
+     "n_bars": 576,
+     "promo_bp": -64.66596818324219
+    },
+    "last40": {
+     "n_bars": 4591,
+     "promo_bp": -44.90749032106065
+    }
+   },
+   "symbol": "BTCUSDT",
+   "span": "2018-02-01~2021-05-01",
+   "span_tag": "sB",
+   "bucket": "B90",
+   "h": 4,
+   "p_holm": 2.2795449544600682e-54
+  },
+  {
+   "n_bars": 5167,
+   "valid_n": 322.9375,
+   "n_filled": 5095,
+   "n_fc": 55,
+   "fill_rate": 0.9860654151345074,
+   "n_fear_long": 1344,
+   "n_greed_short": 3823,
+   "promo_bp": -57.653036137425325,
+   "mean_net_filled_bp": -58.46776010246843,
+   "mean_wait_bars": 0.04867517173699706,
+   "t": -5.792098006921812,
+   "p": 1.6535739132633623e-08,
+   "p_ctrl": 1.0,
+   "fear_long_promo_bp": -67.4972319707253,
+   "greed_short_promo_bp": -54.192246391164474,
+   "seg": {
+    "first60": {
+     "n_bars": 576,
+     "promo_bp": -40.24875942864858
+    },
+    "last40": {
+     "n_bars": 4591,
+     "promo_bp": -59.836626506463745
+    }
+   },
+   "symbol": "BTCUSDT",
+   "span": "2018-02-01~2021-05-01",
+   "span_tag": "sB",
+   "bucket": "B90",
+   "h": 16,
+   "p_holm": 1.3228591306106898e-07
+  },
+  {
+   "n_bars": 5167,
+   "valid_n": 107.64583333333333,
+   "n_filled": 4968,
+   "n_fc": 182,
+   "fill_rate": 0.9614863557189859,
+   "n_fear_long": 1344,
+   "n_greed_short": 3823,
+   "promo_bp": -93.43414309924164,
+   "mean_net_filled_bp": -97.1767748377177,
+   "mean_wait_bars": 0.04790660225442834,
+   "t": -3.3002446165259265,
+   "p": 0.001314172455850432,
+   "p_ctrl": 1.0,
+   "fear_long_promo_bp": -80.22606283265647,
+   "greed_short_promo_bp": -98.07752784375916,
+   "seg": {
+    "first60": {
+     "n_bars": 576,
+     "promo_bp": -7.317093032495418
+    },
+    "last40": {
+     "n_bars": 4591,
+     "promo_bp": -104.23863467807978
+    }
+   },
+   "symbol": "BTCUSDT",
+   "span": "2018-02-01~2021-05-01",
+   "span_tag": "sB",
+   "bucket": "B90",
+   "h": 48,
+   "p_holm": 0.00657086227925216
+  },
+  {
+   "n_bars": 22352,
+   "valid_n": 5588.0,
+   "n_filled": 22227,
+   "n_fc": 33,
+   "fill_rate": 0.994407659269864,
+   "n_fear_long": 14987,
+   "n_greed_short": 7365,
+   "promo_bp": -64.20148144947068,
+   "mean_net_filled_bp": -64.5625371556471,
+   "mean_wait_bars": 0.05160390516039052,
+   "t": -42.12598386848329,
+   "p": 0.0,
+   "p_ctrl": 1.0,
+   "fear_long_promo_bp": -73.1212200865023,
+   "greed_short_promo_bp": -46.05075192425776,
+   "seg": {
+    "first60": {
+     "n_bars": 12022,
+     "promo_bp": -78.1284302891069
+    },
+    "last40": {
+     "n_bars": 10330,
+     "promo_bp": -47.99337119292598
+    }
+   },
+   "symbol": "BTCUSDT",
+   "span": "2018-02-01~2021-05-01",
+   "span_tag": "sB",
+   "bucket": "B80",
+   "h": 4,
+   "p_holm": 0.0
+  },
+  {
+   "n_bars": 22352,
+   "valid_n": 1397.0,
+   "n_filled": 22140,
+   "n_fc": 120,
+   "fill_rate": 0.9905153901216893,
+   "n_fear_long": 14987,
+   "n_greed_short": 7365,
+   "promo_bp": -63.72665188784222,
+   "mean_net_filled_bp": -64.33686192398595,
+   "mean_wait_bars": 0.05176151761517615,
+   "t": -11.347492833488767,
+   "p": 1.3094404681429673e-28,
+   "p_ctrl": 1.0,
+   "fear_long_promo_bp": -66.57089370846808,
+   "greed_short_promo_bp": -57.9389190751172,
+   "seg": {
+    "first60": {
+     "n_bars": 12022,
+     "promo_bp": -72.82872329150524
+    },
+    "last40": {
+     "n_bars": 10330,
+     "promo_bp": -53.13370876927137
+    }
+   },
+   "symbol": "BTCUSDT",
+   "span": "2018-02-01~2021-05-01",
+   "span_tag": "sB",
+   "bucket": "B80",
+   "h": 16,
+   "p_holm": 1.3094404681429672e-27
+  },
+  {
+   "n_bars": 22352,
+   "valid_n": 465.6666666666667,
+   "n_filled": 21919,
+   "n_fc": 341,
+   "fill_rate": 0.9806281317108089,
+   "n_fear_long": 14987,
+   "n_greed_short": 7365,
+   "promo_bp": -61.17828940874536,
+   "mean_net_filled_bp": -62.38683903755994,
+   "mean_wait_bars": 0.051827181896984355,
+   "t": -3.744227386834775,
+   "p": 0.0002036506397265248,
+   "p_ctrl": 1.0,
+   "fear_long_promo_bp": -48.12058596321737,
+   "greed_short_promo_bp": -87.74934189185849,
+   "seg": {
+    "first60": {
+     "n_bars": 12022,
+     "promo_bp": -56.939704566088345
+    },
+    "last40": {
+     "n_bars": 10330,
+     "promo_bp": -66.1111322914581
+    }
+   },
+   "symbol": "BTCUSDT",
+   "span": "2018-02-01~2021-05-01",
+   "span_tag": "sB",
+   "bucket": "B80",
+   "h": 48,
+   "p_holm": 0.0014255544780856736
+  },
+  {
+   "n_bars": 288,
+   "valid_n": 72.0,
+   "n_filled": 283,
+   "n_fc": 0,
+   "fill_rate": 0.9826388888888888,
+   "n_fear_long": 288,
+   "n_greed_short": 0,
+   "promo_bp": -18.44716824240213,
+   "mean_net_filled_bp": -18.773089942797927,
+   "mean_wait_bars": 0.053003533568904596,
+   "t": -3.479638800261382,
+   "p": 0.0008622434673630017,
+   "p_ctrl": 1.0,
+   "fear_long_promo_bp": -18.44716824240213,
+   "greed_short_promo_bp": null,
+   "seg": {
+    "first60": {
+     "n_bars": 288,
+     "promo_bp": -18.44716824240213
+    },
+    "last40": {
+     "n_bars": 0,
+     "promo_bp": null
+    }
+   },
+   "symbol": "BTCUSDT",
+   "span": "2026-04-21~2026-10-14",
+   "span_tag": "sF",
+   "bucket": "B90",
+   "h": 4,
+   "p_holm": 0.00517346080417801
+  },
+  {
+   "n_bars": 288,
+   "valid_n": 18.0,
+   "n_filled": 283,
+   "n_fc": 0,
+   "fill_rate": 0.9826388888888888,
+   "n_fear_long": 288,
+   "n_greed_short": 0,
+   "promo_bp": -14.365387093414185,
+   "mean_net_filled_bp": -14.619192519092884,
+   "mean_wait_bars": 0.053003533568904596,
+   "t": -0.6858950729211916,
+   "p": 0.5020270628691963,
+   "p_ctrl": 0.98,
+   "fear_long_promo_bp": -14.365387093414185,
+   "greed_short_promo_bp": null,
+   "seg": {
+    "first60": {
+     "n_bars": 288,
+     "promo_bp": -14.365387093414185
+    },
+    "last40": {
+     "n_bars": 0,
+     "promo_bp": null
+    }
+   },
+   "symbol": "BTCUSDT",
+   "span": "2026-04-21~2026-10-14",
+   "span_tag": "sF",
+   "bucket": "B90",
+   "h": 16,
+   "p_holm": 1.0
+  },
+  {
+   "n_bars": 288,
+   "valid_n": 6.0,
+   "n_filled": 283,
+   "n_fc": 0,
+   "fill_rate": 0.9826388888888888,
+   "n_fear_long": 288,
+   "n_greed_short": 0,
+   "promo_bp": -5.903645384830901,
+   "mean_net_filled_bp": -6.0079500736088285,
+   "mean_wait_bars": 0.053003533568904596,
+   "t": -0.11653867339374234,
+   "p": 0.9117618269157359,
+   "p_ctrl": 0.87,
+   "fear_long_promo_bp": -5.903645384830901,
+   "greed_short_promo_bp": null,
+   "seg": {
+    "first60": {
+     "n_bars": 288,
+     "promo_bp": -5.903645384830901
+    },
+    "last40": {
+     "n_bars": 0,
+     "promo_bp": null
+    }
+   },
+   "symbol": "BTCUSDT",
+   "span": "2026-04-21~2026-10-14",
+   "span_tag": "sF",
+   "bucket": "B90",
+   "h": 48,
+   "p_holm": 1.0
+  },
+  {
+   "n_bars": 2496,
+   "valid_n": 624.0,
+   "n_filled": 2468,
+   "n_fc": 0,
+   "fill_rate": 0.9887820512820513,
+   "n_fear_long": 2496,
+   "n_greed_short": 0,
+   "promo_bp": -20.19100108139804,
+   "mean_net_filled_bp": -20.420072406470627,
+   "mean_wait_bars": 0.0846839546191248,
+   "t": -9.418571559348228,
+   "p": 8.763052534807272e-20,
+   "p_ctrl": 1.0,
+   "fear_long_promo_bp": -20.19100108139804,
+   "greed_short_promo_bp": null,
+   "seg": {
+    "first60": {
+     "n_bars": 2496,
+     "promo_bp": -20.19100108139804
+    },
+    "last40": {
+     "n_bars": 0,
+     "promo_bp": null
+    }
+   },
+   "symbol": "BTCUSDT",
+   "span": "2026-04-21~2026-10-14",
+   "span_tag": "sF",
+   "bucket": "B80",
+   "h": 4,
+   "p_holm": 7.886747281326545e-19
+  },
+  {
+   "n_bars": 2496,
+   "valid_n": 156.0,
+   "n_filled": 2468,
+   "n_fc": 0,
+   "fill_rate": 0.9887820512820513,
+   "n_fear_long": 2496,
+   "n_greed_short": 0,
+   "promo_bp": -15.428550993055573,
+   "mean_net_filled_bp": -15.60359127984875,
+   "mean_wait_bars": 0.0846839546191248,
+   "t": -2.0865211308609717,
+   "p": 0.038568899329608046,
+   "p_ctrl": 1.0,
+   "fear_long_promo_bp": -15.428550993055573,
+   "greed_short_promo_bp": null,
+   "seg": {
+    "first60": {
+     "n_bars": 2496,
+     "promo_bp": -15.428550993055573
+    },
+    "last40": {
+     "n_bars": 0,
+     "promo_bp": null
+    }
+   },
+   "symbol": "BTCUSDT",
+   "span": "2026-04-21~2026-10-14",
+   "span_tag": "sF",
+   "bucket": "B80",
+   "h": 16,
+   "p_holm": 0.15427559731843218
+  },
+  {
+   "n_bars": 2496,
+   "valid_n": 52.0,
+   "n_filled": 2468,
+   "n_fc": 0,
+   "fill_rate": 0.9887820512820513,
+   "n_fear_long": 2496,
+   "n_greed_short": 0,
+   "promo_bp": -3.5123114628461445,
+   "mean_net_filled_bp": -3.5521594048881555,
+   "mean_wait_bars": 0.0846839546191248,
+   "t": -0.19566881697005992,
+   "p": 0.8456469177508398,
+   "p_ctrl": 0.85,
+   "fear_long_promo_bp": -3.5123114628461445,
+   "greed_short_promo_bp": null,
+   "seg": {
+    "first60": {
+     "n_bars": 2496,
+     "promo_bp": -3.5123114628461445
+    },
+    "last40": {
+     "n_bars": 0,
+     "promo_bp": null
+    }
+   },
+   "symbol": "BTCUSDT",
+   "span": "2026-04-21~2026-10-14",
+   "span_tag": "sF",
+   "bucket": "B80",
+   "h": 48,
+   "p_holm": 1.0
+  }
+ ],
+ "i1_eth_sB": [
+  {
+   "n_bars": 7754,
+   "valid_n": 1938.5,
+   "n_filled": 7596,
+   "n_fc": 108,
+   "fill_rate": 0.9796234201702347,
+   "n_fear_long": 1344,
+   "n_greed_short": 6410,
+   "promo_bp": -62.53545510375811,
+   "mean_net_filled_bp": -63.83621891449978,
+   "mean_wait_bars": 0.07135334386519221,
+   "t": -19.915893134621435,
+   "p": 1.923125936906573e-80,
+   "p_ctrl": 1.0,
+   "fear_long_promo_bp": -108.47546560739049,
+   "greed_short_promo_bp": -52.903103447458285,
+   "seg": {
+    "first60": {
+     "n_bars": 576,
+     "promo_bp": -91.4735107260158
+    },
+    "last40": {
+     "n_bars": 7178,
+     "promo_bp": -60.213315226574984
+    }
+   },
+   "bucket": "B90",
+   "h": 4
+  },
+  {
+   "n_bars": 7754,
+   "valid_n": 484.625,
+   "n_filled": 7553,
+   "n_fc": 151,
+   "fill_rate": 0.9740778952798556,
+   "n_fear_long": 1344,
+   "n_greed_short": 6410,
+   "promo_bp": -73.40854536229011,
+   "mean_net_filled_bp": -75.3620893339332,
+   "mean_wait_bars": 0.07175956573546935,
+   "t": -6.37984082404934,
+   "p": 4.15232271206509e-10,
+   "p_ctrl": 1.0,
+   "fear_long_promo_bp": -117.23196180540847,
+   "greed_short_promo_bp": -64.21998503474705,
+   "seg": {
+    "first60": {
+     "n_bars": 576,
+     "promo_bp": -61.96955862219296
+    },
+    "last40": {
+     "n_bars": 7178,
+     "promo_bp": -74.32646906837759
+    }
+   },
+   "bucket": "B90",
+   "h": 16
+  },
+  {
+   "n_bars": 7754,
+   "valid_n": 161.54166666666666,
+   "n_filled": 7421,
+   "n_fc": 283,
+   "fill_rate": 0.9570544235233428,
+   "n_fear_long": 1344,
+   "n_greed_short": 6410,
+   "promo_bp": -108.201928640123,
+   "mean_net_filled_bp": -113.05723685157174,
+   "mean_wait_bars": 0.07249696806360328,
+   "t": -3.3746266346137164,
+   "p": 0.0009268291486658837,
+   "p_ctrl": 1.0,
+   "fear_long_promo_bp": -150.1440091542496,
+   "greed_short_promo_bp": -99.40783250736385,
+   "seg": {
+    "first60": {
+     "n_bars": 576,
+     "promo_bp": -37.49029667914962
+    },
+    "last40": {
+     "n_bars": 7178,
+     "promo_bp": -113.87619723994477
+    }
+   },
+   "bucket": "B90",
+   "h": 48
+  },
+  {
+   "n_bars": 26187,
+   "valid_n": 6546.75,
+   "n_filled": 24423,
+   "n_fc": 1595,
+   "fill_rate": 0.9326383319967922,
+   "n_fear_long": 14987,
+   "n_greed_short": 11200,
+   "promo_bp": -92.20228020629634,
+   "mean_net_filled_bp": -98.86177421947684,
+   "mean_wait_bars": 0.07251361421610776,
+   "t": -51.281031912664076,
+   "p": 0.0,
+   "p_ctrl": 1.0,
+   "fear_long_promo_bp": -115.80363539175546,
+   "greed_short_promo_bp": -60.620716798753854,
+   "seg": {
+    "first60": {
+     "n_bars": 12022,
+     "promo_bp": -120.30340819381163
+    },
+    "last40": {
+     "n_bars": 14165,
+     "promo_bp": -68.35252654121277
+    }
+   },
+   "bucket": "B80",
+   "h": 4
+  },
+  {
+   "n_bars": 26187,
+   "valid_n": 1636.6875,
+   "n_filled": 24305,
+   "n_fc": 1713,
+   "fill_rate": 0.9281322793752625,
+   "n_fear_long": 14987,
+   "n_greed_short": 11200,
+   "promo_bp": -94.25189464209346,
+   "mean_net_filled_bp": -101.55006644692457,
+   "mean_wait_bars": 0.0753342933552767,
+   "t": -14.71012367356046,
+   "p": 4.263868137890495e-46,
+   "p_ctrl": 1.0,
+   "fear_long_promo_bp": -112.3373258150501,
+   "greed_short_promo_bp": -70.05132705378088,
+   "seg": {
+    "first60": {
+     "n_bars": 12022,
+     "promo_bp": -117.06035796798274
+    },
+    "last40": {
+     "n_bars": 14165,
+     "promo_bp": -74.89408693973972
+    }
+   },
+   "bucket": "B80",
+   "h": 16
+  },
+  {
+   "n_bars": 26187,
+   "valid_n": 545.5625,
+   "n_filled": 23976,
+   "n_fc": 2042,
+   "fill_rate": 0.9155687936762515,
+   "n_fear_long": 14987,
+   "n_greed_short": 11200,
+   "promo_bp": -98.54406021749124,
+   "mean_net_filled_bp": -107.63151922403412,
+   "mean_wait_bars": 0.07465799132465799,
+   "t": -5.420783990745593,
+   "p": 8.928831093311602e-08,
+   "p_ctrl": 1.0,
+   "fear_long_promo_bp": -102.63544703361555,
+   "greed_short_promo_bp": -93.0692732341649,
+   "seg": {
+    "first60": {
+     "n_bars": 12022,
+     "promo_bp": -108.23852200870802
+    },
+    "last40": {
+     "n_bars": 14165,
+     "promo_bp": -90.3162579122312
+    }
+   },
+   "bucket": "B80",
+   "h": 48
+  }
+ ],
+ "i2_r_variant": {
+  "BTCUSDT_2018-02-01": {
+   "n_clusters": 14,
+   "n_filled": 13,
+   "n_fc": 1,
+   "fill_rate": 0.9285714285714286,
+   "promo_bp": 865.9062517667059,
+   "days": [
+    "2018-02-07",
+    "2018-11-26",
+    "2018-12-15",
+    "2019-08-23",
+    "2020-03-14",
+    "2020-03-15",
+    "2020-03-17",
+    "2020-03-18",
+    "2020-03-21",
+    "2020-03-22",
+    "2020-03-24",
+    "2020-03-29",
+    "2020-03-31",
+    "2020-04-13"
+   ],
+   "symbol": "BTCUSDT",
+   "span": "2018-02-01~2021-05-01"
+  },
+  "BTCUSDT_2026-04-21": {
+   "n_clusters": 3,
+   "n_filled": 2,
+   "n_fc": 0,
+   "fill_rate": 0.6666666666666666,
+   "promo_bp": 287.0155227673038,
+   "days": [
+    "2026-06-09",
+    "2026-06-10",
+    "2026-06-11"
+   ],
+   "symbol": "BTCUSDT",
+   "span": "2026-04-21~2026-10-14"
+  },
+  "ETHUSDT_2024-12-10": {
+   "n_clusters": 29,
+   "n_filled": 28,
+   "n_fc": 0,
+   "fill_rate": 0.9655172413793104,
+   "promo_bp": -195.81219011668153,
+   "days": [
+    "2025-02-28",
+    "2025-11-16",
+    "2025-11-17",
+    "2026-02-07",
+    "2026-02-08",
+    "2026-02-09",
+    "2026-02-11",
+    "2026-02-13",
+    "2026-02-14",
+    "2026-02-15",
+    "2026-02-16",
+    "2026-02-18",
+    "2026-02-19",
+    "2026-02-20",
+    "2026-02-21",
+    "2026-02-22",
+    "2026-02-23",
+    "2026-02-24",
+    "2026-02-25",
+    "2026-03-03",
+    "2026-03-05",
+    "2026-03-10",
+    "2026-03-23",
+    "2026-03-24",
+    "2026-03-27",
+    "2026-03-30",
+    "2026-03-31",
+    "2026-04-02",
+    "2026-04-04"
+   ],
+   "symbol": "ETHUSDT",
+   "span": "2024-12-10~2026-04-20"
+  }
+ },
+ "i3_sensitivity": [
+  {
+   "bucket": "B90",
+   "h": 48,
+   "delta_bp": 0.0,
+   "K": 4,
+   "n_bars": 5167,
+   "fill_rate": 0.9572285658989743,
+   "promo_bp": -92.56927321633592
+  },
+  {
+   "bucket": "B90",
+   "h": 48,
+   "delta_bp": 0.0,
+   "K": 16,
+   "n_bars": 5167,
+   "fill_rate": 0.9614863557189859,
+   "promo_bp": -93.43414309924164
+  },
+  {
+   "bucket": "B90",
+   "h": 48,
+   "delta_bp": 5.0,
+   "K": 4,
+   "n_bars": 5167,
+   "fill_rate": 0.901490226437004,
+   "promo_bp": -87.4978083642438
+  },
+  {
+   "bucket": "B90",
+   "h": 48,
+   "delta_bp": 5.0,
+   "K": 16,
+   "n_bars": 5167,
+   "fill_rate": 0.9371008322043739,
+   "promo_bp": -90.90919634548493
+  },
+  {
+   "bucket": "B90",
+   "h": 48,
+   "delta_bp": 10.0,
+   "K": 4,
+   "n_bars": 5167,
+   "fill_rate": 0.8556222179214245,
+   "promo_bp": -81.41261541703575
+  },
+  {
+   "bucket": "B90",
+   "h": 48,
+   "delta_bp": 10.0,
+   "K": 16,
+   "n_bars": 5167,
+   "fill_rate": 0.9127153086897619,
+   "promo_bp": -87.37517604730046
+  },
+  {
+   "bucket": "B90",
+   "h": 48,
+   "delta_bp": 20.0,
+   "K": 4,
+   "n_bars": 5167,
+   "fill_rate": 0.7474356493129476,
+   "promo_bp": -70.89105952799851
+  },
+  {
+   "bucket": "B90",
+   "h": 48,
+   "delta_bp": 20.0,
+   "K": 16,
+   "n_bars": 5167,
+   "fill_rate": 0.8625895103541708,
+   "promo_bp": -82.50130078654149
+  },
+  {
+   "bucket": "B80",
+   "h": 48,
+   "delta_bp": 0.0,
+   "K": 4,
+   "n_bars": 22352,
+   "fill_rate": 0.9760647816750179,
+   "promo_bp": -60.77267449340317
+  },
+  {
+   "bucket": "B80",
+   "h": 48,
+   "delta_bp": 0.0,
+   "K": 16,
+   "n_bars": 22352,
+   "fill_rate": 0.9806281317108089,
+   "promo_bp": -61.17828940874536
+  },
+  {
+   "bucket": "B80",
+   "h": 48,
+   "delta_bp": 5.0,
+   "K": 4,
+   "n_bars": 22352,
+   "fill_rate": 0.9051091624910522,
+   "promo_bp": -57.35915115368779
+  },
+  {
+   "bucket": "B80",
+   "h": 48,
+   "delta_bp": 5.0,
+   "K": 16,
+   "n_bars": 22352,
+   "fill_rate": 0.9494005010737294,
+   "promo_bp": -60.25304550592988
+  },
+  {
+   "bucket": "B80",
+   "h": 48,
+   "delta_bp": 10.0,
+   "K": 4,
+   "n_bars": 22352,
+   "fill_rate": 0.8444434502505369,
+   "promo_bp": -53.41600870871824
+  },
+  {
+   "bucket": "B80",
+   "h": 48,
+   "delta_bp": 10.0,
+   "K": 16,
+   "n_bars": 22352,
+   "fill_rate": 0.9197834645669292,
+   "promo_bp": -57.983171248294525
+  },
+  {
+   "bucket": "B80",
+   "h": 48,
+   "delta_bp": 20.0,
+   "K": 4,
+   "n_bars": 22352,
+   "fill_rate": 0.7185934144595562,
+   "promo_bp": -46.11421690374416
+  },
+  {
+   "bucket": "B80",
+   "h": 48,
+   "delta_bp": 20.0,
+   "K": 16,
+   "n_bars": 22352,
+   "fill_rate": 0.8588493199713673,
+   "promo_bp": -55.09961704458367
+  }
+ ],
+ "i5_maker_fee_sens": [
+  {
+   "fee_bp": 0.0,
+   "promo_bp": -91.51117038780369,
+   "ref_cell": "sB B90 h48"
+  },
+  {
+   "fee_bp": 1.0,
+   "promo_bp": -92.47265674352266,
+   "ref_cell": "sB B90 h48"
+  },
+  {
+   "fee_bp": 2.0,
+   "promo_bp": -93.43414309924164,
+   "ref_cell": "sB B90 h48"
+  }
+ ],
+ "i6_100k_sens": [],
+ "gates": [],
+ "verdict_promotion": false
+}

@@ -1,0 +1,96 @@
+{
+ "exchangeInfo": {
+  "http": 200,
+  "symbols": {
+   "XAUUSDT": {
+    "listed": true,
+    "status": "TRADING",
+    "onboardDate_ms": 1765440300000,
+    "contractType": "TRADIFI_PERPETUAL",
+    "quote": "USDT"
+   },
+   "SNDKUSDT": {
+    "listed": true,
+    "status": "TRADING",
+    "onboardDate_ms": 1775569200000,
+    "contractType": "TRADIFI_PERPETUAL",
+    "quote": "USDT"
+   },
+   "SOXLUSDT": {
+    "listed": true,
+    "status": "TRADING",
+    "onboardDate_ms": 1778853600000,
+    "contractType": "TRADIFI_PERPETUAL",
+    "quote": "USDT"
+   },
+   "SPCXUSDT": {
+    "listed": true,
+    "status": "TRADING",
+    "onboardDate_ms": 1779338700000,
+    "contractType": "TRADIFI_PERPETUAL",
+    "quote": "USDT"
+   },
+   "SKHYNIXUSDT": {
+    "listed": true,
+    "status": "TRADING",
+    "onboardDate_ms": 1780369200000,
+    "contractType": "TRADIFI_PERPETUAL",
+    "quote": "USDT"
+   },
+   "KORUUSDT": {
+    "listed": true,
+    "status": "TRADING",
+    "onboardDate_ms": 1782136500000,
+    "contractType": "TRADIFI_PERPETUAL",
+    "quote": "USDT"
+   },
+   "CLUSDT": {
+    "listed": true,
+    "status": "TRADING",
+    "onboardDate_ms": 1775034000000,
+    "contractType": "TRADIFI_PERPETUAL",
+    "quote": "USDT"
+   },
+   "MUUSDT": {
+    "listed": true,
+    "status": "TRADING",
+    "onboardDate_ms": 1775568600000,
+    "contractType": "TRADIFI_PERPETUAL",
+    "quote": "USDT"
+   },
+   "XAGUSDT": {
+    "listed": true,
+    "status": "TRADING",
+    "onboardDate_ms": 1767780000000,
+    "contractType": "TRADIFI_PERPETUAL",
+    "quote": "USDT"
+   },
+   "BZUSDT": {
+    "listed": true,
+    "status": "TRADING",
+    "onboardDate_ms": 1775034600000,
+    "contractType": "TRADIFI_PERPETUAL",
+    "quote": "USDT"
+   }
+  }
+ },
+ "daily_archive_2026-10-09": {
+  "XAUUSDT": 200,
+  "SNDKUSDT": 200,
+  "SOXLUSDT": 200,
+  "SPCXUSDT": 200,
+  "SKHYNIXUSDT": 200,
+  "KORUUSDT": 200,
+  "CLUSDT": 200,
+  "MUUSDT": 200,
+  "XAGUSDT": 200,
+  "BZUSDT": 200
+ },
+ "recent_checks": {
+  "XAUUSDT_2026-09_monthly": 200,
+  "XAUUSDT_2026-10-09_daily": 200,
+  "XAGUSDT_2026-09_monthly": 200,
+  "XAGUSDT_2026-10-09_daily": 200
+ },
+ "probed_at": "2026-10-13"
+}

@@ -1,0 +1,71 @@
+{
+ "probed_at": "2026-10-13",
+ "symbols": {
+  "XAUUSDT": {
+   "symbol": "XAUUSDT",
+   "first_month": "2026-01",
+   "months_ok": 9,
+   "months_missing": 0,
+   "missing_detail": [],
+   "total_bars": 26208,
+   "approx_days": 273.0,
+   "coverage_rule_540d": false,
+   "coverage_rule_300d": false,
+   "status": "ok"
+  },
+  "SNDKUSDT": {
+   "symbol": "SNDKUSDT",
+   "listed_year": null,
+   "status": "no_data_2024_2026"
+  },
+  "SOXLUSDT": {
+   "symbol": "SOXLUSDT",
+   "listed_year": null,
+   "status": "no_data_2024_2026"
+  },
+  "SPCXUSDT": {
+   "symbol": "SPCXUSDT",
+   "listed_year": null,
+   "status": "no_data_2024_2026"
+  },
+  "SKHYNIXUSDT": {
+   "symbol": "SKHYNIXUSDT",
+   "listed_year": null,
+   "status": "no_data_2024_2026"
+  },
+  "KORUUSDT": {
+   "symbol": "KORUUSDT",
+   "listed_year": null,
+   "status": "no_data_2024_2026"
+  },
+  "CLUSDT": {
+   "symbol": "CLUSDT",
+   "listed_year": null,
+   "status": "no_data_2024_2026"
+  },
+  "MUUSDT": {
+   "symbol": "MUUSDT",
+   "listed_year": null,
+   "status": "no_data_2024_2026"
+  },
+  "XAGUSDT": {
+   "symbol": "XAGUSDT",
+   "first_month": "2026-01",
+   "months_ok": 9,
+   "months_missing": 0,
+   "missing_detail": [],
+   "total_bars": 25592,
+   "approx_days": 266.6,
+   "coverage_rule_540d": false,
+   "coverage_rule_300d": false,
+   "status": "ok"
+  },
+  "BZUSDT": {
+   "symbol": "BZUSDT",
+   "listed_year": null,
+   "status": "no_data_2024_2026"
+  }
+ },
+ "rule_540d_pass": [],
+ "rule_300d_pass": []
+}

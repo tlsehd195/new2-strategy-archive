@@ -1,0 +1,487 @@
+{
+ "data_gap_report": {
+  "BTCUSDT": [
+   "2024-03-31T23:45:00+00:00 -> 2024-06-01T00:00:00+00:00"
+  ],
+  "ETHUSDT": [
+   "2024-05-31T23:45:00+00:00 -> 2024-11-01T00:00:00+00:00",
+   "2026-04-30T23:45:00+00:00 -> 2026-09-01T00:00:00+00:00"
+  ],
+  "SOLUSDT": [
+   "2022-02-25T23:45:00+00:00 -> 2022-03-01T00:00:00+00:00",
+   "2022-03-31T23:45:00+00:00 -> 2022-04-03T00:00:00+00:00"
+  ],
+  "ZECUSDT": [
+   "2022-02-25T23:45:00+00:00 -> 2022-03-01T00:00:00+00:00",
+   "2022-03-31T23:45:00+00:00 -> 2022-04-03T00:00:00+00:00"
+  ],
+  "NEARUSDT": [
+   "2022-02-25T23:45:00+00:00 -> 2022-03-01T00:00:00+00:00",
+   "2022-03-31T23:45:00+00:00 -> 2022-04-03T00:00:00+00:00"
+  ],
+  "XRPUSDT": [
+   "2022-02-25T23:45:00+00:00 -> 2022-03-01T00:00:00+00:00",
+   "2022-03-31T23:45:00+00:00 -> 2022-04-03T00:00:00+00:00"
+  ]
+ },
+ "spec": {
+  "prereg": "PREREG_x14_crosssectional_2026-10-13.md",
+  "universe": [
+   "BTCUSDT",
+   "ETHUSDT",
+   "SOLUSDT",
+   "ZECUSDT",
+   "NEARUSDT",
+   "XRPUSDT"
+  ],
+  "K": 2,
+  "primary_direction": "momentum (top-2 long + bottom-2 short)",
+  "signal": "trailing L-bar log return from 00:00 bar close (causal)",
+  "entry": "00:15 bar open",
+  "exit": "entry + h bars open",
+  "cluster": "entry-date (momentum legs mean)",
+  "cells": "L{96,288,960}xh{96,288}",
+  "end": "2026-09-30 23:45 UTC",
+  "locks_excluded": true
+ },
+ "cells": [
+  {
+   "cell": "L96h96",
+   "L": 96,
+   "h": 96,
+   "n_clusters": 1647,
+   "mean_gross_bp": -18.578057062492245,
+   "net16_bp": -34.57805706249225,
+   "t": -2.3169494763679577,
+   "p": 0.020628688343533798,
+   "era1_n": 630,
+   "era1_mean_bp": -33.398146526894294,
+   "era2_n": 1017,
+   "era2_mean_bp": -9.39747066861487,
+   "oos_n": 659,
+   "oos_mean_bp": -6.0064239937649315,
+   "p_ctrl_random": 1.0,
+   "random_seed_mean_bp": -0.07324525603598639,
+   "universe_long_mean_bp": 3.9098585121265894,
+   "universe_long_n": 1651,
+   "min_cluster_gap_h": 24.0,
+   "dropped": {
+    "incomplete": 350,
+    "lock": 10
+   },
+   "coin_decomposition": {
+    "BTCUSDT": {
+     "n_winner": 591,
+     "n_loser": 427,
+     "mean_winner_bp": 9.82262767045847,
+     "mean_loser_bp": -20.286376228424874
+    },
+    "ETHUSDT": {
+     "n_winner": 523,
+     "n_loser": 382,
+     "mean_winner_bp": 7.85755798119835,
+     "mean_loser_bp": 19.643521166559342
+    },
+    "SOLUSDT": {
+     "n_winner": 539,
+     "n_loser": 620,
+     "mean_winner_bp": 2.7888105774127157,
+     "mean_loser_bp": -3.9204334210623837
+    },
+    "ZECUSDT": {
+     "n_winner": 601,
+     "n_loser": 642,
+     "mean_winner_bp": 19.525079303052365,
+     "mean_loser_bp": -15.000036888257384
+    },
+    "NEARUSDT": {
+     "n_winner": 562,
+     "n_loser": 674,
+     "mean_winner_bp": -8.23675623567964,
+     "mean_loser_bp": 18.109171058964762
+    },
+    "XRPUSDT": {
+     "n_winner": 478,
+     "n_loser": 549,
+     "mean_winner_bp": -8.464186792821808,
+     "mean_loser_bp": 41.98902766368629
+    }
+   },
+   "p_holm": 0.12377213006120279,
+   "holm_pass": false,
+   "gates": {
+    "G1_holm": false,
+    "G2_era_sign": false,
+    "G3_oos": false,
+    "G4_n100": true
+   },
+   "PASS": false
+  },
+  {
+   "cell": "L96h288",
+   "L": 96,
+   "h": 288,
+   "n_clusters": 546,
+   "mean_gross_bp": -36.390379174767986,
+   "net16_bp": -52.390379174767986,
+   "t": -1.5779968679592877,
+   "p": 0.11514654834019525,
+   "era1_n": 208,
+   "era1_mean_bp": -24.22259567123672,
+   "era2_n": 338,
+   "era2_mean_bp": -43.87824594617186,
+   "oos_n": 219,
+   "oos_mean_bp": -19.027169936563045,
+   "p_ctrl_random": 1.0,
+   "random_seed_mean_bp": 0.6312783670132666,
+   "universe_long_mean_bp": 12.658282003409665,
+   "universe_long_n": 548,
+   "min_cluster_gap_h": 72.0,
+   "dropped": {
+    "incomplete": 120,
+    "lock": 3
+   },
+   "coin_decomposition": {
+    "BTCUSDT": {
+     "n_winner": 194,
+     "n_loser": 135,
+     "mean_winner_bp": -13.605922685492606,
+     "mean_loser_bp": 29.343521625691935
+    },
+    "ETHUSDT": {
+     "n_winner": 174,
+     "n_loser": 117,
+     "mean_winner_bp": 51.27086355989955,
+     "mean_loser_bp": -0.4445135227159318
+    },
+    "SOLUSDT": {
+     "n_winner": 181,
+     "n_loser": 212,
+     "mean_winner_bp": 85.20623595942186,
+     "mean_loser_bp": -21.171857815089307
+    },
+    "ZECUSDT": {
+     "n_winner": 208,
+     "n_loser": 215,
+     "mean_winner_bp": -0.6227029347609494,
+     "mean_loser_bp": 22.086470433863326
+    },
+    "NEARUSDT": {
+     "n_winner": 187,
+     "n_loser": 229,
+     "mean_winner_bp": -99.9586224146668,
+     "mean_loser_bp": 95.77995151353042
+    },
+    "XRPUSDT": {
+     "n_winner": 148,
+     "n_loser": 184,
+     "mean_winner_bp": 2.5779668370756412,
+     "mean_loser_bp": 92.60086915765268
+    }
+   },
+   "p_holm": 0.5757327417009762,
+   "holm_pass": false,
+   "gates": {
+    "G1_holm": false,
+    "G2_era_sign": false,
+    "G3_oos": false,
+    "G4_n100": true
+   },
+   "PASS": false
+  },
+  {
+   "cell": "L288h96",
+   "L": 288,
+   "h": 96,
+   "n_clusters": 1637,
+   "mean_gross_bp": -11.866132899648948,
+   "net16_bp": -27.866132899648946,
+   "t": -1.3598026703106074,
+   "p": 0.1740797423684246,
+   "era1_n": 624,
+   "era1_mean_bp": -6.786332489835661,
+   "era2_n": 1013,
+   "era2_mean_bp": -14.995249835210146,
+   "oos_n": 655,
+   "oos_mean_bp": -7.719483024930103,
+   "p_ctrl_random": 1.0,
+   "random_seed_mean_bp": -1.3999067912301049,
+   "universe_long_mean_bp": 3.9098585121265894,
+   "universe_long_n": 1651,
+   "min_cluster_gap_h": 24.0,
+   "dropped": {
+    "incomplete": 358,
+    "lock": 10
+   },
+   "coin_decomposition": {
+    "BTCUSDT": {
+     "n_winner": 620,
+     "n_loser": 398,
+     "mean_winner_bp": 15.906070636269597,
+     "mean_loser_bp": -14.366833804517297
+    },
+    "ETHUSDT": {
+     "n_winner": 533,
+     "n_loser": 368,
+     "mean_winner_bp": 0.6211203342187614,
+     "mean_loser_bp": -4.939045990310581
+    },
+    "SOLUSDT": {
+     "n_winner": 533,
+     "n_loser": 572,
+     "mean_winner_bp": 29.371716799028057,
+     "mean_loser_bp": -25.24396199052753
+    },
+    "ZECUSDT": {
+     "n_winner": 559,
+     "n_loser": 659,
+     "mean_winner_bp": 50.25504144528191,
+     "mean_loser_bp": -0.5777837250664903
+    },
+    "NEARUSDT": {
+     "n_winner": 527,
+     "n_loser": 682,
+     "mean_winner_bp": -21.028809333763487,
+     "mean_loser_bp": 16.56002303269222
+    },
+    "XRPUSDT": {
+     "n_winner": 502,
+     "n_loser": 595,
+     "mean_winner_bp": -17.22356677277941,
+     "mean_loser_bp": 20.25449908349593
+    }
+   },
+   "p_holm": 0.6963189694736984,
+   "holm_pass": false,
+   "gates": {
+    "G1_holm": false,
+    "G2_era_sign": false,
+    "G3_oos": false,
+    "G4_n100": true
+   },
+   "PASS": false
+  },
+  {
+   "cell": "L288h288",
+   "L": 288,
+   "h": 288,
+   "n_clusters": 543,
+   "mean_gross_bp": -2.463483290521178,
+   "net16_bp": -18.46348329052118,
+   "t": -0.10031022900692899,
+   "p": 0.9201351295465239,
+   "era1_n": 207,
+   "era1_mean_bp": -18.209304830343637,
+   "era2_n": 336,
+   "era2_mean_bp": 7.237067479548014,
+   "oos_n": 218,
+   "oos_mean_bp": 20.946478756515518,
+   "p_ctrl_random": 0.5,
+   "random_seed_mean_bp": -1.3179738644563848,
+   "universe_long_mean_bp": 12.658282003409665,
+   "universe_long_n": 548,
+   "min_cluster_gap_h": 72.0,
+   "dropped": {
+    "incomplete": 122,
+    "lock": 3
+   },
+   "coin_decomposition": {
+    "BTCUSDT": {
+     "n_winner": 208,
+     "n_loser": 125,
+     "mean_winner_bp": 13.773795279664936,
+     "mean_loser_bp": -37.35599888052628
+    },
+    "ETHUSDT": {
+     "n_winner": 169,
+     "n_loser": 130,
+     "mean_winner_bp": -1.6812437099535746,
+     "mean_loser_bp": 31.394079267610337
+    },
+    "SOLUSDT": {
+     "n_winner": 172,
+     "n_loser": 184,
+     "mean_winner_bp": 61.587989932515505,
+     "mean_loser_bp": -58.46376677417452
+    },
+    "ZECUSDT": {
+     "n_winner": 188,
+     "n_loser": 220,
+     "mean_winner_bp": 51.01471288603508,
+     "mean_loser_bp": 80.50698827472934
+    },
+    "NEARUSDT": {
+     "n_winner": 182,
+     "n_loser": 230,
+     "mean_winner_bp": -16.76609489484833,
+     "mean_loser_bp": 33.576809314167065
+    },
+    "XRPUSDT": {
+     "n_winner": 167,
+     "n_loser": 197,
+     "mean_winner_bp": 11.754266247489822,
+     "mean_loser_bp": -20.841673759910844
+    }
+   },
+   "p_holm": 1.0,
+   "holm_pass": false,
+   "gates": {
+    "G1_holm": false,
+    "G2_era_sign": false,
+    "G3_oos": true,
+    "G4_n100": true
+   },
+   "PASS": false
+  },
+  {
+   "cell": "L960h96",
+   "L": 960,
+   "h": 96,
+   "n_clusters": 1602,
+   "mean_gross_bp": -6.71822228135847,
+   "net16_bp": -22.71822228135847,
+   "t": -0.8086948649195956,
+   "p": 0.4188108361327223,
+   "era1_n": 603,
+   "era1_mean_bp": -6.604721170913503,
+   "era2_n": 999,
+   "era2_mean_bp": -6.78673196063606,
+   "oos_n": 641,
+   "oos_mean_bp": -2.4755199335764972,
+   "p_ctrl_random": 0.91,
+   "random_seed_mean_bp": -0.051300853647220174,
+   "universe_long_mean_bp": 3.9098585121265894,
+   "universe_long_n": 1651,
+   "min_cluster_gap_h": 24.0,
+   "dropped": {
+    "incomplete": 386,
+    "lock": 10
+   },
+   "coin_decomposition": {
+    "BTCUSDT": {
+     "n_winner": 609,
+     "n_loser": 393,
+     "mean_winner_bp": 5.7012192892528955,
+     "mean_loser_bp": 2.7410042805901194
+    },
+    "ETHUSDT": {
+     "n_winner": 539,
+     "n_loser": 341,
+     "mean_winner_bp": 6.886817998630825,
+     "mean_loser_bp": -15.606088279044071
+    },
+    "SOLUSDT": {
+     "n_winner": 547,
+     "n_loser": 529,
+     "mean_winner_bp": 54.18629213999572,
+     "mean_loser_bp": -12.545151627453789
+    },
+    "ZECUSDT": {
+     "n_winner": 539,
+     "n_loser": 668,
+     "mean_winner_bp": 42.09729828254832,
+     "mean_loser_bp": -21.011078589259174
+    },
+    "NEARUSDT": {
+     "n_winner": 480,
+     "n_loser": 716,
+     "mean_winner_bp": -37.2746221016025,
+     "mean_loser_bp": 3.1112222567505987
+    },
+    "XRPUSDT": {
+     "n_winner": 490,
+     "n_loser": 557,
+     "mean_winner_bp": -2.4284270305678546,
+     "mean_loser_bp": 4.314973213161834
+    }
+   },
+   "p_holm": 1.0,
+   "holm_pass": false,
+   "gates": {
+    "G1_holm": false,
+    "G2_era_sign": false,
+    "G3_oos": false,
+    "G4_n100": true
+   },
+   "PASS": false
+  },
+  {
+   "cell": "L960h288",
+   "L": 960,
+   "h": 288,
+   "n_clusters": 531,
+   "mean_gross_bp": -18.207470253725223,
+   "net16_bp": -34.20747025372522,
+   "t": -0.7583060345417788,
+   "p": 0.44860485451567966,
+   "era1_n": 199,
+   "era1_mean_bp": -22.45883134746059,
+   "era2_n": 332,
+   "era2_mean_bp": -15.659214658383846,
+   "oos_n": 213,
+   "oos_mean_bp": -6.863444122548661,
+   "p_ctrl_random": 0.91,
+   "random_seed_mean_bp": -0.9652288487527793,
+   "universe_long_mean_bp": 12.658282003409665,
+   "universe_long_n": 548,
+   "min_cluster_gap_h": 72.0,
+   "dropped": {
+    "incomplete": 132,
+    "lock": 3
+   },
+   "coin_decomposition": {
+    "BTCUSDT": {
+     "n_winner": 197,
+     "n_loser": 127,
+     "mean_winner_bp": -2.289322576285887,
+     "mean_loser_bp": 9.928076789280794
+    },
+    "ETHUSDT": {
+     "n_winner": 176,
+     "n_loser": 121,
+     "mean_winner_bp": 25.820494382849027,
+     "mean_loser_bp": -19.212232664803246
+    },
+    "SOLUSDT": {
+     "n_winner": 177,
+     "n_loser": 175,
+     "mean_winner_bp": 105.47553322383345,
+     "mean_loser_bp": -36.86415386239336
+    },
+    "ZECUSDT": {
+     "n_winner": 183,
+     "n_loser": 219,
+     "mean_winner_bp": 81.94527143387793,
+     "mean_loser_bp": -58.51671268269794
+    },
+    "NEARUSDT": {
+     "n_winner": 164,
+     "n_loser": 230,
+     "mean_winner_bp": -13.26126136593635,
+     "mean_loser_bp": -34.888587437030935
+    },
+    "XRPUSDT": {
+     "n_winner": 165,
+     "n_loser": 190,
+     "mean_winner_bp": 30.598517908127906,
+     "mean_loser_bp": 23.390784375982772
+    }
+   },
+   "p_holm": 1.0,
+   "holm_pass": false,
+   "gates": {
+    "G1_holm": false,
+    "G2_era_sign": false,
+    "G3_oos": false,
+    "G4_n100": true
+   },
+   "PASS": false
+  }
+ ],
+ "summary": {
+  "n_cells": 6,
+  "holm_pass_cells": 0,
+  "PASS_cells": 0,
+  "verdict": "FAIL (diagnostic)"
+ }
+}

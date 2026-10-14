@@ -1,0 +1,204 @@
+{
+ "XAUUSDT": {
+  "files": 305,
+  "bars": 29248,
+  "us_rth_share": 0.3439,
+  "krx_share": 0.2409,
+  "eu_7_15_share": 0.4335,
+  "comex_2300_share": 0.0226,
+  "nymex_1800_share": 0.0282,
+  "rth_first_hour_share": 0.0919,
+  "rth_last_hour_share": 0.0297,
+  "weekend_qv_share": 0.1986,
+  "top5_slots_utc": [
+   "12:30",
+   "14:00",
+   "13:30",
+   "13:45",
+   "13:00"
+  ]
+ },
+ "SNDKUSDT": {
+  "files": 188,
+  "bars": 17994,
+  "us_rth_share": 0.5745,
+  "krx_share": 0.1426,
+  "eu_7_15_share": 0.5046,
+  "comex_2300_share": 0.0099,
+  "nymex_1800_share": 0.0293,
+  "rth_first_hour_share": 0.2421,
+  "rth_last_hour_share": 0.0487,
+  "weekend_qv_share": 0.2089,
+  "top5_slots_utc": [
+   "13:30",
+   "13:45",
+   "14:00",
+   "14:15",
+   "14:30"
+  ]
+ },
+ "SOXLUSDT": {
+  "files": 150,
+  "bars": 14344,
+  "us_rth_share": 0.5301,
+  "krx_share": 0.1603,
+  "eu_7_15_share": 0.5149,
+  "comex_2300_share": 0.0093,
+  "nymex_1800_share": 0.0269,
+  "rth_first_hour_share": 0.2216,
+  "rth_last_hour_share": 0.0515,
+  "weekend_qv_share": 0.2051,
+  "top5_slots_utc": [
+   "13:30",
+   "13:45",
+   "14:00",
+   "14:15",
+   "14:30"
+  ]
+ },
+ "SPCXUSDT": {
+  "files": 144,
+  "bars": 13805,
+  "us_rth_share": 0.6779,
+  "krx_share": 0.0796,
+  "eu_7_15_share": 0.5002,
+  "comex_2300_share": 0.0074,
+  "nymex_1800_share": 0.0368,
+  "rth_first_hour_share": 0.2704,
+  "rth_last_hour_share": 0.0746,
+  "weekend_qv_share": 0.2084,
+  "top5_slots_utc": [
+   "13:30",
+   "13:45",
+   "14:00",
+   "14:15",
+   "14:30"
+  ]
+ },
+ "SKHYNIXUSDT": {
+  "files": 132,
+  "bars": 12660,
+  "us_rth_share": 0.2282,
+  "krx_share": 0.5121,
+  "eu_7_15_share": 0.2702,
+  "comex_2300_share": 0.0272,
+  "nymex_1800_share": 0.0131,
+  "rth_first_hour_share": 0.0861,
+  "rth_last_hour_share": 0.0196,
+  "weekend_qv_share": 0.1882,
+  "top5_slots_utc": [
+   "00:00",
+   "13:30",
+   "00:15",
+   "00:30",
+   "01:00"
+  ]
+ },
+ "KORUUSDT": {
+  "files": 112,
+  "bars": 10697,
+  "us_rth_share": 0.3734,
+  "krx_share": 0.3516,
+  "eu_7_15_share": 0.3748,
+  "comex_2300_share": 0.0166,
+  "nymex_1800_share": 0.0223,
+  "rth_first_hour_share": 0.1418,
+  "rth_last_hour_share": 0.0332,
+  "weekend_qv_share": 0.1784,
+  "top5_slots_utc": [
+   "13:30",
+   "13:45",
+   "00:00",
+   "14:00",
+   "14:15"
+  ]
+ },
+ "CLUSDT": {
+  "files": 194,
+  "bars": 18588,
+  "us_rth_share": 0.373,
+  "krx_share": 0.1648,
+  "eu_7_15_share": 0.4438,
+  "comex_2300_share": 0.0172,
+  "nymex_1800_share": 0.0344,
+  "rth_first_hour_share": 0.0756,
+  "rth_last_hour_share": 0.0332,
+  "weekend_qv_share": 0.2064,
+  "top5_slots_utc": [
+   "13:00",
+   "14:00",
+   "15:30",
+   "15:15",
+   "13:30"
+  ]
+ },
+ "MUUSDT": {
+  "files": 188,
+  "bars": 17995,
+  "us_rth_share": 0.5469,
+  "krx_share": 0.1635,
+  "eu_7_15_share": 0.486,
+  "comex_2300_share": 0.011,
+  "nymex_1800_share": 0.0305,
+  "rth_first_hour_share": 0.227,
+  "rth_last_hour_share": 0.0465,
+  "weekend_qv_share": 0.1883,
+  "top5_slots_utc": [
+   "13:30",
+   "13:45",
+   "14:00",
+   "14:15",
+   "14:30"
+  ]
+ },
+ "XAGUSDT": {
+  "files": 278,
+  "bars": 26648,
+  "us_rth_share": 0.3343,
+  "krx_share": 0.26,
+  "eu_7_15_share": 0.4066,
+  "comex_2300_share": 0.0243,
+  "nymex_1800_share": 0.0308,
+  "rth_first_hour_share": 0.0809,
+  "rth_last_hour_share": 0.0286,
+  "weekend_qv_share": 0.2062,
+  "top5_slots_utc": [
+   "01:00",
+   "13:00",
+   "13:30",
+   "14:30",
+   "12:30"
+  ]
+ },
+ "BZUSDT": {
+  "files": 194,
+  "bars": 18588,
+  "us_rth_share": 0.3636,
+  "krx_share": 0.1636,
+  "eu_7_15_share": 0.45,
+  "comex_2300_share": 0.0151,
+  "nymex_1800_share": 0.0343,
+  "rth_first_hour_share": 0.0726,
+  "rth_last_hour_share": 0.0325,
+  "weekend_qv_share": 0.2087,
+  "top5_slots_utc": [
+   "22:00",
+   "13:00",
+   "13:30",
+   "14:00",
+   "15:30"
+  ]
+ },
+ "_classification": {
+  "XAUUSDT": "COMMODITY_24H",
+  "SNDKUSDT": "US_equity_RTH",
+  "SOXLUSDT": "US_equity_RTH",
+  "SPCXUSDT": "US_equity_RTH",
+  "SKHYNIXUSDT": "KRX",
+  "KORUUSDT": "US_equity_RTH",
+  "CLUSDT": "US_equity_RTH",
+  "MUUSDT": "US_equity_RTH",
+  "XAGUSDT": "COMMODITY_24H",
+  "BZUSDT": "US_equity_RTH"
+ }
+}

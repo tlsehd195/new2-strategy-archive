@@ -1,9 +1,0 @@
-{
-  "name": "p3-maker-fill-monitor",
-  "version": "1.0.0",
-  "description": "N2 promotion-basis maker 체결 역학 실측 모니터 (Task 41) — 페이퍼 post-only, 실 주문 아님",
-  "scripts": {
-    "dev": "bun index.ts"
-  },
-  "dependencies": {}
-}

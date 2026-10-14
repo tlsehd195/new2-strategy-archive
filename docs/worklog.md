@@ -1141,3 +1141,19 @@ Work Log:
 Stage Summary:
 - 감사 프로젝트 7단계 전부 완료. 이전 검토 25건: 확인 21·기각 3, 수정 16건 전부 자동 테스트로 검증. 잔여: 원본 costs.py 접근 불가·agentTurn LLM 의존·순차 FDR 근사성·체결 실측 부재·생존 편향 — 전부 보고서에 명시
 - 엔진은 v2-audit2로 운영 재개(3시간 주기). 생존자 0은 정상 — 비용 벽 하에서 통과할 전략이 실존할 때만 승격 큐가 움직임
+---
+Task ID: 52
+Agent: Z.ai Code (main, cron Job 459256 첫 정기 사이클 + 사용자 GitHub 확인 질문 대응 중 F-25 발견)
+Task: 첫 정기 사이클 수행 → 백업 push 판정 버그(F-25) 발견·수정 → 오프사이트 전면 재동기화
+
+Work Log:
+- [첫 정기 사이클] cron 459256(v2-audit2 payload) 규정대로 수행: 사이클 15 → CYCLE_OK(exit 0), proposed=10 processed=10, FAIL_COST 8·UNDETERMINED 1·DATA_MISSING 1, errors=0, survivors=0, tested=116/779, 5초. 트리거(생존자/실패/소진/큐 급증) 해당 없음 → worklog 미기록 규정 준수(cycles.md 자동 기록)
+- [F-25 발견] 사용자 질문("전부 GitHub에 올라갔나?") 검증 중 원격 main=710f558 vs 로컬 972588c 불일치 실측. 원인: 복원된 구 백업 스크립트가 push 종료 코드를 검사하지 않고 출력의 "main" 문자열 grep으로 성공 판정 → push 거부 메시지에도 "main -> main" 존재 → 13:32Z·14:49Z 두 push가 OK로 기록됐으나 원격 미반영
+- [수정] git_backup_push.sh: ①push 종료 코드 직접 판정 ②push 후 git ls-remote로 원격 HEAD 실측 → 로컬 SHA 일치 필수 ③git_log에 remote_sha 기록 ④불일치 시 GITBK_FAILED. runner.py: state.json의 engine 라벨을 매 사이클 ENGINE_VERSION으로 갱신(v2-audit1 잔존 라벨 정리)
+- [재동기화] 수동 검증 push(원격 히스토리 710f558 보존 + 로컬 병합) → 2dd67c9. 수정판 스크립트 end-to-end 실행 → GITBK_OK db=4767 remote_sha=daa5ca6, 독립 ls-remote로 원격=로컬 일치 재확인
+- [기록] 감사 보고서에 F-25 사후 부록 추가(기존 판정 미변경). 교훈: 스냅샷 버그(bun -e 오류 은폐)와 동일 계열 — 성공 메시지가 아닌 실측 대조만이 무결성 검증
+
+Stage Summary:
+- 오프사이트 백업이 "진짜" 재가동: 현재 원격=daa5ca6(로컬 완전 동기), 이후 매일 09:00 KST 크론이 실측 검증판으로 운영
+- 감사 25건 외 신규 결함 F-25(높음) 1건 추가 발견·수정·검증 완료 — 감사 보고서 부록 참조
+- 엔진 운영 정상: v2-audit2, cycle 15, tested 116/779, 생존자 0, 재검증 큐 정상 축적

@@ -1,0 +1,41 @@
+{
+ "prereg_target": "X14",
+ "rule": "\ud3d0\uae30 |rho|>=0.8 (A1/X12 \uc120\ub840)",
+ "L": 288,
+ "results": [
+  {
+   "symbol": "BTCUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "rho_vol_rv": 0.23780487546191786,
+   "rho_vol_illiq": -0.16736564846159113,
+   "rho_vol_flow": 0.01624356828003807,
+   "rho_vol_funding": 0.0029369636612005742
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2024-12-10~2026-10-01",
+   "rho_vol_rv": 0.2613796362374658,
+   "rho_vol_illiq": -0.2533889423060594,
+   "rho_vol_flow": 0.01282072829046532,
+   "rho_vol_funding": 1.91910663465831e-17
+  },
+  {
+   "symbol": "ETHUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "rho_vol_rv": 0.24582773176047493,
+   "rho_vol_illiq": -0.1869145919404038,
+   "rho_vol_flow": 0.023293032370392357,
+   "rho_vol_funding": -0.01195172934534209
+  },
+  {
+   "symbol": "ETHUSDT",
+   "span": "2024-12-10~2026-10-01",
+   "rho_vol_rv": 0.26704686982429465,
+   "rho_vol_illiq": -0.24261647774078648,
+   "rho_vol_flow": -0.006771181044042433,
+   "rho_vol_funding": 0.012274239215759814
+  }
+ ],
+ "max_abs_rho": 0.26704686982429465,
+ "verdict": "PASS(|rho|<0.8 \u2014 \uce21\uc815 \uac00\ub2a5)"
+}

@@ -1,0 +1,65 @@
+{
+ "cid": "d01607_180822",
+ "ts": "2026-10-14T18:08:23Z",
+ "family": "fng",
+ "symbols": [
+  "BNBUSDT",
+  "ADAUSDT"
+ ],
+ "params": {
+  "lo": 5,
+  "hi": 95,
+  "horizons": [
+   48
+  ]
+ },
+ "variant": null,
+ "kind": "base",
+ "verdict": "UNDETERMINED_POWER",
+ "cells": [
+  {
+   "sym": "BNBUSDT",
+   "h": 48,
+   "n_raw": 2,
+   "vn_nonov": 2,
+   "fail_closed_o10k": 0,
+   "mean_funding_bp": 0.0,
+   "mean_net_bp": -337.53943530633194,
+   "se": 42.234380054132515,
+   "t": -7.992053745638079,
+   "p": 0.9603776243400948,
+   "mean_net_f_bp": -337.53943530633194,
+   "span_means": [
+    null,
+    -337.53943530633194
+   ],
+   "raw_mean_bp": -337.53943530633194,
+   "raw_n": 2,
+   "mean_net_o100k_bp": -541.2281212870298,
+   "p_holm": 1.0
+  },
+  {
+   "sym": "ADAUSDT",
+   "h": 48,
+   "n_raw": 2,
+   "vn_nonov": 2,
+   "fail_closed_o10k": 0,
+   "mean_funding_bp": -0.07925000000000004,
+   "mean_net_bp": -365.5118631584329,
+   "se": 96.08755171906594,
+   "t": -3.803946053564679,
+   "p": 0.9181725901885452,
+   "mean_net_f_bp": -365.4326131584329,
+   "span_means": [
+    null,
+    -365.5118631584329
+   ],
+   "raw_mean_bp": -365.5118631584329,
+   "raw_n": 2,
+   "mean_net_o100k_bp": null,
+   "p_holm": 1.0
+  }
+ ],
+ "prereg": "/home/z/my-project/NEW2_run/PREREG_discd01607_180822_2026-10-14.md",
+ "engine": "NEW2-discovery-v2-audit2"
+}

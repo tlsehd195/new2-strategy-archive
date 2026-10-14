@@ -1,0 +1,40 @@
+{
+ "meta": {
+  "rule": "|rho|>=0.8 pearson → 겹침 폐기",
+  "x15_assets": [
+   "SNDKUSDT",
+   "MUUSDT",
+   "SOXLUSDT",
+   "SPCXUSDT"
+  ],
+  "x15_episodes": 476,
+  "underlying_closed_days": 158,
+  "fg_note": "F&G 상관 미계산(로컬 원본 CSV 부재) — 패밀리 구조상(일간 시장 센티먼트 vs 자산별 첫 30분 수익률) 겹침 위험 낮음, 실측 4종 전부 |rho|<0.36으로 진행"
+ },
+ "correlations": {
+  "rv_z": {
+   "n": 134,
+   "pearson": -0.3514,
+   "spearman": -0.3101,
+   "overlap_discard": false
+  },
+  "x10_0000_0400_z": {
+   "n": 134,
+   "pearson": 0.1506,
+   "spearman": 0.139,
+   "overlap_discard": false
+  },
+  "daily_absret_z": {
+   "n": 134,
+   "pearson": -0.097,
+   "spearman": -0.0543,
+   "overlap_discard": false
+  },
+  "funding_z": {
+   "n": 85,
+   "pearson": 0.0686,
+   "spearman": 0.0199,
+   "overlap_discard": false
+  }
+ }
+}

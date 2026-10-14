@@ -1,0 +1,836 @@
+{
+ "premium_probe": {
+  "SOLUSDT": {
+   "2021-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2021-10": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2022-06": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2023-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2024-12": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-09": {
+    "status": 404,
+    "bytes": 0
+   }
+  },
+  "XRPUSDT": {
+   "2021-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2021-10": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2022-06": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2023-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2024-12": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-09": {
+    "status": 404,
+    "bytes": 0
+   }
+  },
+  "DOGEUSDT": {
+   "2021-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2021-10": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2022-06": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2023-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2024-12": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-09": {
+    "status": 404,
+    "bytes": 0
+   }
+  },
+  "ADAUSDT": {
+   "2021-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2021-10": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2022-06": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2023-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2024-12": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-09": {
+    "status": 404,
+    "bytes": 0
+   }
+  },
+  "LINKUSDT": {
+   "2021-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2021-10": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2022-06": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2023-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2024-12": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-09": {
+    "status": 404,
+    "bytes": 0
+   }
+  },
+  "AVAXUSDT": {
+   "2021-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2021-10": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2022-06": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2023-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2024-12": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-09": {
+    "status": 404,
+    "bytes": 0
+   }
+  },
+  "DOTUSDT": {
+   "2021-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2021-10": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2022-06": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2023-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2024-12": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-09": {
+    "status": 404,
+    "bytes": 0
+   }
+  },
+  "LTCUSDT": {
+   "2021-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2021-10": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2022-06": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2023-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2024-12": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-09": {
+    "status": 404,
+    "bytes": 0
+   }
+  },
+  "TRXUSDT": {
+   "2021-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2021-10": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2022-06": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2023-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2024-12": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-09": {
+    "status": 404,
+    "bytes": 0
+   }
+  },
+  "BCHUSDT": {
+   "2021-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2021-10": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2022-06": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2023-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2024-12": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-09": {
+    "status": 404,
+    "bytes": 0
+   }
+  },
+  "ATOMUSDT": {
+   "2021-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2021-10": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2022-06": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2023-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2024-12": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-09": {
+    "status": 404,
+    "bytes": 0
+   }
+  },
+  "ETCUSDT": {
+   "2021-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2021-10": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2022-06": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2023-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2024-12": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-09": {
+    "status": 404,
+    "bytes": 0
+   }
+  },
+  "UNIUSDT": {
+   "2021-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2021-10": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2022-06": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2023-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2024-12": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-09": {
+    "status": 404,
+    "bytes": 0
+   }
+  },
+  "NEARUSDT": {
+   "2021-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2021-10": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2022-06": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2023-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2024-12": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-09": {
+    "status": 404,
+    "bytes": 0
+   }
+  },
+  "BNBUSDT": {
+   "2021-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2021-10": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2022-06": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2023-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2024-12": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-09": {
+    "status": 404,
+    "bytes": 0
+   }
+  },
+  "FILUSDT": {
+   "2021-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2021-10": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2022-06": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2023-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2024-12": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-04": {
+    "status": 404,
+    "bytes": 0
+   },
+   "2026-09": {
+    "status": 404,
+    "bytes": 0
+   }
+  }
+ },
+ "coingecko": [
+  {
+   "rank": 1,
+   "symbol": "BTC",
+   "name": "Bitcoin",
+   "mcap_usd": 1676071451903,
+   "mcap_rank": 1
+  },
+  {
+   "rank": 2,
+   "symbol": "ETH",
+   "name": "Ethereum",
+   "mcap_usd": 305931257097,
+   "mcap_rank": 2
+  },
+  {
+   "rank": 3,
+   "symbol": "USDT",
+   "name": "Tether",
+   "mcap_usd": 184059850902,
+   "mcap_rank": 3
+  },
+  {
+   "rank": 4,
+   "symbol": "BNB",
+   "name": "BNB",
+   "mcap_usd": 98581805518,
+   "mcap_rank": 4
+  },
+  {
+   "rank": 5,
+   "symbol": "XRP",
+   "name": "XRP",
+   "mcap_usd": 85926615374,
+   "mcap_rank": 5
+  },
+  {
+   "rank": 6,
+   "symbol": "USDC",
+   "name": "USDC",
+   "mcap_usd": 72677589198,
+   "mcap_rank": 6
+  },
+  {
+   "rank": 7,
+   "symbol": "SOL",
+   "name": "Solana",
+   "mcap_usd": 62871965318,
+   "mcap_rank": 7
+  },
+  {
+   "rank": 8,
+   "symbol": "TRX",
+   "name": "TRON",
+   "mcap_usd": 31304463746,
+   "mcap_rank": 8
+  },
+  {
+   "rank": 9,
+   "symbol": "FIGR_HELOC",
+   "name": "Figure Heloc",
+   "mcap_usd": 25283975359,
+   "mcap_rank": 9
+  },
+  {
+   "rank": 10,
+   "symbol": "ZEC",
+   "name": "Zcash",
+   "mcap_usd": 20485295863,
+   "mcap_rank": 10
+  },
+  {
+   "rank": 11,
+   "symbol": "HYPE",
+   "name": "Hyperliquid",
+   "mcap_usd": 18291971579,
+   "mcap_rank": 11
+  },
+  {
+   "rank": 12,
+   "symbol": "DOGE",
+   "name": "Dogecoin",
+   "mcap_usd": 13090697537,
+   "mcap_rank": 12
+  },
+  {
+   "rank": 13,
+   "symbol": "USDS",
+   "name": "USDS",
+   "mcap_usd": 10344704185,
+   "mcap_rank": 13
+  },
+  {
+   "rank": 14,
+   "symbol": "XMR",
+   "name": "Monero",
+   "mcap_usd": 10121944396,
+   "mcap_rank": 14
+  },
+  {
+   "rank": 15,
+   "symbol": "LINK",
+   "name": "Chainlink",
+   "mcap_usd": 9902646429,
+   "mcap_rank": 15
+  },
+  {
+   "rank": 16,
+   "symbol": "WBT",
+   "name": "WhiteBIT Coin",
+   "mcap_usd": 9727389835,
+   "mcap_rank": 16
+  },
+  {
+   "rank": 17,
+   "symbol": "ADA",
+   "name": "Cardano",
+   "mcap_usd": 8799706675,
+   "mcap_rank": 17
+  },
+  {
+   "rank": 18,
+   "symbol": "LEO",
+   "name": "LEO Token",
+   "mcap_usd": 8181456493,
+   "mcap_rank": 18
+  },
+  {
+   "rank": 19,
+   "symbol": "RAIN",
+   "name": "Rain",
+   "mcap_usd": 7103141790,
+   "mcap_rank": 19
+  },
+  {
+   "rank": 20,
+   "symbol": "XLM",
+   "name": "Stellar",
+   "mcap_usd": 6716157087,
+   "mcap_rank": 20
+  },
+  {
+   "rank": 21,
+   "symbol": "NEAR",
+   "name": "NEAR Protocol",
+   "mcap_usd": 6689649548,
+   "mcap_rank": 21
+  },
+  {
+   "rank": 22,
+   "symbol": "BCH",
+   "name": "Bitcoin Cash",
+   "mcap_usd": 5438424452,
+   "mcap_rank": 22
+  },
+  {
+   "rank": 23,
+   "symbol": "BTW",
+   "name": "Bitway",
+   "mcap_usd": 5057603540,
+   "mcap_rank": 23
+  },
+  {
+   "rank": 24,
+   "symbol": "CC",
+   "name": "Canton",
+   "mcap_usd": 4804272071,
+   "mcap_rank": 24
+  },
+  {
+   "rank": 25,
+   "symbol": "USDE",
+   "name": "Ethena USDe",
+   "mcap_usd": 4762030214,
+   "mcap_rank": 25
+  },
+  {
+   "rank": 26,
+   "symbol": "LTC",
+   "name": "Litecoin",
+   "mcap_usd": 4749678288,
+   "mcap_rank": 26
+  },
+  {
+   "rank": 27,
+   "symbol": "UNI",
+   "name": "Uniswap",
+   "mcap_usd": 4605448152,
+   "mcap_rank": 27
+  },
+  {
+   "rank": 28,
+   "symbol": "AVAX",
+   "name": "Avalanche",
+   "mcap_usd": 4561241634,
+   "mcap_rank": 28
+  },
+  {
+   "rank": 29,
+   "symbol": "DAI",
+   "name": "Dai",
+   "mcap_usd": 4550171460,
+   "mcap_rank": 29
+  },
+  {
+   "rank": 30,
+   "symbol": "SUI",
+   "name": "Sui",
+   "mcap_usd": 4319569922,
+   "mcap_rank": 30
+  },
+  {
+   "rank": 31,
+   "symbol": "USD1",
+   "name": "USD1",
+   "mcap_usd": 4212082438,
+   "mcap_rank": 31
+  },
+  {
+   "rank": 32,
+   "symbol": "GRAM",
+   "name": "Gram (prev. Toncoin)",
+   "mcap_usd": 3890590049,
+   "mcap_rank": 32
+  },
+  {
+   "rank": 33,
+   "symbol": "HBAR",
+   "name": "Hedera",
+   "mcap_usd": 3814012143,
+   "mcap_rank": 33
+  },
+  {
+   "rank": 34,
+   "symbol": "XAUT",
+   "name": "Tether Gold",
+   "mcap_usd": 3380148083,
+   "mcap_rank": 34
+  },
+  {
+   "rank": 35,
+   "symbol": "QNT",
+   "name": "Quant",
+   "mcap_usd": 3214453398,
+   "mcap_rank": 35
+  },
+  {
+   "rank": 36,
+   "symbol": "TAO",
+   "name": "Bittensor",
+   "mcap_usd": 3145551600,
+   "mcap_rank": 36
+  },
+  {
+   "rank": 37,
+   "symbol": "USDG",
+   "name": "Global Dollar",
+   "mcap_usd": 3112091249,
+   "mcap_rank": 37
+  },
+  {
+   "rank": 38,
+   "symbol": "SHIB",
+   "name": "Shiba Inu",
+   "mcap_usd": 3055449288,
+   "mcap_rank": 38
+  },
+  {
+   "rank": 39,
+   "symbol": "CRO",
+   "name": "Cronos",
+   "mcap_usd": 2938849484,
+   "mcap_rank": 39
+  },
+  {
+   "rank": 40,
+   "symbol": "PYUSD",
+   "name": "PayPal USD",
+   "mcap_usd": 2878012103,
+   "mcap_rank": 40
+  },
+  {
+   "rank": 41,
+   "symbol": "ENA",
+   "name": "Ethena",
+   "mcap_usd": 2847794332,
+   "mcap_rank": 41
+  },
+  {
+   "rank": 42,
+   "symbol": "OKB",
+   "name": "OKB",
+   "mcap_usd": 2559874202,
+   "mcap_rank": 42
+  },
+  {
+   "rank": 43,
+   "symbol": "AAVE",
+   "name": "Aave",
+   "mcap_usd": 2442643805,
+   "mcap_rank": 43
+  },
+  {
+   "rank": 44,
+   "symbol": "RLUSD",
+   "name": "Ripple USD",
+   "mcap_usd": 2415212943,
+   "mcap_rank": 44
+  },
+  {
+   "rank": 45,
+   "symbol": "USYC",
+   "name": "Circle USYC",
+   "mcap_usd": 2385922183,
+   "mcap_rank": 45
+  },
+  {
+   "rank": 46,
+   "symbol": "USDY",
+   "name": "Ondo US Dollar Yield",
+   "mcap_usd": 2329289585,
+   "mcap_rank": 46
+  },
+  {
+   "rank": 47,
+   "symbol": "PUMP",
+   "name": "Pump.fun",
+   "mcap_usd": 2310910715,
+   "mcap_rank": 47
+  },
+  {
+   "rank": 48,
+   "symbol": "ONDO",
+   "name": "Ondo",
+   "mcap_usd": 2281554328,
+   "mcap_rank": 48
+  },
+  {
+   "rank": 49,
+   "symbol": "BUIDL",
+   "name": "BlackRock USD Institutional Digital Liquidity Fund",
+   "mcap_usd": 2218171957,
+   "mcap_rank": 49
+  },
+  {
+   "rank": 50,
+   "symbol": "DOT",
+   "name": "Polkadot",
+   "mcap_usd": 1994562277,
+   "mcap_rank": 50
+  }
+ ]
+}

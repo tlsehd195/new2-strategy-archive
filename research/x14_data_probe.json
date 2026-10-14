@@ -1,0 +1,61 @@
+{
+ "BTC": {
+  "month_files": 64,
+  "bars": 187008,
+  "first": "2021-04-01T00:00:00+00:00",
+  "last": "2026-09-30T23:45:00+00:00",
+  "gaps": 0,
+  "missing_bars": 0,
+  "lock_overlap_months": [
+   "2024-03",
+   "2024-06"
+  ]
+ },
+ "ETH": {
+  "month_files": 57,
+  "bars": 166368,
+  "first": "2021-04-01T00:00:00+00:00",
+  "last": "2026-09-30T23:45:00+00:00",
+  "gaps": 0,
+  "missing_bars": 0,
+  "lock_overlap_months": [
+   "2026-04"
+  ]
+ },
+ "SOL": {
+  "month_files": 66,
+  "bars": 192384,
+  "first": "2021-04-01T00:00:00+00:00",
+  "last": "2026-09-30T23:45:00+00:00",
+  "gaps": 0,
+  "missing_bars": 0,
+  "lock_overlap_months": []
+ },
+ "ZEC": {
+  "month_files": 66,
+  "bars": 192384,
+  "first": "2021-04-01T00:00:00+00:00",
+  "last": "2026-09-30T23:45:00+00:00",
+  "gaps": 0,
+  "missing_bars": 0,
+  "lock_overlap_months": []
+ },
+ "NEAR": {
+  "month_files": 66,
+  "bars": 192384,
+  "first": "2021-04-01T00:00:00+00:00",
+  "last": "2026-09-30T23:45:00+00:00",
+  "gaps": 0,
+  "missing_bars": 0,
+  "lock_overlap_months": []
+ },
+ "XRP": {
+  "month_files": 66,
+  "bars": 192384,
+  "first": "2021-04-01T00:00:00+00:00",
+  "last": "2026-09-30T23:45:00+00:00",
+  "gaps": 0,
+  "missing_bars": 0,
+  "lock_overlap_months": []
+ }
+}

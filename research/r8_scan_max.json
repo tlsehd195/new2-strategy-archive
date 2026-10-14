@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://en.wikipedia.org/wiki/Cryptocurrency",
+    "name": "Cryptocurrency",
+    "snippet": "Cryptocurrency is a type of digital asset that uses distributed ledger, or blockchain, technology to enable a secure transaction. Read more",
+    "host_name": "en.wikipedia.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.oswego.edu/cts",
+    "name": "The Basics about Cryptocurrency | CTS",
+    "snippet": "A cryptocurrency is a digital currency, which is an alternative form of payment created using encryption algorithms. The use of encryption technologies means ... Read more",
+    "host_name": "www.oswego.edu",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.rba.gov.au/explainers/cryptocurrencies",
+    "name": "Digital Currencies | Explainer | Education | RBA",
+    "snippet": "This series provides short, concise explanations for various economics topics.",
+    "host_name": "www.rba.gov.au",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://coinmarketcap.com",
+    "name": "CoinMarketCap: Cryptocurrency Prices, Charts And Market",
+    "snippet": "Top cryptocurrency prices and charts, listed by market capitalization. Free access to current and historic data for Bitcoin and thousands of altcoins.",
+    "host_name": "coinmarketcap.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://consumer.ftc.gov/articles",
+    "name": "What To Know About Cryptocurrency and Scams",
+    "snippet": "It depends on many factors, including supply and demand . Cryptocurrencies tend to be more volatile than more traditional investments, such as stocks and bonds. Read more",
+    "host_name": "consumer.ftc.gov",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.kaspersky.com",
+    "name": "What is Cryptocurrency and How Does it Work?",
+    "snippet": "Cryptocurrency is a digital currency using cryptography to secure transactions. Learn about buying cryptocurrency and cryptocurrency scams to look out for.",
+    "host_name": "www.kaspersky.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.investopedia.com/terms/cryptocurrency",
+    "name": "Cryptocurrency Explained With Pros and Cons for Investment",
+    "snippet": "Learn how digital currencies work , how to think about their risks and security concerns, and the factors investors should weigh before buying.",
+    "host_name": "www.investopedia.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.pwc.com/financial-services/fintech",
+    "name": "Making sense of bitcoin, cryptocurrency and blockchain",
+    "snippet": "Understand how Blockchain works, what cryptocurrency is and the potential blockchain applications beyond Bitcoin and cryptocurrency to improve business ...",
+    "host_name": "www.pwc.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

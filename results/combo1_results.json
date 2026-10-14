@@ -1,0 +1,607 @@
+{
+ "prereg": "PREREG_combo1_cme_gap_maker_2026-10-14.md",
+ "type": "combination measurement (F1 \uc2e0\ud638 \u00d7 N2 maker \uc2e4\ud589\uacc4\uce35)",
+ "signal": "CME weekend gap >= 1.0% \u2192 \ucd94\uc885(continuation: gap up\u2192long, gap down\u2192short), maker \uc9c4\uc785 \u03b40 K16, h48 taker \uccad\uc0b0",
+ "family": "4\uc140 (G100 h48 \u03b40 K16 \u00d7 BTC s1/s2, ETH s1/s2) Holm-4",
+ "holdout": "BTCUSDT s3 2024-06-19~2026-04-20 (CME \uac2d \ubbf8\uce21\uc815 \ubc84\uc9c4)",
+ "quality": {
+  "BTCUSDT_cme_bars": 1278,
+  "BTCUSDT_events_total": 230,
+  "BTCUSDT_convention": {
+   "monday_stamped": 237,
+   "sunday_stamped": 0,
+   "dropped_prev_not_fri": 7
+  },
+  "ETHUSDT_cme_bars": 1278,
+  "ETHUSDT_events_total": 230,
+  "ETHUSDT_convention": {
+   "monday_stamped": 237,
+   "sunday_stamped": 0,
+   "dropped_prev_not_fri": 7
+  }
+ },
+ "family_cells": [
+  {
+   "n_events": 38,
+   "n_filled": 36,
+   "n_fc_drop": 0,
+   "fill_rate": 0.9473684210526315,
+   "promo_bp": 63.442990065620634,
+   "mean_gross_filled_bp": 84.74146784107135,
+   "mean_net_filled_bp": 66.96760062482178,
+   "net16_equiv_bp": 68.74146784107135,
+   "mean_wait_bars": 0.05555555555555555,
+   "t": 1.0532561869622188,
+   "p": 0.29905355189619576,
+   "p_ctrl": 0.12,
+   "seg": {
+    "first60": {
+     "n_events": 23,
+     "n_filled": 23,
+     "promo_bp": 26.66746106653494
+    },
+    "last40": {
+     "n_events": 15,
+     "n_filled": 13,
+     "promo_bp": 119.83213453088538
+    }
+   },
+   "symbol": "BTCUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "n_g50plus": 50,
+   "n_delay_drop": 0,
+   "n_g100": 38,
+   "p_holm": 0.8971606556885873
+  },
+  {
+   "n_events": 17,
+   "n_filled": 16,
+   "n_fc_drop": 0,
+   "fill_rate": 0.9411764705882353,
+   "promo_bp": 109.86947378245588,
+   "mean_gross_filled_bp": 135.75955372550547,
+   "mean_net_filled_bp": 116.73631589385938,
+   "net16_equiv_bp": 119.75955372550546,
+   "mean_wait_bars": 0.25,
+   "t": 2.3217842601857637,
+   "p": 0.0337658647403414,
+   "p_ctrl": 0.01,
+   "seg": {
+    "first60": {
+     "n_events": 9,
+     "n_filled": 9,
+     "promo_bp": 105.70780315876132
+    },
+    "last40": {
+     "n_events": 8,
+     "n_filled": 7,
+     "promo_bp": 114.55135323411227
+    }
+   },
+   "symbol": "BTCUSDT",
+   "span": "2023-04-07~2024-03-18",
+   "n_g50plus": 24,
+   "n_delay_drop": 0,
+   "n_g100": 17,
+   "p_holm": 0.1350634589613656
+  },
+  {
+   "n_events": 48,
+   "n_filled": 46,
+   "n_fc_drop": 0,
+   "fill_rate": 0.9583333333333334,
+   "promo_bp": 22.649443992925747,
+   "mean_gross_filled_bp": 44.82678254351799,
+   "mean_net_filled_bp": 23.634202427400783,
+   "net16_equiv_bp": 28.826782543517997,
+   "mean_wait_bars": 0.021739130434782608,
+   "t": 0.3276156560693643,
+   "p": 0.7446571775241905,
+   "p_ctrl": 0.38,
+   "seg": {
+    "first60": {
+     "n_events": 29,
+     "n_filled": 28,
+     "promo_bp": -22.80007002520468
+    },
+    "last40": {
+     "n_events": 19,
+     "n_filled": 18,
+     "promo_bp": 92.01975486270376
+    }
+   },
+   "symbol": "ETHUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "n_g50plus": 52,
+   "n_delay_drop": 0,
+   "n_g100": 48,
+   "p_holm": 0.964568845185988
+  },
+  {
+   "n_events": 45,
+   "n_filled": 42,
+   "n_fc_drop": 1,
+   "fill_rate": 0.9333333333333333,
+   "promo_bp": -28.249954701258417,
+   "mean_gross_filled_bp": -11.535956820833883,
+   "mean_net_filled_bp": -30.26780860849116,
+   "net16_equiv_bp": -27.53595682083388,
+   "mean_wait_bars": 0.07142857142857142,
+   "t": -0.708642057166367,
+   "p": 0.482284422592994,
+   "p_ctrl": 0.8,
+   "seg": {
+    "first60": {
+     "n_events": 28,
+     "n_filled": 26,
+     "promo_bp": -24.716503113540377
+    },
+    "last40": {
+     "n_events": 17,
+     "n_filled": 16,
+     "promo_bp": -34.06975731632343
+    }
+   },
+   "symbol": "ETHUSDT",
+   "span": "2024-12-10~2026-04-20",
+   "n_g50plus": 51,
+   "n_delay_drop": 0,
+   "n_g100": 45,
+   "p_holm": 0.964568845185988
+  }
+ ],
+ "holdout_cell": {
+  "n_events": 48,
+  "n_filled": 43,
+  "n_fc_drop": 1,
+  "fill_rate": 0.8958333333333334,
+  "promo_bp": 21.215394732156835,
+  "mean_gross_filled_bp": 41.84636517511977,
+  "mean_net_filled_bp": 23.682301096361115,
+  "net16_equiv_bp": 25.84636517511977,
+  "mean_wait_bars": 0.13953488372093023,
+  "t": 0.7140431457531405,
+  "p": 0.4787317504542994,
+  "p_ctrl": 0.27,
+  "seg": {
+   "first60": {
+    "n_events": 27,
+    "n_filled": 26,
+    "promo_bp": 66.86189617271026
+   },
+   "last40": {
+    "n_events": 21,
+    "n_filled": 17,
+    "promo_bp": -37.47296426284041
+   }
+  },
+  "symbol": "BTCUSDT",
+  "span": "2024-06-19~2026-04-20",
+  "n_g50plus": 63,
+  "n_delay_drop": 0,
+  "n_g100": 48
+ },
+ "sensitivity_grid": [
+  {
+   "symbol": "BTCUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "delta_bp": 0.0,
+   "K": 4,
+   "n_events": 38,
+   "fill_rate": 0.9473684210526315,
+   "promo_bp": 63.442990065620634
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "delta_bp": 5.0,
+   "K": 4,
+   "n_events": 38,
+   "fill_rate": 0.7631578947368421,
+   "promo_bp": 87.91656700105916
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "delta_bp": 5.0,
+   "K": 16,
+   "n_events": 38,
+   "fill_rate": 0.8947368421052632,
+   "promo_bp": 62.736994809337624
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "delta_bp": 10.0,
+   "K": 4,
+   "n_events": 38,
+   "fill_rate": 0.7368421052631579,
+   "promo_bp": 83.90648291211154
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "delta_bp": 10.0,
+   "K": 16,
+   "n_events": 38,
+   "fill_rate": 0.868421052631579,
+   "promo_bp": 56.9611998531334
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "delta_bp": 20.0,
+   "K": 4,
+   "n_events": 38,
+   "fill_rate": 0.6578947368421053,
+   "promo_bp": 67.26072085782074
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "delta_bp": 20.0,
+   "K": 16,
+   "n_events": 38,
+   "fill_rate": 0.8157894736842105,
+   "promo_bp": 51.90532269241055
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2023-04-07~2024-03-18",
+   "delta_bp": 0.0,
+   "K": 4,
+   "n_events": 17,
+   "fill_rate": 0.8823529411764706,
+   "promo_bp": 106.51190256339429
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2023-04-07~2024-03-18",
+   "delta_bp": 5.0,
+   "K": 4,
+   "n_events": 17,
+   "fill_rate": 0.8235294117647058,
+   "promo_bp": 109.9171553959078
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2023-04-07~2024-03-18",
+   "delta_bp": 5.0,
+   "K": 16,
+   "n_events": 17,
+   "fill_rate": 0.9411764705882353,
+   "promo_bp": 118.03297264286215
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2023-04-07~2024-03-18",
+   "delta_bp": 10.0,
+   "K": 4,
+   "n_events": 17,
+   "fill_rate": 0.5882352941176471,
+   "promo_bp": 84.04748285122778
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2023-04-07~2024-03-18",
+   "delta_bp": 10.0,
+   "K": 16,
+   "n_events": 17,
+   "fill_rate": 0.7058823529411765,
+   "promo_bp": 80.27267026490838
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2023-04-07~2024-03-18",
+   "delta_bp": 20.0,
+   "K": 4,
+   "n_events": 17,
+   "fill_rate": 0.4117647058823529,
+   "promo_bp": 70.73885531021294
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2023-04-07~2024-03-18",
+   "delta_bp": 20.0,
+   "K": 16,
+   "n_events": 17,
+   "fill_rate": 0.6470588235294118,
+   "promo_bp": 59.95099346938877
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2024-06-19~2026-04-20",
+   "delta_bp": 0.0,
+   "K": 4,
+   "n_events": 48,
+   "fill_rate": 0.875,
+   "promo_bp": 17.840940805509636
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2024-06-19~2026-04-20",
+   "delta_bp": 0.0,
+   "K": 16,
+   "n_events": 48,
+   "fill_rate": 0.8958333333333334,
+   "promo_bp": 21.215394732156835
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2024-06-19~2026-04-20",
+   "delta_bp": 5.0,
+   "K": 4,
+   "n_events": 48,
+   "fill_rate": 0.6666666666666666,
+   "promo_bp": 9.438110295785842
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2024-06-19~2026-04-20",
+   "delta_bp": 5.0,
+   "K": 16,
+   "n_events": 48,
+   "fill_rate": 0.7291666666666666,
+   "promo_bp": 10.356290749290482
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2024-06-19~2026-04-20",
+   "delta_bp": 10.0,
+   "K": 4,
+   "n_events": 48,
+   "fill_rate": 0.6041666666666666,
+   "promo_bp": 9.945863355430532
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2024-06-19~2026-04-20",
+   "delta_bp": 10.0,
+   "K": 16,
+   "n_events": 48,
+   "fill_rate": 0.7083333333333334,
+   "promo_bp": 9.149995969280184
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2024-06-19~2026-04-20",
+   "delta_bp": 20.0,
+   "K": 4,
+   "n_events": 48,
+   "fill_rate": 0.5208333333333334,
+   "promo_bp": 7.82344595857876
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2024-06-19~2026-04-20",
+   "delta_bp": 20.0,
+   "K": 16,
+   "n_events": 48,
+   "fill_rate": 0.6666666666666666,
+   "promo_bp": 9.692845752404828
+  },
+  {
+   "symbol": "ETHUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "delta_bp": 0.0,
+   "K": 4,
+   "n_events": 48,
+   "fill_rate": 0.9583333333333334,
+   "promo_bp": 22.649443992925747
+  },
+  {
+   "symbol": "ETHUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "delta_bp": 5.0,
+   "K": 4,
+   "n_events": 48,
+   "fill_rate": 0.8958333333333334,
+   "promo_bp": 18.180958898789573
+  },
+  {
+   "symbol": "ETHUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "delta_bp": 5.0,
+   "K": 16,
+   "n_events": 48,
+   "fill_rate": 0.9166666666666666,
+   "promo_bp": 14.32817722851705
+  },
+  {
+   "symbol": "ETHUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "delta_bp": 10.0,
+   "K": 4,
+   "n_events": 48,
+   "fill_rate": 0.8541666666666666,
+   "promo_bp": 10.833240692948259
+  },
+  {
+   "symbol": "ETHUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "delta_bp": 10.0,
+   "K": 16,
+   "n_events": 48,
+   "fill_rate": 0.875,
+   "promo_bp": 7.083031237838782
+  },
+  {
+   "symbol": "ETHUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "delta_bp": 20.0,
+   "K": 4,
+   "n_events": 48,
+   "fill_rate": 0.7083333333333334,
+   "promo_bp": -15.16473532329624
+  },
+  {
+   "symbol": "ETHUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "delta_bp": 20.0,
+   "K": 16,
+   "n_events": 48,
+   "fill_rate": 0.7916666666666666,
+   "promo_bp": -15.640317610532861
+  },
+  {
+   "symbol": "ETHUSDT",
+   "span": "2024-12-10~2026-04-20",
+   "delta_bp": 0.0,
+   "K": 4,
+   "n_events": 45,
+   "fill_rate": 0.9333333333333333,
+   "promo_bp": -28.249954701258417
+  },
+  {
+   "symbol": "ETHUSDT",
+   "span": "2024-12-10~2026-04-20",
+   "delta_bp": 5.0,
+   "K": 4,
+   "n_events": 45,
+   "fill_rate": 0.7777777777777778,
+   "promo_bp": -24.38663335134488
+  },
+  {
+   "symbol": "ETHUSDT",
+   "span": "2024-12-10~2026-04-20",
+   "delta_bp": 5.0,
+   "K": 16,
+   "n_events": 45,
+   "fill_rate": 0.8222222222222222,
+   "promo_bp": -39.13591687526673
+  },
+  {
+   "symbol": "ETHUSDT",
+   "span": "2024-12-10~2026-04-20",
+   "delta_bp": 10.0,
+   "K": 4,
+   "n_events": 45,
+   "fill_rate": 0.7555555555555555,
+   "promo_bp": -12.406597623595623
+  },
+  {
+   "symbol": "ETHUSDT",
+   "span": "2024-12-10~2026-04-20",
+   "delta_bp": 10.0,
+   "K": 16,
+   "n_events": 45,
+   "fill_rate": 0.8222222222222222,
+   "promo_bp": -39.1829316520246
+  },
+  {
+   "symbol": "ETHUSDT",
+   "span": "2024-12-10~2026-04-20",
+   "delta_bp": 20.0,
+   "K": 4,
+   "n_events": 45,
+   "fill_rate": 0.6888888888888889,
+   "promo_bp": 2.666967906338216
+  },
+  {
+   "symbol": "ETHUSDT",
+   "span": "2024-12-10~2026-04-20",
+   "delta_bp": 20.0,
+   "K": 16,
+   "n_events": 45,
+   "fill_rate": 0.8222222222222222,
+   "promo_bp": -32.5412330210158
+  }
+ ],
+ "g50_rows": [
+  {
+   "symbol": "BTCUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "n_g50": 50,
+   "fill_rate": 0.96,
+   "promo_bp": 12.755725078380792
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2023-04-07~2024-03-18",
+   "n_g50": 24,
+   "fill_rate": 0.9166666666666666,
+   "promo_bp": 63.177011518195336
+  },
+  {
+   "symbol": "ETHUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "n_g50": 52,
+   "fill_rate": 0.9615384615384616,
+   "promo_bp": 16.497881746128492
+  },
+  {
+   "symbol": "ETHUSDT",
+   "span": "2024-12-10~2026-04-20",
+   "n_g50": 51,
+   "fill_rate": 0.9411764705882353,
+   "promo_bp": -2.9014316110362737
+  }
+ ],
+ "maker_fee_sens": [
+  {
+   "symbol": "BTCUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "mf0": 65.33772690772591,
+   "mf1": 64.39035848667328,
+   "mf2": 63.442990065620634
+  },
+  {
+   "symbol": "BTCUSDT",
+   "span": "2023-04-07~2024-03-18",
+   "mf0": 111.75182672363236,
+   "mf1": 110.8106502530441,
+   "mf2": 109.86947378245588
+  },
+  {
+   "symbol": "ETHUSDT",
+   "span": "2021-05-02~2022-08-17",
+   "mf0": 24.56611065959242,
+   "mf1": 23.60777732625907,
+   "mf2": 22.649443992925747
+  },
+  {
+   "symbol": "ETHUSDT",
+   "span": "2024-12-10~2026-04-20",
+   "mf0": -26.383288034591743,
+   "mf1": -27.316621367925098,
+   "mf2": -28.249954701258417
+  }
+ ],
+ "verdict": {
+  "C1_holm": {
+   "pass": false,
+   "n": 0,
+   "detail": []
+  },
+  "C2_consistency": {
+   "pass": true,
+   "pos_of_4": 3,
+   "detail": [
+    "BTCUSDT 2021-05-02~2022-08-17 promo=63.44 n=38",
+    "BTCUSDT 2023-04-07~2024-03-18 promo=109.87 n=17",
+    "ETHUSDT 2021-05-02~2022-08-17 promo=22.65 n=48"
+   ]
+  },
+  "C3_oos": {
+   "pass": true,
+   "pos_of_4": 3,
+   "detail": [
+    "BTCUSDT 2021-05-02~2022-08-17 last40=119.83",
+    "BTCUSDT 2023-04-07~2024-03-18 last40=114.55",
+    "ETHUSDT 2021-05-02~2022-08-17 last40=92.02"
+   ]
+  },
+  "C4_holdout": {
+   "pass": true,
+   "detail": {
+    "span": "2024-06-19~2026-04-20",
+    "promo_bp": 21.215394732156835,
+    "n_g100": 48,
+    "fill_rate": 0.8958333333333334
+   }
+  },
+  "C5_engine": "\ubcc4\ub3c4 \uad50\ucc28\uac80\uc99d(results/combo1_crosscheck_results.*) \u2014 \ub300\uae30",
+  "diag_gates_pass": false,
+  "note": "diag_gates_pass(C1~C4) && C5 \u2192 CONDITIONAL_CANDIDATE; \uc544\ub2c8\uba74 FAIL"
+ }
+}

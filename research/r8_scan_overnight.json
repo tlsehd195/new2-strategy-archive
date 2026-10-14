@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://ideas.repec.org/eee/ecofin",
+    "name": "Intraday return predictability in the cryptocurrency markets",
+    "snippet": "by Z Wen · 2022 · Cited by 51 — This paper reports evidence of intraday return predictability , consisting of both intraday momentum and reversal, in the cryptocurrency market. Read more",
+    "host_name": "ideas.repec.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://papers.ssrn.com/sol3/Delivery.cfm",
+    "name": "Intraday return predictability in the cryptocurrency markets",
+    "snippet": "This paper reports evidence of intraday return predictability , consisting of both intraday momentum and reversal, in the cryptocurrency market. Read more\n7 days ago — Intraday returns are not predictable in or out of sample. An apparent intraday VIX response is largely accounted for by the observed equity ... Read more",
+    "host_name": "papers.ssrn.com",
+    "rank": 1,
+    "date": "Oct 6, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.scheller.gatech.edu/lee/pdf",
+    "name": "Variance Decomposition and Cryptocurrency Return",
+    "snippet": "by SS Lee · 2024 · Cited by 17 — This paper examines how realized variances predict cryptocurrency returns in the cross-section using intraday data. 72 pages",
+    "host_name": "www.scheller.gatech.edu",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.sciencedirect.com/article/abs/pii",
+    "name": "On the intraday return curves of Bitcoin: Predictability and",
+    "snippet": "by E Bouri · 2021 · Cited by 49 — This paper reports evidence of intraday return predictability , consisting of both intraday momentum and reversal, in the cryptocurrency market.",
+    "host_name": "www.sciencedirect.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://centaur.reading.ac.uk",
+    "name": "On the intraday return curves of Bitcoin: predictability and",
+    "snippet": "by E Bouri · 2021 · Cited by 49 — In this paper , we use recent developed tools in the field of functional data analysis and uncover evidence of predictivity in the intraday cumulative return of ... Read more 31 pages",
+    "host_name": "centaur.reading.ac.uk",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.semanticscholar.org/paper",
+    "name": "Intraday Return Predictability in the Cryptocurrency Markets",
+    "snippet": "This paper reports evidence of intraday return predictability , consisting of both intraday momentum and reversal, in the cryptocurrency market.",
+    "host_name": "www.semanticscholar.org",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://arxiv.org/html",
+    "name": "The Quarter-Hour Effect: Periodic Algorithmic Trading and",
+    "snippet": "Opening returns are predictable out of sample, while opening order imbalance predicts returns over four to twelve hours, with much weaker effects at finer clock ... Read more",
+    "host_name": "arxiv.org",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://quantpedia.com/strategies",
+    "name": "Overnight Seasonality in Bitcoin",
+    "snippet": "The data suggests that BTC tends to trend when it is at its maximum and bounce back when at the minimum. These findings support the empirical observations that ... Read more",
+    "host_name": "quantpedia.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

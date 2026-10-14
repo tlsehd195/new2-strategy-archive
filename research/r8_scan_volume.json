@@ -1,0 +1,65 @@
+[
+  {
+    "url": "https://crypto.com",
+    "name": "Crypto.com: Buy, Sell, Trade Crypto, Stocks & More",
+    "snippet": "Crypto , stocks, ETFs and prediction markets, all in the Crypto .com app. Buy, sell & trade with a trusted platform. Open an account and get started today.",
+    "host_name": "crypto.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.kaspersky.com",
+    "name": "What is Cryptocurrency and How Does it Work?",
+    "snippet": "Cryptocurrency is a digital currency using cryptography to secure transactions. Learn about buying cryptocurrency and cryptocurrency scams to look out for.",
+    "host_name": "www.kaspersky.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://en.wikipedia.org/wiki/Cryptocurrency",
+    "name": "Cryptocurrency",
+    "snippet": "Cryptocurrency is a type of digital asset that uses distributed ledger, or blockchain , technology to enable a secure transaction. Read more",
+    "host_name": "en.wikipedia.org",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.cryptoarena.com",
+    "name": "Crypto.com Arena",
+    "snippet": "Crypto .com Arena Event Starts 7:00 PM. Arena 1111 S. Figueroa Street Los Angeles, CA 90015. Box Office (888) 929-7849 … © 2026 Crypto .com Arena.",
+    "host_name": "www.cryptoarena.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://nodejs.org/api/crypto",
+    "name": "Crypto | Node.js v26.11.1 Documentation",
+    "snippet": "The node: crypto module provides cryptographic functionality that includes a set of wrappers for OpenSSL's hash, message authentication code (MAC), cipher, ... Read more",
+    "host_name": "nodejs.org",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.sec.gov/newsroom/press-releases",
+    "name": "SEC Proposes New Regulation Crypto Assets",
+    "snippet": "Aug 18, 2026 — Proposed rules would create a tailored securities offering regime for certain investment contracts involving crypto assets",
+    "host_name": "www.sec.gov",
+    "rank": 5,
+    "date": "Aug 18, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.federalregister.gov/2026%2F08%2F21",
+    "name": "Regulation Crypto Assets",
+    "snippet": "Aug 21, 2026 — The Securities and Exchange Commission (\"Commission\") is proposing new rules to create a tailored offering regime for certain investment ...",
+    "host_name": "www.federalregister.gov",
+    "rank": 6,
+    "date": "Aug 21, 2026",
+    "favicon": ""
+  }
+]

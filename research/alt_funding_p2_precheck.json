@@ -1,0 +1,83 @@
+{
+ "prereg": "PREREG_alt_funding_extreme_p2_2026-10-14.md \u00a75",
+ "symbols": {
+  "ZECUSDT": {
+   "funding_rows": 3741,
+   "range": [
+    "2021-04-01 00:00:00.025000+00:00",
+    "2026-09-30 16:00:00.002000+00:00"
+   ],
+   "median_bp": 1.0,
+   "p01_bp": -15.20396,
+   "p99_bp": 9.55673999999999,
+   "share_abs_ge_10bp": 0.023255813953488372,
+   "share_abs_ge_30bp": 0.0045442395081529,
+   "spans": {
+    "span1": {
+     "funding_in_span": 1416,
+     "expected_funding": 1416,
+     "B80_triggers": 167,
+     "B90_triggers": 145
+    },
+    "span2": {
+     "funding_in_span": 1980,
+     "expected_funding": 1980,
+     "B80_triggers": 269,
+     "B90_triggers": 225
+    }
+   }
+  },
+  "DOGEUSDT": {
+   "funding_rows": 3741,
+   "range": [
+    "2021-04-01 00:00:00.025000+00:00",
+    "2026-09-30 16:00:00.002000+00:00"
+   ],
+   "median_bp": 0.8267000000000001,
+   "p01_bp": -2.62532,
+   "p99_bp": 11.71659999999997,
+   "share_abs_ge_10bp": 0.013900026730820636,
+   "share_abs_ge_30bp": 0.0005346164127238706,
+   "spans": {
+    "span1": {
+     "funding_in_span": 1416,
+     "expected_funding": 1416,
+     "B80_triggers": 211,
+     "B90_triggers": 145
+    },
+    "span2": {
+     "funding_in_span": 1980,
+     "expected_funding": 1980,
+     "B80_triggers": 344,
+     "B90_triggers": 164
+    }
+   }
+  },
+  "LINKUSDT": {
+   "funding_rows": 3741,
+   "range": [
+    "2021-04-01 00:00:00.025000+00:00",
+    "2026-09-30 16:00:00.002000+00:00"
+   ],
+   "median_bp": 1.0,
+   "p01_bp": -1.88646,
+   "p99_bp": 10.247319999999984,
+   "share_abs_ge_10bp": 0.011494252873563218,
+   "share_abs_ge_30bp": 0.0005346164127238706,
+   "spans": {
+    "span1": {
+     "funding_in_span": 1416,
+     "expected_funding": 1416,
+     "B80_triggers": 168,
+     "B90_triggers": 139
+    },
+    "span2": {
+     "funding_in_span": 1980,
+     "expected_funding": 1980,
+     "B80_triggers": 277,
+     "B90_triggers": 166
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,106 @@
+{
+ "prereg": "PREREG_combo1_cme_gap_maker_2026-10-14.md",
+ "gate": "C5 \uc5d4\uc9c4 \uad50\ucc28\uac80\uc99d",
+ "config": "G100 h48 \u03b40 K16 \ucd94\uc885 \u00b7 \uc9c4\uc785 maker 2bp \uace0\uc815 \u00b7 \uccad\uc0b0 \uc5d4\uc9c4 taker(5+2+0.1\u221apart, >5% fc)",
+ "cells": [
+  {
+   "n_valid": 38,
+   "n_filled": 36,
+   "n_fc_drop": 0,
+   "promo_bp_10k": 66.96760062482178,
+   "net_filled_bp_10k": 66.96760062482178,
+   "n_fc_10k": 2,
+   "promo_bp_100k": 47.99606354984165,
+   "net_filled_bp_100k": 47.99606354984165,
+   "n_fc_100k": 2,
+   "cell": "BTCUSDT 2021-05-02~2022-08-17",
+   "type": "family"
+  },
+  {
+   "n_valid": 17,
+   "n_filled": 16,
+   "n_fc_drop": 0,
+   "promo_bp_10k": 116.73631589385938,
+   "net_filled_bp_10k": 116.73631589385938,
+   "n_fc_10k": 1,
+   "promo_bp_100k": 95.06329264793649,
+   "net_filled_bp_100k": 95.06329264793649,
+   "n_fc_100k": 1,
+   "cell": "BTCUSDT 2023-04-07~2024-03-18",
+   "type": "family"
+  },
+  {
+   "n_valid": 48,
+   "n_filled": 46,
+   "n_fc_drop": 0,
+   "promo_bp_10k": 23.634202427400783,
+   "net_filled_bp_10k": 23.634202427400783,
+   "n_fc_10k": 2,
+   "promo_bp_100k": -2.7295411774927203,
+   "net_filled_bp_100k": -2.7295411774927203,
+   "n_fc_100k": 2,
+   "cell": "ETHUSDT 2021-05-02~2022-08-17",
+   "type": "family"
+  },
+  {
+   "n_valid": 45,
+   "n_filled": 42,
+   "n_fc_drop": 1,
+   "promo_bp_10k": -30.26780860849116,
+   "net_filled_bp_10k": -30.26780860849116,
+   "n_fc_10k": 3,
+   "promo_bp_100k": -51.31077432101223,
+   "net_filled_bp_100k": -51.31077432101223,
+   "n_fc_100k": 3,
+   "cell": "ETHUSDT 2024-12-10~2026-04-20",
+   "type": "family"
+  },
+  {
+   "n_valid": 48,
+   "n_filled": 43,
+   "n_fc_drop": 1,
+   "promo_bp_10k": 23.682301096361115,
+   "net_filled_bp_10k": 23.682301096361115,
+   "n_fc_10k": 5,
+   "promo_bp_100k": 3.8670500625097537,
+   "net_filled_bp_100k": 3.8670500625097537,
+   "n_fc_100k": 5,
+   "cell": "BTCUSDT 2024-06-19~2026-04-20",
+   "type": "holdout"
+  }
+ ],
+ "quality": {
+  "BTCUSDT_kline_files_bars": 188064,
+  "ETHUSDT_kline_files_bars": 167424
+ },
+ "verdict": {
+  "C5_pass": false,
+  "detail": [
+   {
+    "cell": "BTCUSDT 2021-05-02~2022-08-17",
+    "10k": 66.96760062482178,
+    "100k": 47.99606354984165
+   },
+   {
+    "cell": "BTCUSDT 2023-04-07~2024-03-18",
+    "10k": 116.73631589385938,
+    "100k": 95.06329264793649
+   },
+   {
+    "cell": "ETHUSDT 2021-05-02~2022-08-17",
+    "10k": 23.634202427400783,
+    "100k": -2.7295411774927203
+   },
+   {
+    "cell": "ETHUSDT 2024-12-10~2026-04-20",
+    "10k": -30.26780860849116,
+    "100k": -51.31077432101223
+   },
+   {
+    "cell": "BTCUSDT 2024-06-19~2026-04-20",
+    "10k": 23.682301096361115,
+    "100k": 3.8670500625097537
+   }
+  ]
+ }
+}

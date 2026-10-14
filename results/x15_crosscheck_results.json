@@ -1,0 +1,168 @@
+{
+ "meta": {
+  "prereg": "PREREG_x15_tokenized_tradfi_session_2026-10-13.md",
+  "engine": "CandleCostModel fee5bp+half_spread2bp+10%sqrt(part) fail_closed>5%",
+  "order_values": [
+   "$10k",
+   "$100k"
+  ],
+  "n_episodes": 329
+ },
+ "cells": [
+  {
+   "direction": "follow",
+   "h": 3,
+   "$10k": {
+    "net_bp": -70.23,
+    "n": 329,
+    "fc_dropped": 0,
+    "t": -3.668,
+    "p": 0.0004,
+    "n_clusters": 97,
+    "p_holm": 0.0012
+   },
+   "$100k": {
+    "net_bp": -139.3,
+    "n": 323,
+    "fc_dropped": 6,
+    "t": -7.056,
+    "p": 0.0,
+    "n_clusters": 94,
+    "p_holm": null
+   }
+  },
+  {
+   "direction": "follow",
+   "h": 12,
+   "$10k": {
+    "net_bp": -59.63,
+    "n": 329,
+    "fc_dropped": 0,
+    "t": -2.194,
+    "p": 0.03064,
+    "n_clusters": 97,
+    "p_holm": 0.06128
+   },
+   "$100k": {
+    "net_bp": -151.12,
+    "n": 312,
+    "fc_dropped": 17,
+    "t": -4.824,
+    "p": 1e-05,
+    "n_clusters": 90,
+    "p_holm": null
+   }
+  },
+  {
+   "direction": "follow",
+   "h": 24,
+   "$10k": {
+    "net_bp": -51.02,
+    "n": 329,
+    "fc_dropped": 0,
+    "t": -1.802,
+    "p": 0.07468,
+    "n_clusters": 97,
+    "p_holm": 0.07468
+   },
+   "$100k": {
+    "net_bp": -130.17,
+    "n": 317,
+    "fc_dropped": 12,
+    "t": -4.329,
+    "p": 4e-05,
+    "n_clusters": 91,
+    "p_holm": null
+   }
+  },
+  {
+   "direction": "mirror",
+   "h": 3,
+   "$10k": {
+    "net_bp": -27.55,
+    "n": 329,
+    "fc_dropped": 0,
+    "t": -1.977,
+    "p": 0.05089,
+    "n_clusters": 97,
+    "p_holm": 0.06272
+   },
+   "$100k": {
+    "net_bp": -95.87,
+    "n": 323,
+    "fc_dropped": 6,
+    "t": -5.345,
+    "p": 0.0,
+    "n_clusters": 94,
+    "p_holm": null
+   }
+  },
+  {
+   "direction": "mirror",
+   "h": 12,
+   "$10k": {
+    "net_bp": -64.23,
+    "n": 329,
+    "fc_dropped": 0,
+    "t": -2.185,
+    "p": 0.03136,
+    "n_clusters": 97,
+    "p_holm": 0.06272
+   },
+   "$100k": {
+    "net_bp": -152.44,
+    "n": 312,
+    "fc_dropped": 17,
+    "t": -4.753,
+    "p": 1e-05,
+    "n_clusters": 90,
+    "p_holm": null
+   }
+  },
+  {
+   "direction": "mirror",
+   "h": 24,
+   "$10k": {
+    "net_bp": -60.39,
+    "n": 329,
+    "fc_dropped": 0,
+    "t": -2.408,
+    "p": 0.01795,
+    "n_clusters": 97,
+    "p_holm": 0.05385
+   },
+   "$100k": {
+    "net_bp": -136.04,
+    "n": 317,
+    "fc_dropped": 12,
+    "t": -4.619,
+    "p": 1e-05,
+    "n_clusters": 91,
+    "p_holm": null
+   }
+  }
+ ],
+ "asset_cost_map": {
+  "SNDKUSDT": {
+   "roundtrip_bp": 61.9,
+   "n_obs": 384
+  },
+  "MUUSDT": {
+   "roundtrip_bp": 71.3,
+   "n_obs": 356
+  },
+  "SOXLUSDT": {
+   "roundtrip_bp": 57.3,
+   "n_obs": 300
+  },
+  "SPCXUSDT": {
+   "roundtrip_bp": 51.2,
+   "n_obs": 276
+  }
+ },
+ "verdict": {
+  "engine_net_positive_follow_10k": "0/3",
+  "engine_net_positive_follow_100k": "0/3",
+  "note": "diag 1차 방향 Holm 0/3 FAIL와 병기 — 엔진은 기록 완결용(비용 지도)이며 G1 실패로 승격 불가 확정"
+ }
+}

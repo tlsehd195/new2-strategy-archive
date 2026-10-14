@@ -1,0 +1,99 @@
+{
+ "downloaded_at": "2026-10-13",
+ "span": [
+  "2025-12-01",
+  "2026-10-12"
+ ],
+ "summary": {
+  "XAUUSDT": {
+   "days_ok": 305,
+   "days_missing": 11,
+   "missing_codes": {
+    "http404": 11
+   },
+   "bars_total": 29248,
+   "approx_span_days": 304.7
+  },
+  "SNDKUSDT": {
+   "days_ok": 188,
+   "days_missing": 128,
+   "missing_codes": {
+    "http404": 128
+   },
+   "bars_total": 17994,
+   "approx_span_days": 187.4
+  },
+  "SOXLUSDT": {
+   "days_ok": 150,
+   "days_missing": 166,
+   "missing_codes": {
+    "http404": 166
+   },
+   "bars_total": 14344,
+   "approx_span_days": 149.4
+  },
+  "SPCXUSDT": {
+   "days_ok": 144,
+   "days_missing": 172,
+   "missing_codes": {
+    "http404": 172
+   },
+   "bars_total": 13805,
+   "approx_span_days": 143.8
+  },
+  "SKHYNIXUSDT": {
+   "days_ok": 132,
+   "days_missing": 184,
+   "missing_codes": {
+    "http404": 184
+   },
+   "bars_total": 12660,
+   "approx_span_days": 131.9
+  },
+  "KORUUSDT": {
+   "days_ok": 112,
+   "days_missing": 204,
+   "missing_codes": {
+    "http404": 204
+   },
+   "bars_total": 10697,
+   "approx_span_days": 111.4
+  },
+  "CLUSDT": {
+   "days_ok": 194,
+   "days_missing": 122,
+   "missing_codes": {
+    "http404": 122
+   },
+   "bars_total": 18588,
+   "approx_span_days": 193.6
+  },
+  "MUUSDT": {
+   "days_ok": 188,
+   "days_missing": 128,
+   "missing_codes": {
+    "http404": 128
+   },
+   "bars_total": 17995,
+   "approx_span_days": 187.4
+  },
+  "XAGUSDT": {
+   "days_ok": 278,
+   "days_missing": 38,
+   "missing_codes": {
+    "http404": 38
+   },
+   "bars_total": 26648,
+   "approx_span_days": 277.6
+  },
+  "BZUSDT": {
+   "days_ok": 194,
+   "days_missing": 122,
+   "missing_codes": {
+    "http404": 122
+   },
+   "bars_total": 18588,
+   "approx_span_days": 193.6
+  }
+ }
+}

@@ -1,0 +1,41 @@
+{
+ "report": {
+  "prereg": "PREREG_x3_alt_basis_collapse_2026-10-13.md",
+  "family_size": 24,
+  "signal": "perp-spot basis 4h-change z <= -1.2816/-1.6449 (collapse), reversal LONG",
+  "assets": [
+   "SOLUSDT",
+   "XRPUSDT"
+  ],
+  "asset_selection_rule": "\uc77c\uac04 qv \uc911\uc559\uac12 top-2 (research/alt_download_log.json, \uc218\uc775\ub960 \ubbf8\uc0ac\uc6a9)",
+  "spans": {},
+  "cells": [],
+  "proxy_validation": {
+   "BTCUSDT": {
+    "n": 87299,
+    "spearman_rho": 0.9125592468915212,
+    "p": 0.0
+   },
+   "ETHUSDT": {
+    "n": 101608,
+    "spearman_rho": 0.7995430335998038,
+    "p": 0.0
+   }
+  },
+  "ABORT": "\ud504\ub85d\uc2dc \ubd88\ub7c9(\u03c1<0.8) \u2014 PREREG \u00a71 \uc0ac\uc804 \uace0\uc815 \uaddc\uce59\uc5d0 \ub530\ub77c \uce21\uc815 \uc911\ub2e8"
+ },
+ "quality": {
+  "proxy_validation": {
+   "BTCUSDT": {
+    "n": 87299,
+    "spearman_rho": 0.9125592468915212,
+    "p": 0.0
+   },
+   "ETHUSDT": {
+    "n": 101608,
+    "spearman_rho": 0.7995430335998038,
+    "p": 0.0
+   }
+  }
+ }
+}

@@ -1,0 +1,20 @@
+{
+ "BTC-USD": {
+  "windows": 142,
+  "ok": 142,
+  "failed": 0,
+  "miss_rate": 0.0,
+  "rows": 40780,
+  "dups_removed": 141,
+  "fails": []
+ },
+ "ETH-USD": {
+  "windows": 192,
+  "ok": 192,
+  "failed": 0,
+  "miss_rate": 0.0,
+  "rows": 55268,
+  "dups_removed": 191,
+  "fails": []
+ }
+}

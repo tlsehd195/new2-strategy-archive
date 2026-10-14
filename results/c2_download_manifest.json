@@ -1,0 +1,36 @@
+{
+ "BTCUSDT": {
+  "already_done": 447,
+  "fetched": 2,
+  "failed": 2,
+  "miss_rate": 0.0045,
+  "fails": [
+   {
+    "day": "2023-02-09",
+    "err": "HTTPError: HTTP Error 404: Not Found"
+   },
+   {
+    "day": "2023-02-08",
+    "err": "HTTPError: HTTP Error 404: Not Found"
+   }
+  ],
+  "total_days": 449
+ },
+ "ETHUSDT": {
+  "already_done": 1204,
+  "fetched": 2,
+  "failed": 2,
+  "miss_rate": 0.0017,
+  "fails": [
+   {
+    "day": "2023-02-08",
+    "err": "HTTPError: HTTP Error 404: Not Found"
+   },
+   {
+    "day": "2023-02-09",
+    "err": "HTTPError: HTTP Error 404: Not Found"
+   }
+  ],
+  "total_days": 1206
+ }
+}

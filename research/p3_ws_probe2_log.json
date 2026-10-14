@@ -1,0 +1,46 @@
+{
+  "probe_started_utc": "2026-10-13T12:20:33.528Z",
+  "listen_s": 60,
+  "streams": {
+    "binance_spot_btcusdt_trade": {
+      "url": "wss://stream.binance.com:9443/ws/btcusdt@trade",
+      "open": true,
+      "msgs": 1533,
+      "first_payload": "{\"e\":\"trade\",\"E\":1791894034291,\"s\":\"BTCUSDT\",\"t\":6757820891,\"p\":\"83198.70000000\",\"q\":\"0.00031000\",\"T\":1791894034290,\"m\":true,\"M\":true}",
+      "first_msg_utc": "2026-10-13T12:20:34.320Z",
+      "events": [
+        "open",
+        "timeout_close",
+        "closed:code=1000"
+      ],
+      "verdict": "DATA_FLOWING"
+    },
+    "okx_public_v5": {
+      "url": "wss://ws.okx.com:8443/ws/v5/public",
+      "open": true,
+      "msgs": 81,
+      "first_payload": "{\"event\":\"subscribe\",\"arg\":{\"channel\":\"trades\",\"instId\":\"BTC-USDT\"},\"connId\":\"124d4dcb\"}",
+      "first_msg_utc": "2026-10-13T12:20:33.783Z",
+      "events": [
+        "open",
+        "timeout_close",
+        "closed:code=1000"
+      ],
+      "verdict": "DATA_FLOWING"
+    },
+    "bybit_public_v5": {
+      "url": "wss://stream.bybit.com/v5/public/linear",
+      "open": true,
+      "msgs": 318,
+      "first_payload": "{\"success\":true,\"ret_msg\":\"\",\"conn_id\":\"db292vkkmmssda4de41g-2cccq\",\"req_id\":\"\",\"op\":\"subscribe\"}",
+      "first_msg_utc": "2026-10-13T12:20:34.243Z",
+      "events": [
+        "open",
+        "timeout_close",
+        "closed:code=1000"
+      ],
+      "verdict": "DATA_FLOWING"
+    }
+  },
+  "probe_ended_utc": "2026-10-13T12:21:35.529Z"
+}
