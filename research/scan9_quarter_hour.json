@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://arxiv.org/html/2607.09426v1",
+    "name": "The Quarter-Hour Effect: Periodic Algorithmic Trading and",
+    "snippet": "We have documented a recurring quarter - hour microstructure pattern in cryptocurrency markets using trade data for six liquid contracts.",
+    "host_name": "arxiv.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.alphaxiv.org/abs/2607.09426",
+    "name": "The Quarter-Hour Effect: Periodic Algorithmic Trading and",
+    "snippet": "Jul 16, 2026 — Cryptocurrency markets exhibit periodic bursts in volatility and volume at one-minute, five-minute, and quarter - hour marks. Read more",
+    "host_name": "www.alphaxiv.org",
+    "rank": 1,
+    "date": "Jul 16, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://antonio-velazquez-bustamante.medium.com/the-ten-seconds-that-move-crypto-futures-c54ca05cde3e",
+    "name": "The Ten Seconds That Move Crypto Futures - Medium",
+    "snippet": "A new study of Binance perpetuals finds that algorithms crowd into quarter-hour openings , leaving small but measurable return patterns behind. Read more",
+    "host_name": "antonio-velazquez-bustamante.medium.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://arxiv.org/html/2607.09426v2",
+    "name": "The Quarter-Hour Effect: Periodic Algorithmic Trading and",
+    "snippet": "Opening returns are predictable out of sample, while opening order imbalance predicts returns over four to twelve hours , with much weaker effects at finer clock ... Read more",
+    "host_name": "arxiv.org",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://quantpedia.com/periodicity-in-cryptocurrencies-recurrent-patterns-in-volatility-and-volume",
+    "name": "Recurrent Patterns in Volatility and Volume",
+    "snippet": "Jan 11, 2022 — Bitcoin and Ether exhibit a large burst in volatility during the first minute of the hour , medium bursts immediately after 15, 30, and 45 ...",
+    "host_name": "quantpedia.com",
+    "rank": 4,
+    "date": "Jan 11, 2022",
+    "favicon": ""
+  },
+  {
+    "url": "https://papers.ssrn.com/sol3/Delivery.cfm/SSRN_ID4135239_code2537556.pdf?abstractid=4080253&mirid=1&ref=aligrithm.com",
+    "name": "Intraday return predictability in the cryptocurrency markets",
+    "snippet": "This paper reports evidence of intraday return predictability , consisting of both intraday momentum and reversal, in the cryptocurrency market. Read more",
+    "host_name": "papers.ssrn.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "url": "https://arxiv.org",
+    "name": "Breaking the Trend: How to Avoid Cherry-Picked Signals",
+    "snippet": "Oct 24, 2025 — The usual recipe to determine a portfolio in the CTA's industry is to use a blend of many different technical indicators as a signal for each ... Read more",
+    "host_name": "arxiv.org",
+    "rank": 0,
+    "date": "Oct 24, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.arxiv.org",
+    "name": "Deep Learning Models Meet Financial Data Modalities",
+    "snippet": "Apr 18, 2025 — We design high frequency trading strategy based on LOB data forecasting with cryptocur -. 2. Page 3. rencies. The paper is organized as follows ... Read more",
+    "host_name": "www.arxiv.org",
+    "rank": 1,
+    "date": "Apr 18, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.ml-quant.com",
+    "name": "arXiv papers",
+    "snippet": "The study tests whether extra reasoning in large language models improves portfolio returns net of trading costs across multiple model families, finding no ... Read more",
+    "host_name": "www.ml-quant.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://thesis.dial.uclouvain.be",
+    "name": "Algorithmic Trading Strategies in the Cryptocurrency Market",
+    "snippet": "May 14, 2025 — In our paper, we investigate the prediction performance of Support Vector Machine (SVM), the Multilayer Perceptron (MLP) and the Long Short Term ... Read more",
+    "host_name": "thesis.dial.uclouvain.be",
+    "rank": 3,
+    "date": "May 14, 2025",
+    "favicon": ""
+  }
+]

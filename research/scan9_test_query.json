@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://quantpedia.com/strategies/short-term-reversal-with-futures",
+    "name": "Short Term Reversal with Futures",
+    "snippet": "The short-term contrarian strategy of buying stocks, which are past losers and selling stocks, which are past winners, is well documented in the academic ... Read more",
+    "host_name": "quantpedia.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://papers.ssrn.com/sol3/Delivery.cfm/4301150.pdf?abstractid=4301150&mirid=1",
+    "name": "Fundamentals of Perpetual Futures",
+    "snippet": "Perpetual futures are the most popular cryptocurrency derivatives . Perpetuals offer leveraged exposure to their underlying without rollover or direct ... Read more",
+    "host_name": "papers.ssrn.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://arxiv.org/html/2607.09426v2",
+    "name": "The Quarter-Hour Effect: Periodic Algorithmic Trading and",
+    "snippet": "This study uses aggregate trade data from the Binance USDT-margined perpetual futures market , the largest crypto -derivatives venue by trading volume throughout ... Read more",
+    "host_name": "arxiv.org",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://metamask.io/news/open-interest-perps-explained",
+    "name": "What is open interest in perpetual futures?",
+    "snippet": "Apr 20, 2026 — Learn how perps open interest works , key differences from volume, common misinterpretation risks, and steps for using OI data responsibly.",
+    "host_name": "metamask.io",
+    "rank": 3,
+    "date": "Apr 20, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://business.cornell.edu/centers/2025/02/18/perpetual-futures-contracts-and-cryptocurrency",
+    "name": "Perpetual Futures Contracts and Cryptocurrency Market Quality",
+    "snippet": "Feb 17, 2025 — How do perpetual futures contracts impact cryptocurrency trading in emerging markets like China? Our research uncovers key insights.",
+    "host_name": "business.cornell.edu",
+    "rank": 4,
+    "date": "Feb 17, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.mdpi.com/2227-7072/14/7/178",
+    "name": "Perpetual Futures in Decentralised Finance: Mechanics",
+    "snippet": "by S Shah · 2026 — We study 17 assets—5 crypto coins, Applying a rolling 3-day t-test to identify abnormal trading volume without a predetermined event calendar, we document 1797 ...",
+    "host_name": "www.mdpi.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

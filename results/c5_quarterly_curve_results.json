@@ -1,0 +1,1476 @@
+{
+ "report": {
+  "prereg": "PREREG_c5_quarterly_curve_2026-10-12.md",
+  "family_size": 48,
+  "signal": "curve slope z (near-vs-far calendar spread, L in 24/120/480/960 h) |z|>=1.2816, FOLLOW",
+  "spans": {
+   "BTCUSDT_span1_2021-05-02~2022-08-17": {
+    "hours_in_span": 11322,
+    "signal_hours_any": 0,
+    "slope_valid_hours": 0
+   },
+   "BTCUSDT_span2_2023-04-07~2024-03-18": {
+    "hours_in_span": 8304,
+    "signal_hours_any": 3920,
+    "slope_valid_hours": 3896
+   },
+   "ETHUSDT_span1_2021-05-02~2022-08-17": {
+    "hours_in_span": 11322,
+    "signal_hours_any": 0,
+    "slope_valid_hours": 0
+   },
+   "ETHUSDT_span2_2024-12-10~2026-04-20": {
+    "hours_in_span": 11904,
+    "signal_hours_any": 10206,
+    "slope_valid_hours": 10062
+   }
+  },
+  "cells": [
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "BTCUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 24,
+    "horizon": 4,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "BTCUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 24,
+    "horizon": 16,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "BTCUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 24,
+    "horizon": 48,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "BTCUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 120,
+    "horizon": 4,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "BTCUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 120,
+    "horizon": 16,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "BTCUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 120,
+    "horizon": 48,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "BTCUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 480,
+    "horizon": 4,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "BTCUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 480,
+    "horizon": 16,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "BTCUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 480,
+    "horizon": 48,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "BTCUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 960,
+    "horizon": 4,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "BTCUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 960,
+    "horizon": 16,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "BTCUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 960,
+    "horizon": 48,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 954,
+    "valid_n": 238.5,
+    "total_bp": -0.0859213712826711,
+    "net12": -12.08592137128267,
+    "net16": -16.085921371282673,
+    "net20": -20.08592137128267,
+    "t": -4.270743946190112,
+    "p": 2.8190735819927923e-05,
+    "oppose_net16": -15.91407862871733,
+    "p_ctrl": 0.56,
+    "symbol": "BTCUSDT",
+    "span": "2023-04-07~2024-03-18",
+    "lookback": 24,
+    "horizon": 4,
+    "dropped_gap": 0,
+    "p_holm": 0.0012122016402569007
+   },
+   {
+    "n": 951,
+    "valid_n": 59.4375,
+    "total_bp": 5.492618783801194,
+    "net12": -6.507381216198805,
+    "net16": -10.507381216198807,
+    "net20": -14.507381216198807,
+    "t": -0.7164856335958398,
+    "p": 0.4765452792662196,
+    "oppose_net16": -21.492618783801195,
+    "p_ctrl": 0.06,
+    "symbol": "BTCUSDT",
+    "span": "2023-04-07~2024-03-18",
+    "lookback": 24,
+    "horizon": 16,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 948,
+    "valid_n": 19.75,
+    "total_bp": 5.896917073702806,
+    "net12": -6.103082926297193,
+    "net16": -10.103082926297196,
+    "net20": -14.103082926297194,
+    "t": -0.25207508587864713,
+    "p": 0.8037254705145267,
+    "oppose_net16": -21.896917073702806,
+    "p_ctrl": 0.18,
+    "symbol": "BTCUSDT",
+    "span": "2023-04-07~2024-03-18",
+    "lookback": 24,
+    "horizon": 48,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 1099,
+    "valid_n": 274.75,
+    "total_bp": -0.2022865522319208,
+    "net12": -12.20228655223192,
+    "net16": -16.20228655223192,
+    "net20": -20.20228655223192,
+    "t": -5.301761878201382,
+    "p": 2.365292606959547e-07,
+    "oppose_net16": -15.79771344776808,
+    "p_ctrl": 0.5,
+    "symbol": "BTCUSDT",
+    "span": "2023-04-07~2024-03-18",
+    "lookback": 120,
+    "horizon": 4,
+    "dropped_gap": 0,
+    "p_holm": 1.0880345992013917e-05
+   },
+   {
+    "n": 1097,
+    "valid_n": 68.5625,
+    "total_bp": -3.3992820486058473,
+    "net12": -15.399282048605846,
+    "net16": -19.399282048605848,
+    "net20": -23.399282048605848,
+    "t": -1.600972965232871,
+    "p": 0.114048805491508,
+    "oppose_net16": -12.600717951394154,
+    "p_ctrl": 0.9,
+    "symbol": "BTCUSDT",
+    "span": "2023-04-07~2024-03-18",
+    "lookback": 120,
+    "horizon": 16,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 1097,
+    "valid_n": 22.854166666666668,
+    "total_bp": -1.43212213541831,
+    "net12": -13.432122135418307,
+    "net16": -17.43212213541831,
+    "net20": -21.43212213541831,
+    "t": -0.49171773949075953,
+    "p": 0.6278215198058095,
+    "oppose_net16": -14.56787786458169,
+    "p_ctrl": 0.65,
+    "symbol": "BTCUSDT",
+    "span": "2023-04-07~2024-03-18",
+    "lookback": 120,
+    "horizon": 48,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 1550,
+    "valid_n": 387.5,
+    "total_bp": 1.1721757499931764,
+    "net12": -10.827824250006822,
+    "net16": -14.827824250006824,
+    "net20": -18.827824250006824,
+    "t": -5.410330882985005,
+    "p": 1.1054420277491139e-07,
+    "oppose_net16": -17.172175749993176,
+    "p_ctrl": 0.19,
+    "symbol": "BTCUSDT",
+    "span": "2023-04-07~2024-03-18",
+    "lookback": 480,
+    "horizon": 4,
+    "dropped_gap": 0,
+    "p_holm": 5.195577530420835e-06
+   },
+   {
+    "n": 1547,
+    "valid_n": 96.6875,
+    "total_bp": 4.019252206651161,
+    "net12": -7.980747793348838,
+    "net16": -11.980747793348838,
+    "net20": -15.98074779334884,
+    "t": -1.1128953271269297,
+    "p": 0.2685413912535051,
+    "oppose_net16": -20.019252206651164,
+    "p_ctrl": 0.03,
+    "symbol": "BTCUSDT",
+    "span": "2023-04-07~2024-03-18",
+    "lookback": 480,
+    "horizon": 16,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 1539,
+    "valid_n": 32.0625,
+    "total_bp": 14.838014737444132,
+    "net12": 2.8380147374441327,
+    "net16": -1.1619852625558693,
+    "net20": -5.161985262555869,
+    "t": -0.03603094184228606,
+    "p": 0.9714882439094138,
+    "oppose_net16": -30.838014737444134,
+    "p_ctrl": 0.0,
+    "symbol": "BTCUSDT",
+    "span": "2023-04-07~2024-03-18",
+    "lookback": 480,
+    "horizon": 48,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 1537,
+    "valid_n": 384.25,
+    "total_bp": 1.2523843406382924,
+    "net12": -10.747615659361706,
+    "net16": -14.747615659361708,
+    "net20": -18.747615659361706,
+    "t": -4.9351645130720785,
+    "p": 1.1966442083371727e-06,
+    "oppose_net16": -17.252384340638294,
+    "p_ctrl": 0.2,
+    "symbol": "BTCUSDT",
+    "span": "2023-04-07~2024-03-18",
+    "lookback": 960,
+    "horizon": 4,
+    "dropped_gap": 0,
+    "p_holm": 5.2652345166835594e-05
+   },
+   {
+    "n": 1534,
+    "valid_n": 95.875,
+    "total_bp": 6.434369667742806,
+    "net12": -5.565630332257193,
+    "net16": -9.565630332257195,
+    "net20": -13.565630332257193,
+    "t": -0.819829060904333,
+    "p": 0.41436842498315274,
+    "oppose_net16": -22.434369667742807,
+    "p_ctrl": 0.0,
+    "symbol": "BTCUSDT",
+    "span": "2023-04-07~2024-03-18",
+    "lookback": 960,
+    "horizon": 16,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 1526,
+    "valid_n": 31.791666666666668,
+    "total_bp": 17.844899594676587,
+    "net12": 5.844899594676586,
+    "net16": 1.8448995946765845,
+    "net20": -2.1551004053234153,
+    "t": 0.052457220017667144,
+    "p": 0.9585032315822125,
+    "oppose_net16": -33.84489959467658,
+    "p_ctrl": 0.0,
+    "symbol": "BTCUSDT",
+    "span": "2023-04-07~2024-03-18",
+    "lookback": 960,
+    "horizon": 48,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "ETHUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 24,
+    "horizon": 4,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "ETHUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 24,
+    "horizon": 16,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "ETHUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 24,
+    "horizon": 48,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "ETHUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 120,
+    "horizon": 4,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "ETHUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 120,
+    "horizon": 16,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "ETHUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 120,
+    "horizon": 48,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "ETHUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 480,
+    "horizon": 4,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "ETHUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 480,
+    "horizon": 16,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "ETHUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 480,
+    "horizon": 48,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "ETHUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 960,
+    "horizon": 4,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "ETHUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 960,
+    "horizon": 16,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 0,
+    "valid_n": 0.0,
+    "total_bp": null,
+    "net12": null,
+    "net16": null,
+    "net20": null,
+    "t": null,
+    "p": 1.0,
+    "oppose_net16": null,
+    "p_ctrl": null,
+    "symbol": "ETHUSDT",
+    "span": "2021-05-02~2022-08-17",
+    "lookback": 960,
+    "horizon": 48,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 1783,
+    "valid_n": 445.75,
+    "total_bp": 3.7970659335571417,
+    "net12": -8.202934066442857,
+    "net16": -12.20293406644286,
+    "net20": -16.202934066442857,
+    "t": -2.802020678965677,
+    "p": 0.005300085413657996,
+    "oppose_net16": -19.797065933557143,
+    "p_ctrl": 0.03,
+    "symbol": "ETHUSDT",
+    "span": "2024-12-10~2026-04-20",
+    "lookback": 24,
+    "horizon": 4,
+    "dropped_gap": 0,
+    "p_holm": 0.21730350195997786
+   },
+   {
+    "n": 1781,
+    "valid_n": 111.3125,
+    "total_bp": 10.16168620879141,
+    "net12": -1.838313791208588,
+    "net16": -5.83831379120859,
+    "net20": -9.83831379120859,
+    "t": -0.3366387259104107,
+    "p": 0.7370288317854576,
+    "oppose_net16": -26.16168620879141,
+    "p_ctrl": 0.0,
+    "symbol": "ETHUSDT",
+    "span": "2024-12-10~2026-04-20",
+    "lookback": 24,
+    "horizon": 16,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 1780,
+    "valid_n": 37.083333333333336,
+    "total_bp": 13.136505251230057,
+    "net12": 1.136505251230057,
+    "net16": -2.863494748769945,
+    "net20": -6.863494748769944,
+    "t": -0.0591252838133832,
+    "p": 0.9531785629486127,
+    "oppose_net16": -29.136505251230055,
+    "p_ctrl": 0.01,
+    "symbol": "ETHUSDT",
+    "span": "2024-12-10~2026-04-20",
+    "lookback": 24,
+    "horizon": 48,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 2051,
+    "valid_n": 512.75,
+    "total_bp": 1.3815590779528963,
+    "net12": -10.618440922047101,
+    "net16": -14.618440922047103,
+    "net20": -18.618440922047103,
+    "t": -3.635744659795655,
+    "p": 0.0003052200378322916,
+    "oppose_net16": -17.381559077952897,
+    "p_ctrl": 0.24,
+    "symbol": "ETHUSDT",
+    "span": "2024-12-10~2026-04-20",
+    "lookback": 120,
+    "horizon": 4,
+    "dropped_gap": 0,
+    "p_holm": 0.012819241588956247
+   },
+   {
+    "n": 2049,
+    "valid_n": 128.0625,
+    "total_bp": 7.738218010547131,
+    "net12": -4.261781989452868,
+    "net16": -8.26178198945287,
+    "net20": -12.261781989452869,
+    "t": -0.5043332224638528,
+    "p": 0.6149006756491224,
+    "oppose_net16": -23.73821801054713,
+    "p_ctrl": 0.01,
+    "symbol": "ETHUSDT",
+    "span": "2024-12-10~2026-04-20",
+    "lookback": 120,
+    "horizon": 16,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 2048,
+    "valid_n": 42.666666666666664,
+    "total_bp": 16.668875416251264,
+    "net12": 4.668875416251265,
+    "net16": 0.6688754162512632,
+    "net20": -3.3311245837487364,
+    "t": 0.013900406241909457,
+    "p": 0.988975783944245,
+    "oppose_net16": -32.66887541625126,
+    "p_ctrl": 0.01,
+    "symbol": "ETHUSDT",
+    "span": "2024-12-10~2026-04-20",
+    "lookback": 120,
+    "horizon": 48,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 2656,
+    "valid_n": 664.0,
+    "total_bp": -0.2349598036241315,
+    "net12": -12.23495980362413,
+    "net16": -16.234959803624132,
+    "net20": -20.234959803624132,
+    "t": -4.995359479248738,
+    "p": 7.519940715534684e-07,
+    "oppose_net16": -15.76504019637587,
+    "p_ctrl": 0.54,
+    "symbol": "ETHUSDT",
+    "span": "2024-12-10~2026-04-20",
+    "lookback": 480,
+    "horizon": 4,
+    "dropped_gap": 0,
+    "p_holm": 3.383973321990608e-05
+   },
+   {
+    "n": 2656,
+    "valid_n": 166.0,
+    "total_bp": -0.2517720906203228,
+    "net12": -12.251772090620323,
+    "net16": -16.251772090620324,
+    "net20": -20.251772090620324,
+    "t": -1.2654732444807615,
+    "p": 0.20748580796712573,
+    "oppose_net16": -15.748227909379677,
+    "p_ctrl": 0.45,
+    "symbol": "ETHUSDT",
+    "span": "2024-12-10~2026-04-20",
+    "lookback": 480,
+    "horizon": 16,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 2656,
+    "valid_n": 55.333333333333336,
+    "total_bp": -4.3385662581343745,
+    "net12": -16.33856625813437,
+    "net16": -20.338566258134378,
+    "net20": -24.338566258134374,
+    "t": -0.5247319228886586,
+    "p": 0.6019040966184499,
+    "oppose_net16": -11.661433741865627,
+    "p_ctrl": 0.76,
+    "symbol": "ETHUSDT",
+    "span": "2024-12-10~2026-04-20",
+    "lookback": 480,
+    "horizon": 48,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 3947,
+    "valid_n": 986.75,
+    "total_bp": -0.3608196244927423,
+    "net12": -12.360819624492741,
+    "net16": -16.360819624492745,
+    "net20": -20.36081962449274,
+    "t": -6.582894310487245,
+    "p": 7.486383272797049e-11,
+    "oppose_net16": -15.639180375507259,
+    "p_ctrl": 0.6,
+    "symbol": "ETHUSDT",
+    "span": "2024-12-10~2026-04-20",
+    "lookback": 960,
+    "horizon": 4,
+    "dropped_gap": 0,
+    "p_holm": 3.5934639709425833e-09
+   },
+   {
+    "n": 3947,
+    "valid_n": 246.6875,
+    "total_bp": 2.3276185533638363,
+    "net12": -9.672381446636162,
+    "net16": -13.672381446636164,
+    "net20": -17.672381446636162,
+    "t": -1.3541252774069272,
+    "p": 0.17694058869640977,
+    "oppose_net16": -18.327618553363838,
+    "p_ctrl": 0.18,
+    "symbol": "ETHUSDT",
+    "span": "2024-12-10~2026-04-20",
+    "lookback": 960,
+    "horizon": 16,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   },
+   {
+    "n": 3947,
+    "valid_n": 82.22916666666667,
+    "total_bp": 8.665044511267753,
+    "net12": -3.334955488732246,
+    "net16": -7.3349554887322475,
+    "net20": -11.334955488732247,
+    "t": -0.2331679550158229,
+    "p": 0.8162175547149872,
+    "oppose_net16": -24.66504451126775,
+    "p_ctrl": 0.02,
+    "symbol": "ETHUSDT",
+    "span": "2024-12-10~2026-04-20",
+    "lookback": 960,
+    "horizon": 48,
+    "dropped_gap": 0,
+    "p_holm": 1.0
+   }
+  ],
+  "verdict": {
+   "holm_pass_cells": [
+    {
+     "cell": "BTCUSDT 2023-04-07~2024-03-18 L24 h4",
+     "p_holm": 0.0012122016402569007,
+     "net16": -16.085921371282673,
+     "config_pos_of_4": 0
+    },
+    {
+     "cell": "BTCUSDT 2023-04-07~2024-03-18 L120 h4",
+     "p_holm": 1.0880345992013917e-05,
+     "net16": -16.20228655223192,
+     "config_pos_of_4": 0
+    },
+    {
+     "cell": "BTCUSDT 2023-04-07~2024-03-18 L480 h4",
+     "p_holm": 5.195577530420835e-06,
+     "net16": -14.827824250006824,
+     "config_pos_of_4": 0
+    },
+    {
+     "cell": "BTCUSDT 2023-04-07~2024-03-18 L960 h4",
+     "p_holm": 5.2652345166835594e-05,
+     "net16": -14.747615659361708,
+     "config_pos_of_4": 0
+    },
+    {
+     "cell": "ETHUSDT 2024-12-10~2026-04-20 L120 h4",
+     "p_holm": 0.012819241588956247,
+     "net16": -14.618440922047103,
+     "config_pos_of_4": 0
+    },
+    {
+     "cell": "ETHUSDT 2024-12-10~2026-04-20 L480 h4",
+     "p_holm": 3.383973321990608e-05,
+     "net16": -16.234959803624132,
+     "config_pos_of_4": 0
+    },
+    {
+     "cell": "ETHUSDT 2024-12-10~2026-04-20 L960 h4",
+     "p_holm": 3.5934639709425833e-09,
+     "net16": -16.360819624492745,
+     "config_pos_of_4": 0
+    }
+   ],
+   "PASS": false,
+   "best_config": {
+    "cell": "BTCUSDT 2023-04-07~2024-03-18 L24 h4",
+    "p_holm": 0.0012122016402569007,
+    "net16": -16.085921371282673,
+    "config_pos_of_4": 0
+   }
+  },
+  "oos": {
+   "executed": true,
+   "segments": [
+    {
+     "symbol": "BTCUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "lookback": 24,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "symbol": "BTCUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "lookback": 120,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "symbol": "BTCUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "lookback": 480,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "symbol": "BTCUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "lookback": 960,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "symbol": "BTCUSDT",
+     "span": "2023-04-07~2024-03-18",
+     "lookback": 24,
+     "horizon": 4,
+     "n": 753,
+     "net16": -15.906150526608384
+    },
+    {
+     "symbol": "BTCUSDT",
+     "span": "2023-04-07~2024-03-18",
+     "lookback": 120,
+     "horizon": 4,
+     "n": 867,
+     "net16": -16.030516237286506
+    },
+    {
+     "symbol": "BTCUSDT",
+     "span": "2023-04-07~2024-03-18",
+     "lookback": 480,
+     "horizon": 4,
+     "n": 1453,
+     "net16": -14.834499522159307
+    },
+    {
+     "symbol": "BTCUSDT",
+     "span": "2023-04-07~2024-03-18",
+     "lookback": 960,
+     "horizon": 4,
+     "n": 1522,
+     "net16": -14.690851215368914
+    },
+    {
+     "symbol": "ETHUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "lookback": 24,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "symbol": "ETHUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "lookback": 120,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "symbol": "ETHUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "lookback": 480,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "symbol": "ETHUSDT",
+     "span": "2021-05-02~2022-08-17",
+     "lookback": 960,
+     "horizon": 4,
+     "n": 0,
+     "net16": null
+    },
+    {
+     "symbol": "ETHUSDT",
+     "span": "2024-12-10~2026-04-20",
+     "lookback": 24,
+     "horizon": 4,
+     "n": 652,
+     "net16": -9.667850120360198
+    },
+    {
+     "symbol": "ETHUSDT",
+     "span": "2024-12-10~2026-04-20",
+     "lookback": 120,
+     "horizon": 4,
+     "n": 794,
+     "net16": -16.66231663004122
+    },
+    {
+     "symbol": "ETHUSDT",
+     "span": "2024-12-10~2026-04-20",
+     "lookback": 480,
+     "horizon": 4,
+     "n": 870,
+     "net16": -14.59744056100487
+    },
+    {
+     "symbol": "ETHUSDT",
+     "span": "2024-12-10~2026-04-20",
+     "lookback": 960,
+     "horizon": 4,
+     "n": 1492,
+     "net16": -15.71236329542732
+    }
+   ]
+  },
+  "family_precheck": {
+   "note": "\ucee4\ube0c \uc2ac\ub85c\ud504(\uc6d0\uc6d4\u2212\uadfc\uc6d4)\ub294 \uc774\ub860\uc801\uc73c\ub85c \ubbf8\ub798 \ud380\ub529 \uae30\ub300\uc640 \uc5f0\ub3d9 \uac00\ub2a5 \u2014 |\u03c1|\u22650.5\uba74 \ud380\ub529 \ubcc0\ud615\uc73c\ub85c \uae30\ub85d(\ud310\uc815 \uaddc\uce59 \ubcc0\uacbd \uc5c6\uc74c)",
+   "pairs": [
+    {
+     "symbol": "BTCUSDT",
+     "span": 2,
+     "lookback": 24,
+     "n_pairs": 488,
+     "spearman_rho_vs_funding_z": 0.20175116786588182,
+     "p": 7.066724632191647e-06
+    },
+    {
+     "symbol": "BTCUSDT",
+     "span": 2,
+     "lookback": 120,
+     "n_pairs": 446,
+     "spearman_rho_vs_funding_z": 0.4527635438369844,
+     "p": 6.317780678417007e-24
+    },
+    {
+     "symbol": "BTCUSDT",
+     "span": 2,
+     "lookback": 480,
+     "n_pairs": 375,
+     "spearman_rho_vs_funding_z": 0.6062539159032794,
+     "p": 5.2886857906100476e-39
+    },
+    {
+     "symbol": "BTCUSDT",
+     "span": 2,
+     "lookback": 960,
+     "n_pairs": 333,
+     "spearman_rho_vs_funding_z": 0.43745635107570374,
+     "p": 5.347967469726887e-17
+    },
+    {
+     "symbol": "ETHUSDT",
+     "span": 2,
+     "lookback": 24,
+     "n_pairs": 1263,
+     "spearman_rho_vs_funding_z": 0.08002559713917984,
+     "p": 0.0044306193913529746
+    },
+    {
+     "symbol": "ETHUSDT",
+     "span": 2,
+     "lookback": 120,
+     "n_pairs": 1191,
+     "spearman_rho_vs_funding_z": 0.2013974817704289,
+     "p": 2.2977826179971655e-12
+    },
+    {
+     "symbol": "ETHUSDT",
+     "span": 2,
+     "lookback": 480,
+     "n_pairs": 1077,
+     "spearman_rho_vs_funding_z": 0.22077645311727953,
+     "p": 2.3438435022404836e-13
+    },
+    {
+     "symbol": "ETHUSDT",
+     "span": 2,
+     "lookback": 960,
+     "n_pairs": 1109,
+     "spearman_rho_vs_funding_z": 0.12373006960195232,
+     "p": 3.6016169769482335e-05
+    }
+   ]
+  }
+ },
+ "quality": {
+  "BTCUSDT_slope": {
+   "contracts_used": 24,
+   "contract_list": [
+    {
+     "sym": "BTCUSDT_210326",
+     "first": "2021-02-03 08:00:00+00:00",
+     "last": "2021-03-26 08:00:00+00:00",
+     "bars": 1225
+    },
+    {
+     "sym": "BTCUSDT_210625",
+     "first": "2021-03-16 07:00:00+00:00",
+     "last": "2021-06-25 10:00:00+00:00",
+     "bars": 2428
+    },
+    {
+     "sym": "BTCUSDT_210924",
+     "first": "2021-06-18 03:00:00+00:00",
+     "last": "2021-09-24 08:00:00+00:00",
+     "bars": 2358
+    },
+    {
+     "sym": "BTCUSDT_211231",
+     "first": "2021-09-22 03:00:00+00:00",
+     "last": "2021-12-31 08:00:00+00:00",
+     "bars": 2406
+    },
+    {
+     "sym": "BTCUSDT_220325",
+     "first": "2021-12-24 03:00:00+00:00",
+     "last": "2022-03-25 08:00:00+00:00",
+     "bars": 2190
+    },
+    {
+     "sym": "BTCUSDT_220624",
+     "first": "2022-03-22 03:00:00+00:00",
+     "last": "2022-06-24 08:00:00+00:00",
+     "bars": 2262
+    },
+    {
+     "sym": "BTCUSDT_220930",
+     "first": "2022-06-20 02:00:00+00:00",
+     "last": "2022-09-30 08:00:00+00:00",
+     "bars": 2455
+    },
+    {
+     "sym": "BTCUSDT_221230",
+     "first": "2022-09-23 02:00:00+00:00",
+     "last": "2022-12-30 08:00:00+00:00",
+     "bars": 2359
+    },
+    {
+     "sym": "BTCUSDT_230331",
+     "first": "2022-12-23 02:00:00+00:00",
+     "last": "2023-03-31 08:00:00+00:00",
+     "bars": 2359
+    },
+    {
+     "sym": "BTCUSDT_230630",
+     "first": "2023-03-27 02:00:00+00:00",
+     "last": "2023-06-30 08:00:00+00:00",
+     "bars": 2287
+    },
+    {
+     "sym": "BTCUSDT_230929",
+     "first": "2023-06-25 02:00:00+00:00",
+     "last": "2023-09-30 23:00:00+00:00",
+     "bars": 2350
+    },
+    {
+     "sym": "BTCUSDT_231229",
+     "first": "2023-08-18 12:00:00+00:00",
+     "last": "2023-12-31 23:00:00+00:00",
+     "bars": 3252
+    },
+    {
+     "sym": "BTCUSDT_240329",
+     "first": "2023-10-01 00:00:00+00:00",
+     "last": "2024-03-29 09:00:00+00:00",
+     "bars": 4330
+    },
+    {
+     "sym": "BTCUSDT_240628",
+     "first": "2024-01-01 00:00:00+00:00",
+     "last": "2024-06-30 23:00:00+00:00",
+     "bars": 4368
+    },
+    {
+     "sym": "BTCUSDT_240927",
+     "first": "2024-04-01 00:00:00+00:00",
+     "last": "2024-09-27 08:00:00+00:00",
+     "bars": 4305
+    },
+    {
+     "sym": "BTCUSDT_241227",
+     "first": "2024-07-01 00:00:00+00:00",
+     "last": "2024-12-27 08:00:00+00:00",
+     "bars": 4305
+    },
+    {
+     "sym": "BTCUSDT_250328",
+     "first": "2024-10-01 00:00:00+00:00",
+     "last": "2025-03-28 08:00:00+00:00",
+     "bars": 4281
+    },
+    {
+     "sym": "BTCUSDT_250627",
+     "first": "2025-01-01 00:00:00+00:00",
+     "last": "2025-06-27 08:00:00+00:00",
+     "bars": 4257
+    },
+    {
+     "sym": "BTCUSDT_250926",
+     "first": "2025-04-01 00:00:00+00:00",
+     "last": "2025-09-26 08:00:00+00:00",
+     "bars": 4281
+    },
+    {
+     "sym": "BTCUSDT_251226",
+     "first": "2025-07-01 00:00:00+00:00",
+     "last": "2025-12-31 23:00:00+00:00",
+     "bars": 4416
+    },
+    {
+     "sym": "BTCUSDT_260327",
+     "first": "2025-10-01 00:00:00+00:00",
+     "last": "2026-03-31 23:00:00+00:00",
+     "bars": 4368
+    },
+    {
+     "sym": "BTCUSDT_260626",
+     "first": "2026-01-01 00:00:00+00:00",
+     "last": "2026-06-26 08:00:00+00:00",
+     "bars": 4233
+    },
+    {
+     "sym": "BTCUSDT_260925",
+     "first": "2026-04-01 00:00:00+00:00",
+     "last": "2026-09-25 08:00:00+00:00",
+     "bars": 4257
+    },
+    {
+     "sym": "BTCUSDT_261225",
+     "first": "2026-07-01 00:00:00+00:00",
+     "last": "2026-09-30 23:00:00+00:00",
+     "bars": 2208
+    }
+   ]
+  },
+  "BTCUSDT_slope_valid_total": 22027,
+  "BTCUSDT_span1_slope_valid": 0,
+  "BTCUSDT_span2_slope_valid": 4646,
+  "ETHUSDT_slope": {
+   "contracts_used": 24,
+   "contract_list": [
+    {
+     "sym": "ETHUSDT_210326",
+     "first": "2021-02-04 07:00:00+00:00",
+     "last": "2021-03-26 08:00:00+00:00",
+     "bars": 1202
+    },
+    {
+     "sym": "ETHUSDT_210625",
+     "first": "2021-03-16 07:00:00+00:00",
+     "last": "2021-06-25 10:00:00+00:00",
+     "bars": 2428
+    },
+    {
+     "sym": "ETHUSDT_210924",
+     "first": "2021-06-18 03:00:00+00:00",
+     "last": "2021-09-24 08:00:00+00:00",
+     "bars": 2358
+    },
+    {
+     "sym": "ETHUSDT_211231",
+     "first": "2021-09-22 03:00:00+00:00",
+     "last": "2021-12-31 08:00:00+00:00",
+     "bars": 2406
+    },
+    {
+     "sym": "ETHUSDT_220325",
+     "first": "2021-12-24 03:00:00+00:00",
+     "last": "2022-03-25 08:00:00+00:00",
+     "bars": 2190
+    },
+    {
+     "sym": "ETHUSDT_220624",
+     "first": "2022-03-22 03:00:00+00:00",
+     "last": "2022-06-24 08:00:00+00:00",
+     "bars": 2262
+    },
+    {
+     "sym": "ETHUSDT_220930",
+     "first": "2022-06-20 02:00:00+00:00",
+     "last": "2022-09-30 08:00:00+00:00",
+     "bars": 2455
+    },
+    {
+     "sym": "ETHUSDT_221230",
+     "first": "2022-09-23 02:00:00+00:00",
+     "last": "2022-12-30 08:00:00+00:00",
+     "bars": 2359
+    },
+    {
+     "sym": "ETHUSDT_230331",
+     "first": "2022-12-23 02:00:00+00:00",
+     "last": "2023-03-31 08:00:00+00:00",
+     "bars": 2359
+    },
+    {
+     "sym": "ETHUSDT_230630",
+     "first": "2023-03-27 02:00:00+00:00",
+     "last": "2023-06-30 08:00:00+00:00",
+     "bars": 2287
+    },
+    {
+     "sym": "ETHUSDT_230929",
+     "first": "2023-06-25 02:00:00+00:00",
+     "last": "2023-09-30 23:00:00+00:00",
+     "bars": 2350
+    },
+    {
+     "sym": "ETHUSDT_231229",
+     "first": "2023-08-18 12:00:00+00:00",
+     "last": "2023-12-31 23:00:00+00:00",
+     "bars": 3252
+    },
+    {
+     "sym": "ETHUSDT_240329",
+     "first": "2023-10-01 00:00:00+00:00",
+     "last": "2024-03-29 09:00:00+00:00",
+     "bars": 4330
+    },
+    {
+     "sym": "ETHUSDT_240628",
+     "first": "2024-01-01 00:00:00+00:00",
+     "last": "2024-06-30 23:00:00+00:00",
+     "bars": 4368
+    },
+    {
+     "sym": "ETHUSDT_240927",
+     "first": "2024-04-01 00:00:00+00:00",
+     "last": "2024-09-27 08:00:00+00:00",
+     "bars": 4305
+    },
+    {
+     "sym": "ETHUSDT_241227",
+     "first": "2024-07-01 00:00:00+00:00",
+     "last": "2024-12-27 08:00:00+00:00",
+     "bars": 4305
+    },
+    {
+     "sym": "ETHUSDT_250328",
+     "first": "2024-10-01 00:00:00+00:00",
+     "last": "2025-03-28 08:00:00+00:00",
+     "bars": 4281
+    },
+    {
+     "sym": "ETHUSDT_250627",
+     "first": "2025-01-01 00:00:00+00:00",
+     "last": "2025-06-27 08:00:00+00:00",
+     "bars": 4257
+    },
+    {
+     "sym": "ETHUSDT_250926",
+     "first": "2025-04-01 00:00:00+00:00",
+     "last": "2025-09-26 08:00:00+00:00",
+     "bars": 4281
+    },
+    {
+     "sym": "ETHUSDT_251226",
+     "first": "2025-07-01 00:00:00+00:00",
+     "last": "2025-12-31 23:00:00+00:00",
+     "bars": 4416
+    },
+    {
+     "sym": "ETHUSDT_260327",
+     "first": "2025-10-01 00:00:00+00:00",
+     "last": "2026-03-31 23:00:00+00:00",
+     "bars": 4368
+    },
+    {
+     "sym": "ETHUSDT_260626",
+     "first": "2026-01-01 00:00:00+00:00",
+     "last": "2026-06-26 08:00:00+00:00",
+     "bars": 4233
+    },
+    {
+     "sym": "ETHUSDT_260925",
+     "first": "2026-04-01 00:00:00+00:00",
+     "last": "2026-09-25 08:00:00+00:00",
+     "bars": 4257
+    },
+    {
+     "sym": "ETHUSDT_261225",
+     "first": "2026-07-01 00:00:00+00:00",
+     "last": "2026-09-30 23:00:00+00:00",
+     "bars": 2208
+    }
+   ]
+  },
+  "ETHUSDT_slope_valid_total": 22027,
+  "ETHUSDT_span1_slope_valid": 0,
+  "ETHUSDT_span2_slope_valid": 10206,
+  "BTCUSDT_span1_2021-05-02~2022-08-17": {
+   "hours_in_span": 11322,
+   "signal_hours_any": 0,
+   "slope_valid_hours": 0
+  },
+  "BTCUSDT_span2_2023-04-07~2024-03-18": {
+   "hours_in_span": 8304,
+   "signal_hours_any": 3920,
+   "slope_valid_hours": 3896
+  },
+  "ETHUSDT_span1_2021-05-02~2022-08-17": {
+   "hours_in_span": 11322,
+   "signal_hours_any": 0,
+   "slope_valid_hours": 0
+  },
+  "ETHUSDT_span2_2024-12-10~2026-04-20": {
+   "hours_in_span": 11904,
+   "signal_hours_any": 10206,
+   "slope_valid_hours": 10062
+  }
+ }
+}

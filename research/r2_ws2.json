@@ -1,0 +1,65 @@
+[
+  {
+    "url": "https://hftbacktest.readthedocs.io",
+    "name": "Market Making with Alpha - Order Book Imbalance - HftBacktest",
+    "snippet": "Order Book Imbalance , also known as Order Flow Imbalance, is a widely recognized microstructure indicator often analyzed alongside trade flow. This concept has ... Read more",
+    "host_name": "hftbacktest.readthedocs.io",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://arxiv.org",
+    "name": "Order Book Filtration and Directional Signal Extraction at",
+    "snippet": "Jul 30, 2025 — We investigate whether directional signals such as order book imbalance results show that days with excess buying (positive imbalance ) ...",
+    "host_name": "arxiv.org",
+    "rank": 1,
+    "date": "Jul 30, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://bookmap.com",
+    "name": "How Order Flow Imbalance Can Boost Your Trading Success",
+    "snippet": "Jul 19, 2024 — Through this article, we will explore how to identify and analyze order flow imbalance using advanced market analysis tools like Bookmap. Also, ... Read more",
+    "host_name": "bookmap.com",
+    "rank": 2,
+    "date": "Jul 19, 2024",
+    "favicon": ""
+  },
+  {
+    "url": "https://dm13450.github.io",
+    "name": "Order Flow Imbalance - A High Frequency Trading Signal",
+    "snippet": "Feb 2, 2022 — I'll show you how to calculate the 'order flow imbalance ' and build a high-frequency trading signal with the results.",
+    "host_name": "dm13450.github.io",
+    "rank": 3,
+    "date": "Feb 2, 2022",
+    "favicon": ""
+  },
+  {
+    "url": "https://docs.dolphindb.com",
+    "name": "Best Practices for High-Frequency Backtesting of Market-",
+    "snippet": "Cryptocurrency backtesting evaluates a trading strategy performance using historical market data. By simulating trading activity, key metrics such as return, ...",
+    "host_name": "docs.dolphindb.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://questdb.com",
+    "name": "Order Imbalance Strategies",
+    "snippet": "Order imbalance strategies trade temporary buy-sell mismatches in the order book to capture alpha and supply liquidity, key for market makers.",
+    "host_name": "questdb.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://ora.ox.ac.uk",
+    "name": "Enhancing Trading Strategies with Order Book Signals",
+    "snippet": "by Á Cartea · 2018 · Cited by 180 — We use high-frequency data from the Nasdaq exchange to build a measure of volume imbalance in the limit order book (LOB). We show that our measure is a good ... Read more",
+    "host_name": "ora.ox.ac.uk",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  }
+]

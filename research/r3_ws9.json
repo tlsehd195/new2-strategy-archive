@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://arxiv.org",
+    "name": "Stylized Facts of High-Frequency Bitcoin Time Series",
+    "snippet": "Jun 22, 2025 — This paper analyses the high 33, 34, 35, 15, 33, 36, 37] , with the intention of quantifying Bitcoin price fluctuations. We rounded this value ...",
+    "host_name": "arxiv.org",
+    "rank": 0,
+    "date": "Jun 22, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.investing.com",
+    "name": "Bitcoin And Big Round Numbers",
+    "snippet": "Dec 17, 2020 — Bitcoin And Big Round Numbers . Prices of cryptocurrencies are extremely volatile",
+    "host_name": "www.investing.com",
+    "rank": 1,
+    "date": "Dec 17, 2020",
+    "favicon": ""
+  },
+  {
+    "url": "https://discussions.apple.com",
+    "name": "Automated Bitcoin price in numbers",
+    "snippet": "I am looking for a simple way to import the current Bitcoin value into a Numbers sheet. Google sheets handles this quickly and efficiently by using this ... Read more",
+    "host_name": "discussions.apple.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://papers.ssrn.com",
+    "name": "Volatility Clustering in Bitcoin by Gabriel Borrego Roldán",
+    "snippet": "by G Borrego Roldán · 2024 — This paper examines Bitcoin's volatility from an observational standpoint, emphasizing volatility clustering- its persistence, market impacts, ... Read more",
+    "host_name": "papers.ssrn.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com",
+    "name": "bitcoin-address-clustering/README.md at main",
+    "snippet": "Round number detection . Mixed Transaction Recognition: Identifies and handles CoinJoin transactions using taint analysis. Results. Clustering Effectiveness. Read more",
+    "host_name": "github.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.kaggle.com",
+    "name": "Cryptocurrency clustering by Bitcoin",
+    "snippet": "The observation dominance index shows the share of its capitalization in the cryptocurrency market. The bitcoin dominance index is important for understanding ... Read more",
+    "host_name": "www.kaggle.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://clusterbtc.com",
+    "name": "ClusterBTC - Cryptocurrency Analytics System",
+    "snippet": "The cluster chart displays the volume of buys and sells at each price level within a specific candle. Access to the most liquid cryptocurrency exchanges,",
+    "host_name": "clusterbtc.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://bitcoin.stackexchange.com",
+    "name": "Rounding in BTC exchanges",
+    "snippet": "Apr 15, 2015 — Does anyone know whether exchanges usually round values or truncate them instead?  Different exchanges support different resolutions for prices and amounts. ...",
+    "host_name": "bitcoin.stackexchange.com",
+    "rank": 7,
+    "date": "Apr 15, 2015",
+    "favicon": ""
+  }
+]

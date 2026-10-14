@@ -1,0 +1,575 @@
+{
+  "meta": {
+    "script": "kp_engine_crosscheck.py",
+    "engine": "CandleCostModel fee=5bp half_spread=2bp impact=0.1*sqrt(part) max_part=5%",
+    "end": "2026-10-08",
+    "event_merge": "에피소드당 1트레이드 (kp_diag.py 정정판과 동일)"
+  },
+  "segments": {
+    "BTCUSDT_s1": {
+      "span": [
+        "2021-04-01",
+        "2024-03-25"
+      ],
+      "cells": {
+        "(90, 'B80', 16)": {
+          "n_raw": 82,
+          "engine_10k": {
+            "n_used": 82,
+            "fail_closed": 0,
+            "net_mean_bp": -38.18644977715204,
+            "net_pos": 20
+          },
+          "engine_100k": {
+            "n_used": 82,
+            "fail_closed": 0,
+            "net_mean_bp": -88.69519773523065,
+            "net_pos": 13
+          },
+          "gross_mean_bp": -0.8274016361536098,
+          "t_stat": -0.06682116195732181,
+          "p_raw": 0.946888737464296,
+          "n_event": 82
+        },
+        "(90, 'B80', 48)": {
+          "n_raw": 82,
+          "engine_10k": {
+            "n_used": 82,
+            "fail_closed": 0,
+            "net_mean_bp": -22.81970829856229,
+            "net_pos": 28
+          },
+          "engine_100k": {
+            "n_used": 82,
+            "fail_closed": 0,
+            "net_mean_bp": -64.23029223192405,
+            "net_pos": 24
+          },
+          "gross_mean_bp": 10.331663745922075,
+          "t_stat": 0.4531091639599516,
+          "p_raw": 0.6516815945206864,
+          "n_event": 82
+        },
+        "(90, 'B90', 16)": {
+          "n_raw": 53,
+          "engine_10k": {
+            "n_used": 53,
+            "fail_closed": 0,
+            "net_mean_bp": -19.79400466517913,
+            "net_pos": 14
+          },
+          "engine_100k": {
+            "n_used": 53,
+            "fail_closed": 0,
+            "net_mean_bp": -70.1068970163799,
+            "net_pos": 11
+          },
+          "gross_mean_bp": 17.474465096138584,
+          "t_stat": 0.8693187674570914,
+          "p_raw": 0.38866777881303793,
+          "n_event": 53
+        },
+        "(90, 'B90', 48)": {
+          "n_raw": 53,
+          "engine_10k": {
+            "n_used": 53,
+            "fail_closed": 0,
+            "net_mean_bp": -37.525332644119494,
+            "net_pos": 20
+          },
+          "engine_100k": {
+            "n_used": 53,
+            "fail_closed": 0,
+            "net_mean_bp": -81.09851492785937,
+            "net_pos": 16
+          },
+          "gross_mean_bp": -3.3738122883356088,
+          "t_stat": -0.10327590335214917,
+          "p_raw": 0.9181412731808131,
+          "n_event": 53
+        },
+        "(288, 'B80', 16)": {
+          "n_raw": 52,
+          "engine_10k": {
+            "n_used": 52,
+            "fail_closed": 0,
+            "net_mean_bp": -32.31741442965811,
+            "net_pos": 11
+          },
+          "engine_100k": {
+            "n_used": 52,
+            "fail_closed": 0,
+            "net_mean_bp": -85.33775989421648,
+            "net_pos": 7
+          },
+          "gross_mean_bp": 6.203185510513136,
+          "t_stat": 0.4543422357616609,
+          "p_raw": 0.651510398485226,
+          "n_event": 52
+        },
+        "(288, 'B80', 48)": {
+          "n_raw": 52,
+          "engine_10k": {
+            "n_used": 52,
+            "fail_closed": 0,
+            "net_mean_bp": -22.116974010802544,
+            "net_pos": 19
+          },
+          "engine_100k": {
+            "n_used": 52,
+            "fail_closed": 0,
+            "net_mean_bp": -66.46988431754508,
+            "net_pos": 15
+          },
+          "gross_mean_bp": 12.395151292887048,
+          "t_stat": 0.472363605712284,
+          "p_raw": 0.638682382135179,
+          "n_event": 52
+        },
+        "(288, 'B90', 16)": {
+          "n_raw": 28,
+          "engine_10k": {
+            "n_used": 28,
+            "fail_closed": 0,
+            "net_mean_bp": -43.21239124899489,
+            "net_pos": 6
+          },
+          "engine_100k": {
+            "n_used": 28,
+            "fail_closed": 0,
+            "net_mean_bp": -93.67776446043855,
+            "net_pos": 2
+          },
+          "gross_mean_bp": -5.873402856766922,
+          "t_stat": -0.2754790906424713,
+          "p_raw": 0.785045541124648,
+          "n_event": 28
+        },
+        "(288, 'B90', 48)": {
+          "n_raw": 28,
+          "engine_10k": {
+            "n_used": 28,
+            "fail_closed": 0,
+            "net_mean_bp": -44.06809872638679,
+            "net_pos": 8
+          },
+          "engine_100k": {
+            "n_used": 28,
+            "fail_closed": 0,
+            "net_mean_bp": -86.14588964813056,
+            "net_pos": 6
+          },
+          "gross_mean_bp": -10.608159932741257,
+          "t_stat": -0.29972824058720043,
+          "p_raw": 0.7666798206590628,
+          "n_event": 28
+        }
+      }
+    },
+    "BTCUSDT_s2": {
+      "span": [
+        "2024-06-19",
+        "2026-10-08"
+      ],
+      "cells": {
+        "(90, 'B80', 16)": {
+          "n_raw": 62,
+          "engine_10k": {
+            "n_used": 62,
+            "fail_closed": 0,
+            "net_mean_bp": -35.25349880997783,
+            "net_pos": 18
+          },
+          "engine_100k": {
+            "n_used": 62,
+            "fail_closed": 0,
+            "net_mean_bp": -78.82673852004046,
+            "net_pos": 8
+          },
+          "gross_mean_bp": -1.101951895938346,
+          "t_stat": -0.10710589844044827,
+          "p_raw": 0.9150564557345271,
+          "n_event": 62
+        },
+        "(90, 'B80', 48)": {
+          "n_raw": 62,
+          "engine_10k": {
+            "n_used": 62,
+            "fail_closed": 0,
+            "net_mean_bp": -35.307223914309745,
+            "net_pos": 22
+          },
+          "engine_100k": {
+            "n_used": 62,
+            "fail_closed": 0,
+            "net_mean_bp": -75.75254128404362,
+            "net_pos": 16
+          },
+          "gross_mean_bp": -2.6022638091471326,
+          "t_stat": -0.16741006807016906,
+          "p_raw": 0.8676011665457994,
+          "n_event": 62
+        },
+        "(90, 'B90', 16)": {
+          "n_raw": 39,
+          "engine_10k": {
+            "n_used": 39,
+            "fail_closed": 0,
+            "net_mean_bp": -29.894167319364726,
+            "net_pos": 13
+          },
+          "engine_100k": {
+            "n_used": 39,
+            "fail_closed": 0,
+            "net_mean_bp": -72.98111163149412,
+            "net_pos": 7
+          },
+          "gross_mean_bp": 4.032479986779179,
+          "t_stat": 0.28899813126355184,
+          "p_raw": 0.7741536158097508,
+          "n_event": 39
+        },
+        "(90, 'B90', 48)": {
+          "n_raw": 39,
+          "engine_10k": {
+            "n_used": 39,
+            "fail_closed": 0,
+            "net_mean_bp": -31.656310162869467,
+            "net_pos": 14
+          },
+          "engine_100k": {
+            "n_used": 39,
+            "fail_closed": 0,
+            "net_mean_bp": -72.84535158537129,
+            "net_pos": 9
+          },
+          "gross_mean_bp": 1.3926039434226833,
+          "t_stat": 0.06992791317615503,
+          "p_raw": 0.9446177448703237,
+          "n_event": 39
+        },
+        "(288, 'B80', 16)": {
+          "n_raw": 20,
+          "engine_10k": {
+            "n_used": 20,
+            "fail_closed": 0,
+            "net_mean_bp": -50.27507734928374,
+            "net_pos": 5
+          },
+          "engine_100k": {
+            "n_used": 20,
+            "fail_closed": 0,
+            "net_mean_bp": -93.12051673975427,
+            "net_pos": 3
+          },
+          "gross_mean_bp": -16.460120103166663,
+          "t_stat": -0.8160713941711705,
+          "p_raw": 0.42457283527240997,
+          "n_event": 20
+        },
+        "(288, 'B80', 48)": {
+          "n_raw": 20,
+          "engine_10k": {
+            "n_used": 20,
+            "fail_closed": 0,
+            "net_mean_bp": -53.33520607592368,
+            "net_pos": 9
+          },
+          "engine_100k": {
+            "n_used": 20,
+            "fail_closed": 0,
+            "net_mean_bp": -94.0283318665968,
+            "net_pos": 5
+          },
+          "gross_mean_bp": -20.515640698041402,
+          "t_stat": -0.6259701418921341,
+          "p_raw": 0.5387823247047914,
+          "n_event": 20
+        },
+        "(288, 'B90', 16)": {
+          "n_raw": 9,
+          "engine_10k": {
+            "n_used": 9,
+            "fail_closed": 0,
+            "net_mean_bp": -70.0314203460387,
+            "net_pos": 2
+          },
+          "engine_100k": {
+            "n_used": 9,
+            "fail_closed": 0,
+            "net_mean_bp": -104.25817927481235,
+            "net_pos": 1
+          },
+          "gross_mean_bp": -40.202389893904986,
+          "t_stat": -1.0910966668500124,
+          "p_raw": 0.3069986147265182,
+          "n_event": 9
+        },
+        "(288, 'B90', 48)": {
+          "n_raw": 9,
+          "engine_10k": {
+            "n_used": 9,
+            "fail_closed": 0,
+            "net_mean_bp": -111.15530704181963,
+            "net_pos": 2
+          },
+          "engine_100k": {
+            "n_used": 9,
+            "fail_closed": 0,
+            "net_mean_bp": -145.1754737320606,
+            "net_pos": 2
+          },
+          "gross_mean_bp": -81.42182039626465,
+          "t_stat": -1.634666803724218,
+          "p_raw": 0.14075900621224188,
+          "n_event": 9
+        }
+      }
+    },
+    "ETHUSDT_s1": {
+      "span": [
+        "2021-04-01",
+        "2026-04-28"
+      ],
+      "cells": {
+        "(90, 'B80', 16)": {
+          "n_raw": 126,
+          "engine_10k": {
+            "n_used": 126,
+            "fail_closed": 0,
+            "net_mean_bp": -44.65185653626893,
+            "net_pos": 39
+          },
+          "engine_100k": {
+            "n_used": 126,
+            "fail_closed": 0,
+            "net_mean_bp": -103.86921759914709,
+            "net_pos": 23
+          },
+          "gross_mean_bp": -3.265289975586438,
+          "t_stat": -0.3276822058841065,
+          "p_raw": 0.743700141006606,
+          "n_event": 126
+        },
+        "(90, 'B80', 48)": {
+          "n_raw": 126,
+          "engine_10k": {
+            "n_used": 126,
+            "fail_closed": 0,
+            "net_mean_bp": -18.09387901643529,
+            "net_pos": 52
+          },
+          "engine_100k": {
+            "n_used": 126,
+            "fail_closed": 0,
+            "net_mean_bp": -70.6168926231312,
+            "net_pos": 36
+          },
+          "gross_mean_bp": 20.196717225772506,
+          "t_stat": 1.0368175315661947,
+          "p_raw": 0.3018224547789433,
+          "n_event": 126
+        },
+        "(90, 'B90', 16)": {
+          "n_raw": 88,
+          "engine_10k": {
+            "n_used": 88,
+            "fail_closed": 0,
+            "net_mean_bp": -36.78464131983455,
+            "net_pos": 29
+          },
+          "engine_100k": {
+            "n_used": 88,
+            "fail_closed": 0,
+            "net_mean_bp": -94.16060235888985,
+            "net_pos": 20
+          },
+          "gross_mean_bp": 3.7503232205600345,
+          "t_stat": 0.2276505944701228,
+          "p_raw": 0.8204520325311241,
+          "n_event": 88
+        },
+        "(90, 'B90', 48)": {
+          "n_raw": 88,
+          "engine_10k": {
+            "n_used": 88,
+            "fail_closed": 0,
+            "net_mean_bp": -32.06675135474521,
+            "net_pos": 38
+          },
+          "engine_100k": {
+            "n_used": 88,
+            "fail_closed": 0,
+            "net_mean_bp": -84.56763373333547,
+            "net_pos": 25
+          },
+          "gross_mean_bp": 6.213609741203007,
+          "t_stat": 0.22029069577037244,
+          "p_raw": 0.8261608776483444,
+          "n_event": 88
+        },
+        "(288, 'B80', 16)": {
+          "n_raw": 88,
+          "engine_10k": {
+            "n_used": 88,
+            "fail_closed": 0,
+            "net_mean_bp": -41.14458479134592,
+            "net_pos": 29
+          },
+          "engine_100k": {
+            "n_used": 88,
+            "fail_closed": 0,
+            "net_mean_bp": -100.50087131996158,
+            "net_pos": 17
+          },
+          "gross_mean_bp": 0.3062313651663357,
+          "t_stat": 0.024579644168838816,
+          "p_raw": 0.980446546336638,
+          "n_event": 88
+        },
+        "(288, 'B80', 48)": {
+          "n_raw": 88,
+          "engine_10k": {
+            "n_used": 88,
+            "fail_closed": 0,
+            "net_mean_bp": -36.935473105095646,
+            "net_pos": 33
+          },
+          "engine_100k": {
+            "n_used": 88,
+            "fail_closed": 0,
+            "net_mean_bp": -88.77997715411804,
+            "net_pos": 26
+          },
+          "gross_mean_bp": 1.041329228877135,
+          "t_stat": 0.044483224910176755,
+          "p_raw": 0.9646211649862331,
+          "n_event": 88
+        },
+        "(288, 'B90', 16)": {
+          "n_raw": 49,
+          "engine_10k": {
+            "n_used": 49,
+            "fail_closed": 0,
+            "net_mean_bp": -35.77733088349956,
+            "net_pos": 15
+          },
+          "engine_100k": {
+            "n_used": 49,
+            "fail_closed": 0,
+            "net_mean_bp": -89.79243749960106,
+            "net_pos": 10
+          },
+          "gross_mean_bp": 3.203321514257386,
+          "t_stat": 0.16770913530688752,
+          "p_raw": 0.8675167220367964,
+          "n_event": 49
+        },
+        "(288, 'B90', 48)": {
+          "n_raw": 49,
+          "engine_10k": {
+            "n_used": 49,
+            "fail_closed": 0,
+            "net_mean_bp": -35.31007134951864,
+            "net_pos": 19
+          },
+          "engine_100k": {
+            "n_used": 49,
+            "fail_closed": 0,
+            "net_mean_bp": -82.71963274422885,
+            "net_pos": 15
+          },
+          "gross_mean_bp": 0.615679569546217,
+          "t_stat": 0.01932006735213931,
+          "p_raw": 0.9846658632932239,
+          "n_event": 49
+        }
+      }
+    },
+    "ETHUSDT_s2": {
+      "span": [
+        "2026-09-01",
+        "2026-10-08"
+      ],
+      "cells": {
+        "(90, 'B80', 16)": {
+          "n_raw": 0
+        },
+        "(90, 'B80', 48)": {
+          "n_raw": 0
+        },
+        "(90, 'B90', 16)": {
+          "n_raw": 0
+        },
+        "(90, 'B90', 48)": {
+          "n_raw": 0
+        },
+        "(288, 'B80', 16)": {
+          "n_raw": 0
+        },
+        "(288, 'B80', 48)": {
+          "n_raw": 0
+        },
+        "(288, 'B90', 16)": {
+          "n_raw": 0
+        },
+        "(288, 'B90', 48)": {
+          "n_raw": 0
+        }
+      }
+    }
+  },
+  "engine_verdict": {
+    "cells_with_data": 24,
+    "engine10k_net_pos": 0,
+    "engine100k_net_pos": 0,
+    "holm_passing_n": 0,
+    "best_10k": [
+      [
+        "ETHUSDT_s1|L90B80h48",
+        {
+          "n_used": 126,
+          "fail_closed": 0,
+          "net_mean_bp": -18.09387901643529,
+          "net_pos": 52
+        }
+      ],
+      [
+        "BTCUSDT_s1|L90B90h16",
+        {
+          "n_used": 53,
+          "fail_closed": 0,
+          "net_mean_bp": -19.79400466517913,
+          "net_pos": 14
+        }
+      ],
+      [
+        "BTCUSDT_s1|L288B80h48",
+        {
+          "n_used": 52,
+          "fail_closed": 0,
+          "net_mean_bp": -22.116974010802544,
+          "net_pos": 19
+        }
+      ],
+      [
+        "BTCUSDT_s1|L90B80h48",
+        {
+          "n_used": 82,
+          "fail_closed": 0,
+          "net_mean_bp": -22.81970829856229,
+          "net_pos": 28
+        }
+      ],
+      [
+        "BTCUSDT_s2|L90B90h16",
+        {
+          "n_used": 39,
+          "fail_closed": 0,
+          "net_mean_bp": -29.894167319364726,
+          "net_pos": 13
+        }
+      ]
+    ]
+  }
+}

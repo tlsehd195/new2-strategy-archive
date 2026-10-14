@@ -1,0 +1,20 @@
+[
+  {
+    "url": "https://my.jumpapp.com",
+    "name": "Login - Jump",
+    "snippet": "Log in to your account Sign in with the same email you used to set up your Jump account originally. Already have a code? Enter it here.",
+    "host_name": "my.jumpapp.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://fwp.mt.gov",
+    "name": "First Peoples Buffalo Jump | Montana FWP",
+    "snippet": "First Peoples Buffalo Jump is an archaeological site with possibly the largest bison cliff jump in North America and is designated as a National Historic ...",
+    "host_name": "fwp.mt.gov",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  }
+]

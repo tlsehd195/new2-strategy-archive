@@ -1,0 +1,111 @@
+{
+  "date": "2026-10-13",
+  "principle": "X12 rolling skewness of 15m returns (MAX/lottery prior, Bali et al. 2011)",
+  "rule": "|rho|>=0.8 vs any family -> redundant DISCARD; else proceed to PREREG+measure",
+  "results": [
+    {
+      "symbol": "BTCUSDT",
+      "span": 0,
+      "window": "2021-05-02~2022-08-17",
+      "n": 45312,
+      "skew_vs_rv": {
+        "pearson": 0.0052,
+        "spearman": -0.0019,
+        "n": 45312
+      },
+      "skew_vs_flow": {
+        "pearson": 0.5216,
+        "spearman": 0.5497,
+        "n": 45312
+      },
+      "skew_vs_illiq": {
+        "pearson": -0.0251,
+        "spearman": -0.0195,
+        "n": 44733
+      },
+      "skew_vs_funding": {
+        "pearson": 0.0753,
+        "spearman": 0.0832,
+        "n": 27807
+      }
+    },
+    {
+      "symbol": "BTCUSDT",
+      "span": 1,
+      "window": "2023-04-07~2024-03-18",
+      "n": 33216,
+      "skew_vs_rv": {
+        "pearson": -0.0745,
+        "spearman": -0.0634,
+        "n": 33216
+      },
+      "skew_vs_flow": {
+        "pearson": 0.4944,
+        "spearman": 0.4944,
+        "n": 33216
+      },
+      "skew_vs_illiq": {
+        "pearson": -0.0304,
+        "spearman": -0.0359,
+        "n": 32923
+      },
+      "skew_vs_funding": {
+        "pearson": -0.0029,
+        "spearman": -0.0183,
+        "n": 33216
+      }
+    },
+    {
+      "symbol": "ETHUSDT",
+      "span": 0,
+      "window": "2021-05-02~2022-08-17",
+      "n": 45312,
+      "skew_vs_rv": {
+        "pearson": -0.0802,
+        "spearman": -0.0647,
+        "n": 45312
+      },
+      "skew_vs_flow": {
+        "pearson": 0.4969,
+        "spearman": 0.526,
+        "n": 45312
+      },
+      "skew_vs_illiq": {
+        "pearson": -0.0203,
+        "spearman": -0.016,
+        "n": 44733
+      },
+      "skew_vs_funding": {
+        "pearson": 0.0615,
+        "spearman": 0.0624,
+        "n": 27807
+      }
+    },
+    {
+      "symbol": "ETHUSDT",
+      "span": 1,
+      "window": "2024-12-10~2026-04-20",
+      "n": 47616,
+      "skew_vs_rv": {
+        "pearson": 0.0367,
+        "spearman": 0.0502,
+        "n": 47616
+      },
+      "skew_vs_flow": {
+        "pearson": 0.4691,
+        "spearman": 0.493,
+        "n": 47616
+      },
+      "skew_vs_illiq": {
+        "pearson": -0.024,
+        "spearman": -0.0301,
+        "n": 47616
+      },
+      "skew_vs_funding": {
+        "pearson": 0.0759,
+        "spearman": 0.1017,
+        "n": 47616
+      }
+    }
+  ]
+}

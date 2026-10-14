@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4729284",
+    "name": "A Profitable Day Trading Strategy For The U.S. Equity Market",
+    "snippet": "by C Zarattini · 2024 · Cited by 6 — this paper expanded the analysis to compare the return profile of the ORB strategy applied to different time frames, such as 15, 30, and 60 minutes.",
+    "host_name": "papers.ssrn.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://quantpedia.com/revisiting-trend-following-and-mean-reversion-strategies-in-bitcoin",
+    "name": "Revisiting Trend-following and Mean-reversion Strategies",
+    "snippet": "The MIN strategy is based on the mean-reversion theory, which posits that returns will tend to move back toward an average level over time, ...",
+    "host_name": "quantpedia.com",
+    "rank": 1,
+    "date": "Sep 12, 2024",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.mdpi.com/1911-8074/19/9/692",
+    "name": "On the Performance of Lagged Momentum and Reversal",
+    "snippet": "This paper examines whether separating the cryptocurrency trading day into paired sessions reveals return predictability that is not visible in daily returns.",
+    "host_name": "www.mdpi.com",
+    "rank": 2,
+    "date": "by Z Wu · 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://trendspider.com/trading-tools-store/strategies/momentum-reversal-long-15-min-strategy",
+    "name": "Momentum Reversal Long 15-Min Strategy",
+    "snippet": "This strategy was developed on QQQ using a 15-minute timeframe and is designed to capture sharp intraday reversals from extreme oversold conditions.",
+    "host_name": "trendspider.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.researchgate.net/publication/360493561_Intraday_Return_Predictability_in_the_Cryptocurrency_Markets_Momentum_Reversal_or_Both",
+    "name": "Intraday Return Predictability in the Cryptocurrency Markets",
+    "snippet": "This paper reports evidence of intraday return predictability, consisting of both intraday momentum and reversal, in the cryptocurrency market.",
+    "host_name": "www.researchgate.net",
+    "rank": 4,
+    "date": "May 13, 2022",
+    "favicon": ""
+  }
+]

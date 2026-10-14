@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://studio.glassnode.com",
+    "name": "BTC Options 25 Delta Skew (6 Months) Chart",
+    "snippet": "Glassnode Studio delivers trusted digital assets analytics, helping investors and teams analyze market trends, asset activity, and ecosystem dynamics.",
+    "host_name": "studio.glassnode.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://cryptoslate.com",
+    "name": "Bitcoin 1-month 25D Skew suggests a \"Put Premium\"",
+    "snippet": "May 18, 2023 — Bitcoin's options market as the 1-month 25D Skew indicates a \"Put Premium,\" while the overall put-to-call ratio points to a bullish trend.",
+    "host_name": "cryptoslate.com",
+    "rank": 1,
+    "date": "May 18, 2023",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.binance.com",
+    "name": "The calm before the storm? Bearish sentiment grows as",
+    "snippet": "Mar 6, 2023 — The 25 delta skew in Bitcoin options suggests investors have been hedging with put options since early March, but what does that mean? Read more",
+    "host_name": "www.binance.com",
+    "rank": 2,
+    "date": "Mar 6, 2023",
+    "favicon": ""
+  },
+  {
+    "url": "https://optionalpha.com",
+    "name": "Risk Reversal",
+    "snippet": "Sep 8, 2025 — When the option position delta reaches either 40 or 20 delta or 3 market days, roll options . Default Bot Inputs. 1 Share Spy: $648. Core Hedge ... Read more",
+    "host_name": "optionalpha.com",
+    "rank": 3,
+    "date": "Sep 8, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://pi42.com",
+    "name": "Understanding IV Skew in BTC and ETH Options Markets",
+    "snippet": "5 days ago — BTC options often show put skew , where puts have higher IV than calls. This indicates consistent demand for downside protection. This pattern is ... Read more",
+    "host_name": "pi42.com",
+    "rank": 4,
+    "date": "Oct 7, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.elitetrader.com",
+    "name": "Any traders in here who specialize in volatility skew and",
+    "snippet": "May 19, 2021 — The basic position for skew is the delta neutral 25 delta risk reversal , which already is a bitch to manage. Converting it into a fly when ... Read more",
+    "host_name": "www.elitetrader.com",
+    "rank": 5,
+    "date": "May 19, 2021",
+    "favicon": ""
+  },
+  {
+    "url": "https://support.coincall.com",
+    "name": "8. Demystifying Volatility Skew in Options Trading",
+    "snippet": "Sep 27, 2023 — Volatility skew is an important options market anomaly … 25 % implied volatility. This demonstrates volatility skew , Risk reversals - Combining ...",
+    "host_name": "support.coincall.com",
+    "rank": 6,
+    "date": "Sep 27, 2023",
+    "favicon": ""
+  },
+  {
+    "url": "https://blog.amberdata.io",
+    "name": "Fed Updates, Market Sentiment & Bitcoin Vol",
+    "snippet": "Nov 20, 2024 — On the other hand, ∆25 RR-Skew for Bitcoin is at the 12-month highs (which makes sense given spot prices trading new ATHs and approaching the ... Read more",
+    "host_name": "blog.amberdata.io",
+    "rank": 7,
+    "date": "Nov 20, 2024",
+    "favicon": ""
+  }
+]

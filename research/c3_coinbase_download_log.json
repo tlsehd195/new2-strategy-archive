@@ -1,0 +1,30 @@
+{
+ "start": "2021-04-01T00:00:00Z",
+ "end": "2026-10-13T00:00:00Z",
+ "products": [
+  {
+   "product": "BTC-USD",
+   "requests": 647,
+   "http_200": 647,
+   "http_429": 0,
+   "http_5xx": 0,
+   "http_other": 0,
+   "fail_chunks": [],
+   "candles": 193908,
+   "first": "2021-04-01 00:00",
+   "last": "2026-10-12 16:30"
+  },
+  {
+   "product": "ETH-USD",
+   "requests": 647,
+   "http_200": 647,
+   "http_429": 0,
+   "http_5xx": 0,
+   "http_other": 0,
+   "fail_chunks": [],
+   "candles": 193907,
+   "first": "2021-04-01 00:00",
+   "last": "2026-10-12 16:30"
+  }
+ ]
+}

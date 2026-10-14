@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://coinmarketcap.com",
+    "name": "CMC Crypto Fear and Greed Index",
+    "snippet": "The index has been backtested thoroughly and is regularly reviewed to ensure that it remains the most relevant guide to overall crypto market conditions. Read more",
+    "host_name": "coinmarketcap.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://milkroad.com",
+    "name": "Crypto Fear & Greed Index for October 11th, 2026",
+    "snippet": "The Milk Road Crypto Fear and Greed Index is a single metascore that quantifies crypto investor market sentiment as it relates to Bitcoin (BTC). Read more",
+    "host_name": "milkroad.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.binance.com",
+    "name": "Crypto Fear & Greed Index | Bitcoin Sentiment",
+    "snippet": "The index ranges from 0 (Extreme Fear ) to 100 (Extreme Greed ), reflecting crypto market sentiment. , while a high value warns of a potential market correction.",
+    "host_name": "www.binance.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://bitcoincalculator.tools",
+    "name": "Bitcoin Fear & Greed Strategy: Buy Fear, Sell Greed",
+    "snippet": "Mar 9, 2026 — The Fear & Greed Index runs 0–100. Historical backtests show buying below 25 (Extreme Fear ) and trimming above 75 (Extreme Greed) beats buy-and ...",
+    "host_name": "bitcoincalculator.tools",
+    "rank": 3,
+    "date": "Mar 9, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://charts.bitbo.io",
+    "name": "Bitcoin Fear and Greed Index [Live & History Chart]",
+    "snippet": "The Bitcoin Fear and Greed Index is a tool used to analyze market sentiment in the cryptocurrency space . It helps identify when the market is experiencing ... Read more",
+    "host_name": "charts.bitbo.io",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

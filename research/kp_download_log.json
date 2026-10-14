@@ -1,0 +1,492 @@
+{
+  "upbit_BTC": {
+    "rows": 2200,
+    "span": [
+      "2020-10-03",
+      "2026-10-11"
+    ],
+    "gap_jumps": 0
+  },
+  "upbit_ETH": {
+    "rows": 2200,
+    "span": [
+      "2020-10-03",
+      "2026-10-11"
+    ],
+    "gap_jumps": 0
+  },
+  "vision_BTCUSDT_2021-04": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xe0-\\xd1R\\xc9OM\\x1b\\xff\\x07\\x00\\x00"
+  },
+  "vision_BTCUSDT_2021-05": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xe0-\\xd1R|O\\xf8\\x11]\\x08\\x00\\x00j\\x"
+  },
+  "vision_BTCUSDT_2021-06": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x8b\\x01\\xe1Rux\\xeaX\\x0e\\x08\\x00\\x00"
+  },
+  "vision_BTCUSDT_2021-07": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xbc\\x02\\x01S\\xbf\\x12\\x92rJ\\x08\\x00\\"
+  },
+  "vision_BTCUSDT_2021-08": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xf50!S\\x9b\\\\k\\x1f8\\x08\\x00\\x00Q\\x14"
+  },
+  "vision_BTCUSDT_2021-09": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xa3\\x05AS\\xe3\\xd8\\xde\\xff\\xde\\x07\\x"
+  },
+  "vision_BTCUSDT_2021-10": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00Q\\x07aS\\xd3FU\\xa8\\x14\\x08\\x00\\x00Q\\x"
+  },
+  "vision_BTCUSDT_2021-11": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xab\\t\\x81S\\xee\\xb1<\\xdc\\xe8\\x07\\x00"
+  },
+  "vision_BTCUSDT_2021-12": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00FD!T\\r\\x89\\xfa2\\x06\\x08\\x00\\x00:\\x14"
+  },
+  "vision_BTCUSDT_2022-01": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x95+ATOj\\xf0\\xca\\xf9\\x07\\x00\\x00*\\x"
+  },
+  "vision_BTCUSDT_2022-02": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00zRaT\\xdd\\xf2>YM\\x07\\x00\\x00=\\x12\\x00"
+  },
+  "vision_BTCUSDT_2022-03": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00(%\"U\\x0fy\\n\\xe1\\x10\\x08\\x00\\x00=\\x14"
+  },
+  "vision_BTCUSDT_2022-04": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00M\\x03\\xa1Tc\\xa0\\xf8\\xcc\\xb7\\x07\\x00\\"
+  },
+  "vision_BTCUSDT_2022-05": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x007\\x03\\xc1T\\xb0\\xb6\\x10v\\x16\\x08\\x00\\"
+  },
+  "vision_BTCUSDT_2022-06": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x8a\\x0c\\xe1T\\x0cY+\\x04\\xeb\\x07\\x00\\"
+  },
+  "vision_BTCUSDT_2022-07": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00t\\x0f\\x01U\\xc3\\xf6zi7\\x08\\x00\\x00o\\x"
+  },
+  "vision_BTCUSDT_2022-08": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xf8\\x02!U\\xa6\\x90\\x08O/\\x08\\x00\\x00"
+  },
+  "vision_BTCUSDT_2022-09": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xdd)AUc\\x01\\x11\\xb2\\x17\\x08\\x00\\x00"
+  },
+  "vision_BTCUSDT_2022-10": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xb2\\x02bU\\xaa\\xe7\\xb2\\x85\\x1d\\x08\\x"
+  },
+  "vision_BTCUSDT_2022-11": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x188\\x81U\\x8d|}\\xa2\\x01\\x08\\x00\\x00"
+  },
+  "vision_BTCUSDT_2022-12": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00m\\xb9\"V\\x97\\xbd\\x90\\xa5 \\x08\\x00\\x00"
+  },
+  "vision_BTCUSDT_2023-01": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xb9\\xbdPVNM\\xd0#<\\x08\\x00\\x00\\x8b\\x"
+  },
+  "vision_BTCUSDT_2023-02": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x05yaV\\xc6=it\\x8a\\x07\\x00\\x00\\x9e\\x"
+  },
+  "vision_BTCUSDT_2023-03": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00k\\x0c\\x84V\\xd5\\xa1y\\x00K\\x08\\x00\\x00"
+  },
+  "vision_BTCUSDT_2023-04": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xfa5\\xa1V\\x1cQ\\xd4\\x0c\\xae\\x07\\x00\\"
+  },
+  "vision_BTCUSDT_2023-05": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xa3@\\xc3V\\xcd$\\x9b\\xc8\\xea\\x07\\x00\\"
+  },
+  "vision_BTCUSDT_2023-06": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x16\\n\\xe3V\\xb5\\x86\\x8fZ\\xa5\\x07\\x00"
+  },
+  "vision_BTCUSDT_2023-07": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x94\\x02\\x02W\\xfd\\xefB\\xc5\\xc6\\x07\\x"
+  },
+  "vision_BTCUSDT_2023-08": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00Z\"2WSf\\xdb\\x93\\xe2\\x07\\x00\\x00\\x01\\x"
+  },
+  "vision_BTCUSDT_2023-09": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x91%DW\\xac\\xfb\\x80B\\x92\\x07\\x00\\x00"
+  },
+  "vision_BTCUSDT_2023-10": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xe8<cW\\xe4\\x10\\x0bQ\\xdc\\x07\\x00\\x00"
+  },
+  "vision_BTCUSDT_2023-11": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x8d\\x18\\x84W\\x0e\\x96\\x06X\\xa8\\x07\\x"
+  },
+  "vision_BTCUSDT_2023-12": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00;\\xb5(X\\xae\\xb3\\xb0\\xaa\\xf3\\x07\\x00\\"
+  },
+  "vision_BTCUSDT_2024-01": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xc3\\x1aEX\\xb2\\x88^\\x90\\x00\\x08\\x00\\"
+  },
+  "vision_BTCUSDT_2024-02": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x96tkXw\\x03\\x1e0w\\x07\\x00\\x00\\xec\\x"
+  },
+  "vision_BTCUSDT_2024-03": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xd4\\x12\\x8bXt\\x83\\xab\\xbf\"\\x08\\x00\\"
+  },
+  "vision_BTCUSDT_2024-04": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00N_\\xaaX\\x1c\\xe2\\x90u\\xcf\\x07\\x00\\x00"
+  },
+  "vision_BTCUSDT_2024-05": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00lK\\xc5Xu\\xd9\\x03\\x97\\xfb\\x07\\x00\\x00"
+  },
+  "vision_BTCUSDT_2024-06": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00i*\\xe8X\\x94\\x8f\\x0e\\xb3\\xa1\\x07\\x00\\"
+  },
+  "vision_BTCUSDT_2024-07": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00<\\x16\\x08Ydyy\\xf0\\r\\x08\\x00\\x009\\x14"
+  },
+  "vision_BTCUSDT_2024-08": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x96Y)Y\\xd4\\xd0o\\xab\\x00\\x08\\x00\\x00"
+  },
+  "vision_BTCUSDT_2024-09": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x01wBY1\\xe7\\xc6\\x12\\xac\\x07\\x00\\x00"
+  },
+  "vision_BTCUSDT_2024-10": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xa6\\xa8eY\\x12)\\xe4\\x80\\r\\x08\\x00\\x0"
+  },
+  "vision_BTCUSDT_2024-11": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x19I\\x82Y-\\x11\\x8e\\xb6\\xdf\\x07\\x00\\"
+  },
+  "vision_BTCUSDT_2024-12": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x8aS\\'Zc\\xa9\\xc8Y\\x1c\\x08\\x00\\x00l\\"
+  },
+  "vision_BTCUSDT_2025-01": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xd4<GZ\\x94w\\x93\\x0c@\\x08\\x00\\x006\\x"
+  },
+  "vision_BTCUSDT_2025-02": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xee\\x8ecZ\\xde\\x9b<\\xa5i\\x07\\x00\\x00"
+  },
+  "vision_BTCUSDT_2025-03": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xbb\\x1a\\x8cZ&(\\xa2\\xc0;\\x08\\x00\\x00"
+  },
+  "vision_BTCUSDT_2025-04": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x07\"\\xa6Z\\x99\\x96]\\x9f\\xe7\\x07\\x00\\"
+  },
+  "vision_BTCUSDT_2025-05": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00#\\x10\\xc2Z\\x98\\xb2\\x8e\\xf2?\\x08\\x00\\"
+  },
+  "vision_BTCUSDT_2025-06": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00)\\x10\\xe7Z\\xc0/\\x99\\xa9\\xec\\x07\\x00\\"
+  },
+  "vision_BTCUSDT_2025-07": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00(\\x10\\x04[\\x93r/K*\\x08\\x00\\x00N\\x15\\"
+  },
+  "vision_BTCUSDT_2025-08": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00)\\x10![\\xee\\xc2\"\\xcf/\\x08\\x00\\x00W\\x"
+  },
+  "vision_BTCUSDT_2025-09": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00B\\x10F[.\\x11\\xe0)\\xdc\\x07\\x00\\x00\\x8"
+  },
+  "vision_BTCUSDT_2025-10": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\'\\x10c[l\\xc6\\xdb\\x8eH\\x08\\x00\\x00w\\"
+  },
+  "vision_BTCUSDT_2025-11": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00&\\x10\\x81[\\xa1\\xcf\\xe0(\\xfb\\x07\\x00\\"
+  },
+  "vision_BTCUSDT_2025-12": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00=\\x10%\\\\m\\xea\\xf2\\xbe(\\x08\\x00\\x00\\x"
+  },
+  "vision_BTCUSDT_2026-01": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00#\\x10B\\\\\\'\\xcbz\\xd7/\\x08\\x00\\x00\\xd1"
+  },
+  "vision_BTCUSDT_2026-02": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\"\\x10b\\\\\\xdfs@\\xa1`\\x07\\x00\\x00\\xec\\"
+  },
+  "vision_BTCUSDT_2026-03": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00$\\x10\\x86\\\\\\xe1\\xd2>\\xa64\\x08\\x00\\x0"
+  },
+  "vision_BTCUSDT_2026-04": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00#\\x10\\xa4\\\\-\\xe0\\x86\\xc4\\xd9\\x07\\x00"
+  },
+  "vision_BTCUSDT_2026-05": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x1d\\x10\\xc1\\\\~z\\xd9D!\\x08\\x00\\x00\\x"
+  },
+  "vision_BTCUSDT_2026-06": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x004\\x10\\xe6\\\\\\x90enT\\xd2\\x07\\x00\\x00)\\"
+  },
+  "vision_BTCUSDT_2026-07": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\" \\x03]\\xa8w\\x975\\x03\\x08\\x00\\x00\\xc"
+  },
+  "vision_BTCUSDT_2026-08": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00% \\']L\\xeeu\\xa4\\xfb\\x07\\x00\\x00\\xbc\\"
+  },
+  "vision_BTCUSDT_2026-09": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00$ E]\\x7f\\x145\\xfc\\xb2\\x07\\x00\\x00\\x1"
+  },
+  "vision_BTCUSDT_2026-10-01": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00x\\x06B]\\xe3\\xfa\\xb4\\x0b[\\x00\\x00\\x00"
+  },
+  "vision_BTCUSDT_2026-10-02": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xb4\\x08C]\\xe7hU\\xfd\\\\\\x00\\x00\\x00\\x"
+  },
+  "vision_BTCUSDT_2026-10-03": {
+    "error": "UnicodeDecodeError('utf-8', b\"PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x94\\nD]\\xb1\\xc7}\\xd5X\\x00\\x00\\x00\\x"
+  },
+  "vision_BTCUSDT_2026-10-04": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xaf\\x04E]\\ttY\\xd1W\\x00\\x00\\x00\\xaa\\"
+  },
+  "vision_BTCUSDT_2026-10-05": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xd4\\x02F]\\xa9$\\x11\\xc8Y\\x00\\x00\\x00"
+  },
+  "vision_BTCUSDT_2026-10-06": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00%\\x07G]\\xe9J\\x1e\\xed\\\\\\x00\\x00\\x00\\x"
+  },
+  "vision_BTCUSDT_2026-10-07": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00(\\x03H]\\xef`\\x1d\\xa1[\\x00\\x00\\x00\\xa"
+  },
+  "vision_BTCUSDT_2026-10-08": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xfa\\x06I]\\xf6m\\xeb\\x15Y\\x00\\x00\\x00"
+  },
+  "vision_BTCUSDT_2026-10-09": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xcb\\x00J]\\xbey\\xa7\\x1a\\\\\\x00\\x00\\x0"
+  },
+  "vision_BTCUSDT_2026-10-10": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x93\\x03K]\\x9c-\\x80-Z\\x00\\x00\\x00\\xa"
+  },
+  "vision_BTCUSDT_2026-10-11": {
+    "error": "UnicodeDecodeError('utf-8', b\"PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x0b\\x07L]Q\\xf8\\xfcn\\\\\\x00\\x00\\x00\\x"
+  },
+  "vision_BTCUSDT_2026-10-12": {
+    "error": "<HTTPError 404: 'Not Found'>"
+  },
+  "binance_BTCUSDT": {
+    "error": "ValueError('No objects to concatenate')"
+  },
+  "vision_ETHUSDT_2021-04": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00y.\\xd1R\\xfa\\xa5\\xd3\\xcf\\xb5\\x07\\x00\\"
+  },
+  "vision_ETHUSDT_2021-05": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00y.\\xd1R\\x14C\\x07!2\\x08\\x00\\x00<\\x14\\"
+  },
+  "vision_ETHUSDT_2021-06": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xb8\\x01\\xe1R=\\x82\\x06\\xa1\\xca\\x07\\x"
+  },
+  "vision_ETHUSDT_2021-07": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xe1\\x02\\x01S\\x84_I\\xee\\xfc\\x07\\x00\\"
+  },
+  "vision_ETHUSDT_2021-08": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00x1!S\\xf8\\x97]\\xe2\\n\\x08\\x00\\x00\\x04\\"
+  },
+  "vision_ETHUSDT_2021-09": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xc7\\x05AS\\xa8\\xde\\xeb4\\x9b\\x07\\x00\\"
+  },
+  "vision_ETHUSDT_2021-10": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00}\\x07aS\\xcdr\\x99\\xa7\\xc3\\x07\\x00\\x00"
+  },
+  "vision_ETHUSDT_2021-11": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xd9\\t\\x81S-\\xdfj\\x8c\\x92\\x07\\x00\\x0"
+  },
+  "vision_ETHUSDT_2021-12": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xcbD!T\\xc9\\xf1\\xecR\\xb4\\x07\\x00\\x00"
+  },
+  "vision_ETHUSDT_2022-01": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xc0+AT\\x18\\x0e\\x19\\xcb\\xcd\\x07\\x00\\"
+  },
+  "vision_ETHUSDT_2022-02": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xc3RaT\\xa0R\\x0e7\\x0e\\x07\\x00\\x00\\xf"
+  },
+  "vision_ETHUSDT_2022-03": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00,%\"U\\x15::\\xa0\\xc5\\x07\\x00\\x00\\xd8\\x"
+  },
+  "vision_ETHUSDT_2022-04": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xf9\\x03\\xa1T\\x0f\\xd0t\\x07k\\x07\\x00\\"
+  },
+  "vision_ETHUSDT_2022-05": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00f\\x03\\xc1T\\x1b\\xf1q\\x9c\\xd2\\x07\\x00\\"
+  },
+  "vision_ETHUSDT_2022-06": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xf6\\x0c\\xe1T\\xdb\\xb0\\x13\\x0c~\\x07\\x"
+  },
+  "vision_ETHUSDT_2022-07": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xc4\\x10\\x01U\\x83\\xd8c/\\xc4\\x07\\x00\\"
+  },
+  "vision_ETHUSDT_2022-08": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00e\\x13!U\\xfd\\x0e\\x89\\xb4\\xb8\\x07\\x00\\"
+  },
+  "vision_ETHUSDT_2022-09": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x9b*AU\\xfc\\x9c.\\x82X\\x07\\x00\\x00C\\x"
+  },
+  "vision_ETHUSDT_2022-10": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xb2\\x02bU\\xe5\\xf8\\xe6\\xd9\\x9a\\x07\\x"
+  },
+  "vision_ETHUSDT_2022-11": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\"8\\x81U<G \\xb8\\x7f\\x07\\x00\\x005\\x13\\"
+  },
+  "vision_ETHUSDT_2022-12": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00k\\xb9\"V\\x1fd<\\x98t\\x07\\x00\\x00\\xb5\\x"
+  },
+  "vision_ETHUSDT_2023-01": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xb9\\xbdPV;aH\\xc4\\x99\\x07\\x00\\x00\\xb"
+  },
+  "vision_ETHUSDT_2023-02": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x01yaVa\\x03;\\xd9\\xee\\x06\\x00\\x00\\xd"
+  },
+  "vision_ETHUSDT_2023-03": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x88\\x0c\\x84V\\xb2\\xd92l\\xa4\\x07\\x00\\"
+  },
+  "vision_ETHUSDT_2023-04": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00 6\\xa1V\\x142<^U\\x07\\x00\\x00)\\x13\\x00"
+  },
+  "vision_ETHUSDT_2023-05": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xac@\\xc3V\\xfaH\\xe6\\x93\\x99\\x07\\x00\\"
+  },
+  "vision_ETHUSDT_2023-06": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00.\\n\\xe3V\\x1eCW2<\\x07\\x00\\x00\\x19\\x13"
+  },
+  "vision_ETHUSDT_2023-07": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xaf\\x02\\x02W\\xe2\\xfe\\x8d\\xc5f\\x07\\x"
+  },
+  "vision_ETHUSDT_2023-08": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00t\"2W\\x8b\\x04$\\x8f|\\x07\\x00\\x00\\xa4\\x"
+  },
+  "vision_ETHUSDT_2023-09": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xa3%DW<b%13\\x07\\x00\\x00\\xff\\x12\\x00"
+  },
+  "vision_ETHUSDT_2023-10": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xfa<cW }\\xd2\\xc1}\\x07\\x00\\x00\\xb4\\x"
+  },
+  "vision_ETHUSDT_2023-11": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x90\\x18\\x84WmgK\\x1eX\\x07\\x00\\x00 \\x"
+  },
+  "vision_ETHUSDT_2023-12": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00I\\xb5(XG\\x1b\\x819\\x98\\x07\\x00\\x00\\xc"
+  },
+  "vision_ETHUSDT_2024-01": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xca\\x1aEXN&\\xd8\\xd7\\xaf\\x07\\x00\\x00"
+  },
+  "vision_ETHUSDT_2024-02": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x9dtkX2h\\xd0\\x08*\\x07\\x00\\x00\\x99\\x"
+  },
+  "vision_ETHUSDT_2024-03": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xdc\\x12\\x8bX\\xaa\\x81\\xcfV\\xbf\\x07\\x"
+  },
+  "vision_ETHUSDT_2024-04": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00R_\\xaaX\\xff\\x10<pt\\x07\\x00\\x00D\\x13\\"
+  },
+  "vision_ETHUSDT_2024-05": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x83K\\xc5XX@\\xbd\\x92\\xaf\\x07\\x00\\x00"
+  },
+  "vision_ETHUSDT_2024-06": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00l*\\xe8X\\xe3=\\x0c\\x89P\\x07\\x00\\x00\\x1"
+  },
+  "vision_ETHUSDT_2024-07": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00Q\\x16\\x08Y\\x98\\xb9)\\xe4\\x9f\\x07\\x00\\"
+  },
+  "vision_ETHUSDT_2024-08": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xa1Y)Y\\x8b\\xe5lV\\xad\\x07\\x00\\x00\\xe"
+  },
+  "vision_ETHUSDT_2024-09": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x08wBY\\x8d\\x95\\xf7\\r`\\x07\\x00\\x00/\\"
+  },
+  "vision_ETHUSDT_2024-10": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xa3\\xa8eY\\xa8s{\\\\\\x96\\x07\\x00\\x00\\x"
+  },
+  "vision_ETHUSDT_2024-11": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00$I\\x82Y#o\"\\x19\\x8c\\x07\\x00\\x00`\\x13\\"
+  },
+  "vision_ETHUSDT_2024-12": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x97S\\'Z\\xed\\x97\\x11\\x0e\\xc2\\x07\\x00"
+  },
+  "vision_ETHUSDT_2025-01": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xe1<GZ\\x98\\x91\\xf8%\\xdf\\x07\\x00\\x00"
+  },
+  "vision_ETHUSDT_2025-02": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xf7\\x8ecZF\\xee186\\x07\\x00\\x00\\xbb\\x"
+  },
+  "vision_ETHUSDT_2025-03": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xcb\\x1a\\x8cZ\\xcc\\x97\\x1f\\x88\\xee\\x0"
+  },
+  "vision_ETHUSDT_2025-04": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x10\"\\xa6Z\\xd7\\xf0\\x94J\\xad\\x07\\x00\\"
+  },
+  "vision_ETHUSDT_2025-05": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00(\\x10\\xc2Z\\xad1\\xdb\\xfb\\xd8\\x07\\x00\\"
+  },
+  "vision_ETHUSDT_2025-06": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00.\\x10\\xe7Zh\\xf8>\\xfc\\x8f\\x07\\x00\\x00"
+  },
+  "vision_ETHUSDT_2025-07": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00-\\x10\\x04[\\x164\\xc1\\xeb\\xd6\\x07\\x00\\"
+  },
+  "vision_ETHUSDT_2025-08": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00,\\x10![\\x03m\\xb5\\x1a\\xef\\x07\\x00\\x00"
+  },
+  "vision_ETHUSDT_2025-09": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00I\\x10F[W\\xd1\\x1f\\x02\\xaa\\x07\\x00\\x00"
+  },
+  "vision_ETHUSDT_2025-10": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00+\\x10c[\\xf3L\\xc9\\x9f\\xf0\\x07\\x00\\x00"
+  },
+  "vision_ETHUSDT_2025-11": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00*\\x10\\x81[\\x8bQ\\xd6\\x86\\xa7\\x07\\x00\\"
+  },
+  "vision_ETHUSDT_2025-12": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00G\\x10%\\\\+\\xb5\\x12\\xc8\\xe7\\x07\\x00\\x0"
+  },
+  "vision_ETHUSDT_2026-01": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00*\\x10B\\\\\\xffO6\\x1a\\xd9\\x07\\x00\\x00\\x"
+  },
+  "vision_ETHUSDT_2026-02": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00(\\x10b\\\\J\\xdd\\\\\\xe5\\x1f\\x07\\x00\\x00\\"
+  },
+  "vision_ETHUSDT_2026-03": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00,\\x10\\x86\\\\(\\xcb\\xec\\x13\\xd7\\x07\\x00"
+  },
+  "vision_ETHUSDT_2026-04": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00*\\x10\\xa4\\\\N\\xb2?#\\x8d\\x07\\x00\\x00\\x"
+  },
+  "vision_ETHUSDT_2026-05": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00!\\x10\\xc1\\\\\\x8d/P[\\xbe\\x07\\x00\\x00\\x"
+  },
+  "vision_ETHUSDT_2026-06": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x005\\x10\\xe6\\\\\\n\\t\\xadH\\x83\\x07\\x00\\x00"
+  },
+  "vision_ETHUSDT_2026-07": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00$ \\x03]%q\\xe4\\xad\\xaf\\x07\\x00\\x00\\x8"
+  },
+  "vision_ETHUSDT_2026-08": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00& \\']\\xbd\\xb6\\xd3\\xc5\\xbb\\x07\\x00\\x0"
+  },
+  "vision_ETHUSDT_2026-09": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00% E]\\xee\\xe8S3\\x8c\\x07\\x00\\x00\\xe7\\x"
+  },
+  "vision_ETHUSDT_2026-10-01": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00{\\x06B]\\x9fh\\x97\\x93Y\\x00\\x00\\x00\\xa"
+  },
+  "vision_ETHUSDT_2026-10-02": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xb6\\x08C]\\xf7\\xb0\\x0b\\xc9Y\\x00\\x00\\"
+  },
+  "vision_ETHUSDT_2026-10-03": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x95\\nD]\\x08EKdU\\x00\\x00\\x00\\xa7\\x00"
+  },
+  "vision_ETHUSDT_2026-10-04": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xb1\\x04E]e\\x9f\\xdeuX\\x00\\x00\\x00\\xa"
+  },
+  "vision_ETHUSDT_2026-10-05": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xd7\\x02F]\\xf6\\x9f_%X\\x00\\x00\\x00\\xa"
+  },
+  "vision_ETHUSDT_2026-10-06": {
+    "error": "UnicodeDecodeError('utf-8', b\"PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00'\\x07G]@kH-W\\x00\\x00\\x00\\xa9\\x00\\x00"
+  },
+  "vision_ETHUSDT_2026-10-07": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00,\\x03H]\\xea\\xfc\\x94\\xd7Z\\x00\\x00\\x00"
+  },
+  "vision_ETHUSDT_2026-10-08": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xfd\\x06I]M4\\x00\\xe1Y\\x00\\x00\\x00\\xa"
+  },
+  "vision_ETHUSDT_2026-10-09": {
+    "error": "UnicodeDecodeError('utf-8', b\"PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\xcd\\x00J]\\x14\\xc709X\\x00\\x00\\x00\\xa"
+  },
+  "vision_ETHUSDT_2026-10-10": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\x94\\x03K]4\\x0c\\xed\\xbbX\\x00\\x00\\x00"
+  },
+  "vision_ETHUSDT_2026-10-11": {
+    "error": "UnicodeDecodeError('utf-8', b'PK\\x03\\x04\\x14\\x00\\x00\\x00\\x08\\x00\\r\\x07L],\\xba\\xd0\\x8fX\\x00\\x00\\x00\\x"
+  },
+  "vision_ETHUSDT_2026-10-12": {
+    "error": "<HTTPError 404: 'Not Found'>"
+  },
+  "binance_ETHUSDT": {
+    "error": "ValueError('No objects to concatenate')"
+  }
+}

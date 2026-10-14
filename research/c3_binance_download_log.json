@@ -1,0 +1,897 @@
+{
+ "spot": [
+  {
+   "f": "BTCUSDT-2021-04",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2021-05",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2021-06",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2021-07",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2021-08",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2021-09",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2021-10",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2021-11",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2021-12",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2022-01",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2022-02",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2022-03",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2022-04",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2022-05",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2022-06",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2022-07",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2022-08",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2022-09",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2022-10",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2022-11",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2022-12",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2023-01",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2023-02",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2023-03",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2023-04",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2023-05",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2023-06",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2023-07",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2023-08",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2023-09",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2023-10",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2023-11",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2023-12",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2024-01",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2024-02",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2024-03",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2024-04",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2024-05",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2024-06",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2024-07",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2024-08",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2024-09",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2024-10",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2024-11",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2024-12",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2025-01",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2025-02",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2025-03",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2025-04",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2025-05",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2025-06",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2025-07",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2025-08",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2025-09",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2025-10",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2025-11",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2025-12",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-01",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-02",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-03",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-04",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-05",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-06",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-07",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-08",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-09",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-10-01",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-10-02",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-10-03",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-10-04",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-10-05",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-10-06",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-10-07",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-10-08",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-10-09",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-10-10",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-10-11",
+   "skip": "exists"
+  },
+  {
+   "f": "BTCUSDT-2026-10-12",
+   "http": 404,
+   "note": "no-data"
+  },
+  {
+   "f": "ETHUSDT-2021-04",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2021-05",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2021-06",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2021-07",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2021-08",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2021-09",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2021-10",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2021-11",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2021-12",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2022-01",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2022-02",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2022-03",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2022-04",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2022-05",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2022-06",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2022-07",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2022-08",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2022-09",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2022-10",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2022-11",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2022-12",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2023-01",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2023-02",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2023-03",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2023-04",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2023-05",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2023-06",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2023-07",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2023-08",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2023-09",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2023-10",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2023-11",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2023-12",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2024-01",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2024-02",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2024-03",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2024-04",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2024-05",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2024-06",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2024-07",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2024-08",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2024-09",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2024-10",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2024-11",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2024-12",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2025-01",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2025-02",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2025-03",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2025-04",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2025-05",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2025-06",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2025-07",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2025-08",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2025-09",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2025-10",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2025-11",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2025-12",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-01",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-02",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-03",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-04",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-05",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-06",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-07",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-08",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-09",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-10-01",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-10-02",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-10-03",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-10-04",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-10-05",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-10-06",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-10-07",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-10-08",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-10-09",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-10-10",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-10-11",
+   "skip": "exists"
+  },
+  {
+   "f": "ETHUSDT-2026-10-12",
+   "http": 404,
+   "note": "no-data"
+  }
+ ],
+ "perp": [
+  {
+   "f": "BTCUSDT-2024-06",
+   "http": 200,
+   "rows": 2880
+  },
+  {
+   "f": "BTCUSDT-2024-07",
+   "http": 200,
+   "rows": 2976
+  },
+  {
+   "f": "BTCUSDT-2024-08",
+   "http": 200,
+   "rows": 2976
+  },
+  {
+   "f": "BTCUSDT-2024-09",
+   "http": 200,
+   "rows": 2880
+  },
+  {
+   "f": "BTCUSDT-2024-10",
+   "http": 200,
+   "rows": 2976
+  },
+  {
+   "f": "BTCUSDT-2024-11",
+   "http": 200,
+   "rows": 2880
+  },
+  {
+   "f": "BTCUSDT-2024-12",
+   "http": 200,
+   "rows": 2976
+  },
+  {
+   "f": "BTCUSDT-2025-01",
+   "http": 200,
+   "rows": 2976
+  },
+  {
+   "f": "BTCUSDT-2025-02",
+   "http": 200,
+   "rows": 2688
+  },
+  {
+   "f": "BTCUSDT-2025-03",
+   "http": 200,
+   "rows": 2976
+  },
+  {
+   "f": "BTCUSDT-2025-04",
+   "http": 200,
+   "rows": 2880
+  },
+  {
+   "f": "BTCUSDT-2025-05",
+   "http": 200,
+   "rows": 2976
+  },
+  {
+   "f": "BTCUSDT-2025-06",
+   "http": 200,
+   "rows": 2880
+  },
+  {
+   "f": "BTCUSDT-2025-07",
+   "http": 200,
+   "rows": 2976
+  },
+  {
+   "f": "BTCUSDT-2025-08",
+   "http": 200,
+   "rows": 2976
+  },
+  {
+   "f": "BTCUSDT-2025-09",
+   "http": 200,
+   "rows": 2880
+  },
+  {
+   "f": "BTCUSDT-2025-10",
+   "http": 200,
+   "rows": 2976
+  },
+  {
+   "f": "BTCUSDT-2025-11",
+   "http": 200,
+   "rows": 2880
+  },
+  {
+   "f": "BTCUSDT-2025-12",
+   "http": 200,
+   "rows": 2976
+  },
+  {
+   "f": "BTCUSDT-2026-01",
+   "http": 200,
+   "rows": 2976
+  },
+  {
+   "f": "BTCUSDT-2026-02",
+   "http": 200,
+   "rows": 2688
+  },
+  {
+   "f": "BTCUSDT-2026-03",
+   "http": 200,
+   "rows": 2976
+  },
+  {
+   "f": "BTCUSDT-2026-04",
+   "http": 200,
+   "rows": 2880
+  },
+  {
+   "f": "BTCUSDT-2026-05",
+   "http": 200,
+   "rows": 2976
+  },
+  {
+   "f": "BTCUSDT-2026-06",
+   "http": 200,
+   "rows": 2880
+  },
+  {
+   "f": "BTCUSDT-2026-07",
+   "http": 200,
+   "rows": 2976
+  },
+  {
+   "f": "BTCUSDT-2026-08",
+   "http": 200,
+   "rows": 2976
+  },
+  {
+   "f": "BTCUSDT-2026-09",
+   "http": 200,
+   "rows": 2880
+  },
+  {
+   "f": "BTCUSDT-2026-10-01",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "BTCUSDT-2026-10-02",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "BTCUSDT-2026-10-03",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "BTCUSDT-2026-10-04",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "BTCUSDT-2026-10-05",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "BTCUSDT-2026-10-06",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "BTCUSDT-2026-10-07",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "BTCUSDT-2026-10-08",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "BTCUSDT-2026-10-09",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "BTCUSDT-2026-10-10",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "BTCUSDT-2026-10-11",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "BTCUSDT-2026-10-12",
+   "http": 404,
+   "note": "no-data"
+  },
+  {
+   "f": "ETHUSDT-2026-09",
+   "http": 200,
+   "rows": 2880
+  },
+  {
+   "f": "ETHUSDT-2026-10-01",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "ETHUSDT-2026-10-02",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "ETHUSDT-2026-10-03",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "ETHUSDT-2026-10-04",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "ETHUSDT-2026-10-05",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "ETHUSDT-2026-10-06",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "ETHUSDT-2026-10-07",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "ETHUSDT-2026-10-08",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "ETHUSDT-2026-10-09",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "ETHUSDT-2026-10-10",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "ETHUSDT-2026-10-11",
+   "http": 200,
+   "rows": 96
+  },
+  {
+   "f": "ETHUSDT-2026-10-12",
+   "http": 404,
+   "note": "no-data"
+  }
+ ]
+}

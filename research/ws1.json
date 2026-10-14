@@ -1,0 +1,29 @@
+[
+  {
+    "url": "https://explore.microsoft.com",
+    "name": "Get to Know Microsoft Edge",
+    "snippet": "Internet access required, fees may apply. · * Feature availability and functionality may vary by device type, market , and browser version. · * The content on this ...",
+    "host_name": "explore.microsoft.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://apps.apple.com",
+    "name": "Microsoft Edge - App Store",
+    "snippet": "Microsoft Edge , your everyday web browser with built-in Copilot. Edge helps you research faster, read with focus and keep learning across devices.",
+    "host_name": "apps.apple.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://play.google.com/store/apps/details?id=com.microsoft.emmx&hl=en_US",
+    "name": "Microsoft Edge - Apps on Google Play",
+    "snippet": "Sep 28, 2026 — Microsoft edge is a fast, smooth, and reliable app whether I'm browsing the web, watching videos, doing research, or handling everyday tasks. Read more",
+    "host_name": "play.google.com",
+    "rank": 2,
+    "date": "Sep 28, 2026",
+    "favicon": ""
+  }
+]

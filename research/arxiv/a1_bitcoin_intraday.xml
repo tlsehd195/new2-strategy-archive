@@ -1,0 +1,263 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/hNsZjJjPHkQFkxGGgk24AWbj8tQ</id>
+  <title>arXiv Query: search_query=all:"bitcoin" AND all:"intraday"&amp;id_list=&amp;start=0&amp;max_results=12</title>
+  <updated>2026-10-12T03:37:55Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22bitcoin%22+AND+all:%22intraday%22&amp;start=0&amp;max_results=12&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>12</opensearch:itemsPerPage>
+  <opensearch:totalResults>16</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/1906.03430v1</id>
+    <title>The Effects of the Introduction of Bitcoin Futures on the Volatility of Bitcoin Returns</title>
+    <updated>2019-06-08T09:38:28Z</updated>
+    <link href="https://arxiv.org/abs/1906.03430v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1906.03430v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper investigates the effects of the launch of Bitcoin futures on the intraday volatility of Bitcoin. Based on one-minute price data collected from four cryptocurrency exchanges, we first examine the change in realized volatility after the introduction of Bitcoin futures to investigate their aggregate effects on the intraday volatility of Bitcoin. We then analyze the effects in more detail utilizing the discrete Fourier transform. We show that although the Bitcoin market became more volatile immediately after the introduction of Bitcoin futures, over time it has become more stable than it was before the introduction.</summary>
+    <category term="q-fin.TR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2019-06-08T09:38:28Z</published>
+    <arxiv:comment>Accepted in Finance Research Letters</arxiv:comment>
+    <arxiv:primary_category term="q-fin.TR"/>
+    <author>
+      <name>Wonse Kim</name>
+    </author>
+    <author>
+      <name>Junseok Lee</name>
+    </author>
+    <author>
+      <name>Kyungwon Kang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1406.7577v3</id>
+    <title>Nowcasting the Bitcoin Market with Twitter Signals</title>
+    <updated>2016-01-18T10:46:02Z</updated>
+    <link href="https://arxiv.org/abs/1406.7577v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1406.7577v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper analyzes correlations and causalities between Bitcoin market indicators and Twitter posts containing emotional signals on Bitcoin. Within a timeframe of 104 days (November 23rd 2013 - March 7th 2014), about 160,000 Twitter posts containing "bitcoin" and a positive, negative or uncertainty related term were collected and further analyzed. For instance, the terms "happy", "love", "fun", "good", "bad", "sad" and "unhappy" represent positive and negative emotional signals, while "hope", "fear" and "worry" are considered as indicators of uncertainty. The static (daily) Pearson correlation results show a significant positive correlation between emotional tweets and the close price, trading volume and intraday price spread of Bitcoin. However, a dynamic Granger causality analysis does not confirm a statistically significant effect of emotional Tweets on Bitcoin market values. To the contrary, the analyzed data shows that a higher Bitcoin trading volume Granger causes more signals of uncertainty within a 24 to 72-hour timeframe. This result leads to the interpretation that emotional sentiments rather mirror the market than that they make it predictable. Finally, the conclusion of this paper is that the microblogging platform Twitter is Bitcoin's virtual trading floor, emotionally reflecting its trading dynamics.</summary>
+    <category term="cs.SI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2014-06-30T02:08:03Z</published>
+    <arxiv:primary_category term="cs.SI"/>
+    <author>
+      <name>Jermain Kaminski</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2505.20508v1</id>
+    <title>Intraday Functional PCA Forecasting of Cryptocurrency Returns</title>
+    <updated>2025-05-26T20:19:00Z</updated>
+    <link href="https://arxiv.org/abs/2505.20508v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2505.20508v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study the Functional PCA (FPCA) forecasting method in application to functions of intraday returns on Bitcoin. We show that improved interval forecasts of future return functions are obtained when the conditional heteroscedasticity of return functions is taken into account. The Karhunen-Loeve (KL) dynamic factor model is introduced to bridge the functional and discrete time dynamic models. It offers a convenient framework for functional time series analysis. For intraday forecasting, we introduce a new algorithm based on the FPCA applied by rolling, which can be used for any data observed continuously 24/7. The proposed FPCA forecasting methods are applied to return functions computed from data sampled hourly and at 15-minute intervals. Next, the functional forecasts evaluated at discrete points in time are compared with the forecasts based on other methods, including machine learning and a traditional ARMA model. The proposed FPCA-based methods perform well in terms of forecast accuracy and outperform competitors in terms of directional (sign) of return forecasts at fixed points in time.</summary>
+    <category term="econ.EM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-05-26T20:19:00Z</published>
+    <arxiv:primary_category term="econ.EM"/>
+    <author>
+      <name>Joann Jasiak</name>
+    </author>
+    <author>
+      <name>Cheng Zhong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1709.08090v1</id>
+    <title>The inefficiency of Bitcoin revisited: a dynamic approach</title>
+    <updated>2017-09-23T18:00:23Z</updated>
+    <link href="https://arxiv.org/abs/1709.08090v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1709.08090v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This letter revisits the informational efficiency of the Bitcoin market. In particular we analyze the time-varying behavior of long memory of returns on Bitcoin and volatility 2011 until 2017, using the Hurst exponent. Our results are twofold. First, R/S method is prone to detect long memory, whereas DFA method can discriminate more precisely variations in informational efficiency across time. Second, daily returns exhibit persistent behavior in the first half of the period under study, whereas its behavior is more informational efficient since 2014. Finally, price volatility, measured as the logarithmic difference between intraday high and low prices exhibits long memory during all the period. This reflects a different underlying dynamic process generating the prices and volatility.</summary>
+    <category term="q-fin.ST" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-fin.CP" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-fin.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-fin.RM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2017-09-23T18:00:23Z</published>
+    <arxiv:comment>Economics Letters, 2017</arxiv:comment>
+    <arxiv:primary_category term="q-fin.ST"/>
+    <author>
+      <name>Aurelio F. Bariviera</name>
+    </author>
+    <arxiv:doi>10.1016/j.econlet.2017.09.013</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1016/j.econlet.2017.09.013" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2408.02973v1</id>
+    <title>Comparative analysis of stationarity for Bitcoin and the S&amp;P500</title>
+    <updated>2024-08-06T06:10:52Z</updated>
+    <link href="https://arxiv.org/abs/2408.02973v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2408.02973v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper compares and contrasts stationarity between the conventional stock market and cryptocurrency. The dataset used for the analysis is the intraday price indices of the S&amp;P500 from 1996 to 2023 and the intraday Bitcoin indices from 2019 to 2023, both in USD. We adopt the definition of `wide sense stationary', which constrains the time independence of the first and second moments of a time series. The testing method used in this paper follows the Wiener-Khinchin Theorem, i.e., that for a wide sense stationary process, the power spectral density and the autocorrelation are a Fourier transform pair. We demonstrate that localized stationarity can be achieved by truncating the time series into segments, and for each segment, detrending and normalizing the price return are required. These results show that the S&amp;P500 price return can achieve stationarity for the full 28-year period with a detrending window of 12 months and a constrained normalization window of 10 minutes. With truncated segments, a larger normalization window can be used to establish stationarity, indicating that within the segment the data is more homogeneous. For Bitcoin price return, the segment with higher volatility presents stationarity with a normalization window of 60 minutes, whereas stationarity cannot be established in other segments.</summary>
+    <category term="q-fin.ST" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-08-06T06:10:52Z</published>
+    <arxiv:primary_category term="q-fin.ST"/>
+    <author>
+      <name>Yaoyue Tang</name>
+    </author>
+    <author>
+      <name>Karina Arias-Calluari</name>
+    </author>
+    <author>
+      <name>Michael S. Harré</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2501.05232v1</id>
+    <title>The Intraday Bitcoin Response to Tether Minting and Burning Events: Asymmetry, Investor Sentiment, And "Whale Alerts" On Twitter</title>
+    <updated>2025-01-09T13:39:22Z</updated>
+    <link href="https://arxiv.org/abs/2501.05232v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2501.05232v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Tether Limited has the sole authority to create (mint) and destroy (burn) Tether stablecoins (USDT). This paper investigates Bitcoin's response to USDT supply change events between 2014 and 2021 and identifies an interesting asymmetry between Bitcoin's responses to USDT minting and burning events. Bitcoin responds positively to USDT minting events over 5- to 30-minute event windows, but this response begins declining after 60 minutes. State-dependence is also demonstrated, with Bitcoin prices exhibiting a greater increase when the corresponding USDT minting event coincides with positive investor sentiment and is announced to the public by data service provider, Whale Alert, on Twitter.</summary>
+    <category term="q-fin.GN" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-fin.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-fin.TR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-01-09T13:39:22Z</published>
+    <arxiv:comment>18 pages, 5 tables</arxiv:comment>
+    <arxiv:primary_category term="q-fin.GN"/>
+    <arxiv:journal_ref>Finance Research Letters, 49, 103096 (2022)</arxiv:journal_ref>
+    <author>
+      <name>Aman Saggu</name>
+    </author>
+    <arxiv:doi>10.1016/j.frl.2022.103096</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1016/j.frl.2022.103096" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2402.11930v2</id>
+    <title>Stylized Facts of High-Frequency Bitcoin Time Series</title>
+    <updated>2025-06-22T06:48:30Z</updated>
+    <link href="https://arxiv.org/abs/2402.11930v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2402.11930v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This paper analyses the high-frequency intraday Bitcoin dataset from 2019 to 2022. During this time frame, the Bitcoin market index exhibited two distinct periods, 2019-20 and 2021-22, characterized by an abrupt change in volatility. The Bitcoin price returns for both periods can be described by an anomalous diffusion process, transitioning from subdiffusion for short intervals to weak superdiffusion over longer time intervals. The characteristic features related to this anomalous behavior studied in the present paper include heavy tails, which can be described using a $q$-Gaussian distribution and correlations. When we sample the autocorrelation of absolute returns, we observe a power-law relationship, indicating time dependence in both periods initially. The ensemble autocorrelation of the returns decays rapidly. We fitted the autocorrelation with a power law to capture the decay and found that the second period experienced a slightly higher decay rate. The further study involves the analysis of endogenous effects within the Bitcoin time series, which are examined through detrending analysis. We found that both periods are multifractal and present self-similarity in the detrended probability density function (PDF). The Hurst exponent over short time intervals shifts from less than 0.5 ($\sim$ 0.42) in Period 1 to closer to 0.5 in Period 2 ($\sim$ 0.49), indicating that the market has gained efficiency over time.</summary>
+    <category term="q-fin.ST" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-02-19T08:17:24Z</published>
+    <arxiv:comment>21 pages, 11 figures</arxiv:comment>
+    <arxiv:primary_category term="q-fin.ST"/>
+    <author>
+      <name>Yaoyue Tang</name>
+    </author>
+    <author>
+      <name>Karina Arias-Calluari</name>
+    </author>
+    <author>
+      <name>M. N. Najafi</name>
+    </author>
+    <author>
+      <name>Michael S. Harré</name>
+    </author>
+    <author>
+      <name>Fernando Alonso-Marroquin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2004.05870v2</id>
+    <title>The leverage effect and other stylized facts displayed by Bitcoin returns</title>
+    <updated>2021-01-31T17:41:10Z</updated>
+    <link href="https://arxiv.org/abs/2004.05870v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2004.05870v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In this paper, we explore some stylized facts of the Bitcoin market using the BTC-USD exchange rate time series of historical intraday data from 2013 to 2020. Bitcoin presents some very peculiar idiosyncrasies, like the absence of macroeconomic fundamentals or connections with underlying assets or benchmarks, an asymmetry between demand and supply and the presence of inefficiency in the form of strong arbitrage opportunity. Nevertheless, all these elements seem to be marginal in the definition of the structural statistical properties of this virtual financial asset, which result to be analogous to general individual stocks or indices. In contrast, we find some clear differences, compared to fiat money exchange rates time series, in the values of the linear autocorrelation and, more surprisingly, in the presence of the leverage effect. We also explore the dynamics of correlations, monitoring the shifts in the evolution of the Bitcoin market. This analysis is able to distinguish between two different regimes: a stochastic process with weaker memory signatures and closer to Gaussianity between the Mt. Gox incident and the late 2015, and a dynamics with relevant correlations and strong deviations from Gaussianity before and after this interval.</summary>
+    <category term="q-fin.ST" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-fin.TR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2020-04-13T11:23:02Z</published>
+    <arxiv:comment>10 pages, 6 figures</arxiv:comment>
+    <arxiv:primary_category term="q-fin.ST"/>
+    <arxiv:journal_ref>Brazilian Journal of Physics (2021) 51, 576-586</arxiv:journal_ref>
+    <author>
+      <name>F. N. M. de Sousa Filho</name>
+    </author>
+    <author>
+      <name>J. N. Silva</name>
+    </author>
+    <author>
+      <name>M. A. Bertella</name>
+    </author>
+    <author>
+      <name>E. Brigatti</name>
+    </author>
+    <arxiv:doi>10.1007/s13538-020-00846-8</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1007/s13538-020-00846-8" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2504.17451v1</id>
+    <title>Functional $K$ Sample Problem via Multivariate Optimal Measure Transport-Based Permutation Test</title>
+    <updated>2025-04-24T11:30:46Z</updated>
+    <link href="https://arxiv.org/abs/2504.17451v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2504.17451v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The null hypothesis of equality of distributions of functional data coming from $K$ samples is considered. The proposed test statistic is multivariate and its components are based on pairwise Cramér von Mises comparisons of empirical characteristic functionals. The significance of the test statistic is evaluated via the novel multivariate permutation test, where the final single $p$-value is computed using the discrete optimal measure transport. The methodology is illustrated by real data on cumulative intraday returns of Bitcoin.</summary>
+    <category term="math.ST" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-04-24T11:30:46Z</published>
+    <arxiv:primary_category term="math.ST"/>
+    <author>
+      <name>Šárka Hudecová</name>
+    </author>
+    <author>
+      <name>Daniel Hlubinka</name>
+    </author>
+    <author>
+      <name>Zdeněk Hlávka</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2411.06327v2</id>
+    <title>Return and Volatility Forecasting Using On-Chain Flows in Cryptocurrency Markets</title>
+    <updated>2025-09-01T05:42:01Z</updated>
+    <link href="https://arxiv.org/abs/2411.06327v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2411.06327v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We empirically examine the intraday return- and volatility-forecasting power of on-chain flow data for Bitcoin(BTC), Ethereum(ETH), and Tether(USDT). We find ETH net inflows to strongly predict ETH returns and volatility in the 2017-2023 period. Our intraday frequencies are 1-6 hours. We find that differing significantly from forecasting patterns for BTC, ETH net inflows negatively predict ETH returns and volatility. First, we find that USDT flowing out of investors wallets and into cryptocurrency exchanges, namely, USDT net inflows into the exchanges, positively predicts BTC and ETH returns at multiple intervals and negatively predicts ETH volatility at various intervals and BTC volatility at the 6-hour interval. Second, we find that ETH net inflows negatively predict ETH returns and volatility for all intraday intervals. Third, BTC net inflows generally lack predictive power for BTC returns(except at 4 hours) but are negatively associated with volatility across all intraday intervals. We illustrate our findings on return forecasting via case studies. Moreover, we develop option strategies to assess profits and losses on ETH investments based on ETH net inflows. Our findings contribute to the growing literature on on-chain activity and its asset pricing implications, offering economically relevant insights for intraday portfolio management in cryptocurrency markets.</summary>
+    <category term="econ.EM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-11-10T01:27:49Z</published>
+    <arxiv:primary_category term="econ.EM"/>
+    <author>
+      <name>Yeguang Chi</name>
+      <arxiv:affiliation>Ruihua</arxiv:affiliation>
+    </author>
+    <author>
+      <name> Qionghua</name>
+      <arxiv:affiliation>Ruihua</arxiv:affiliation>
+    </author>
+    <author>
+      <name> Chu</name>
+    </author>
+    <author>
+      <name>Wenyan Hao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2306.13371v1</id>
+    <title>Fractal properties, information theory, and market efficiency</title>
+    <updated>2023-06-23T08:50:39Z</updated>
+    <link href="https://arxiv.org/abs/2306.13371v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2306.13371v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Considering that both the entropy-based market information and the Hurst exponent are useful tools for determining whether the efficient market hypothesis holds for a given asset, we study the link between the two approaches. We thus provide a theoretical expression for the market information when log-prices follow either a fractional Brownian motion or its stationary extension using the Lamperti transform. In the latter model, we show that a Hurst exponent close to 1/2 can lead to a very high informativeness of the time series, because of the stationarity mechanism. In addition, we introduce a multiscale method to get a deeper interpretation of the entropy and of the market information, depending on the size of the information set. Applications to Bitcoin, CAC 40 index, Nikkei 225 index, and EUR/USD FX rate, using daily or intraday data, illustrate the methodological content.</summary>
+    <category term="q-fin.ST" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="stat.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2023-06-23T08:50:39Z</published>
+    <arxiv:primary_category term="q-fin.ST"/>
+    <author>
+      <name>Xavier Brouty</name>
+    </author>
+    <author>
+      <name>Matthieu Garcin</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2602.10785v1</id>
+    <title>A novel approach to trading strategy parameter optimization using double out-of-sample data and walk-forward techniques</title>
+    <updated>2026-02-11T12:19:24Z</updated>
+    <link href="https://arxiv.org/abs/2602.10785v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2602.10785v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This study introduces a novel approach to walk-forward optimization by parameterizing the lengths of training and testing windows. We demonstrate that the performance of a trading strategy using the Exponential Moving Average (EMA) evaluated within a walk-forward procedure based on the Robust Sharpe Ratio is highly dependent on the chosen window size. We investigated the strategy on intraday Bitcoin data at six frequencies (1 minute to 60 minutes) using 81 combinations of walk-forward window lengths (1 day to 28 days) over a 19-month training period. The two best-performing parameter sets from the training data were applied to a 21-month out-of-sample testing period to ensure data independence. The strategy was only executed once during the testing period. To further validate the framework, strategy parameters estimated on Bitcoin were applied to Binance Coin and Ethereum. Our results suggest the robustness of our custom approach. In the training period for Bitcoin, all combinations of walk-forward windows outperformed a Buy-and-Hold strategy. During the testing period, the strategy performed similarly to Buy-and-Hold but with lower drawdown and a higher Information Ratio. Similar results were observed for Binance Coin and Ethereum. The real strength was demonstrated when a portfolio combining Buy-and-Hold with our strategies outperformed all individual strategies and Buy-and-Hold alone, achieving the highest overall performance and a 50 percent reduction in drawdown. A conservative fee of 0.1 percent per transaction was included in all calculations. A cost sensitivity analysis was performed as a sanity check, revealing that the strategy's break-even point was around 0.4 percent per transaction. This research highlights the importance of optimizing walk-forward window lengths and emphasizing the value of single-time out-of-sample testing for reliable strategy evaluation.</summary>
+    <category term="q-fin.TR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-fin.MF" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="q-fin.PM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-02-11T12:19:24Z</published>
+    <arxiv:comment>40 pages, 8 figures, 11 tables</arxiv:comment>
+    <arxiv:primary_category term="q-fin.TR"/>
+    <author>
+      <name>Tomasz Mroziewicz</name>
+    </author>
+    <author>
+      <name>Robert Ślepaczuk</name>
+    </author>
+  </entry>
+</feed>

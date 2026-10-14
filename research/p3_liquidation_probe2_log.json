@@ -1,0 +1,45 @@
+{
+  "probe_time_utc": "2026-10-13T00:42:11.859095+00:00",
+  "tests": {
+    "bitmex_XBTUSDT_oldest": {
+      "http": 200,
+      "n": 0,
+      "first": null
+    },
+    "bitmex_ETHUSD_oldest": {
+      "http": 200,
+      "n": 0,
+      "first": null
+    },
+    "bitmex_ETHUSDT_oldest": {
+      "http": 200,
+      "n": 0,
+      "first": null
+    },
+    "bitmex_nosymbol_oldest": {
+      "http": 200,
+      "n": 0,
+      "first": null
+    },
+    "bitmex_nosymbol_newest": {
+      "http": 200,
+      "n": 0,
+      "first": null
+    },
+    "okx_begin_end_1y": {
+      "http": 200,
+      "code": "0",
+      "n": 5,
+      "times_ms": [
+        1791851853004,
+        1791851640333,
+        1791851640261,
+        1791851640228,
+        1791851640121
+      ]
+    },
+    "okx_eth_instid": {
+      "error": "<HTTPError 400: 'Bad Request'>"
+    }
+  }
+}

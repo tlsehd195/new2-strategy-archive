@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://www.researchgate.net",
+    "name": "A survey of statistical arbitrage pairs trading strategies with",
+    "snippet": "Aug 11, 2026 — This review examines the growing literature on pairs trading frameworks, which involve relative value arbitrage strategies between two or ... Read more",
+    "host_name": "www.researchgate.net",
+    "rank": 0,
+    "date": "Aug 11, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://finsharpe.com",
+    "name": "Statistical Arbitrage with Pairs Trading and Backtesting",
+    "snippet": "Pairs trading is a market-neutral strategy where we use statistical techniques to identify two stocks that are historically highly correlated with each other. Read more",
+    "host_name": "finsharpe.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com",
+    "name": "miindisponi99/Statistical-Arbitrage-Emerging-Markets: Built",
+    "snippet": "Ultimately, the strategy prioritizes selecting the asset pair with the highest Sharpe ratio to check if its performance is consistent with out-of-sample data. Read more",
+    "host_name": "github.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://blog.amberdata.io",
+    "name": "Empirical Results & Performance Analysis",
+    "snippet": "Jan 28, 2025 — Crypto pairs trading strategy validated with real data, showing substantial returns, controlled risk, & robust performance in volatile ...",
+    "host_name": "blog.amberdata.io",
+    "rank": 3,
+    "date": "Jan 28, 2025",
+    "favicon": ""
+  },
+  {
+    "url": "https://israeldi.github.io",
+    "name": "Statistical Arbitrage by Pair Trading using Clustering and",
+    "snippet": "Nov 28, 2019 — Comparative analysis is carried out based on returns, Sharpe Ratio, and other per- formance indicators of different models. 1 Introduction. Read more 13 pages",
+    "host_name": "israeldi.github.io",
+    "rank": 4,
+    "date": "Nov 28, 2019",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.scribd.com",
+    "name": "Pairs Trading: A Statistical Arbitrage Guide | PDF",
+    "snippet": "Pairs trading is a statistical arbitrage strategy that involves choosing two stocks that move together closely based on correlation, then taking long and ... Read more",
+    "host_name": "www.scribd.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

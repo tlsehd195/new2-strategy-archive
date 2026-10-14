@@ -1,0 +1,65 @@
+[
+  {
+    "url": "https://www.sciencedirect.com",
+    "name": "Sentiment and jumps in the cryptocurrency market",
+    "snippet": "by AF Aysan · 2024 · Cited by 48 — This paper analyzes the relationship between price jumps and news sentiment in cryptocurrencies . We detect jumps at the intraday level and correlate their ... Read more",
+    "host_name": "www.sciencedirect.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://pmc.ncbi.nlm.nih.gov",
+    "name": "Nonlinear nexus between cryptocurrency returns and COVID",
+    "snippet": "by AK Banerjee · 2022 · Cited by 84 — Abstract. The paper examines how various COVID-19 news sentiments differentially impact the behaviour of cryptocurrency returns. Read more",
+    "host_name": "pmc.ncbi.nlm.nih.gov",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://docserv.uni-duesseldorf.de",
+    "name": "Social Media Sentiment Analysis, Cryptocurrency Returns",
+    "snippet": "by LM Kürzinger · 2024 · Cited by 2 — The Influence of Intraday Sentiment on Bitcoin Returns . 5.1. Abstract. The assessment of Bitcoin , the oldest and most prominent CC, presents a challenge due to. Read more 181 pages",
+    "host_name": "docserv.uni-duesseldorf.de",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.cnn.com",
+    "name": "Fear and Greed Index - Investor Sentiment",
+    "snippet": "CNN's Fear & Greed Index is a way to gauge stock market movements and whether stocks are fairly priced. The index uses seven market indicators to help ...",
+    "host_name": "www.cnn.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.mdpi.com",
+    "name": "Sentiment Matters for Cryptocurrencies: Evidence from",
+    "snippet": "by R Lupu · 2025 · Cited by 15 — This study provides empirical evidence that cryptocurrency market movements are influenced by sentiment extracted from social media.",
+    "host_name": "www.mdpi.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://finnhub.io",
+    "name": "News Sentiment",
+    "snippet": "Intraday data will remain unadjusted. Only 1 month of intraday will be returned at a time . If you need more historical intraday data, please use the from ... Read more",
+    "host_name": "finnhub.io",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://ideas.repec.org",
+    "name": "Intraday return predictability in the cryptocurrency markets",
+    "snippet": "by Z Wen · 2022 · Cited by 51 — This paper reports evidence of intraday return predictability , consisting of both intraday momentum and reversal, in the cryptocurrency market. Read more",
+    "host_name": "ideas.repec.org",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  }
+]
