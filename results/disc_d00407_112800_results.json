@@ -1,0 +1,61 @@
+{
+ "cid": "d00407_112800",
+ "ts": "2026-10-14T11:28:00Z",
+ "family": "fng",
+ "symbols": [
+  "BNBUSDT",
+  "ADAUSDT"
+ ],
+ "params": {
+  "lo": 5,
+  "hi": 95,
+  "horizons": [
+   4
+  ]
+ },
+ "variant": null,
+ "kind": "base",
+ "verdict": "UNDETERMINED_POWER",
+ "cells": [
+  {
+   "sym": "BNBUSDT",
+   "h": 4,
+   "n_raw": 2,
+   "vn_nonov": 2,
+   "fail_closed_o10k": 0,
+   "mean_net_bp": -121.68501378128968,
+   "se": 42.28915847963409,
+   "t": -2.8774517667428072,
+   "p": 0.8935341190082327,
+   "span_means": [
+    null,
+    -121.68501378128968
+   ],
+   "raw_mean_bp": -121.68501378128968,
+   "raw_n": 2,
+   "mean_net_o100k_bp": null,
+   "p_holm": 1.0
+  },
+  {
+   "sym": "ADAUSDT",
+   "h": 4,
+   "n_raw": 2,
+   "vn_nonov": 2,
+   "fail_closed_o10k": 0,
+   "mean_net_bp": -199.98625219495506,
+   "se": 0.21401109651382907,
+   "t": -934.466742391707,
+   "p": 0.9996593674764046,
+   "span_means": [
+    null,
+    -199.98625219495506
+   ],
+   "raw_mean_bp": -199.98625219495506,
+   "raw_n": 2,
+   "mean_net_o100k_bp": null,
+   "p_holm": 1.0
+  }
+ ],
+ "prereg": "/home/z/my-project/NEW2_run/PREREG_discd00407_112800_2026-10-14.md",
+ "engine": "NEW2-discovery-v1"
+}

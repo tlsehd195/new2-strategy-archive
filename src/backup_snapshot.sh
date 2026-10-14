@@ -38,6 +38,7 @@ tar -cf "$STAGE/docs_and_code.tar" \
   worklog.md \
   NEW2_전략탐색_종합정리.md \
   NEW2_전략연구_보고서_v*.md \
+  HANDOVER_NEXT_SESSION.md \
   NEW2_분석보고서.md \
   전략리서치_보고서.md \
   strategy_research_v2.md \
@@ -50,6 +51,15 @@ tar -cf "$STAGE/docs_and_code.tar" \
   mini-services/maker-fill-monitor/index.ts \
   mini-services/maker-fill-monitor/package.json \
   NEW2_run/backup_snapshot.sh \
+  NEW2_run/git_backup_push.sh \
+  NEW2_run/discovery/engine_lib.py \
+  NEW2_run/discovery/generator.py \
+  NEW2_run/discovery/runner.py \
+  NEW2_run/discovery/run_cycle.sh \
+  NEW2_run/discovery/state.json \
+  NEW2_run/discovery/discovery_ledger.jsonl \
+  NEW2_run/discovery/cycles.md \
+  NEW2_run/discovery/promotion_queue.md \
   2>/dev/null || FAIL=1
 
 # 4) manifest

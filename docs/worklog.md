@@ -1032,3 +1032,36 @@ Stage Summary:
 - **오프사이트 백업 체계 완성**: 로컬 스냅샷(7세대 회전·SHA256) + GitHub push(매일 09:00 KST 자동) 이중화. 샌드박스 전체 소실 시에도 GitHub 저장소에서 프로젝트 TIER1 전체 복원 가능 — 3계층 리스크 매트릭스의 마지막 빈칸(전체 소실) 해소
 - 회수 방법 안내 완료: GitHub 저장소 Settings → Deploy keys 삭제 시 push 즉시 차단
 - 대기 사항 소진: 재개 트리거 ③(사용자 지시)으로 착수된 인프라 전부 완결 — 이후 정기 판정(2027-01-11/2027-07-01)과 누적만 남음
+---
+Task ID: 45
+Agent: Z.ai Code (main, 사용자 "완료"+저장소 URL 수신 → Task 43 완료 + 백업 cron 458723 첫 실행)
+Task: Deploy Key 연결 검증 → TIER1 GitHub 초기 push → 오프사이트 백업 자동화 완성 → 일일 백업 크론 절차 수행
+
+Work Log:
+- [Deploy Key 검증] git ls-remote 성공 (git@github.com:tlsehd195/new2-strategy-archive.git, refs/heads/main 감지) — ssh2 전송기·Deploy Key·저장소 등록 전부 정상
+- [오프사이트 스크립트] NEW2_run/git_backup_push.sh 신설: VACUUM INTO 일관성 장부 스냅샷 → ledgers/results/research/prereg/docs/src 트리 동기화 → 커밋(행 수 메타 포함) → GIT_SSH 전송기로 push, 원격 선행 커밋 시 rebase 재시도, git_log.md 기록, GITBK_OK/FAILED 출력
+- [첫 push 성공] commit 49ec8de — 원격 HEAD와 일치 확인. 트리: ledgers(청산DB 2,909행·fng 10·fill 30)+results+research+prereg+docs(보고서 v3~v28·종합정리·worklog)+src. 10:33:52Z 선행 실행(커밋 2건)도 정상 기록 — 이중 실행 무충돌 확인
+- [일일 백업 크론 절차 수행] backup_snapshot.sh → SNAPSHOT_OK 20261014T103801Z 3.06MB / git_backup_push.sh → GITBK_OK commit=49ec8de / 행 수 2,562→2,909 증가(감소 없음) / 실패 0건
+
+Stage Summary:
+- **오프사이트 백업 체계 완성**: 로컬 7세대 스냅샷(크론 458540·458723) + GitHub 매일 push(크론 458723) 이중화. 소실 가능성 3계층 리스크 중 ③샌드박스 전체 소실에 대한 방어 최초로 확보 — 이제 어느 환경에서든 TIER1 전체 복원 가능
+- 대기 중이던 사용자 액션 해소 — 재개 트리거 ③ 사용자 지시 소진. 다음 변동: 익일 백업 크론 자동화, 2027-01-11 동시 판정
+---
+Task ID: 47
+Agent: Z.ai Code (main, 사용자 "전략 탐색→검증→조합→승격 완전 자동화" 지시)
+Task: 자율탐색 엔진(engine-discovery-v1) 신설 — 탐색·검증·조합·승격큐 완전 자동화 + 백업 체계 확장 + 구 루프 정리
+
+Work Log:
+- [설계] 기존 잠금 방법론(CandleCostModel 비용모델·Holm·승격 게이트·locked TEST 구간 배제·append-only)을 결정론적 순환 엔진으로 이식. 게이트는 비중첩 표본으로만 판정하는 R1(중첩 과대 계상 차단), 승자 저주 수축 R2(mean−2.2414·se>0), 승격 절대 자동 선언 금지 R3 — 3규칙 사전 고지
+- [구현] NEW2_run/discovery/{engine_lib.py, generator.py, runner.py, run_cycle.sh, state.json, discovery_ledger.jsonl, cycles.md, promotion_queue.md}. 7패밀리 문법 × 5심볼페어 × 파라미터 그리드 = 779 후보 유니버스(flow_z 360·ret_rev 120·ts_mom 60·vol_break 60·tod 60·fund_z 45·fng 74). F2/X6 기존 측정분 정확 중복 배제 목록 포함
+- [정합성 수정] ①개발 구간 제한 누락 발견 → 진입·청산 모두 dev span 내부로 제한(X8 규격 준용) ②배치 내 중복 후보 재시험 결함 수정(proposed-hash 집합) ③크래시 안전 커서 규약(장부 append 성공 후에만 커서 전진)
+- [검증] 스모크 2후보 → X8 교차검증 결과와 정합 확인(flow_z L16/h4 BTC net −34.7bp ≈ X8 −32.1bp, 차이는 비중첩·구간 필터 기인). FNG (5,95) 후보 vn=2는 실측 재확인으로 정직 판정 검증(FNG≥95는 전부 2019~2021.2=구간 밖, ≤5는 전세계 3일). 사이클 5회 연속 CYCLE_OK, 총 33/779 검증 완료(FAIL_COST 29·UNDETERMINED_POWER 4·에러 0)
+- [자동화] 크론 Job 458843 신설(3시간 고정 주기): worklog/state 확인 → run_cycle.sh 실행 → SURVIVOR/CYCLE_FAILED/유니버스 소진 시에만 worklog 기록·보고, 정상 사이클은 cycles.md 자동 기록만. locked 구간·장부 무수정·자동 승격 금지 조항 포함
+- [구 루프 정리] Job 453321(수동 목표 루프, 종료 판정 상태) 삭제 — 임무를 458843으로 이관, 중복 실행 차단
+- [백업 확장] git_backup_push.sh에 discovery/ 전체 포함, backup_snapshot.sh에 엔진 소스+장부 4종 추가
+- [인수인계] HANDOVER_NEXT_SESSION.md 갱신: §0/§2.3/§8/§9 자율탐색 엔진 반영 + §12 신설(파일·문법·게이트·순환 논리·운영 참고)
+
+Stage Summary:
+- **탐색→검증→조합→승격큐 완전 자동화 완성**: 3시간마다 자동 사이클(사이클당 ~10개), 779 유니버스 소진까지 약 10일, 이후 생존 풀 조합(섭동·필터·Stouffer) 지속. SURVIVOR는 promotion_queue 적재 후 2027 판정에서만 처리 — 자동화가 과학 규율을 우회하지 않는 구조
+- 예상 결과: 비용 벽 때문에 대부분 FAIL_COST — 엔진은 이를 정직하게 장부화하는 것이 임무. UNDETERMINED_POWER는 데이터 누적 후 재검증 큐로 회수
+- 현재 진행: cycle 5, tested 33/779, survivors 0, errors 0

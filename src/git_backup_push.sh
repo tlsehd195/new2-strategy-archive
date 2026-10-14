@@ -40,13 +40,16 @@ cp -rf NEW2_run/results/.   "$REPO/results/"   2>/dev/null || FAIL=1
 cp -rf NEW2_run/research/.  "$REPO/research/"  2>/dev/null || FAIL=1
 cp -f  NEW2_run/PREREG_*.md "$REPO/prereg/"    2>/dev/null || FAIL=1
 cp -f  NEW2_run/*.md        "$REPO/docs/"      2>/dev/null
-cp -f  worklog.md NEW2_전략탐색_종합정리.md NEW2_전략연구_보고서_v*.md NEW2_분석보고서.md 전략리서치_보고서.md strategy_research_v2.md "$REPO/docs/" 2>/dev/null
+cp -f  worklog.md HANDOVER_NEXT_SESSION.md NEW2_전략탐색_종합정리.md NEW2_전략연구_보고서_v*.md NEW2_분석보고서.md 전략리서치_보고서.md strategy_research_v2.md "$REPO/docs/" 2>/dev/null
 cp -f  src/instrumentation.ts prisma/schema.prisma "$REPO/src/" 2>/dev/null
 for s in liq-collector fng-watcher maker-fill-monitor; do
   mkdir -p "$REPO/src/mini_services/$s"
   cp -f mini-services/$s/index.ts mini-services/$s/package.json "$REPO/src/mini_services/$s/" 2>/dev/null
 done
 cp -f NEW2_run/backup_snapshot.sh NEW2_run/git_backup_push.sh "$REPO/src/" 2>/dev/null
+# 자율탐색 엔진 (engine-discovery-v1) — 상태·장부·문법 전체 포함
+mkdir -p "$REPO/run/discovery"
+cp -rf NEW2_run/discovery/. "$REPO/run/discovery/" 2>/dev/null || FAIL=1
 
 # 3) 커밋 + push
 cd "$REPO" || exit 1
