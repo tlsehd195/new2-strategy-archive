@@ -74,11 +74,13 @@ echo "$PUSHOUT" | tail -2
 
 if [ "$FAIL" != "0" ]; then
   echo "GITBK_FAILED $TS" >&2
-  echo "$TS push=FAIL fail=1 db=$DBROWS" >> NEW2_run/backup/git_log.md
+  mkdir -p /home/z/my-project/NEW2_run/backup
+  echo "$TS push=FAIL fail=1 db=$DBROWS" >> /home/z/my-project/NEW2_run/backup/git_log.md
   exit 2
 fi
 
 # 4) 로그 1행 + 요약
 NCOMMIT=$(git rev-list --count HEAD)
-echo "$TS push=OK db=$DBROWS commits=$NCOMMIT" >> NEW2_run/backup/git_log.md
+mkdir -p /home/z/my-project/NEW2_run/backup
+echo "$TS push=OK db=$DBROWS commits=$NCOMMIT" >> /home/z/my-project/NEW2_run/backup/git_log.md
 echo "GITBK_OK $TS db=$DBROWS files_changed=$NFILES commits=$NCOMMIT"
