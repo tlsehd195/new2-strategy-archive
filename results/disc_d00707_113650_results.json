@@ -1,0 +1,60 @@
+{
+ "cid": "d00707_113650",
+ "ts": "2026-10-14T11:36:50Z",
+ "family": "fng",
+ "symbols": [
+  "BTCUSDT",
+  "ETHUSDT"
+ ],
+ "params": {
+  "lo": 5,
+  "hi": 95,
+  "horizons": [
+   16
+  ]
+ },
+ "variant": null,
+ "kind": "base",
+ "verdict": "UNDETERMINED_POWER",
+ "cells": [
+  {
+   "sym": "BTCUSDT",
+   "h": 16,
+   "n_raw": 2,
+   "vn_nonov": 0,
+   "fail_closed_o10k": 0,
+   "mean_net_bp": null,
+   "se": null,
+   "t": null,
+   "p": 1.0,
+   "span_means": [
+    null,
+    null
+   ],
+   "raw_mean_bp": null,
+   "raw_n": 0,
+   "mean_net_o100k_bp": null
+  },
+  {
+   "sym": "ETHUSDT",
+   "h": 16,
+   "n_raw": 2,
+   "vn_nonov": 2,
+   "fail_closed_o10k": 0,
+   "mean_net_bp": -150.8355118264826,
+   "se": 136.11352613125894,
+   "t": -1.108159608480253,
+   "p": 0.7663166548092777,
+   "span_means": [
+    null,
+    -150.8355118264826
+   ],
+   "raw_mean_bp": -150.8355118264826,
+   "raw_n": 2,
+   "mean_net_o100k_bp": -198.53850752074257,
+   "p_holm": 0.7663166548092777
+  }
+ ],
+ "prereg": "/home/z/my-project/NEW2_run/PREREG_discd00707_113650_2026-10-14.md",
+ "engine": "NEW2-discovery-v1"
+}

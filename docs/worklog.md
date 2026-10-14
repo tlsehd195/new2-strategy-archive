@@ -1065,3 +1065,9 @@ Stage Summary:
 - **탐색→검증→조합→승격큐 완전 자동화 완성**: 3시간마다 자동 사이클(사이클당 ~10개), 779 유니버스 소진까지 약 10일, 이후 생존 풀 조합(섭동·필터·Stouffer) 지속. SURVIVOR는 promotion_queue 적재 후 2027 판정에서만 처리 — 자동화가 과학 규율을 우회하지 않는 구조
 - 예상 결과: 비용 벽 때문에 대부분 FAIL_COST — 엔진은 이를 정직하게 장부화하는 것이 임무. UNDETERMINED_POWER는 데이터 누적 후 재검증 큐로 회수
 - 현재 진행: cycle 5, tested 33/779, survivors 0, errors 0
+
+### Task 47 부록 — 백업 스냅샷 치명 버그 발견·수정 (같은 날)
+- **버그**: bun:sqlite `VACUUM INTO`는 대상 파일이 이미 존재하면 예외를 던지지만 bun -e가 exit 0으로 은폐(오류 미출력) → git_backup_push.sh의 GitHub 스냅샷이 **10:38 커밋(2,909행) 이후 갱신되지 않은 채** 매일 push되고 있었음 (JSONL·results 등 나머지는 정상 갱신)
+- **수정**: 두 백업 스크립트의 SQLite 스냅샷 단계를 python3 sqlite3로 교체 + 대상 파일 사전 삭제(wal/shm 포함) + 행 수 0 검증(assert) + 실패 시 명시적 FAIL. bun -e 오류 은폐 특성은 worklog에 운영 교훈으로 기록
+- **재검증**: git push 재실행 → repo 스냅샷 2,914행으로 신선화(commit ac2abcd), 로컬 스냅샷 SNAPSHOT_OK 2,914행. 발견 계기: 자율탐색 엔진 작업 중 push 메타의 빈 행 수 필드(liq= 공백) 관찰 → 추적
+- 교훈: 백업 무결성은 "성공 메시지"가 아니라 **행 수·mtime 실측 대조**로만 검증 가능

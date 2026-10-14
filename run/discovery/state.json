@@ -1,20 +1,20 @@
 {
  "engine": "NEW2-discovery-v1",
- "cycle": 6,
+ "cycle": 7,
  "cursors": {
-  "flow_z": 8,
-  "ret_rev": 8,
-  "ts_mom": 7,
-  "vol_break": 5,
-  "tod": 5,
-  "fund_z": 5,
-  "fng": 5
+  "flow_z": 10,
+  "ret_rev": 10,
+  "ts_mom": 9,
+  "vol_break": 6,
+  "tod": 6,
+  "fund_z": 6,
+  "fng": 6
  },
- "tested": 52,
+ "tested": 62,
  "survivors": [],
  "survivor_specs": {},
  "stouffer_done": [],
  "promotion_queue": [],
- "last_ts": "2026-10-14T11:33:11Z",
+ "last_ts": "2026-10-14T11:36:50Z",
  "last_status": "ok"
 }
