@@ -3,3 +3,4 @@ CYCLE_OK cycle=2 tested=9/779 verdicts={"FAIL_COST": 9, "UNDETERMINED_POWER": 1}
 CYCLE_OK cycle=3 tested=16/779 verdicts={"FAIL_COST": 9, "UNDETERMINED_POWER": 1} survivors=0 dur=1s
 CYCLE_OK cycle=4 tested=23/779 verdicts={"FAIL_COST": 9, "UNDETERMINED_POWER": 1} survivors=0 dur=1s
 CYCLE_OK cycle=5 tested=33/779 verdicts={"FAIL_COST": 9, "UNDETERMINED_POWER": 1} survivors=0 dur=3s
+CYCLE_OK cycle=6 tested=43/779 verdicts={"FAIL_COST": 9, "UNDETERMINED_POWER": 1} survivors=0 dur=3s

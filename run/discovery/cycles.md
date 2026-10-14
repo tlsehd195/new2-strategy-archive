@@ -18,3 +18,7 @@
 - tested=33/779(문법 유니버스) verdicts={'FAIL_COST': 9, 'UNDETERMINED_POWER': 1} survivors_total=0
 - 패밀리 커서: {"flow_z": 6, "ret_rev": 6, "ts_mom": 5, "vol_break": 4, "tod": 4, "fund_z": 4, "fng": 4}
 
+## Cycle 6 — 2026-10-14T11:33:11Z
+- tested=43/779(문법 유니버스) verdicts={'FAIL_COST': 9, 'UNDETERMINED_POWER': 1} survivors_total=0
+- 패밀리 커서: {"flow_z": 8, "ret_rev": 8, "ts_mom": 7, "vol_break": 5, "tod": 5, "fund_z": 5, "fng": 5}
+

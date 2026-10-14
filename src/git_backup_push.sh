@@ -26,12 +26,22 @@ if [ ! -d "$REPO/.git" ]; then
   fi
 fi
 
-# 1) SQLite 일관성 스냅샷 (활성 writer와 무관)
+# 1) SQLite 일관성 스냅샷 (활성 writer와 무관; python3 — bun:sqlite는 실패 시 exit 0 은폐 버그)
 mkdir -p "$REPO/ledgers" "$REPO/results" "$REPO/research" "$REPO/prereg" "$REPO/docs" "$REPO/src/mini_services"
-if ! bun -e "const {Database}=require('bun:sqlite'); const d=new Database('mini-services/liq-collector/data/liquidations.db',{readonly:true}); d.exec(\"VACUUM INTO 'NEW2_gitbackup/ledgers/liquidations.db'\"); console.log(d.query('SELECT COUNT(*) n FROM liquidations').get().n)" > /tmp/gitbk_rows.txt 2>&1; then
-  echo "ERROR: liquidations.db VACUUM INTO 실패" >&2; FAIL=1
+if ! ROWS=$(python3 -c "
+import os, sqlite3
+dst = 'NEW2_gitbackup/ledgers/liquidations.db'
+for suf in ('', '-wal', '-shm'):
+    p = dst + suf
+    if os.path.exists(p): os.remove(p)
+src = sqlite3.connect('file:mini-services/liq-collector/data/liquidations.db?mode=ro', uri=True)
+src.execute(\"VACUUM INTO 'NEW2_gitbackup/ledgers/liquidations.db'\")
+n = src.execute('SELECT COUNT(*) FROM liquidations').fetchone()[0]
+assert n > 0, 'source rows == 0'
+print(n)
+" 2>/tmp/gitbk_err.txt); then
+  echo "ERROR: liquidations.db 스냅샷 실패: $(tail -2 /tmp/gitbk_err.txt)" >&2; FAIL=1; ROWS=UNKNOWN
 fi
-ROWS=$(cat /tmp/gitbk_rows.txt 2>/dev/null || echo UNKNOWN)
 cp -f mini-services/fng-watcher/data/fng_ledger.jsonl "$REPO/ledgers/" 2>/dev/null || FAIL=1
 cp -f mini-services/maker-fill-monitor/data/fill_ledger.jsonl "$REPO/ledgers/" 2>/dev/null
 

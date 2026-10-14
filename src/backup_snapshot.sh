@@ -17,9 +17,20 @@ mkdir -p "$STAGE"
 
 FAIL=0
 
-# 0) SQLite 일관성 스냅샷 (활성 writer와 무관하게 읽기 일관 보장)
-if ! bun -e "const {Database}=require('bun:sqlite'); const d=new Database('mini-services/liq-collector/data/liquidations.db',{readonly:true}); d.exec(\"VACUUM INTO 'NEW2_run/backup/stage/liquidations.db'\"); const n=d.query('SELECT COUNT(*) n FROM liquidations').get().n; console.log('DB_SNAPSHOT_ROWS='+n);" > "$STAGE/db_meta.txt" 2>&1; then
-  echo "ERROR: liquidations.db VACUUM INTO 실패" >&2
+# 0) SQLite 일관성 스냅샷 (활성 writer와 무관; python3 — bun:sqlite는 실패 시 exit 0 은폐 버그)
+if ! python3 -c "
+import os, sqlite3
+dst = 'NEW2_run/backup/stage/liquidations.db'
+for suf in ('', '-wal', '-shm'):
+    p = dst + suf
+    if os.path.exists(p): os.remove(p)
+src = sqlite3.connect('file:mini-services/liq-collector/data/liquidations.db?mode=ro', uri=True)
+src.execute(\"VACUUM INTO 'NEW2_run/backup/stage/liquidations.db'\")
+n = src.execute('SELECT COUNT(*) FROM liquidations').fetchone()[0]
+assert n > 0, 'source rows == 0'
+open('NEW2_run/backup/stage/db_meta.txt','w').write('DB_SNAPSHOT_ROWS=%d\n' % n)
+" > "$STAGE/db_meta_stdout.txt" 2>&1; then
+  echo "ERROR: liquidations.db VACUUM INTO 실패: $(tail -2 "$STAGE/db_meta_stdout.txt")" >&2
   FAIL=1
 fi
 
