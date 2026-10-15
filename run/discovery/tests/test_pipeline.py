@@ -28,6 +28,16 @@ from data_quality import Bar  # noqa: E402
 from engine_lib import iter_jsonl, strategy_id  # noqa: E402
 from strategy_spec import SPEC_SCHEMA, canonicalize_spec  # noqa: E402
 from test_residual_fixes import fee_cost  # noqa: E402
+from costs_bridge import CostContext  # noqa: E402
+
+
+def verified_fee_cost(fee=0.0002):
+    """Synthetic VERIFIED stand-in so the happy path can be exercised in tests.
+    ``test_only`` keeps the production runner from ever accepting it."""
+    return CostContext.from_params({"fee_rate": fee, "half_spread": 0.0, "impact_coefficient": 0.0,
+                                    "max_participation": 1.0}, version="TEST_VERIFIED_FEE",
+                                   verified=True, test_only=True)
+
 
 MS15 = 900_000
 DAY_MS = 86_400_000
@@ -149,7 +159,7 @@ class PipelineCase(unittest.TestCase):
         self.td = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.td, True)
 
-    def pipe(self, provider, *, cfg_patch=None, state=None):
+    def pipe(self, provider, *, cfg_patch=None, state=None, cost=None):
         from pipeline import DEFAULT_PROMOTION_CONFIG, EvolutionPipeline
         cfgp = None
         if cfg_patch:
@@ -158,7 +168,7 @@ class PipelineCase(unittest.TestCase):
                 cfg[sec].update(kv)
             cfgp = self.td / "promo.json"
             cfgp.write_text(json.dumps(cfg))
-        return EvolutionPipeline(state or self.td / "state", provider, fee_cost(0.0002),
+        return EvolutionPipeline(state or self.td / "state", provider, cost or verified_fee_cost(),
                                  symbols=["BTCUSDT"], promotion_config=cfgp)
 
     def register_all(self, p, specs):
@@ -192,7 +202,8 @@ class TestStagedPipeline(PipelineCase):
         self.assertEqual(p.lock_registry.uses(edge, "BTCUSDT"), 1)
         review = list(iter_jsonl(p.review_path))[-1]
         self.assertEqual(set(review["evidence"]), {"dev", "validation", "robustness", "locked"})
-        self.assertIn("UNVERIFIED_COST_MODEL", review["labels"])
+        self.assertIn("TEST_ONLY_COST", review["labels"])
+        self.assertNotIn("UNVERIFIED_COST_MODEL", review["labels"])
         # every evidence id points at a stored evaluation record
         ids = {r["record_id"] for r in iter_jsonl(p.eval_path)}
         self.assertTrue(set(review["evidence"].values()) <= ids)
@@ -321,14 +332,30 @@ class TestPromotionAndStatus(PipelineCase):
         self.assertIn("missing locked evidence", r["failures"])
         self.assertNotEqual(p.statuses.status(edge, ctx), "PAPER_TEST_READY")
 
-    def test_unverified_cost_can_be_forbidden(self):
-        p = self.pipe(SyntheticProvider(),
-                      cfg_patch={"promotion": {"allow_unverified_cost_for_paper": False}})
+    def test_unverified_cost_is_never_paper_ready(self):
+        # a legacy config that still says allow_unverified_cost_for_paper=true is ignored
+        p = self.pipe(SyntheticProvider(), cost=fee_cost(0.0002),
+                      cfg_patch={"promotion": {"allow_unverified_cost_for_paper": True}})
         ctx = p.context_id()
         edge, *_ = self.register_all(p, [EDGE] + NOISE[:7])
         p.run_validation()
         p.run_locked_campaign()
         self.assertEqual(p.statuses.status(edge, ctx), "BLOCKED_COST")
+        rv = [r for r in iter_jsonl(p.review_path) if r["strategy_id"] == edge][-1]
+        self.assertFalse(rv["cost_verified"])
+        self.assertIn("UNVERIFIED_COST_MODEL", rv["labels"])
+
+    def test_tampered_evidence_record_blocks_promotion(self):
+        from pipeline import EvidenceTampered, EvolutionPipeline
+        p = self.pipe(SyntheticProvider())
+        edge, *_ = self.register_all(p, [EDGE] + NOISE[:7])
+        lines = p.eval_path.read_text().splitlines()
+        rec = json.loads(lines[0])
+        rec["status"] = "OK" if rec.get("status") != "OK" else "OK "
+        lines[0] = json.dumps(rec, sort_keys=True)
+        p.eval_path.write_text("\n".join(lines) + "\n")
+        with self.assertRaises(EvidenceTampered):
+            self.pipe(SyntheticProvider(), state=p.state_dir).promotion_review(edge)
 
     def test_transition_table(self):
         from pipeline import InvalidStatusTransition, StatusStore
@@ -357,7 +384,12 @@ class TestPaper(PipelineCase):
         p.run_locked_campaign()
         with self.assertRaises(PaperRefused):
             run_paper(p, edge, mode="live")
-        run_paper(p, edge)
+        r = run_paper(p, edge)
+        ctx = p.context_id()
+        self.assertEqual(p.statuses.status(edge, ctx),
+                         {"PAPER_CONSISTENT": "PAPER_PASSED", "PAPER_DEGRADED": "PAPER_FAILED",
+                          "PAPER_INCONCLUSIVE": "PAPER_TESTING"}[r["verdict"]])
+        self.assertEqual(r["orders_sent"], 0)
         with self.assertRaises(PaperRefused):
             run_paper(p, edge)                            # paper window used once
 
@@ -429,7 +461,7 @@ class TestCycle(PipelineCase):
         from autoloop import run_evolution_cycle
         from search import SearchConfig
         cfg = kw.pop("cfg", SearchConfig(children_per_round=6, seed=3))
-        return run_evolution_cycle(state, prov, fee_cost(0.0002), symbols=["BTCUSDT"],
+        return run_evolution_cycle(state, prov, verified_fee_cost(), symbols=["BTCUSDT"],
                                    search_cfg=cfg, seed_legacy=False, **kw)
 
     def test_blocked_data_cycle(self):
@@ -505,3 +537,33 @@ class TestSpecCausality(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestHandoff(PipelineCase):
+    def test_handoff_is_sealed_and_never_live(self):
+        from handoff import HandoffRefused, build_handoff, export_handoff
+        p = self.pipe(SyntheticProvider())
+        edge, *_ = self.register_all(p, [EDGE] + NOISE[:7])
+        with self.assertRaises(HandoffRefused):
+            build_handoff(p, edge)                        # not promoted yet
+        p.run_validation()
+        p.run_locked_campaign()
+        path = export_handoff(p, edge, self.td / "out")
+        doc = json.loads(path.read_text())
+        self.assertFalse(doc["live_registration"])
+        self.assertTrue(doc["requires_human_approval"])
+        self.assertEqual(set(doc["evidence_record_ids"]), {"dev", "validation", "robustness", "locked"})
+        self.assertEqual(export_handoff(p, edge, self.td / "out"), path)   # idempotent, no overwrite
+        self.assertEqual(len(list((self.td / "out").iterdir())), 1)
+
+    def test_handoff_refuses_when_review_evidence_differs(self):
+        from handoff import HandoffRefused, build_handoff
+        p = self.pipe(SyntheticProvider())
+        edge, *_ = self.register_all(p, [EDGE] + NOISE[:7])
+        p.run_validation()
+        p.run_locked_campaign()
+        lines = [json.loads(x) for x in p.review_path.read_text().splitlines()]
+        lines[-1]["evidence"]["locked"] = "EV-forged"
+        p.review_path.write_text("\n".join(json.dumps(x) for x in lines) + "\n")
+        with self.assertRaises(HandoffRefused):
+            build_handoff(p, edge)

@@ -64,11 +64,12 @@ from strategy_spec import (
 PIPELINE_VERSION = "evo-pipeline-v1"
 EVO_CODE_FILES = tuple(sorted(set(CODE_FILES) | {"strategy_spec.py", "evolution.py", "search.py",
                                                  "pipeline.py", "autoloop.py", "paper.py"}))
-DEFAULT_PROMOTION_CONFIG = Path(__file__).resolve().parent / "config" / "promotion_v1.json"
+DEFAULT_PROMOTION_CONFIG = Path(__file__).resolve().parent / "config" / "promotion_v2.json"
 DAY_MS = 86_400_000
 
 STATUSES = ("RESEARCH_ONLY", "VALIDATION_SURVIVOR", "PAPER_TEST_READY", "REJECTED",
-            "INCONCLUSIVE", "BLOCKED_DATA", "BLOCKED_COST", "BLOCKED_STATISTICS")
+            "INCONCLUSIVE", "BLOCKED_DATA", "BLOCKED_COST", "BLOCKED_STATISTICS",
+            "PAPER_TESTING", "PAPER_PASSED", "PAPER_FAILED")
 _BLOCKED = ("BLOCKED_DATA", "BLOCKED_COST", "BLOCKED_STATISTICS")
 TRANSITIONS = {
     None: {"RESEARCH_ONLY", "REJECTED", "INCONCLUSIVE", "BLOCKED_DATA", "BLOCKED_COST"},
@@ -81,12 +82,21 @@ TRANSITIONS = {
                            *_BLOCKED},
     "REJECTED": set(),
     "INCONCLUSIVE": set(),
-    "PAPER_TEST_READY": set(),       # paper outcomes are annotations, not transitions
+    # isolated paper replay only (no live trading): PAPER_PASSED / PAPER_FAILED never
+    # authorise real orders; a human approval outside this repository would be required
+    "PAPER_TEST_READY": {"PAPER_TESTING"},
+    "PAPER_TESTING": {"PAPER_PASSED", "PAPER_FAILED"},
+    "PAPER_PASSED": set(),
+    "PAPER_FAILED": set(),
 }
 
 
 class InvalidStatusTransition(RuntimeError):
     pass
+
+
+class EvidenceTampered(RuntimeError):
+    """An append-only evaluation record fails its own content hash."""
 
 
 def load_promotion_config(path: Optional[Path] = None) -> tuple[dict, str]:
@@ -403,6 +413,11 @@ class EvolutionPipeline:
         if self._evals is None:
             self._evals = {}
             for r in iter_jsonl(self.eval_path):
+                if r.get("record_id") != record_hash(r):
+                    # an evidence record whose content no longer matches its id is
+                    # never promotable evidence: stop instead of reading around it
+                    raise EvidenceTampered(f"{self.eval_path}: record {r.get('record_id')} "
+                                           f"does not match its content hash")
                 self._evals[(r["stage"], r["strategy_id"], r["context_id"])] = r
         return self._evals
 
@@ -1139,16 +1154,17 @@ class EvolutionPipeline:
             if self.lock_registry.uses(sid, s) != 1:
                 failures.append(f"{s}: locked window not used exactly once")
         labels = []
-        cost_ok = True
-        if not self.cost.verified:
-            if pc["allow_unverified_cost_for_paper"]:
-                labels.append(pc["unverified_cost_label"])
-            else:
-                cost_ok = False
+        # PAPER_TEST_READY needs a VERIFIED cost model (calibrated against recorded
+        # fills/books). The old config switch ``allow_unverified_cost_for_paper`` is
+        # no longer honoured: an unverified model leaves the candidate research-only.
+        cost_ok = bool(self.cost.verified)
+        if not cost_ok:
+            labels.append(pc.get("unverified_cost_label", UNVERIFIED_COST_MODEL))
         if self.cost.test_only:
             labels.append("TEST_ONLY_COST")
         review = {"strategy_id": sid, "context_id": ctx, "config_hash": self.cfg_hash,
                   "evidence": evidence, "failures": failures, "labels": labels,
+                  "cost_verified": cost_ok,
                   "decision": ("PAPER_TEST_READY" if not failures and cost_ok
                                else "BLOCKED_COST" if not failures else "NOT_ELIGIBLE"),
                   "scope": "paper trading / isolated simulation only — never live orders",
@@ -1159,7 +1175,7 @@ class EvolutionPipeline:
                               labels=labels)
         elif review["decision"] == "BLOCKED_COST":
             self.statuses.set(sid, ctx, "BLOCKED_COST", stage="promotion",
-                              reasons=["cost model unverified and config forbids unverified paper"],
+                              reasons=["UNVERIFIED_COST_MODEL: research candidate only, not promotable to PAPER_TEST_READY"],
                               evidence=evidence, resume_to="VALIDATION_SURVIVOR")
         else:
             self.statuses.set(sid, ctx, "BLOCKED_STATISTICS", stage="promotion", reasons=failures,

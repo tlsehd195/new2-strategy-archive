@@ -41,7 +41,8 @@ def run_paper(pipeline, sid: str, *, mode: str = PAPER_MODE) -> dict:
                            "(no live / exchange execution is implemented)")
     ctx = pipeline.context_id()
     st = pipeline.statuses.status(sid, ctx)
-    if st != "PAPER_TEST_READY":
+    # PAPER_TESTING without a recorded run = a replay that was interrupted: resumable
+    if st not in ("PAPER_TEST_READY", "PAPER_TESTING"):
         raise PaperRefused(f"{sid} is {st}, not PAPER_TEST_READY")
     if any(r["strategy_id"] == sid and r["context_id"] == ctx for r in paper_runs(pipeline)):
         raise PaperRefused(f"{sid}: paper window already used in this context")
@@ -65,6 +66,9 @@ def run_paper(pipeline, sid: str, *, mode: str = PAPER_MODE) -> dict:
         # a blocked replay does not consume the paper window
         append_jsonl(pipeline.dir / "paper_blocked.jsonl", run)
         return run
+    if st == "PAPER_TEST_READY":
+        pipeline.statuses.set(sid, ctx, "PAPER_TESTING", stage="paper",
+                              reasons=["isolated replay started"])
     n = sum(v["n"] for v in per.values())
     tot = sum(v["sum_bp"] for v in per.values())
     mean = tot / n if n else None
@@ -84,6 +88,13 @@ def run_paper(pipeline, sid: str, *, mode: str = PAPER_MODE) -> dict:
                            "verdict": verdict, "n": n,
                            "mean_bp": mean if mean is None or math.isfinite(mean) else None,
                            "is_simulation": True})
+    if verdict == "PAPER_CONSISTENT":
+        pipeline.statuses.set(sid, ctx, "PAPER_PASSED", stage="paper", reasons=[
+            "replay mean > 0 with enough events; this is NOT approval for live trading"])
+    elif verdict == "PAPER_DEGRADED":
+        pipeline.statuses.set(sid, ctx, "PAPER_FAILED", stage="paper",
+                              reasons=["replay mean <= 0 after costs"])
+    # PAPER_INCONCLUSIVE (too few events): stays PAPER_TESTING, the window is consumed
     append_jsonl(pipeline.dir / "research_feedback.jsonl",
                  {"strategy_id": sid, "context_id": ctx, "source": "paper_replay",
                   "verdict": verdict, "mean_bp": mean, "n": n,

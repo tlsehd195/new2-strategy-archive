@@ -185,7 +185,7 @@ def run_evolution_cycle(state_dir: Path, provider, cost, *, symbols: Sequence[st
     s.campaign = pipe.run_locked_campaign()
     # 6) isolated paper replay of newly ready strategies
     for sid, stt in sorted(pipe.statuses.all(ctx).items()):
-        if stt == "PAPER_TEST_READY":
+        if stt in ("PAPER_TEST_READY", "PAPER_TESTING"):
             try:
                 r = run_paper(pipe, sid)
                 s.paper.append({"strategy_id": sid, "status": r["status"], "verdict": r.get("verdict")})
