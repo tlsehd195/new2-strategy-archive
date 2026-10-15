@@ -1322,3 +1322,12 @@ Work Log:
 Stage Summary:
 - 감사 프로젝트 Phase 1·1-g·2·3·4·5·6 완료 + Phase 7(테스트·백업) 완료 — 이전 소실된 v2-audit2를 초과하는 v2-audit3로 재건 완료
 - 핵심 수치: 원장 160행(고유 140), 수정 22건+신규 발견 13건(F-26~36) 전부 처리 또는 기록, 테스트 16/16+5/5+스모크 통과, 오프사이트 백업 원격 쓰기 검증 완료
+
+## 2026-10-15 후속 감사 프로젝트 완료 (v2)
+
+- Phase 0 전수 판독 → R-1~R-7 정의(`run/audit/AUDIT_REMAINING_ISSUES.md`)
+- 코드 수정 8건(R-2/R-3/R-4/R-6/R-8/A-33/A-34/A-35) — 전부 자동화 테스트로 증명
+- 테스트 스위트 91개 신규(`run/discovery/tests/test_engine.py`): 91/91 OK 2회 연속
+- 실데이터 회귀: 사이클 2회 CYCLE_OK, v2 원장 30→33행(append-only), DATA_MISSING 12 전략 정직 기록
+- 최종 보고서: `run/audit/AUDIT_FINAL_감사보고서.md` (10항목 평가 평균 ~80/100)
+- 잠금 TEST: 미소비 유지(선택편향 게이트 통과 후보 부재) — 정상
