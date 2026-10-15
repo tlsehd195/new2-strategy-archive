@@ -111,17 +111,32 @@ def funding_paid_bp(funding: Sequence[tuple[int, float]], start_ts: int, end_ts:
 class FundingIndex:
     """Precomputed time index over a funding series — O(log F) coverage
     checks and O(gap) summation per event instead of O(F) scans (needed
-    because validation/locked windows produce thousands of events)."""
+    because validation/locked windows produce thousands of events).
 
-    __slots__ = ("funding", "times")
+    Gap-aware (auto-evolution §2-3): a holding window that overlaps a gap in
+    the settlement series (settlements missing between two recorded ones) is
+    NOT covered — the sum over the recorded settlements would understate the
+    cost, so ``paid_bp`` returns None and the event is dropped."""
 
-    def __init__(self, funding: Sequence[tuple[int, float]]):
+    __slots__ = ("funding", "times", "gaps")
+
+    def __init__(self, funding: Sequence[tuple[int, float]],
+                 gaps: Optional[Sequence[tuple[int, int]]] = None):
+        from data_quality import funding_gaps
         self.funding = list(funding)
         self.times = [t for t, _ in self.funding]
+        self.gaps = list(gaps) if gaps is not None else funding_gaps(self.funding)
 
     def paid_bp(self, start_ts: int, end_ts: int, side: int) -> Optional[float]:
+        """Funding in bp for a position opened at the open of ``start_ts`` and
+        closed at the open of ``end_ts``: settlements t with start < t <= end
+        (fills happen just after the bar open, so a settlement stamped exactly
+        at the entry open is not held, one stamped at the exit open is)."""
         if not self.times or self.times[0] > start_ts or self.times[-1] < end_ts:
             return None
+        for a, b in self.gaps:
+            if a < end_ts and b > start_ts:
+                return None
         lo = bisect_right(self.times, start_ts)
         hi = bisect_right(self.times, end_ts)   # events in (start, end]
         total = 0.0

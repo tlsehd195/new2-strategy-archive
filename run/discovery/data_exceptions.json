@@ -1,0 +1,5 @@
+{
+ "schema": "data_exceptions_v1",
+ "note": "Documented exchange-side data exceptions (halts/maintenance) that excuse kline gaps. Only add an entry with a verifiable public source; an entry must cover every missing bar of a gap to excuse it. Empty = every gap blocks.",
+ "exceptions": []
+}

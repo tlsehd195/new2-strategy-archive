@@ -201,10 +201,15 @@ def merged_bars(data_dir: Path, symbol: str, start_iso: str, end_iso: str) -> Da
                          quality=rep)
 
 
-def load_funding_window(data_dir: Path, symbol: str, start_iso: str, end_iso: str) -> list[tuple[int, float]]:
+def load_funding_window_checked(data_dir: Path, symbol: str, start_iso: str,
+                                end_iso: str) -> tuple[list[tuple[int, float]], dict]:
+    """Monthly funding files merged; parse errors / torn tails of ANY file are
+    reported (and make :func:`funding_quality` fail) instead of vanishing."""
+    from data_quality import load_funding_csv_checked
     fdir = data_dir / "funding"
+    rep = {"parse_errors": [], "torn_tail": False, "intervals": {}}
     if not fdir.exists():
-        return []
+        return [], rep
     import datetime as dt
     d0 = dt.date.fromisoformat(start_iso).replace(day=1)
     d1 = dt.date.fromisoformat(end_iso)
@@ -213,10 +218,24 @@ def load_funding_window(data_dir: Path, symbol: str, start_iso: str, end_iso: st
     while cur <= d1:
         p = fdir / f"{symbol}-fundingRate-{cur:%Y-%m}.csv"
         if p.exists():
-            out.extend(load_funding_csv(p))
+            pairs, r = load_funding_csv_checked(p)
+            out.extend(pairs)
+            rep["parse_errors"] += [f"{p.name}:{ln}" for ln in r["parse_errors"]]
+            rep["torn_tail"] = rep["torn_tail"] or r["torn_tail"]
+            rep["intervals"].update(r["intervals"])
         cur = (cur.replace(day=28) + dt.timedelta(days=6)).replace(day=1)
     out.sort(key=lambda x: x[0])
-    return out
+    return out, rep
+
+
+def load_funding_window(data_dir: Path, symbol: str, start_iso: str, end_iso: str) -> list[tuple[int, float]]:
+    return load_funding_window_checked(data_dir, symbol, start_iso, end_iso)[0]
+
+
+def checked_funding_quality(pairs, rep: Mapping) -> dict:
+    return funding_quality(pairs, parse_errors=rep.get("parse_errors", ()),
+                           torn_tail=rep.get("torn_tail", False),
+                           intervals=rep.get("intervals"))
 
 
 # ---------------------------------------------------------------------------
@@ -226,41 +245,54 @@ def load_funding_window(data_dir: Path, symbol: str, start_iso: str, end_iso: st
 VALIDATION_MONTHS = 6
 
 
-def split_windows(symbol: str, first_ts: int, last_ts: int, horizon: int) -> dict:
+#: minimum embargo between dev and validation (and before the locked window):
+#: one UTC day covers the FNG publication lag and daily-feature overlap even
+#: for short holding periods (auto-evolution §2-3)
+EMBARGO_MIN_BARS = 96
+
+
+def split_windows(symbol: str, first_ts: int, last_ts: int, horizon: int,
+                  ts_list: Optional[Sequence[int]] = None) -> dict:
     """dev / independent-validation / locked-TEST index windows.
 
     - symbols without a locked window get NO_LOCKED_TEST (final claims are
       impossible; directive §6)
-    - an embargo of `horizon` bars separates dev from validation so no
-      holding period straddles the boundary
+    - an embargo of max(horizon, EMBARGO_MIN_BARS) bars separates dev from
+      validation so no holding period or publication lag straddles the
+      boundary; validation also ends one embargo before the readable end
+    - with ``ts_list`` the indices come from the actual bar timestamps
+      (robust to documented exchange gaps and to a first bar that is not at
+      00:00 UTC); without it a gap-free 15m grid is assumed (legacy callers)
     """
     import datetime as dt
+    from bisect import bisect_left
     lock = locked_window_for(symbol)
     ms = 15 * 60 * 1000
-    bars_per_day = 96
-    embargo = horizon
+    embargo = max(int(horizon), EMBARGO_MIN_BARS)
     last_dt = dt.datetime.fromtimestamp(last_ts / 1000, tz=dt.timezone.utc).date()
-    first_dt = dt.datetime.fromtimestamp(first_ts / 1000, tz=dt.timezone.utc).date()
     if lock:
         lock_start = dt.date.fromisoformat(lock[0])
         val_start = lock_start - dt.timedelta(days=30 * VALIDATION_MONTHS)
     else:
         val_start = last_dt - dt.timedelta(days=30 * VALIDATION_MONTHS)
-    dev_end = val_start - dt.timedelta(days=1)
-    idx_val_start = int((dt.datetime(val_start.year, val_start.month, val_start.day)
-                         - dt.datetime(first_dt.year, first_dt.month, first_dt.day)
-                         ).total_seconds() * 1000) // ms
-    # A-27 fix: data may start AFTER the validation window begins (short
-    # history) — clamp instead of letting a negative index wrap around
-    idx_val_start = max(0, idx_val_start)
+    val_start_ms = int(dt.datetime(val_start.year, val_start.month, val_start.day,
+                                   tzinfo=dt.timezone.utc).timestamp() * 1000)
+    if ts_list is not None:
+        n_bars = len(ts_list)
+        idx_val_start = bisect_left(list(ts_list), val_start_ms)
+    else:
+        n_bars = (last_ts - first_ts) // ms + 1
+        idx_val_start = (val_start_ms - first_ts) // ms
+    # A-27: data may start AFTER the validation window begins — clamp
+    idx_val_start = max(0, min(int(idx_val_start), n_bars))
     idx_dev_end = max(1, idx_val_start - embargo)
-    n_bars = (last_ts - first_ts) // ms + 1
     return {
         "dev": (0, max(2, idx_dev_end)),
         "validation": (idx_val_start, n_bars - 1 - embargo),
         "locked": lock,
         "no_locked_test": lock is None,
         "embargo_bars": embargo,
+        "validation_start_ms": val_start_ms,
     }
 
 
@@ -287,11 +319,14 @@ def _rolling_z(vals: Sequence[Optional[float]], i: int, window: int) -> Optional
 
 
 def build_signal_fn(defn: Mapping, aux: Mapping) -> Callable:
+    if is_spec(defn):
+        from strategy_spec import build_spec_signal
+        return build_spec_signal(defn, aux)
     fam = defn["family"]
-    # canonical definitions drop default-valued params — merge the family
-    # defaults back so a candidate that equals its defaults still resolves
-    from generator import FAMILY_DEFAULTS
-    p = {**FAMILY_DEFAULTS.get(fam, {}), **(defn.get("params") or {})}
+    # canonical definitions drop default-valued params — resolve_params is the
+    # ONE resolver shared with build_aux (auto-evolution §2-2)
+    from generator import resolve_params
+    p = resolve_params(defn)
 
     if fam == "flow_z":
         share = aux["taker_share"]
@@ -402,6 +437,51 @@ def build_signal_fn(defn: Mapping, aux: Mapping) -> Callable:
     raise ValueError(f"unknown family {fam}")
 
 
+#: publication lag of the daily Fear&Greed value: the value labelled UTC day
+#: D is used only from day D + FNG_PUBLICATION_LAG_DAYS on (alternative.me
+#: stamps the value with the day's 00:00 UTC; it is updated during that day,
+#: so the same-day value is never treated as known)
+FNG_PUBLICATION_LAG_DAYS = 1
+
+
+def funding_known_series(bars: Sequence[Bar], funding: Sequence[tuple[int, float]]) -> list[int]:
+    """For each bar i: the number of settlements with calc_time <= close of
+    bar i (the settlements a decision at that close may know)."""
+    horizon_ms = 15 * 60 * 1000
+    out: list[int] = []
+    j = 0
+    for b in bars:
+        close_ts = b.ts + horizon_ms
+        while j < len(funding) and funding[j][0] <= close_ts:
+            j += 1
+        out.append(j)
+    return out
+
+
+def funding_settlement_z(funding: Sequence[tuple[int, float]], known: Sequence[int],
+                         window: int) -> list[Optional[float]]:
+    """z-score of the LATEST known settlement against the ``window``
+    settlements before it (auto-evolution §2-3).  The previous per-bar version
+    took a rolling z over 15-minute bars of a step function: the window held
+    one or two distinct rates, its sd was mostly 0 and the signal almost
+    never fired; ``funding_window`` now counts SETTLEMENTS."""
+    rates = [r for _, r in funding]
+    cache: dict[int, Optional[float]] = {}
+    out: list[Optional[float]] = []
+    for k in known:
+        if k not in cache:
+            if k - 1 < window:
+                cache[k] = None
+            else:
+                prev = rates[k - 1 - window:k - 1]
+                mu = sum(prev) / window
+                var = sum((x - mu) ** 2 for x in prev) / max(1, window - 1)
+                sd = var ** 0.5
+                cache[k] = (rates[k - 1] - mu) / sd if sd > 0 else None
+        out.append(cache[k])
+    return out
+
+
 def build_aux(bars: Sequence[Bar], defn: Mapping,
               funding: Optional[Sequence[tuple[int, float]]],
               fng: Optional[Mapping] = None) -> dict:
@@ -412,45 +492,64 @@ def build_aux(bars: Sequence[Bar], defn: Mapping,
     has already been published (§9-4 발표 시점 구분).
 
     FNG (A-18): per-bar ``fng_hist[i]`` holds the last 10 CONFIRMED daily
-    values as of bar i — values of days strictly BEFORE the bar's own UTC
-    day.  Today's value can never leak into a decision at bar i.
+    values as of bar i — values of days at least FNG_PUBLICATION_LAG_DAYS
+    before the bar's own UTC day.  Today's value can never leak.
+
+    Parameters come from :func:`generator.resolve_params` — the SAME resolver
+    as the signal builder, so a default-omitted canonical definition computes
+    exactly what the explicit one computes (the old code read the stripped
+    ``defn["params"]`` and fell back to unrelated numbers: ret_rev's default
+    lookback 4 ran as 32, fund_z's default window 30 ran as 90).
     """
+    if is_spec(defn):
+        from strategy_spec import build_spec_aux
+        return build_spec_aux(bars, defn, funding, fng)
+    from generator import resolve_params
     n = len(bars)
     closes = [b.close for b in bars]
     taker_share = [None] * n
     for i, b in enumerate(bars):
         if b.volume > 0:
             taker_share[i] = b.taker_buy_volume / b.volume
-    p = defn["params"]
-    lb = p.get("lookback") or p.get("z_window") or p.get("vol_window") or 32
+    p = resolve_params(defn)
+    lb = int(p.get("lookback") or 32)
     lb_returns: list[Optional[float]] = [None] * n
     for i in range(lb, n):
         if closes[i - lb] > 0:
             lb_returns[i] = closes[i] / closes[i - lb] - 1.0
-    aux: dict = {"closes": closes, "taker_share": taker_share, "lb_returns": lb_returns}
+    aux: dict = {"closes": closes, "taker_share": taker_share, "lb_returns": lb_returns,
+                 "resolved_params": dict(p)}
     if funding is not None:
-        horizon_ms = 15 * 60 * 1000
-        rates: list[Optional[float]] = [None] * n
-        j = 0
-        for i, b in enumerate(bars):
-            close_ts = b.ts + horizon_ms
-            while j < len(funding) and funding[j][0] <= close_ts:
-                j += 1
-            rates[i] = funding[j - 1][1] if j > 0 else None
-        zwin = p.get("funding_window") or 90
-        fz: list[Optional[float]] = [None] * n
-        for i in range(n):
-            fz[i] = _rolling_z(rates, i, zwin)
-        aux["funding_z"] = fz
+        known = funding_known_series(bars, funding)
+        zwin = int(p.get("funding_window") or 30)
+        aux["funding_z"] = funding_settlement_z(funding, known, zwin)
     if fng is not None:
         day_ms = 86_400_000
         k_max = 10  # generator caps confirm_days at 3; headroom stays bounded
+        lag = FNG_PUBLICATION_LAG_DAYS
         fng_hist: list = [None] * n
         for i, b in enumerate(bars):
             d = b.ts // day_ms
-            fng_hist[i] = [fng.get(d - k) for k in range(1, k_max + 1)]
+            fng_hist[i] = [fng.get(d - k) for k in range(lag, lag + k_max)]
         aux["fng_hist"] = fng_hist
     return aux
+
+
+def is_spec(defn: Mapping) -> bool:
+    return defn.get("schema") == "strategy_spec_v1"
+
+
+def defn_horizon(defn: Mapping) -> int:
+    if is_spec(defn):
+        return int(defn["exit"]["horizon"])
+    return int(defn["holding"])
+
+
+def defn_requirements(defn: Mapping) -> list[str]:
+    if is_spec(defn):
+        from strategy_spec import spec_requirements
+        return spec_requirements(defn)
+    return FAMILY_DATA_REQUIREMENTS.get(defn["family"], ["klines"])
 
 
 # ---------------------------------------------------------------------------
@@ -468,7 +567,12 @@ DATA_POLICY = {
     "timezone": "UTC (epoch ms; day boundaries in UTC)",
     "kline_interval_ms": 900_000,
     "window_cut": "hard truncation to [start 00:00, end 23:59:59.999] UTC before the quality gate",
-    "missing_candles": "fail-closed, never interpolated (max_gap_multiplier=2)",
+    "missing_candles": "fail-closed, never interpolated (exact 15m grid; only documented exchange exceptions excuse a gap)",
+    "quality_policy": "dq-v2 (OK/WARN/BLOCK; BLOCK never reaches a backtest)",
+    "embargo": "max(horizon, 96 bars) between dev and validation and before the readable end",
+    "fng_publication_lag_days": 1,
+    "funding_z": "z of the latest known settlement vs the previous funding_window settlements",
+    "funding_gaps": "holding windows overlapping a settlement gap are dropped (never summed short)",
     "max_abs_logret_15m": 0.20,
     "funding_known_at": "calc_time <= bar close (no early use)",
     "funding_quality": "duplicates/inversions fail-closed; event dropped when holding window not covered",
@@ -476,6 +580,13 @@ DATA_POLICY = {
     "read_start": READ_START,
     "read_end": "day before the symbol's locked TEST window, else " + READ_END_NO_LOCK,
 }
+
+
+def data_policy() -> dict:
+    """DATA_POLICY plus the identity of the documented exchange-exception
+    file (changing an exception changes which data may be used)."""
+    from data_quality import exceptions_identity
+    return {**DATA_POLICY, "data_exceptions": exceptions_identity()}
 
 
 def _series_sha(pairs) -> str:
@@ -552,7 +663,7 @@ class Runner:
     def register_all(self) -> dict:
         cands, dedup = self.candidates_fn()
         manifest = build_manifest(cands, dedup, settings={
-            "validation": self._validation_cfg(), "data_policy": DATA_POLICY})
+            "validation": self._validation_cfg(), "data_policy": data_policy()})
         info = self.prereg.ensure(manifest)
         self._manifest = manifest
         self._cands = list(cands)
@@ -621,8 +732,8 @@ class Runner:
                 assert_no_locked_overlap(sym, first_d, read_end, "dev/validation selection")
             # A-17: holding-period funding applies to EVERY family; missing or
             # corrupt funding is fail-closed, never replaced with a guess
-            f = load_funding_window(self.paths.data_dir, sym, first_d, read_end)
-            fq = funding_quality(f)
+            f, frep = load_funding_window_checked(self.paths.data_dir, sym, first_d, read_end)
+            fq = checked_funding_quality(f, frep)
             entry["fq"] = fq
             if fq["ok"]:
                 entry["funding"] = f
@@ -659,7 +770,7 @@ class Runner:
                         if fng else {"missing": "FNG dataset absent"})
         comps = {
             "data": data,
-            "data_policy": DATA_POLICY,
+            "data_policy": data_policy(),
             "cost": self.cost.identity(),
             "code": {"code_hash": code_identity()["code_hash"]},
             "validation": {**self._validation_cfg(),
@@ -681,10 +792,13 @@ class Runner:
         cur = self.store.entry(sid)
         if CandidateState(cur.state) is not CandidateState.PENDING:
             return {"skipped": True, "state": cur.state}
-        self.store.set(sid, CandidateState.RUNNING)
-        started = time.time()
         ctx = self._ctx
         ev_id = evaluation_id(sid, ctx)
+        # the evaluation id is announced BEFORE the work starts so a crash
+        # between "ledger written" and "state written" is recoverable without
+        # a duplicate evaluation (store.reconcile)
+        self.store.set(sid, CandidateState.RUNNING, pending_evaluation_id=ev_id)
+        started = time.time()
         base = {"phase": "dev", "generation_id": self.generation_id, "context_id": ctx,
                 "run_id": self.run_id, "code_version": CODE_VERSION,
                 "validation_cfg_version": VALIDATION_CFG_VERSION,
@@ -706,17 +820,18 @@ class Runner:
         status = rec["status"]
         self.ledger.append(rec)
         if status == "AWAITING_FDR":
-            self.store.set(sid, CandidateState.AWAITING_FDR, data_version=ctx)
+            self.store.set(sid, CandidateState.AWAITING_FDR, data_version=ctx, pending_evaluation_id=None)
         elif status in ("FAIL_COST", "FAIL_STAT", "UNDETERMINED_POWER", "DATA_MISSING"):
             self.store.set(sid, CandidateState(status),
                            error_code=rec.get("error_code"),
                            error_message=rec.get("error_message"),
-                           data_version=ctx)
+                           data_version=ctx, pending_evaluation_id=None)
             self._maybe_enqueue_reverify(sid, status)
         else:
             e_code = rec.get("error_code", "LOGIC_ERROR")
             self.store.set(sid, CandidateState.ERROR,
-                           error_code=e_code, error_message=rec.get("error_message"))
+                           error_code=e_code, error_message=rec.get("error_message"),
+                           pending_evaluation_id=None)
             self._maybe_enqueue_reverify(sid, "ERROR", error_code=e_code)
         return {"skipped": False, "status": status, "record": rec}
 
@@ -782,8 +897,8 @@ class Runner:
     def _evaluate(self, sid: str, defn: Mapping) -> dict:
         fam = defn["family"]
         required = list(defn["symbols"])
-        horizon = int(defn["holding"])
-        needs = FAMILY_DATA_REQUIREMENTS.get(fam, ["klines"])
+        horizon = defn_horizon(defn)
+        needs = defn_requirements(defn)
         handles: dict[str, DatasetHandle] = {}
         fundings: dict[str, list] = {}
         missing: list[str] = []
@@ -820,7 +935,7 @@ class Runner:
         for sym, h in handles.items():
             aux = build_aux(h.bars, defn, fundings.get(sym), fng=fng)
             sig_fn = build_signal_fn(defn, aux)
-            win = split_windows(sym, h.first_ts, h.last_ts, horizon)
+            win = split_windows(sym, h.first_ts, h.last_ts, horizon, [b.ts for b in h.bars])
             d0, d1 = win["dev"]
             sub = h.bars[:d1 + 1]
             es = run_event_study(sub, sym, sig_fn, horizon, self.cost,
@@ -1053,7 +1168,7 @@ class Runner:
     def _locked_test(self, sid: str, defn: Mapping, ctx: str) -> Optional[tuple[str, dict]]:
         required = list(defn["symbols"])
         fam = defn["family"]
-        horizon = int(defn["holding"])
+        horizon = defn_horizon(defn)
         info: dict = {"windows": {s: locked_window_for(s) for s in required},
                       "consumed": False}
         no_lock = symbols_without_locked_test(required)
@@ -1084,8 +1199,8 @@ class Runner:
                 blocked.append(f"{sym}: locked klines missing/rejected {lh.missing}")
                 continue
             # A-31: the locked window needs its OWN funding load
-            lf = load_funding_window(self.paths.data_dir, sym, lo, hi)
-            lfq = funding_quality(lf)
+            lf, lfrep = load_funding_window_checked(self.paths.data_dir, sym, lo, hi)
+            lfq = checked_funding_quality(lf, lfrep)
             if not lfq["ok"]:
                 blocked.append(f"{sym}: locked-window funding {lfq['issues']}")
                 continue
@@ -1096,7 +1211,7 @@ class Runner:
             info["blocked"] = blocked
             info["note"] = "locked data unavailable — BLOCKED_DATA_MISSING, window NOT consumed"
             return "DATA_MISSING", info
-        fng = self._fng() if "fng" in FAMILY_DATA_REQUIREMENTS.get(fam, []) else None
+        fng = self._fng() if "fng" in defn_requirements(defn) else None
         results: dict = {}
         try:
             for sym in required:
@@ -1354,7 +1469,7 @@ class Runner:
 
 
 def win_for(h: DatasetHandle, horizon: int) -> tuple[int, int]:
-    w = split_windows(h.symbol, h.first_ts, h.last_ts, horizon)
+    w = split_windows(h.symbol, h.first_ts, h.last_ts, horizon, [b.ts for b in h.bars])
     return w["dev"]
 
 

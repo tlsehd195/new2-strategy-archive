@@ -53,6 +53,7 @@ from pathlib import Path
 from typing import Iterable, Mapping, Optional, Sequence
 
 from engine_lib import (
+    append_jsonl,
     atomic_write_json,
     bh_fdr_family,
     canonical_json,
@@ -191,15 +192,13 @@ class PreregistrationStore:
         prev = None
         for rec in iter_jsonl(self.log):
             prev = rec.get("generation_id")
-        with open(self.log, "a", encoding="utf-8") as f:
-            f.write(json.dumps({"generation_id": gid,
+        append_jsonl(self.log, {"generation_id": gid,
                                 "manifest_hash": manifest["manifest_hash"],
                                 "n_candidates": manifest["n_candidates"],
                                 "family_counts": manifest["family_counts"],
                                 "generator_version": manifest["generator_version"],
                                 "previous_generation": prev,
-                                "created_at": doc["preregistered_at"]},
-                               sort_keys=True) + "\n")
+                                "created_at": doc["preregistered_at"]})
         return {"generation_id": gid, "created": True, "doc": doc}
 
     def load(self, generation_id: str) -> Optional[dict]:
@@ -445,27 +444,18 @@ class FdrDecisionStore:
             same, why = self._same_evidence(existing, decision)
             if same:
                 return existing
-            self.conflict_path.parent.mkdir(parents=True, exist_ok=True)
-            with open(self.conflict_path, "a", encoding="utf-8") as f:
-                f.write(json.dumps({"detected_at": iso_now(),
-                                    "generation_id": decision["generation_id"],
-                                    "context_id": decision["context_id"],
-                                    "stored_input_hash": existing.get("input_hash"),
-                                    "new_input_hash": decision.get("input_hash"),
-                                    "stored_survivors": existing.get("survivors"),
-                                    "new_survivors": decision.get("survivors"),
-                                    "reason": why},
-                                   sort_keys=True) + "\n")
-                f.flush()
-                os.fsync(f.fileno())
+            append_jsonl(self.conflict_path, {"detected_at": iso_now(),
+                                              "generation_id": decision["generation_id"],
+                                              "context_id": decision["context_id"],
+                                              "stored_input_hash": existing.get("input_hash"),
+                                              "new_input_hash": decision.get("input_hash"),
+                                              "stored_survivors": existing.get("survivors"),
+                                              "new_survivors": decision.get("survivors"),
+                                              "reason": why})
             raise FdrDecisionConflict(
                 f"FDR decision for ({decision['generation_id']}, {decision['context_id']}) "
                 "already exists and the new evidence differs — old decision kept, conflict logged")
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.path, "a", encoding="utf-8") as f:
-            f.write(json.dumps(dict(decision), sort_keys=True) + "\n")
-            f.flush()
-            os.fsync(f.fileno())
+        append_jsonl(self.path, dict(decision))
         return dict(decision)
 
 

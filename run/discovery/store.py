@@ -63,7 +63,7 @@ class CandidateStore:
         raw = self._data["candidates"].get(strategy_id)
         if raw is None:
             return CandidateEntry(updated_at=iso_now())
-        retry = RetryRecord(**raw.get("retry", {}))
+        retry = RetryRecord.from_json(raw.get("retry", {}))
         return CandidateEntry(state=raw["state"], updated_at=raw.get("updated_at", ""),
                               retry=retry)
 
@@ -257,9 +257,16 @@ def reconcile(store: CandidateStore, queue: ReverifyQueue, ledger: Ledger,
               "queue_realigned": []}
 
     running_in_ledger: set[str] = set()
-    for rec in ledger.records():
+    by_eval: dict[str, dict] = {}
+    _, scan = __import__("engine_lib").scan_jsonl(ledger.path)
+    report["corrupt_ledger_lines"] = len(scan["corrupt"])
+    report["torn_ledger_tail"] = scan["torn_tail"]
+    for rec in ledger.records():          # raises JsonlCorruption on interior damage
         if rec.get("status") == "RUNNING":
             running_in_ledger.add(rec["strategy_id"])
+        if rec.get("evaluation_id"):
+            by_eval[rec["evaluation_id"]] = rec
+    report["recovered_from_ledger"] = []
 
     re_verifiable = {
         CandidateState.DATA_MISSING,
@@ -271,6 +278,16 @@ def reconcile(store: CandidateStore, queue: ReverifyQueue, ledger: Ledger,
 
     for sid, st in list(store.all_states().items()):
         e = store.entry(sid)
+        done = by_eval.get(e.retry.pending_evaluation_id or "") \
+            if e.state == CandidateState.RUNNING.value else None
+        if done is not None and done.get("strategy_id") == sid \
+                and done.get("status") in LEDGER_TO_STATE:
+            # the evaluation finished and its record is in the ledger; only the
+            # state write was lost — apply the recorded outcome, do NOT re-run
+            store.set(sid, LEDGER_TO_STATE[done["status"]], data_version=done.get("context_id"),
+                      error_code=done.get("error_code"), pending_evaluation_id=None)
+            report["recovered_from_ledger"].append(sid)
+            continue
         if e.state == CandidateState.RUNNING.value and sid not in running_in_ledger:
             # interrupted before any ledger record — transient retry
             e.retry.error_code = e.retry.error_code or "PROCESS_INTERRUPTED"
