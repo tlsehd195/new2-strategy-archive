@@ -1,0 +1,20 @@
+{
+ "code_version": "discovery-v2.0.0",
+ "dev_selection_data": "pre-locked-window dev split per symbol (split_windows, embargo = horizon bars)",
+ "duplicates_collapsed_at_generation": 0,
+ "family_grid_counts": {
+  "flow_z": 360,
+  "fng": 74,
+  "fund_z": 45,
+  "ret_rev": 120,
+  "tod": 60,
+  "ts_mom": 60,
+  "vol_break": 60
+ },
+ "generator_version": "rule_based_v2",
+ "note": "The search space was fixed before evaluation. Changing the grid invalidates this preregistration and requires a NEW generation file.",
+ "preregistered_at": "2026-10-15T05:20:33Z",
+ "selection_rule": "Holm within symbol cell family; BH-FDR across candidates under the same experiment context BEFORE the locked TEST is consumed; locked TEST single-use per strategy+symbol",
+ "total_candidates": 779,
+ "validation_cfg_version": "valcfg-v2.0.0"
+}

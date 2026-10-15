@@ -242,15 +242,30 @@ def reconcile(store: CandidateStore, queue: ReverifyQueue, ledger: Ledger,
     - ledger is authoritative for the final state of finished evaluations;
       state.json is only corrected *forward* via legal transitions
     - queue items whose candidate no longer exists are dropped
+    - queue items whose candidate sits in a re-verifiable non-final state
+      are REALIGNED: the candidate moves to REVERIFY_PENDING so the queue
+      pop can actually promote it (A-35: stale entries otherwise pop into
+      nothing and are re-counted forever)
+    - queue items whose candidate is final (PASS) or already in flight
+      (RUNNING) are dropped — the queue must never resurrect them
     """
     now = now_ts or __import__("time").time()
     report = {"requeued_interrupted": [], "dropped_queue_items": [],
-              "state_repaired": [], "corrupt_ledger_lines": 0}
+              "state_repaired": [], "corrupt_ledger_lines": 0,
+              "queue_realigned": []}
 
     running_in_ledger: set[str] = set()
     for rec in ledger.records():
         if rec.get("status") == "RUNNING":
             running_in_ledger.add(rec["strategy_id"])
+
+    re_verifiable = {
+        CandidateState.DATA_MISSING,
+        CandidateState.UNDETERMINED_POWER,
+        CandidateState.ERROR,
+        CandidateState.FAIL_COST,
+        CandidateState.FAIL_STAT,
+    }
 
     for sid, st in list(store.all_states().items()):
         e = store.entry(sid)
@@ -271,7 +286,21 @@ def reconcile(store: CandidateStore, queue: ReverifyQueue, ledger: Ledger,
         if sid not in store.all_states():
             report["dropped_queue_items"].append(sid)
             continue
-        keep.append(item)
+        cur = CandidateState(store.entry(sid).state)
+        if cur in re_verifiable:
+            # A-35: align the store forward into REVERIFY_PENDING so the
+            # queue pop can promote this candidate to PENDING and re-run it
+            if cur is not CandidateState.REVERIFY_PENDING:
+                store.set(sid, CandidateState.REVERIFY_PENDING,
+                          reverify_reason=item.get("reason") or "queue_realign")
+                report["queue_realigned"].append(sid)
+            keep.append(item)
+        elif cur is CandidateState.REVERIFY_PENDING or cur is CandidateState.PENDING:
+            keep.append(item)
+        else:
+            # PASS (final) or RUNNING (in flight): queue must not resurrect
+            report["dropped_queue_items"].append(sid)
+            continue
     if len(keep) != len(queue.items()):
         queue._items = keep
         queue.save()

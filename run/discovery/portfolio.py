@@ -43,10 +43,12 @@ class OpenPosition:
     notional0: float
     liq_price: float
     funding_paid: float = 0.0
+    fi: int = 0   # funding pointer into the (time-sorted) funding series
 
 
 @dataclass
 class PortfolioResult:
+    initial_capital: float = 0.0
     equity_curve: list[float] = field(default_factory=list)
     final_equity: float = 0.0
     total_return: float = 0.0
@@ -92,6 +94,7 @@ def simulate_portfolio(bars_by_symbol: Mapping[str, Sequence[Bar]],
             raise ValueError("symbols do not share a common timestamp grid")
     n = len(next(iter(grids.values())))
     res = PortfolioResult()
+    res.initial_capital = cfg.initial_capital
     equity = cfg.initial_capital
     positions: dict[str, OpenPosition] = {}
 
@@ -123,13 +126,18 @@ def simulate_portfolio(bars_by_symbol: Mapping[str, Sequence[Bar]],
 
     for i in range(n):
         # 1) funding on open positions for events in (prev_ts, ts]
+        #    (pointer walk — the series is time-sorted, so amortized O(1))
         for sym, pos in list(positions.items()):
             fund = funding_by_symbol.get(sym, ())
             ts_i = grids[sym][i]
             ts_prev = grids[sym][i - 1] if i > 0 else -1
-            for t, r in fund:
-                if ts_prev < t <= ts_i:
-                    pos.funding_paid += pos.side * r * pos.notional0
+            while pos.fi < len(fund) and fund[pos.fi][0] <= ts_prev:
+                pos.fi += 1
+            j = pos.fi
+            while j < len(fund) and fund[j][0] <= ts_i:
+                pos.funding_paid += pos.side * fund[j][1] * pos.notional0
+                j += 1
+            pos.fi = j
         # 2) mark-to-market equity (for sizing/dd)
         mtm = equity
         for sym, pos in positions.items():

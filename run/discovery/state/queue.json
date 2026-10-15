@@ -1,36 +1,6 @@
 {
  "items": [
   {
-   "next_retry_after_ts": 1792037040.3853834,
-   "queued_at": "2026-10-15T03:56:00Z",
-   "reason": "retry_backoff",
-   "strategy_id": "S-1a4afcc6b0979b39"
-  },
-  {
-   "next_retry_after_ts": 1792037041.6860976,
-   "queued_at": "2026-10-15T03:56:01Z",
-   "reason": "retry_backoff",
-   "strategy_id": "S-10d4b13f9392ed5f"
-  },
-  {
-   "next_retry_after_ts": 1792037189.3321316,
-   "queued_at": "2026-10-15T04:02:29Z",
-   "reason": "data_now_available",
-   "strategy_id": "S-a3102b330eaa34b3"
-  },
-  {
-   "next_retry_after_ts": 1792037190.7128487,
-   "queued_at": "2026-10-15T04:02:30Z",
-   "reason": "data_now_available",
-   "strategy_id": "S-ddc7e3519e683c49"
-  },
-  {
-   "next_retry_after_ts": 1792037432.0680518,
-   "queued_at": "2026-10-15T04:02:32Z",
-   "reason": "retry_backoff",
-   "strategy_id": "S-e96ce66f0b937830"
-  },
-  {
    "next_retry_after_ts": 1792037433.4382107,
    "queued_at": "2026-10-15T04:02:33Z",
    "reason": "retry_backoff",
@@ -47,6 +17,24 @@
    "queued_at": "2026-10-15T04:02:36Z",
    "reason": "data_now_available",
    "strategy_id": "S-4a035b558da9ded7"
+  },
+  {
+   "next_retry_after_ts": 1792042281.1656463,
+   "queued_at": "2026-10-15T05:23:21Z",
+   "reason": "retry_backoff",
+   "strategy_id": "S-a3102b330eaa34b3"
+  },
+  {
+   "next_retry_after_ts": 1792042282.584479,
+   "queued_at": "2026-10-15T05:23:22Z",
+   "reason": "retry_backoff",
+   "strategy_id": "S-ddc7e3519e683c49"
+  },
+  {
+   "next_retry_after_ts": 1792042763.9418862,
+   "queued_at": "2026-10-15T05:23:23Z",
+   "reason": "retry_backoff",
+   "strategy_id": "S-e96ce66f0b937830"
   }
  ],
  "schema": "discovery_state_v2"

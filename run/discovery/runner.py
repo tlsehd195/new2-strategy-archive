@@ -8,6 +8,8 @@ never quietly reads old data from another location.
 from __future__ import annotations
 
 import hashlib
+import json
+import math
 import os
 import signal
 import sys
@@ -35,9 +37,11 @@ from engine_lib import (  # noqa: E402
     TRANSIENT_ERROR_CODES,
     assert_no_locked_overlap,
     atomic_write_json,
+    bh_fdr,
     evaluation_id,
     experiment_context_id,
     iso_now,
+    load_json,
     locked_window_for,
     symbols_without_locked_test,
 )
@@ -455,6 +459,7 @@ class CycleSummary:
     runtime_seconds: float = 0.0
     fatal: Optional[str] = None
     search_space_state: str = ""
+    notes: list = field(default_factory=list)
 
     def to_json(self) -> dict:
         return dict(self.__dict__)
@@ -472,6 +477,7 @@ class Runner:
         self.promo = PromotionQueue(paths.state_dir / "promotion_queue.jsonl")
         self._interrupted = False
         self._fng_cache: Optional[dict] = None
+        self._preregistered = False
         for _sig in (signal.SIGINT, signal.SIGTERM):
             try:
                 signal.signal(_sig, self._on_signal)
@@ -488,7 +494,92 @@ class Runner:
         for sid, _ in cands:
             if sid not in known:
                 self.store.set(sid, CandidateState.PENDING)
+        self._write_preregistration(cands, dedup)
         return {"registered": len(cands), "duplicates_collapsed": len(dedup)}
+
+    def _write_preregistration(self, cands, dedup) -> dict:
+        """Directive §5-2 preregistration ledger (R-3).
+
+        Written ONCE, at first registration, BEFORE any evaluation.  The
+        search space is fixed at preregistration time; a later change of
+        the generator grid must create a NEW generation file, never an
+        edit of this one.  Re-running registration never rewrites it.
+        """
+        p = self.paths.state_dir / "preregistration.json"
+        existing = load_json(p, default=None)
+        if existing:
+            self._preregistered = True
+            return existing
+        by_family: dict = {}
+        for _, d in cands:
+            by_family[d["family"]] = by_family.get(d["family"], 0) + 1
+        doc = {
+            "preregistered_at": iso_now(),
+            "generator_version": "rule_based_v2",
+            "code_version": CODE_VERSION,
+            "validation_cfg_version": VALIDATION_CFG_VERSION,
+            "total_candidates": len(cands),
+            "duplicates_collapsed_at_generation": len(dedup),
+            "family_grid_counts": by_family,
+            "selection_rule": (
+                "Holm within symbol cell family; BH-FDR across candidates "
+                "under the same experiment context BEFORE the locked TEST is "
+                "consumed; locked TEST single-use per strategy+symbol"
+            ),
+            "dev_selection_data": (
+                "pre-locked-window dev split per symbol (split_windows, "
+                "embargo = horizon bars)"
+            ),
+            "note": (
+                "The search space was fixed before evaluation. Changing the "
+                "grid invalidates this preregistration and requires a NEW "
+                "generation file."
+            ),
+        }
+        atomic_write_json(p, doc)
+        self._preregistered = True
+        return doc
+
+    def _preregistered_flag(self) -> bool:
+        return bool(load_json(self.paths.state_dir / "preregistration.json",
+                              default=None))
+
+    @staticmethod
+    def _primary_dev_p(rec: Mapping) -> Optional[float]:
+        """Pre-registered primary cell's dev p-value of a ledger record."""
+        v = rec.get("primary_dev_p")
+        try:
+            f = float(v)
+        except (TypeError, ValueError):
+            return None
+        return f if math.isfinite(f) else None
+
+    def _bh_fdr_survival(self, sid: str, ctx: str, p_dev: Optional[float]) -> dict:
+        """Directive §5-3 (R-2): cross-candidate BH-FDR over the dev
+        p-values of every candidate evaluated under the SAME experiment
+        context (dataset+cost+code+cfg).  A candidate that does not survive
+        never consumes the locked TEST window — the most scarce resource of
+        the whole pipeline.  The ledger stays the authoritative record.
+        """
+        ps: list[tuple[str, float]] = []
+        for r in self.ledger.records():
+            if r.get("context_id") != ctx:
+                continue
+            p = self._primary_dev_p(r)
+            if p is not None:
+                ps.append((r["strategy_id"], p))
+        if p_dev is not None and math.isfinite(p_dev) and \
+                sid not in {s for s, _ in ps}:
+            ps.append((sid, float(p_dev)))
+        if not ps:
+            return {"trials": 0, "survived": False, "q": 0.05,
+                    "note": "no finite primary dev p-values"}
+        flags = bh_fdr([p for _, p in ps], q=0.05)
+        for (s, _), ok in zip(ps, flags):
+            if s == sid:
+                return {"trials": len(ps), "survived": bool(ok), "q": 0.05}
+        return {"trials": len(ps), "survived": False, "q": 0.05,
+                "note": "candidate absent from family"}
 
     def run_one(self, sid: str, defn: Mapping) -> dict:
         cur = self.store.entry(sid)
@@ -647,9 +738,24 @@ class Runner:
             vsymres = [SymbolResult(symbol=c.symbol, cells=[c],
                                     status=_agg_symbol_status([c])) for c in vcells]
             val_verdict, val_detail = verdict_from_cells(vsymres, required)
+        # cross-candidate BH-FDR (R-2): computed for every dev-PASS record
+        # BEFORE the locked TEST window is even considered
+        primary_sym = required[0]
+        primary_p = None
+        for r in results_dev.values():
+            if r["symbol"] == primary_sym and math.isfinite(r.get("p", float("nan"))):
+                primary_p = r["p"]
+                break
+        fdr = self._bh_fdr_survival(sid, ctx, primary_p)
         final = dev_verdict
         lock_info: dict = {"windows": {s: locked_window_for(s) for s in required}}
-        if dev_verdict == "PASS":
+        promotion_check: Optional[dict] = None
+        if dev_verdict == "PASS" and not fdr["survived"]:
+            final = "FAIL_STAT"
+            lock_info["note"] = ("did NOT survive BH-FDR across candidates "
+                                 f"({fdr['trials']} trials) — locked TEST not consumed")
+            lock_info.update({"bh_fdr": fdr})
+        elif dev_verdict == "PASS":
             if val_verdict != "PASS":
                 final = val_verdict if val_verdict in ("FAIL_STAT", "FAIL_COST",
                                                        "UNDETERMINED_POWER",
@@ -669,19 +775,35 @@ class Runner:
                     if not lh.bars:
                         lock_pass[sym] = None
                         continue
-                    auxl = build_aux(lh.bars, defn, fundings.get(sym), fng=self._fng_cache)
+                    # A-31 (R-8): the locked window needs its OWN funding load —
+                    # the dev/val funding series is capped at read_end (the day
+                    # before the lock) and would fail coverage for every lock
+                    # event, silently turning every locked test into a failure.
+                    lf = load_funding_window(self.paths.data_dir, sym,
+                                             locked_window_for(sym)[0],
+                                             locked_window_for(sym)[1])
+                    lfq = funding_quality(lf)
+                    if not lfq["ok"]:
+                        # fail-closed: no funding, no locked evaluation, and the
+                        # registry use is recorded honestly (it was consumed)
+                        lock_pass[sym] = None
+                        lock_info["note"] = (f"locked-window funding unavailable "
+                                             f"for {sym} — not evaluated")
+                        continue
+                    auxl = build_aux(lh.bars, defn, lf, fng=self._fng_cache)
                     sigl = build_signal_fn(defn, auxl)
                     esl = run_event_study(lh.bars, sym, sigl, horizon, self.cost,
-                                          self.order_value, fundings.get(sym))
+                                          self.order_value, lf)
                     cl = cell_stats(esl.events, sym, f"{fam}|lock")
                     lock_pass[sym] = cl["status"] == "PASS"
                 lock_info.update({"pass": lock_pass, "independent": independent})
                 vals = [v for v in lock_pass.values() if v is not None]
                 if any(v is None for v in lock_pass.values()):
-                    final = "DATA_MISSING" if not vals else (
-                        "PASS" if all(v for v in vals) else "FAIL_STAT")
-                    if any(v is None for v in lock_pass.values()):
-                        lock_info["note"] = "NO_LOCKED_TEST for some symbols — not final"
+                    # A-32 (R-8, §6): a symbol without an evaluated locked test
+                    # can NEVER yield a final PASS — "not final" states only.
+                    final = "DATA_MISSING" if not vals else "UNDETERMINED_POWER"
+                    lock_info["note"] = ("NO_LOCKED_TEST for some symbols — "
+                                         "cannot claim final")
                 elif not vals:
                     final = "DATA_MISSING"
                     lock_info["note"] = "NO_LOCKED_TEST — cannot claim final"
@@ -692,6 +814,23 @@ class Runner:
                 else:
                     final = "FAIL_STAT"
                     lock_info["note"] = "locked window re-used — not independent"
+                # R-6: promotion gate wiring — PASS records are gated and
+                # eligible ones land in the append-only promotion queue
+                if final == "PASS":
+                    chk = promotion_gate(
+                        state="PASS",
+                        preregistered=self._preregistered or self._preregistered_flag(),
+                        independent_validation_passed=(val_verdict == "PASS"),
+                        lock_test_passed=True,
+                        lock_test_used=max(
+                            (self.lock_registry.uses(sid, s) for s in required),
+                            default=0),
+                        required_symbols=required,
+                    )
+                    chk.strategy_id = sid
+                    promotion_check = chk.to_json()
+                    if chk.eligible:
+                        self.promo.register(chk, sid, ctx)
         # 7) portfolio check for dev-passing candidates (survivor track)
         portfolio: Optional[dict] = None
         if dev_verdict == "PASS":
@@ -717,6 +856,9 @@ class Runner:
         rec = {
             "status": final,
             "context_id": ctx,
+            "primary_symbol": required[0],
+            "primary_dev_p": primary_p,
+            "multiple_testing": fdr,
             "dataset": {s: handles[s].identity() for s in handles},
             "cost_model": {"version": self.cost.version,
                            "status": UNVERIFIED_COST_MODEL if not self.cost.verified else "VERIFIED",
@@ -730,6 +872,7 @@ class Runner:
             "cells_dev": [r for r in results_dev.values()],
             "cells_val": [r for r in results_val.values()],
             "locked_test": lock_info,
+            "promotion_check": promotion_check,
             "portfolio": portfolio,
             "staleness": st,
         }
@@ -879,7 +1022,7 @@ def win_for(h: DatasetHandle, horizon: int) -> tuple[int, int]:
 class PrefixShim:
     """Lightweight prefix view reusing evaluator.PrefixView semantics."""
 
-    __slots__ = ("_bars", "_end")
+    __slots__ = ("_v",)
 
     def __init__(self, bars, end):
         from evaluator import PrefixView
@@ -919,9 +1062,17 @@ def main(argv: Sequence[str]) -> int:
     except PathConfigError as e:
         print(f"CONFIG_ERROR: {e}", file=sys.stderr)
         return 1
+    if os.environ.get("REFRESH") == "1":
+        # §9-1 (R-4): the flag is explicitly NOT supported — say so, loudly,
+        # instead of silently pretending data was refreshed.
+        print("WARNING: REFRESH=1 is NOT supported by the v2 discovery engine. "
+              "Data updates are performed by run/download_missing_data.py; "
+              "every evaluation records data staleness honestly.", file=sys.stderr)
     r = Runner(paths)
     s = r.cycle(max_candidates=batch)
-    print(s.to_json())
+    if os.environ.get("REFRESH") == "1":
+        s.notes.append("REFRESH=1 requested but NOT supported — no data was refreshed")
+    print(json.dumps(s.to_json()))
     return {"SUCCESS": 0, "SUCCESS_WITH_WARNINGS": 0, "PARTIAL_FAILURE": 2,
             "FAILED": 1, "INTERRUPTED": 1}[s.status]
 

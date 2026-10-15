@@ -1,0 +1,14 @@
+{
+ "duplicates_collapsed": 0,
+ "errors": 0,
+ "evaluated": 4,
+ "fatal": null,
+ "finished_at": "2026-10-15T04:04:50Z",
+ "reverify_queue": 8,
+ "runtime_seconds": 0.15686655044555664,
+ "search_space_state": "REVERIFY_PENDING",
+ "started_at": "2026-10-15T04:04:50Z",
+ "status": "SUCCESS_WITH_WARNINGS",
+ "total_candidates": 779,
+ "verdict_counts": {}
+}

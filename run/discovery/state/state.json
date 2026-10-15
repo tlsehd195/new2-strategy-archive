@@ -1983,10 +1983,10 @@
     "last_attempt_at": "2026-10-15T04:02:32Z",
     "max_attempts": 3,
     "next_retry_after": null,
-    "reverify_reason": "data_now_available"
+    "reverify_reason": "retry_backoff"
    },
-   "state": "DATA_MISSING",
-   "updated_at": "2026-10-15T04:02:33Z"
+   "state": "REVERIFY_PENDING",
+   "updated_at": "2026-10-15T05:23:19Z"
   },
   "S-30f83931ef0e4cf1": {
    "retry": {
@@ -6848,17 +6848,17 @@
   },
   "S-a3102b330eaa34b3": {
    "retry": {
-    "attempt_count": 2,
+    "attempt_count": 3,
     "data_version": null,
     "error_code": null,
     "error_message": null,
-    "last_attempt_at": "2026-10-15T04:02:27Z",
+    "last_attempt_at": "2026-10-15T05:23:19Z",
     "max_attempts": 3,
     "next_retry_after": null,
     "reverify_reason": "data_now_available"
    },
-   "state": "REVERIFY_PENDING",
-   "updated_at": "2026-10-15T04:02:29Z"
+   "state": "DATA_MISSING",
+   "updated_at": "2026-10-15T05:23:21Z"
   },
   "S-a317811e483d385b": {
    "retry": {
@@ -9438,17 +9438,17 @@
   },
   "S-ddc7e3519e683c49": {
    "retry": {
-    "attempt_count": 2,
+    "attempt_count": 3,
     "data_version": null,
     "error_code": null,
     "error_message": null,
-    "last_attempt_at": "2026-10-15T04:02:29Z",
+    "last_attempt_at": "2026-10-15T05:23:21Z",
     "max_attempts": 3,
     "next_retry_after": null,
     "reverify_reason": "data_now_available"
    },
-   "state": "REVERIFY_PENDING",
-   "updated_at": "2026-10-15T04:02:30Z"
+   "state": "DATA_MISSING",
+   "updated_at": "2026-10-15T05:23:22Z"
   },
   "S-ddca3395f8cad21b": {
    "retry": {
@@ -9942,17 +9942,17 @@
   },
   "S-e96ce66f0b937830": {
    "retry": {
-    "attempt_count": 3,
+    "attempt_count": 4,
     "data_version": null,
     "error_code": null,
     "error_message": null,
-    "last_attempt_at": "2026-10-15T04:02:30Z",
+    "last_attempt_at": "2026-10-15T05:23:22Z",
     "max_attempts": 3,
     "next_retry_after": null,
-    "reverify_reason": "data_now_available"
+    "reverify_reason": "retry_backoff"
    },
    "state": "DATA_MISSING",
-   "updated_at": "2026-10-15T04:02:32Z"
+   "updated_at": "2026-10-15T05:23:23Z"
   },
   "S-e97095d6c26d9122": {
    "retry": {

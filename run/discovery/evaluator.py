@@ -14,6 +14,7 @@ Construction (identical in spirit to the public repo's futures engine):
 from __future__ import annotations
 
 import math
+from bisect import bisect_right
 from dataclasses import dataclass, field
 from typing import Callable, Optional, Sequence
 
@@ -105,6 +106,28 @@ def funding_paid_bp(funding: Sequence[tuple[int, float]], start_ts: int, end_ts:
     return total * 1e4
 
 
+class FundingIndex:
+    """Precomputed time index over a funding series — O(log F) coverage
+    checks and O(gap) summation per event instead of O(F) scans (needed
+    because validation/locked windows produce thousands of events)."""
+
+    __slots__ = ("funding", "times")
+
+    def __init__(self, funding: Sequence[tuple[int, float]]):
+        self.funding = list(funding)
+        self.times = [t for t, _ in self.funding]
+
+    def paid_bp(self, start_ts: int, end_ts: int, side: int) -> Optional[float]:
+        if not self.times or self.times[0] > start_ts or self.times[-1] < end_ts:
+            return None
+        lo = bisect_right(self.times, start_ts)
+        hi = bisect_right(self.times, end_ts)   # events in (start, end]
+        total = 0.0
+        for k in range(lo, hi):
+            total += side * self.funding[k][1]
+        return total * 1e4
+
+
 def run_event_study(bars: Sequence[Bar], symbol: str, signal_fn: SignalFn,
                     horizon: int, cost: CostContext, order_value: float,
                     funding: Optional[Sequence[tuple[int, float]]] = None,
@@ -115,6 +138,7 @@ def run_event_study(bars: Sequence[Bar], symbol: str, signal_fn: SignalFn,
     are skipped and COUNTED — they are not independent observations.
     """
     res = EventStudyResult(symbol=symbol)
+    fidx = FundingIndex(funding) if funding is not None else None
     n = len(bars)
     last_exit_index = -1
     for t in range(warmup, n - 1):
@@ -143,7 +167,7 @@ def run_event_study(bars: Sequence[Bar], symbol: str, signal_fn: SignalFn,
             res.participation_refusals += 1
             continue
         if funding is not None:
-            fp = funding_paid_bp(funding, entry_bar.ts, exit_bar.ts, side)
+            fp = fidx.paid_bp(entry_bar.ts, exit_bar.ts, side)
             if fp is None:
                 res.dropped_missing_funding += 1
                 continue
