@@ -148,7 +148,7 @@ class FundingIndex:
 def run_event_study(bars: Sequence[Bar], symbol: str, signal_fn: SignalFn,
                     horizon: int, cost: CostContext, order_value: float,
                     funding: Optional[Sequence[tuple[int, float]]] = None,
-                    *, warmup: int = 1) -> EventStudyResult:
+                    *, warmup: int = 1, exit_rule: Optional[Callable] = None) -> EventStudyResult:
     """Evaluate one strategy definition on one symbol.
 
     Events whose holding window would overlap a previously accepted event
@@ -171,6 +171,13 @@ def run_event_study(bars: Sequence[Bar], symbol: str, signal_fn: SignalFn,
             continue
         if exit_i >= n:
             break
+        exit_px = None
+        if exit_rule is not None:
+            # intrabar stop / take-profit (spec strategies): (index, price, reason)
+            ex = exit_rule(bars, entry_i, side, horizon)
+            if ex is None:
+                break
+            exit_i, exit_px, _reason = ex
         entry_bar, exit_bar = bars[entry_i], bars[exit_i]
         try:
             cost_bp = cost.round_trip_bp(order_value,
@@ -194,7 +201,8 @@ def run_event_study(bars: Sequence[Bar], symbol: str, signal_fn: SignalFn,
                 continue
         else:
             fp = 0.0
-        gross = side * (exit_bar.open / entry_bar.open - 1.0) * 1e4
+        px_out = exit_bar.open if exit_px is None else exit_px
+        gross = side * (px_out / entry_bar.open - 1.0) * 1e4
         net = gross - cost_bp - fp
         res.events.append(EventRecord(
             symbol=symbol, entry_index=entry_i, exit_index=exit_i, side=side,
