@@ -1,0 +1,15 @@
+== D1 BH-FDR order dependence (current _bh_fdr_survival) ==
+['A', 'B', 'C', 'D', 'E'] -> A: (True, 1)
+['B', 'C', 'D', 'E', 'A'] -> A: (False, 5)
+full-family BH (m=5): {'A': False, 'B': False, 'C': False, 'D': False, 'E': False}  m=779 equivalent threshold for rank1 = 6.418485237483954e-05
+== D2 portfolio equity_curve ignores unrealized PnL ==
+equity_curve[3:16]: [10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 9985]
+max_drawdown: 0.0015 (true MTM drawdown ~0.5 while held)
+== D3 exit cost ValueError -> favorable fallback ==
+trades: 1 total_cost_bp: 7.0 notes: []  (exit bar participation = 5000/1000 = 500% -> priced at fee+half_spread only)
+== D4 lock registry use recorded before data load ==
+uses after data-missing path: 1 {'S1': {'BTCUSDT': [{'context_id': 'C', 'ts': '2026-10-15T07:41:08Z'}]}}
+== D5 experiment_context_id has no funding/fng/cost-param inputs ==
+(*, dataset_id: 'str', data_sha256: 'str', cost_model: 'str', code_version: 'str' = 'discovery-v2.0.0', validation_cfg_version: 'str' = 'valcfg-v2.0.0') -> 'str'
+== D6 preregistration reuse by existence only ==
+returned existing doc: {'total_candidates': 3, 'note': 'different space'}  flag: True

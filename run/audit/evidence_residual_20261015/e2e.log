@@ -1,0 +1,9 @@
+cycle status SUCCESS | generation G-cfdd00bfabbf69b0 | context C2-47b4a292fac4d5a4eaa2
+fdr_family {"m": 1, "evaluated": 1, "missing": 0, "complete": true, "decision": {"survivors": ["S-4c5d36cf789c87b2"], "m": 1, "n_with_statistic": 1}}
+finalized [{'strategy_id': 'S-4c5d36cf789c87b2', 'status': 'PASS'}]
+dev AWAITING_FDR p= 0.0 | val PASS | portfolio passed True mdd 0.002976350662778842
+final PASS p= None | val PASS  None mdd None
+  locked {'BTCUSDT': {'lock_data_sha256': 'efd95e11e4a95d022ea6919be090e0d078362a42ebc4e0de80a3b5c4f368f21f', 'mean_bp': 65.82544259561413, 'n': 621, 'p': 0.0, 'pass': True, 'status': 'PASS'}} 
+  claim_scope UNVERIFIED_COST_MODEL 
+  promotion False ['cost model UNVERIFIED — not promotable']
+promotion queue entries: []
