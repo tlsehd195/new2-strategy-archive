@@ -15,40 +15,85 @@ importantly, what they do NOT guarantee.  It reflects the code as of the
 | search generation | the complete preregistered candidate space; id = hash(sorted ids + normalized definitions + generator version + FDR spec) | `generation.build_manifest` |
 | FDR family | (generation, experiment context); m = number of candidates in the generation | `generation.family_status` |
 
-## 2. Cross-candidate multiple testing (P0-1)
+## 2. Cross-candidate multiple testing (P0-1, final-residual §3/§5)
 
-Rule (pre-specified, fixed sample): Benjamini–Hochberg at q = 0.05 over
-m = |generation|, run ONCE when every candidate has a dev outcome under the
-context.  The tested value is the first dev-phase record of each candidate
-under that context; re-evaluations are kept as history and cannot replace it.
-The decision is stored append-only (`state/fdr_decisions.jsonl`).
+### 2.1 What is tested
 
-- Candidates without a valid statistic (`UNDETERMINED_POWER`,
-  `DATA_MISSING`) are counted in m and never rejected.  No p-value is
-  imputed; this is BH on the full family with those hypotheses retained,
-  and it can only be stricter than BH on the testable subset.
-- `ERROR` is not an outcome: a family with an erroring candidate stays
-  incomplete until the error is fixed (fixing code changes the context).
-- Before completion nobody survives, so no locked TEST is reserved and the
-  evaluation order cannot change any decision (tested:
-  `TestGenerationFdr.test_order_invariance_and_no_early_decision`).
-- A terminal PASS from an earlier context is retained (counted, not re-tested).
+- **p-value**: the one-sided Newey–West HAC t-test p-value of the candidate's
+  *primary cell* (primary symbol, pre-registered horizon) on dev data, from
+  non-overlapping event net returns (costs and funding included).  The normal
+  approximation is used; n < 30 events gives no p-value (`UNDETERMINED_POWER`).
+- **Hypothesis**: "the primary cell has positive mean net return on dev data".
+- **m** = the number of candidates in the preregistered generation manifest
+  (all of them, evaluated or not).  Nobody is removed from m after the fact.
+- **Tested value** = the first dev-phase ledger record of the candidate *under
+  the current experiment context*.  Re-evaluations stay as history; they cannot
+  replace it.
 
-What is guaranteed and what is not:
+### 2.2 Four different questions (the old single `complete` flag mixed them)
 
-- BH controls the FDR at q when the test statistics are independent or
-  PRDS (Benjamini & Hochberg 1995; Benjamini & Yekutieli 2001).  Candidates
-  here share data and overlap; **PRDS is an assumption, not verified**.
-  Benjamini–Yekutieli (valid under arbitrary dependence) is not used.
-- The FDR statement covers the primary-cell hypotheses.  The additional
-  "all symbols PASS" and independent-validation requirements only remove
-  rejections, so they cannot raise the FDR of the primary hypotheses.
-- Re-testing the same generation under a NEW context (new data / code /
-  cost) is a new family; FDR is NOT controlled across families.  The
-  protection against that repetition is the single-use locked TEST (one
-  exposure per strategy+symbol, ever).
-- No sequential / alpha-spending procedure is implemented; therefore no
-  interim decision is made.
+`generation.family_status()` returns them separately:
+
+| field | question |
+|---|---|
+| `manifest_complete` | is the preregistered list whole, free of duplicate ids and consistent with its stored hash? |
+| `current_context_complete` | does EVERY member have a dev outcome produced **under this context**? |
+| `fdr_decision_ready` | both of the above, and no dev record for an unregistered id |
+| `locked_test_eligible` | (in the decision) BH survivors whose independent validation also passed |
+| `complete` | compatibility alias of `fdr_decision_ready`; internal logic uses the specific fields |
+
+Population breakdown reported next to them: `unevaluated_current`,
+`without_statistic` (evaluated, but no valid p — recorded as such, never 1.0,
+never 0), `prior_context_pass`, `prior_context_only`, `errored_current_only`,
+`duplicate_dev_records`, `unregistered_records`, `reevaluation_required`.
+
+### 2.3 Evidence from other contexts
+
+- A PASS (or any dev record) produced under another experiment context is **not**
+  an evaluation of the current context.  It is reported with its original
+  context id / evaluation ids (`prior_context_pass`, `prior_context_only`), flagged
+  `reevaluation_required`, and it keeps the family undecided.
+- Prior-context PASS candidates stay `PASS` (their locked TEST is consumed and
+  immutable).  The runner re-runs only their **dev phase** under the current
+  context (`prior_pass_reeval` ledger record); the locked TEST is never touched
+  and the state is not changed.  Their new p-value takes part in BH like any other.
+- Same-context results are reused without recomputation: once a current-context
+  dev record exists it is the tested value.
+- Decision rule: BH at q = 0.05 over m, run ONCE when `fdr_decision_ready`;
+  candidates without a valid statistic are counted in m and never rejected.
+  No sequential / alpha-spending procedure exists, so no interim decision is made.
+
+### 2.4 Decision immutability
+
+A decision is keyed by (generation id, context id) and carries `manifest_hash`,
+method + version, q, m and `input_hash` (a hash of the exact first-record ids and
+p-values).  Recording identical evidence again is idempotent.  Different evidence
+for an existing decision raises `FdrDecisionConflict`, leaves the stored decision
+untouched, appends the conflict to `state/fdr_decisions.conflicts.jsonl`, and the
+runner reports the family as not decision-ready (no candidate is resolved).
+
+### 2.5 What is and is not guaranteed
+
+- BH controls the FDR at q under independence or PRDS of the test statistics
+  (Benjamini & Hochberg 1995; Benjamini & Yekutieli 2001).  The candidates share
+  the same price series and overlap heavily.  **PRDS has NOT been verified**, so
+  the FDR level is *not guaranteed* for this family.  Benjamini–Yekutieli (valid
+  under arbitrary dependence, lower power) is not used; swapping the method
+  would need its own pre-registration and was deliberately not done here.
+- The FDR statement covers the primary-cell hypotheses only.  The additional
+  "all symbols PASS", independent-validation and locked-TEST requirements only
+  remove rejections.
+- Re-testing a generation under a NEW context is a new family; FDR is NOT
+  controlled across families.  The single-use locked TEST (one exposure per
+  strategy+symbol, ever) is the only protection against that repetition.
+- Selection bias that remains: the candidate space itself was designed by people
+  who have seen earlier data and results (the generator, horizons, thresholds);
+  m counts the registered space, not the ideas discarded before registration.
+- Leakage risks that remain: dev and validation windows come from the same
+  history as the data the rules were conceived on; rolling z-score and
+  alignment of auxiliary data (funding, FNG) depend on the publication-timing
+  assumptions in `DATA_POLICY`; none of this has been independently audited
+  with real data.
 
 ## 3. Candidate states
 
@@ -66,6 +111,14 @@ UNDETERMINED_POWER, DATA_MISSING, ERROR, REVERIFY_PENDING}`;
 | UNDETERMINED_POWER | too few events (n < 30) or degenerate variance | fail or pass |
 | DATA_MISSING | required data absent / quality-rejected / no locked window | statistical failure |
 | ERROR | computation error (NaN/inf, p outside [0,1], cost model numeric error, crash) | p = 0 or p = 1 |
+
+Non-overlap check (one cause → one label): `FAIL_STAT` = data and cost model were
+fine, the effect is not shown; `DATA_MISSING` = data absent/rejected, nothing was
+tested; `UNDETERMINED_POWER` = tested but too few events or degenerate variance,
+no judgement; `FAIL_COST` = the cost model refused a trade or the result fails after
+costs; an *unverified* cost model is not a label but a claim scope
+(`UNVERIFIED_COST_MODEL`: such a PASS is never promotable); `ERROR` = the program failed to complete the evaluation.
+`AWAITING_FDR` is not a verdict.
 
 Verdict precedence when symbols disagree:
 `ERROR > DATA_MISSING > UNDETERMINED_POWER > FAIL_COST > FAIL_STAT > PASS`;
@@ -99,11 +152,14 @@ range, per-symbol funding series hash, FNG series hash (or explicit
 timing), full cost identity (all four parameters, cost-model source sha256,
 verified/test flags), engine source hash over `CODE_FILES`, validation config
 (windows, MIN_VALID_N, alpha, embargo, locked windows, order value,
-portfolio config and pass criteria, FDR spec), Python implementation +
+portfolio config and pass criteria, FDR spec, strategy space = generation id +
+manifest hash + generator version), Python implementation +
 version (the engine is stdlib-only, so this is the only library version that
 can change numbers).  No clock, uuid, host or path enters it; `run_id` and
 `evaluation_id` identify runs.  The git commit is recorded informationally
-only.  Legacy `C-…` ids of old ledger rows are left as they are; those rows
+only (stored beside the context, never hashed, so a doc-only commit is not a new
+experiment; the source hash is what detects real code changes).  Series hashes are
+independent of row order; candidate order never changes the id.  Legacy `C-…` ids of old ledger rows are left as they are; those rows
 are re-evaluated under the new context, never rewritten.
 
 ## 6. Portfolio accounting (P0-2, P0-4)

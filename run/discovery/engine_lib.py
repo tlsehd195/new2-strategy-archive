@@ -39,7 +39,7 @@ from typing import Iterable, Mapping, Optional, Sequence
 # versions (code identity for experiment_context_id)
 # ---------------------------------------------------------------------------
 
-CODE_VERSION = "discovery-v2.1.0"          # human label only — identity is CODE_HASH
+CODE_VERSION = "discovery-v2.2.0"          # human label only — identity is CODE_HASH
 VALIDATION_CFG_VERSION = "valcfg-v2.1.0"
 LEDGER_SCHEMA = "discovery_ledger_v2"
 STATE_SCHEMA = "discovery_state_v2"

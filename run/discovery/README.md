@@ -24,10 +24,24 @@ evaluations in this cycle).  The script can be run from any working
 directory.  Invalid input (`0`, `-3`, `abc`, more than one argument) is
 rejected before Python starts.
 
-Exit codes: 0 CYCLE_OK · 1 CYCLE_FAILED (runner error, usage error, log
-pipeline failure) · 2 CYCLE_PARTIAL · 3 CYCLE_SKIPPED (another process holds
-`state/run.lock`).  The runner's exit code is propagated unchanged; a
-failing `tee` to the log file also fails the cycle.
+Exit codes: 0 CYCLE_OK · 1 CYCLE_FAILED · 2 CYCLE_PARTIAL · 3 CYCLE_SKIPPED
+(another process holds `state/run.lock`).  The runner's exit code, the log
+writer's exit code and the output filter's exit code are captured separately
+(`PIPESTATUS`) and recorded in `$NEW2_DISC_AUDIT` (default
+`$NEW2_DISCOVERY_ROOT/cycle_audit.log`) and on stderr.  A log-writer failure never
+hides the runner's status:
+
+| runner | log writer | exit | meaning |
+|---|---|---|---|
+| 0 | ok | 0 | CYCLE_OK |
+| 0 | fail | 1 | success without a record is not success |
+| ≥1 | ok / fail | 1 | CYCLE_FAILED; with a log failure both are recorded |
+| 2 | ok | 2 | CYCLE_PARTIAL |
+| 2 | fail | 1 | partial result whose record was lost → FAILED |
+| 3 | ok / fail | 3 | CYCLE_SKIPPED (nothing ran); a log error is still recorded |
+
+If the log directory cannot be created the runner is not started (exit 1).
+`NEW2_DISC_TEE` replaces the log writer command (used by the tests).
 
 `runner.py` can be called directly: `python3 run/discovery/runner.py --batch N`.
 
@@ -53,8 +67,9 @@ Environment (all optional, fail-closed when wrong):
 4. re-queues candidates whose last evaluation ran under another context
 5. evaluates up to BATCH candidates (dev + independent validation); dev-PASS
    candidates wait in `AWAITING_FDR` — no final verdict, no locked TEST yet
-6. when EVERY candidate of the generation has a dev outcome under the
-   context, runs Benjamini–Hochberg once over m = |generation| (decision
+6. prior-context PASS candidates get a fresh dev-phase statistic under the
+   current context (their PASS and locked TEST are untouched); when EVERY
+   candidate of the generation has a dev outcome **under the current context**, runs Benjamini–Hochberg once over m = |generation| (decision
    stored append-only in `state/fdr_decisions.jsonl`); survivors with a
    validation PASS get their locked TEST (reserve → data checks → start →
    complete), everyone else is resolved without touching the lock
@@ -70,8 +85,11 @@ whole generation has been evaluated (779 candidates ≈ 78 cycles at batch 10).
 cd run && COINTRADER_SRC=/path/to/NEW2/src python3 -m unittest discover -s discovery/tests -v
 ```
 
-168 tests (unittest, stdlib only): `test_engine.py` (91, original suite) and
-`test_residual_fixes.py` (77, residual-defect regressions).  Synthetic data +
+unittest, stdlib only: `test_engine.py` (original suite), `test_residual_fixes.py`
+(residual-defect regressions), `test_run_cycle_combinations.py` (run_cycle.sh exit-code
+matrix) and `test_final_fdr_context.py` (FDR family notions, prior-context evidence,
+decision immutability, context behaviour).  The exact counts of the last verification
+are in the final audit report.  Synthetic data +
 isolated temp dirs — the real ledger/state and the locked TEST windows are
 NEVER touched.  The run log of the last verification is in the residual-fix
 audit report.

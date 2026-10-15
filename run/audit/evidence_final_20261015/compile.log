@@ -1,0 +1,3 @@
+cmd: python3 -m compileall -q discovery
+2026-10-15T08:19:11Z
+exit=0

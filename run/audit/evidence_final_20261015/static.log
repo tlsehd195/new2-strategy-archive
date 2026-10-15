@@ -1,0 +1,7 @@
+cmd: ruff check discovery --select F --statistics
+13	F401	[*] unused-import
+ 7	F841	[ ] unused-variable
+Found 20 errors.
+[*] 13 fixable with the `--fix` option (7 hidden fixes can be enabled with the `--unsafe-fixes` option).
+exit=1
+baseline (66646cd) F errors: 20, all in untouched pre-existing code

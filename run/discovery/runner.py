@@ -40,6 +40,7 @@ from engine_lib import (  # noqa: E402
     assert_no_locked_overlap,
     atomic_write_json,
     code_identity,
+    git_commit,
     evaluation_id,
     experiment_context,
     iso_now,
@@ -56,6 +57,8 @@ from generation import (  # noqa: E402
     FdrDecisionStore,
     PreregistrationStore,
     build_manifest,
+    DEV_OUTCOME_STATUSES,
+    FdrDecisionConflict,
     decide_family,
     family_status,
 )
@@ -477,7 +480,7 @@ DATA_POLICY = {
 
 def _series_sha(pairs) -> str:
     h = hashlib.sha256()
-    for t, r in pairs:
+    for t, r in sorted(pairs):          # order-independent: same series -> same hash
         h.update(f"{int(t)}:{float(r)!r};".encode())
     return h.hexdigest()
 
@@ -659,11 +662,14 @@ class Runner:
             "data_policy": DATA_POLICY,
             "cost": self.cost.identity(),
             "code": {"code_hash": code_identity()["code_hash"]},
-            "validation": self._validation_cfg(),
+            "validation": {**self._validation_cfg(),
+                           "strategy_space": {"generation_id": self.generation_id,
+                                              "manifest_hash": self._manifest["manifest_hash"],
+                                              "generator_version": self._manifest["generator_version"]}},
             "runtime": runtime_identity(),
         }
         ctx, norm = experiment_context(comps)
-        self.contexts.ensure(ctx, norm)
+        self.contexts.ensure(ctx, norm, info={"git_commit": git_commit()})
         self._ctx = ctx
         return ctx
 
@@ -713,6 +719,49 @@ class Runner:
                            error_code=e_code, error_message=rec.get("error_message"))
             self._maybe_enqueue_reverify(sid, "ERROR", error_code=e_code)
         return {"skipped": False, "status": status, "record": rec}
+
+    def prior_pass_needing_reevaluation(self) -> list[str]:
+        """Terminal-PASS candidates (earned under ANOTHER context) that have no dev
+        outcome under the current context.  They stay PASS (their locked TEST is
+        consumed and immutable) but a PASS from another environment is not an
+        evaluation of this one: the FDR family needs a fresh current-context
+        dev statistic for them."""
+        self._ensure_registered()
+        if self._ctx is None:
+            self._current_context()
+        have = {r.get("strategy_id") for r in self.ledger.records()
+                if r.get("phase") == "dev" and r.get("context_id") == self._ctx
+                and r.get("generation_id") == self.generation_id
+                and r.get("status") in DEV_OUTCOME_STATUSES}
+        return [sid for sid, _ in self._cands
+                if CandidateState(self.store.entry(sid).state) is CandidateState.PASS
+                and sid not in have]
+
+    def reevaluate_prior_pass(self, sid: str, defn: Mapping) -> dict:
+        """Dev-phase re-evaluation of a prior-context PASS under the current
+        context.  Writes a dev ledger record flagged ``prior_pass_reeval``; the
+        candidate state stays PASS and the locked TEST is never touched."""
+        ctx = self._ctx
+        started = time.time()
+        base = {"phase": "dev", "generation_id": self.generation_id, "context_id": ctx,
+                "run_id": self.run_id, "code_version": CODE_VERSION,
+                "validation_cfg_version": VALIDATION_CFG_VERSION,
+                "in_generation": sid in self._defn_by_sid, "prior_pass_reeval": True}
+        try:
+            rec = self._evaluate(sid, defn)
+        except LockedWindowError as e:
+            rec = {"status": "ERROR", "error_code": "CONFIG_ERROR", "error_message": str(e)}
+        except (FileNotFoundError, LookupError) as e:
+            rec = {"status": "DATA_MISSING", "missing": [str(e)]}
+        except Exception as e:  # noqa: BLE001
+            rec = {"status": "ERROR", "error_code": "LOGIC_ERROR",
+                   "error_message": f"{type(e).__name__}: {e}"}
+        rec = {**base, **rec}
+        rec["evaluation_id"] = evaluation_id(sid, ctx)
+        rec["strategy_id"] = sid
+        rec["runtime_seconds"] = time.time() - started
+        self.ledger.append(rec)
+        return {"skipped": False, "status": rec["status"], "record": rec, "prior_pass_reeval": True}
 
     def _maybe_enqueue_reverify(self, sid: str, status: str, error_code: Optional[str] = None) -> None:
         e = self.store.entry(sid)
@@ -870,13 +919,26 @@ class Runner:
         fam = family_status(records, self._manifest, ctx, terminal_pass=terminal_pass)
         report = {"generation_id": gid, "context_id": ctx, "m": fam["m"],
                   "evaluated": fam["evaluated"], "missing": len(fam["missing"]),
-                  "complete": fam["complete"], "decision": None, "resolved": [],
-                  "waiting": []}
-        if not fam["complete"]:
+                  "complete": fam["complete"],
+                  "manifest_complete": fam["manifest_complete"],
+                  "current_context_complete": fam["current_context_complete"],
+                  "fdr_decision_ready": fam["fdr_decision_ready"],
+                  "n_without_statistic": fam["n_without_statistic"],
+                  "prior_context_pass": len(fam["prior_context_pass"]),
+                  "prior_context_only": len(fam["prior_context_only"]),
+                  "decision": None, "resolved": [], "waiting": []}
+        if not fam["fdr_decision_ready"]:
             return report
-        decision = self.fdr_store.get(gid, ctx) or self.fdr_store.record(decide_family(fam))
+        try:
+            decision = self.fdr_store.record(decide_family(fam))
+        except FdrDecisionConflict as e:
+            report["decision"] = None
+            report["conflict"] = str(e)
+            report["fdr_decision_ready"] = False
+            return report
         report["decision"] = {"survivors": decision["survivors"], "m": decision["m"],
-                              "n_with_statistic": decision["n_with_statistic"]}
+                              "n_with_statistic": decision["n_with_statistic"],
+                              "locked_test_eligible": decision.get("locked_test_eligible")}
         by_eid = {r.get("evaluation_id"): r for r in records}
         survivors = set(decision["survivors"])
         for sid, st in sorted(states.items()):
@@ -1195,11 +1257,22 @@ class Runner:
                 r = self.run_one(sid, defn)
                 done += 1
                 _count(r)
+        # 1b) prior-context PASS candidates need a current-context dev statistic
+        if s.status != "INTERRUPTED":
+            defn_by = dict(self._cands)
+            for sid in self.prior_pass_needing_reevaluation():
+                if done >= max_candidates or self._interrupted:
+                    break
+                r = self.reevaluate_prior_pass(sid, defn_by[sid])
+                done += 1
+                _count(r)
         # 2) generation-wide FDR decision + locked tests of survivors
         if s.status != "INTERRUPTED":
             fdr = self.finalize_fdr()
-            s.fdr_family = {k: fdr[k] for k in ("m", "evaluated", "missing", "complete",
-                                                "decision")}
+            s.fdr_family = {k: fdr.get(k) for k in (
+                "m", "evaluated", "missing", "complete", "manifest_complete",
+                "current_context_complete", "fdr_decision_ready", "n_without_statistic",
+                "prior_context_pass", "prior_context_only", "decision", "conflict")}
             s.finalized = fdr["resolved"]
             for x in fdr["resolved"]:
                 verdicts["final_" + x["status"]] = verdicts.get("final_" + x["status"], 0) + 1
