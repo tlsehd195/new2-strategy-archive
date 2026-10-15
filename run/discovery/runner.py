@@ -641,6 +641,9 @@ class Runner:
         self.prereg = PreregistrationStore(paths.state_dir)
         self.fdr_store = FdrDecisionStore(paths.state_dir / "fdr_decisions.jsonl")
         self.contexts = ContextStore(paths.state_dir)
+        from campaigns import CampaignLedger
+        self.campaigns = CampaignLedger(paths.state_dir / "locked_window_campaigns.jsonl")
+        self._campaign: Optional[dict] = None
         self.run_id = new_run_id()
         self._interrupted = False
         self._fng_cache: Optional[dict] = None
@@ -704,6 +707,7 @@ class Runner:
             "portfolio_model": PORTFOLIO_MODEL_VERSION,
             "portfolio_pass": PORTFOLIO_PASS_CRITERIA,
             "fdr": FDR_SPEC,
+            "locked_campaigns": _locked_campaign_cfg(),
         }
 
     @staticmethod
@@ -1052,6 +1056,10 @@ class Runner:
             report["fdr_decision_ready"] = False
             return report
         entry = self.locked_test_eligible(decision)
+        self._campaign, retired = self._legacy_campaign(decision, entry["eligible"])
+        report["campaign"] = ({"campaign_id": self._campaign["campaign_id"],
+                               "windows": self._campaign["windows"]} if self._campaign else None)
+        report["campaign_window_retired"] = retired
         report["decision"] = {"survivors": decision["survivors"], "m": decision["m"],
                               "n_with_statistic": decision["n_with_statistic"],
                               "statistical_survivors": decision["survivors"],
@@ -1067,10 +1075,69 @@ class Runner:
             if dev_rec is None:
                 report["waiting"].append(sid)   # waiting under another context
                 continue
+            if sid in retired:
+                report["waiting"].append(sid)   # locked window retired: needs new locked data
+                continue
             out = self._resolve(sid, dev_rec, sid in survivors, decision)
             (report["resolved"] if out else report["waiting"]).append(
                 {"strategy_id": sid, "status": out} if out else sid)
+        self._close_legacy_campaign()
         return report
+
+    # -- group-level locked-window control (campaigns.py) ----------------------
+    def _legacy_campaign(self, decision: Mapping, eligible: Sequence[str]) -> tuple[Optional[dict], dict]:
+        """The locked-TEST entrants of one BH decision form ONE campaign,
+        preregistered (members + alpha) before any locked data is read.
+        Members whose window is retired are held back (reported)."""
+        if not eligible:
+            return None, {}
+        cfg = _locked_campaign_cfg()
+        base = decision["input_hash"]
+        k = 0
+        while True:
+            found = self.campaigns.find("legacy_fdr", f"{base}:{k}")
+            if found is None:
+                break
+            if not found["aborted"]:
+                return found["preregistered"], {}
+            k += 1
+        members, retired = {}, {}
+        for sid in eligible:
+            syms = list(self._defn_by_sid[sid]["symbols"])
+            bad = [s for s in syms
+                   if self.campaigns.window_status(s, max_campaigns=cfg["max_campaigns_per_window"])["retired"]]
+            if bad:
+                retired[sid] = f"WINDOW_RETIRED {bad}"
+            else:
+                members[sid] = syms
+        if not members:
+            return None, retired
+        camp = self.campaigns.preregister(
+            source="legacy_fdr", source_ref=f"{base}:{k}", context_id=self._ctx, members=members,
+            alpha_total=cfg["alpha_total_per_window"], max_campaigns=cfg["max_campaigns_per_window"],
+            method="legacy cell test (HAC t, n>=30, mean>0) AND p <= campaign member alpha",
+            config_hash=cfg["config_hash"])
+        return camp, retired
+
+    def _close_legacy_campaign(self) -> None:
+        camp, self._campaign = self._campaign, None
+        if camp is None:
+            return
+        done = {}
+        exposed = False
+        for sid, syms in camp["members"].items():
+            for sym in syms:
+                r = self.lock_registry.result(sid, sym)
+                if r and r.get("campaign_id") == camp["campaign_id"]:
+                    done.setdefault(sid, {})[sym] = r
+                if any(a.get("exposed") and a.get("context_id") == camp["context_id"]
+                       for a in self.lock_registry.attempts(sid, sym)):
+                    exposed = True
+        if done and len(done) == len(camp["members"]):
+            self.campaigns.record_result(camp, done)
+        elif not exposed:
+            self.campaigns.abort_no_exposure(camp, "no member reached locked-data exposure "
+                                                   "(data missing / in progress elsewhere)")
 
     def lock_entry_status(self, sid: str, defn: Mapping) -> dict:
         """May a NEW locked-TEST attempt start for this candidate?  Independent of the
@@ -1224,8 +1291,14 @@ class Runner:
                 esl = run_event_study(lh.bars, sym, sigl, horizon, self.cost,
                                       self.order_value, lf)
                 cl = cell_stats(esl.events, sym, f"{fam}|lock")
+                from campaigns import member_alpha
+                camp = self._campaign
+                a = member_alpha(camp, sym) if camp and sid in camp["members"] else None
+                p_ok = a is None or (isinstance(cl.get("p"), float) and cl["p"] <= a)
                 res = {"status": cl["status"], "n": cl["n"], "mean_bp": cl.get("mean_bp"),
-                       "p": cl.get("p"), "pass": cl["status"] == "PASS",
+                       "p": cl.get("p"), "pass": cl["status"] == "PASS" and p_ok,
+                       "campaign_id": camp["campaign_id"] if a is not None else None,
+                       "campaign_alpha_member": a,
                        "lock_data_sha256": lh.sha256}
                 self.lock_registry.complete(tokens[sym], res)
                 results[sym] = res
@@ -1245,6 +1318,9 @@ class Runner:
             return "PASS", info
         if "ERROR" in sts:
             return "ERROR", info
+        if any(r["status"] == "PASS" and not r["pass"] for r in results.values()):
+            info["note"] = "cell significant at 0.05 but not at the campaign member alpha"
+            return "FAIL_STAT", info
         if "FAIL_STAT" in sts or not info["independent"]:
             return "FAIL_STAT", info
         info["note"] = "locked window consumed but under-powered — cannot be re-tested independently"
@@ -1489,6 +1565,14 @@ class PrefixShim:
         return self._v[i]
 
 
+def _locked_campaign_cfg() -> dict:
+    """Locked-window campaign settings shared with the evolution pipeline
+    (config/promotion_v1.json ``locked`` section)."""
+    from pipeline import load_promotion_config
+    cfg, h = load_promotion_config()
+    return {**cfg["locked"], "config_hash": h}
+
+
 def _agg_symbol_status(cells) -> str:
     if any(c.status == "ERROR" for c in cells):
         return "ERROR"
@@ -1512,37 +1596,53 @@ class UsageError(ValueError):
     pass
 
 
-def parse_args(argv: Sequence[str]) -> int:
-    """``--batch N`` (or ``--batch=N``), N a positive integer; default 10.
+MODES = ("legacy", "evolve", "full")
+
+
+def parse_options(argv: Sequence[str]) -> dict:
+    """``--batch N`` (default 10), ``--mode legacy|evolve|full`` (default
+    legacy), ``--rounds N`` and ``--evals N`` (evolution budgets per cycle).
     Anything else is a usage error — never silently ignored."""
     args = list(argv)
-    batch = 10
+    opts = {"batch": 10, "mode": "legacy", "rounds": 2, "evals": 60}
     i = 0
     while i < len(args):
         a = args[i]
-        if a == "--batch":
-            if i + 1 >= len(args):
-                raise UsageError("--batch needs a value")
-            val = args[i + 1]
-            i += 2
-        elif a.startswith("--batch="):
+        key = a[2:].split("=", 1)[0] if a.startswith("--") else None
+        if key not in opts:
+            raise UsageError(f"unknown argument {a!r}")
+        if "=" in a:
             val = a.split("=", 1)[1]
             i += 1
         else:
-            raise UsageError(f"unknown argument {a!r}")
-        if not val.isdigit() or int(val) < 1:
-            raise UsageError(f"--batch must be a positive integer, got {val!r}")
-        batch = int(val)
-    return batch
+            if i + 1 >= len(args):
+                raise UsageError(f"--{key} needs a value")
+            val = args[i + 1]
+            i += 2
+        if key == "mode":
+            if val not in MODES:
+                raise UsageError(f"--mode must be one of {MODES}, got {val!r}")
+            opts["mode"] = val
+            continue
+        if not val.isdigit() or int(val) < (0 if key == "rounds" else 1):
+            raise UsageError(f"--{key} must be a positive integer, got {val!r}")
+        opts[key] = int(val)
+    return opts
+
+
+def parse_args(argv: Sequence[str]) -> int:
+    return parse_options(argv)["batch"]
 
 
 EXIT_CODES = {"SUCCESS": 0, "SUCCESS_WITH_WARNINGS": 0, "PARTIAL_FAILURE": 2,
               "FAILED": 1, "INTERRUPTED": 1}
+#: 4 = CYCLE_BLOCKED_DATA (evolution mode: no usable market data, nothing evaluated)
+EXIT_BLOCKED_DATA = 4
 
 
 def main(argv: Sequence[str]) -> int:
     try:
-        batch = parse_args(argv)
+        opts = parse_options(argv)
     except UsageError as e:
         print(f"USAGE_ERROR: {e}", file=sys.stderr)
         return 1
@@ -1561,18 +1661,30 @@ def main(argv: Sequence[str]) -> int:
     if not lock.acquire():
         print(f"CYCLE_SKIPPED lock held ({paths.state_dir / 'run.lock'})")
         return 3
+    rc = 0
     try:
-        r = Runner(paths)
-        s = r.cycle(max_candidates=batch)
+        if opts["mode"] in ("legacy", "full"):
+            r = Runner(paths)
+            s = r.cycle(max_candidates=opts["batch"])
+            if os.environ.get("REFRESH") == "1":
+                s.notes.append("REFRESH=1 requested but NOT supported — no data was refreshed")
+            print(json.dumps(s.to_json(), default=str))
+            rc = EXIT_CODES[s.status]
+        if opts["mode"] in ("evolve", "full"):
+            from autoloop import CYCLE_EXIT, run_evolution_cycle
+            from pipeline import RunnerDataProvider
+            es = run_evolution_cycle(paths.state_dir, RunnerDataProvider(paths.data_dir),
+                                     CostContext.futures_default(), rounds=opts["rounds"],
+                                     max_dev_evals=opts["evals"], results_dir=paths.results_dir)
+            print(json.dumps(es.to_json(), default=str))
+            erc = CYCLE_EXIT[es.status]
+            rc = erc if rc == 0 else (rc if erc == 0 else max(rc, erc))
     except Exception as e:  # noqa: BLE001 — a crash is FAILED, never success
         print(json.dumps({"status": "FAILED", "fatal": f"{type(e).__name__}: {e}"}))
         return 1
     finally:
         lock.release()
-    if os.environ.get("REFRESH") == "1":
-        s.notes.append("REFRESH=1 requested but NOT supported — no data was refreshed")
-    print(json.dumps(s.to_json(), default=str))
-    return EXIT_CODES[s.status]
+    return rc
 
 
 if __name__ == "__main__":

@@ -1,0 +1,55 @@
+{
+  "schema": "promotion_config_v1",
+  "version": "promo-v1",
+  "note": "Changing any value requires a new file/version; the file hash enters the experiment context. Values are research gates, not claims of profitability.",
+  "dev_screen": {
+    "min_events_per_symbol": 30,
+    "min_mean_bp": 0.0,
+    "min_t": 1.0,
+    "min_fold_positive_share": 0.5,
+    "dev_folds": 4,
+    "max_cost_share": 0.8
+  },
+  "validation": {
+    "method": "romano_wolf_stepm_studentized_per_symbol_window",
+    "alpha_total_per_window": 0.05,
+    "alpha_spending": "alpha_total*6/pi^2/k^2 (k = batch index on the window)",
+    "max_batch_size": 20,
+    "bootstrap_B": 1000,
+    "bootstrap_seed": 7,
+    "min_events_per_symbol": 30,
+    "min_days": 30
+  },
+  "robustness": {
+    "cost_multipliers": [1.5, 2.0],
+    "require_positive_at_cost_multiplier": 1.5,
+    "regime_min_positive_share": 0.5,
+    "regime_min_events": 10,
+    "max_validation_mdd_bp": 2500.0,
+    "max_top5pct_event_profit_share": 0.6,
+    "max_top_day_profit_share": 0.35,
+    "min_param_neighbour_positive_share": 0.6,
+    "walk_forward_min_positive_share": 0.6,
+    "ci_level": 0.95,
+    "pbo_partitions": 16,
+    "pbo_min_trials": 8,
+    "max_pbo": 0.5
+  },
+  "locked": {
+    "alpha_total_per_window": 0.05,
+    "alpha_spending": "alpha_total*6/pi^2/c^2 (c = campaign index on the window), Bonferroni inside the campaign",
+    "max_campaigns_per_window": 3,
+    "min_events_per_symbol": 30
+  },
+  "promotion": {
+    "allow_unverified_cost_for_paper": true,
+    "unverified_cost_label": "UNVERIFIED_COST_MODEL",
+    "required_evidence": ["dev", "validation", "robustness", "locked"]
+  },
+  "paper": {
+    "mode": "isolated_replay_only",
+    "start": "day after the symbol's locked window end + embargo",
+    "min_events": 20,
+    "max_runs_per_strategy": 1
+  }
+}

@@ -465,16 +465,32 @@ def spec_requirements(spec: Mapping) -> list[str]:
 # execution
 # ---------------------------------------------------------------------------
 
-def build_spec_aux(bars, spec: Mapping, funding, fng) -> dict:
-    """Feature series for every condition (computed once per bar list)."""
+def build_spec_aux(bars, spec: Mapping, funding, fng, *, cache: Optional[dict] = None,
+                   cache_ns: object = None) -> dict:
+    """Feature series for every condition (computed once per bar list).
+
+    ``cache`` (with a namespace identifying the exact bars / funding / FNG
+    inputs) shares series between strategies that use the same feature.
+    Every feature is causal (value i uses bars <= i only — tested), so a
+    series computed on a longer bar list is valid for any prefix of it."""
     s = canonicalize_spec(spec)
-    ctx = {"bars": bars, "closes": [b.close for b in bars], "funding": funding, "fng": fng,
-           "taker_share": [b.taker_buy_volume / b.volume if b.volume > 0 else None for b in bars]}
+    ctx = None
     series = {}
     for c in s["entry"]["conditions"] + s["filters"]:
         key = _cond_key({"feature": c["feature"], "params": c["params"]})
-        if key not in series:
-            series[key] = FEATURES[c["feature"]].compute(ctx, c["params"])
+        if key in series:
+            continue
+        ck = (cache_ns, key)
+        if cache is not None and ck in cache:
+            series[key] = cache[ck]
+            continue
+        if ctx is None:
+            ctx = {"bars": bars, "closes": [b.close for b in bars], "funding": funding, "fng": fng,
+                   "taker_share": [b.taker_buy_volume / b.volume if b.volume > 0 else None
+                                   for b in bars]}
+        series[key] = FEATURES[c["feature"]].compute(ctx, c["params"])
+        if cache is not None:
+            cache[ck] = series[key]
     return {"spec": s, "series": series}
 
 
