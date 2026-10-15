@@ -123,6 +123,7 @@ class ReverifyQueue:
             validation_design_changed=reason == "validation_design_changed",
             data_now_available=reason == "data_refresh_check",
             power_condition_met=reason == "power_condition_met",
+            context_changed=reason == "context_changed",
         )
         if not eligible:
             return False
@@ -229,6 +230,7 @@ LEDGER_TO_STATE = {
     "UNDETERMINED_POWER": CandidateState.UNDETERMINED_POWER,
     "DATA_MISSING": CandidateState.DATA_MISSING,
     "ERROR": CandidateState.ERROR,
+    "AWAITING_FDR": CandidateState.AWAITING_FDR,
 }
 
 

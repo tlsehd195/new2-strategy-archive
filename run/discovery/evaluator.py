@@ -18,7 +18,7 @@ from bisect import bisect_right
 from dataclasses import dataclass, field
 from typing import Callable, Optional, Sequence
 
-from costs_bridge import CostContext
+from costs_bridge import CostContext, CostDataMissing, CostRefused
 from data_quality import Bar
 
 
@@ -72,6 +72,7 @@ class EventStudyResult:
     skipped_overlapped: int = 0
     dropped_missing_funding: int = 0
     participation_refusals: int = 0
+    cost_data_missing: int = 0
     signals_total: int = 0
 
     def to_json(self) -> dict:
@@ -81,6 +82,7 @@ class EventStudyResult:
             "skipped_overlapped": self.skipped_overlapped,
             "dropped_missing_funding": self.dropped_missing_funding,
             "participation_refusals": self.participation_refusals,
+            "cost_data_missing": self.cost_data_missing,
             "signals_total": self.signals_total,
             "events": [e.to_json() for e in self.events],
         }
@@ -155,17 +157,21 @@ def run_event_study(bars: Sequence[Bar], symbol: str, signal_fn: SignalFn,
         if exit_i >= n:
             break
         entry_bar, exit_bar = bars[entry_i], bars[exit_i]
-        if entry_bar.quote_volume <= 0 or exit_bar.quote_volume <= 0:
-            res.participation_refusals += 1
-            continue
         try:
             cost_bp = cost.round_trip_bp(order_value,
                                          entry_bar.quote_volume,
                                          exit_bar.quote_volume)
-        except ValueError:
-            # participation cap exceeded → fail-closed refusal, counted
+        except CostRefused:
+            # participation cap exceeded → the trade is refused, counted
             res.participation_refusals += 1
             continue
+        except CostDataMissing:
+            # no traded value to price against → not a tradable event, counted
+            # separately (it is a data fact, not a cost-model verdict)
+            res.cost_data_missing += 1
+            continue
+        # CostComputationError propagates: a numeric failure of the cost
+        # model is an ERROR of the evaluation, never a skipped event
         if funding is not None:
             fp = fidx.paid_bp(entry_bar.ts, exit_bar.ts, side)
             if fp is None:
@@ -201,6 +207,11 @@ def cell_stats(events: Sequence[EventRecord], symbol: str, cell_id: str,
     min_n = max(min_n, MIN_VALID_N)
     nets = [e.net_bp for e in events]
     n = len(nets)
+    if any(not math.isfinite(x) for x in nets):
+        # P2: NaN/inf returns are a computation error, never a test input
+        return {"symbol": symbol, "cell_id": cell_id, "n": n, "status": "ERROR",
+                "mean_bp": float("nan"), "t": float("nan"), "p": float("nan"),
+                "note": "non-finite event return"}
     if n == 0:
         return {"symbol": symbol, "cell_id": cell_id, "n": 0,
                 "status": "DATA_MISSING", "mean_bp": float("nan"),
@@ -216,6 +227,10 @@ def cell_stats(events: Sequence[EventRecord], symbol: str, cell_id: str,
                 "status": "UNDETERMINED_POWER", "mean_bp": mu,
                 "t": t, "p": float("nan")}
     p = t_sf(t, n - 1)
+    if not math.isfinite(p) or not 0.0 <= p <= 1.0:
+        return {"symbol": symbol, "cell_id": cell_id, "n": n, "status": "ERROR",
+                "mean_bp": mu, "t": t, "p": float("nan"),
+                "note": f"p-value computation failed ({p!r})"}
     status = "PASS" if (p < 0.05 and mu > 0) else "FAIL_STAT"
     return {"symbol": symbol, "cell_id": cell_id, "n": n, "mean_bp": mu,
             "t": t, "p": p, "status": status}

@@ -19,10 +19,14 @@ Design rules enforced here (directive §3-§14):
 
 from __future__ import annotations
 
+import fcntl
 import hashlib
 import json
 import math
 import os
+import platform
+import socket
+import sys
 import tempfile
 import time
 import uuid
@@ -35,8 +39,8 @@ from typing import Iterable, Mapping, Optional, Sequence
 # versions (code identity for experiment_context_id)
 # ---------------------------------------------------------------------------
 
-CODE_VERSION = "discovery-v2.0.0"
-VALIDATION_CFG_VERSION = "valcfg-v2.0.0"
+CODE_VERSION = "discovery-v2.1.0"          # human label only — identity is CODE_HASH
+VALIDATION_CFG_VERSION = "valcfg-v2.1.0"
 LEDGER_SCHEMA = "discovery_ledger_v2"
 STATE_SCHEMA = "discovery_state_v2"
 
@@ -55,6 +59,10 @@ class CandidateState(str, Enum):
     DATA_MISSING = "DATA_MISSING"
     ERROR = "ERROR"
     REVERIFY_PENDING = "REVERIFY_PENDING"
+    #: dev/validation evaluated and dev-PASS, but the cross-candidate FDR
+    #: decision of its search generation is not final yet (P0-1).  The
+    #: locked TEST is never touched in this state.
+    AWAITING_FDR = "AWAITING_FDR"
 
 
 #: allowed (from, to) transitions.  Any transition not listed (and not the
@@ -68,8 +76,20 @@ ALLOWED_TRANSITIONS: dict[CandidateState, set[CandidateState]] = {
         CandidateState.UNDETERMINED_POWER,
         CandidateState.DATA_MISSING,
         CandidateState.ERROR,
+        CandidateState.AWAITING_FDR,
         # crash recovery: a RUNNING candidate whose process died without a
         # ledger record is moved to the reverify queue by reconcile()
+        CandidateState.REVERIFY_PENDING,
+    },
+    # FDR finalization resolves a waiting candidate to its final state; a
+    # context change before finalization sends it back to re-evaluation
+    CandidateState.AWAITING_FDR: {
+        CandidateState.PASS,
+        CandidateState.FAIL_COST,
+        CandidateState.FAIL_STAT,
+        CandidateState.UNDETERMINED_POWER,
+        CandidateState.DATA_MISSING,
+        CandidateState.ERROR,
         CandidateState.REVERIFY_PENDING,
     },
     # reverify eligibility is checked by reverify_eligible(), not by the table
@@ -120,6 +140,7 @@ def reverify_eligible(
     validation_design_changed: bool = False,
     data_now_available: bool = False,
     power_condition_met: bool = False,
+    context_changed: bool = False,
 ) -> tuple[bool, str]:
     """Central policy for when a non-final state may be re-verified.
 
@@ -130,6 +151,13 @@ def reverify_eligible(
     if state in (CandidateState.PASS, CandidateState.PENDING, CandidateState.RUNNING,
                  CandidateState.REVERIFY_PENDING):
         return False, f"state {state.value} is not re-verifiable"
+    if context_changed:
+        # P0-1/P1-7: a NEW experiment context (data, cost, code, config) is a
+        # new experiment, not a retry of the old one — the per-experiment
+        # attempt limit does not carry over.  PASS stays terminal (above).
+        return True, "context_changed"
+    if state == CandidateState.AWAITING_FDR:
+        return False, "awaiting the generation FDR decision"
     if attempt_count >= max_attempts:
         return False, f"max attempts reached ({attempt_count}/{max_attempts})"
     if state == CandidateState.UNDETERMINED_POWER:
@@ -323,6 +351,9 @@ def strategy_id(defn: Mapping) -> str:
 def experiment_context_id(*, dataset_id: str, data_sha256: str, cost_model: str,
                           code_version: str = CODE_VERSION,
                           validation_cfg_version: str = VALIDATION_CFG_VERSION) -> str:
+    """LEGACY (v2.0) context id — kept so old ledger rows stay readable.
+    It does not cover funding/FNG data, cost parameters or real code
+    changes; new evaluations use :func:`experiment_context` instead."""
     canon = canonical_json({
         "dataset_id": dataset_id,
         "data_sha256": data_sha256,
@@ -331,6 +362,88 @@ def experiment_context_id(*, dataset_id: str, data_sha256: str, cost_model: str,
         "validation_cfg_version": validation_cfg_version,
     })
     return "C-" + hashlib.sha256(canon.encode("utf-8")).hexdigest()[:16]
+
+
+#: every component that can change an evaluation result (P1-7).  Missing
+#: components are an error — a context can never silently omit an input.
+CONTEXT_COMPONENTS = ("data", "data_policy", "cost", "code", "validation", "runtime")
+
+
+def _hash_floats_ok(obj: object) -> object:
+    """Canonical form for hashing: floats via repr (exact), NaN/inf refused."""
+    if isinstance(obj, float):
+        if not math.isfinite(obj):
+            raise ValueError("non-finite value in experiment context")
+        return repr(obj)
+    if isinstance(obj, bool) or obj is None or isinstance(obj, (int, str)):
+        return obj
+    if isinstance(obj, Mapping):
+        return {str(k): _hash_floats_ok(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_hash_floats_ok(v) for v in obj]
+    raise TypeError(f"unsupported type {type(obj)!r} in experiment context")
+
+
+def experiment_context(components: Mapping) -> tuple[str, dict]:
+    """Deterministic experiment-environment id from normalized components.
+
+    The id identifies the experimental CONDITIONS — never the run: no clock,
+    no uuid, no host name enters it (each run has its own run_id /
+    evaluation_id).  Returns (context_id, normalized components).
+    """
+    missing = [k for k in CONTEXT_COMPONENTS if k not in components]
+    if missing:
+        raise ValueError(f"experiment context missing components {missing}")
+    extra = sorted(set(components) - set(CONTEXT_COMPONENTS))
+    if extra:
+        raise ValueError(f"unknown experiment context components {extra}")
+    norm = _hash_floats_ok({k: components[k] for k in CONTEXT_COMPONENTS})
+    canon = canonical_json(norm)
+    return "C2-" + hashlib.sha256(canon.encode("utf-8")).hexdigest()[:20], norm
+
+
+#: source files whose content defines engine behaviour.  CODE_VERSION is a
+#: hand-maintained label; this hash is what actually identifies the code.
+CODE_FILES = ("engine_lib.py", "runner.py", "evaluator.py", "portfolio.py",
+              "generator.py", "generation.py", "data_quality.py",
+              "costs_bridge.py", "store.py", "promotion.py")
+
+
+def code_identity(base: Optional[Path] = None, files: Sequence[str] = CODE_FILES) -> dict:
+    base = Path(base) if base else Path(__file__).resolve().parent
+    h = hashlib.sha256()
+    per: dict = {}
+    for name in sorted(files):
+        p = base / name
+        data = p.read_bytes() if p.exists() else b"<MISSING>"
+        fh = hashlib.sha256(data).hexdigest()
+        per[name] = fh
+        h.update(name.encode() + b"\0" + fh.encode() + b"\n")
+    return {"code_hash": h.hexdigest(), "files": per, "label": CODE_VERSION}
+
+
+def runtime_identity() -> dict:
+    """Interpreter identity.  The engine is stdlib-only, so the Python
+    implementation/version is the only library version that can change
+    numeric results (math.erfc, lgamma, float formatting)."""
+    return {"python_implementation": platform.python_implementation(),
+            "python_version": "%d.%d.%d" % sys.version_info[:3]}
+
+
+def git_commit(base: Optional[Path] = None) -> Optional[str]:
+    """Informational only (recorded, NOT hashed: a doc-only commit must not
+    create a new experiment)."""
+    import subprocess
+    try:
+        out = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(base or Path(__file__).parent),
+                             capture_output=True, text=True, timeout=5)
+        return out.stdout.strip() or None if out.returncode == 0 else None
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
+def new_run_id() -> str:
+    return "R-" + time.strftime("%Y%m%dT%H%M%SZ", time.gmtime()) + "-" + uuid.uuid4().hex[:8]
 
 
 def evaluation_id(strategy: str, context: str) -> str:
@@ -473,15 +586,33 @@ def holm_test(pvalues: Sequence[float], alpha: float = 0.05) -> list[bool]:
 
 def bh_fdr(pvalues: Sequence[float], q: float = 0.05) -> list[bool]:
     """Benjamini-Hochberg FDR control across candidates."""
-    m = len(pvalues)
-    if m == 0:
+    return bh_fdr_family(pvalues, len(pvalues), q)
+
+
+def bh_fdr_family(pvalues: Sequence[float], m_family: int, q: float = 0.05) -> list[bool]:
+    """BH step-up over a PRE-REGISTERED family of ``m_family`` hypotheses of
+    which ``pvalues`` are the ones that produced a valid test statistic.
+
+    Hypotheses of the family without a valid statistic (insufficient power,
+    data missing) are counted in m and are never rejected.  No p-value is
+    invented for them: the thresholds q*k/m simply use the full family size,
+    which is exactly BH on the whole family with those hypotheses retained
+    (and can only be stricter than BH on the testable subset).
+    """
+    k_ = len(pvalues)
+    if m_family < k_:
+        raise ValueError(f"family size {m_family} < number of p-values {k_}")
+    if any((not isinstance(p, (int, float))) or not math.isfinite(p) or not 0.0 <= p <= 1.0
+           for p in pvalues):
+        raise ValueError("BH-FDR requires finite p-values in [0, 1]")
+    if k_ == 0:
         return []
-    order = sorted(range(m), key=lambda i: pvalues[i])
-    rejected = [False] * m
+    order = sorted(range(k_), key=lambda i: pvalues[i])
+    rejected = [False] * k_
     k = -1
-    for rank in range(m - 1, -1, -1):
+    for rank in range(k_ - 1, -1, -1):
         idx = order[rank]
-        if pvalues[idx] <= q * (rank + 1) / m:
+        if pvalues[idx] <= q * (rank + 1) / m_family:
             k = rank
             break
     if k >= 0:
@@ -776,6 +907,7 @@ class SymbolResult:
 #: "not proven" states outrank explicit failures so missing data can never
 #: be laundered into a clean FAIL (and failures still block PASS).
 VERDICT_PRECEDENCE = [
+    CandidateState.ERROR.value,          # P2: a computation error outranks all
     CandidateState.DATA_MISSING.value,
     CandidateState.UNDETERMINED_POWER.value,
     CandidateState.FAIL_COST.value,
@@ -785,6 +917,8 @@ VERDICT_PRECEDENCE = [
 
 
 def _symbol_status(cells: Sequence[CellResult], alpha: float = 0.05) -> str:
+    if any(c.status == "ERROR" for c in cells):
+        return "ERROR"
     if any(c.status == "DATA_MISSING" for c in cells):
         return "DATA_MISSING"
     if any(c.status == "UNDETERMINED_POWER" for c in cells):
@@ -825,6 +959,9 @@ def verdict_from_cells(symbol_results: Sequence[SymbolResult],
             statuses[s] = "DATA_MISSING"
             continue
         statuses[s] = r.status if r.status else _symbol_status(r.cells, alpha)
+        if statuses[s] not in VERDICT_PRECEDENCE:
+            # P2: an unknown label can never be ranked into a pass
+            statuses[s] = CandidateState.ERROR.value
         r.status = statuses[s]
     extra = {r.symbol: r.status for r in symbol_results if r.symbol not in required_symbols}
     rank = VERDICT_PRECEDENCE.index
@@ -895,29 +1032,256 @@ def symbols_without_locked_test(symbols: Sequence[str]) -> list[str]:
     return [s for s in symbols if s not in LOCKED_TEST_PERIODS]
 
 
-class LockTestRegistry:
-    """Single-use ledger for final locked tests.
+class LockState(str, Enum):
+    """Locked-TEST attempt states (P1-6).
 
-    Using a locked window twice for one strategy means the second use is
-    NOT an independent final test and must be recorded as such.
+    AVAILABLE            no attempt ever exposed the window to this strategy
+    RESERVED             a process holds the right to run it; data not yet
+                         loaded / not yet shown to the strategy
+    EVALUATION_STARTED   locked bars passed every check and are being fed to
+                         the strategy — from here on the window is USED
+    CONSUMED             evaluation finished; the result is stored, immutable
+    BLOCKED_DATA_MISSING data missing / quality failed BEFORE exposure —
+                         recorded, not consumed, may be retried
+    FAILED               the attempt died; consumed iff it had started
+    """
+    AVAILABLE = "AVAILABLE"
+    RESERVED = "RESERVED"
+    EVALUATION_STARTED = "EVALUATION_STARTED"
+    CONSUMED = "CONSUMED"
+    BLOCKED_DATA_MISSING = "BLOCKED_DATA_MISSING"
+    FAILED = "FAILED"
+
+
+LOCK_REGISTRY_SCHEMA = "lock_test_registry_v2"
+_LOCK_ACTIVE = (LockState.RESERVED.value, LockState.EVALUATION_STARTED.value)
+
+
+class LockRegistryError(RuntimeError):
+    pass
+
+
+def _pid_alive(pid: int) -> bool:
+    try:
+        os.kill(int(pid), 0)
+        return True
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True   # exists, owned by someone else
+    except (ValueError, TypeError, OverflowError):
+        return False
+
+
+class LockTestRegistry:
+    """Single-use registry for final locked tests, with explicit attempt
+    state transitions and cross-process concurrency control.
+
+    Storage: one JSON file, every read-modify-write under an exclusive
+    ``fcntl.flock`` on ``<file>.lock`` and written atomically.  The v1 format
+    ({sid: {sym: [{"context_id","ts"}]}}) is preserved verbatim under
+    ``legacy_v1`` and every legacy entry counts as an exposed use — old
+    consumption is never forgotten or deleted.
     """
 
-    def __init__(self, path: Path):
+    def __init__(self, path: Path, *, owner_pid: Optional[int] = None):
         self.path = Path(path)
-        self._data: dict = load_json(self.path, default={}) or {}
+        self.guard = self.path.with_name(self.path.name + ".lock")
+        self.owner = {"pid": owner_pid or os.getpid(), "host": socket.gethostname()}
+
+    # -- storage -----------------------------------------------------------
+    def _load(self) -> dict:
+        raw = load_json(self.path, default=None)
+        if raw is None:
+            return {"schema": LOCK_REGISTRY_SCHEMA, "legacy_v1": {}, "attempts": {}}
+        if isinstance(raw, dict) and raw.get("schema") == LOCK_REGISTRY_SCHEMA:
+            raw.setdefault("legacy_v1", {})
+            raw.setdefault("attempts", {})
+            return raw
+        if isinstance(raw, dict):
+            # v1 layout: keep every byte of history under legacy_v1
+            return {"schema": LOCK_REGISTRY_SCHEMA, "legacy_v1": raw, "attempts": {}}
+        raise LockRegistryError(f"{self.path}: unreadable lock registry")
+
+    def _txn(self):
+        reg = self
+
+        class _T:
+            def __enter__(self_inner):
+                reg.path.parent.mkdir(parents=True, exist_ok=True)
+                self_inner.fd = os.open(str(reg.guard), os.O_CREAT | os.O_RDWR, 0o644)
+                fcntl.flock(self_inner.fd, fcntl.LOCK_EX)
+                self_inner.data = reg._load()
+                self_inner.dirty = False
+                return self_inner
+
+            def __exit__(self_inner, et, ev, tb):
+                try:
+                    if et is None and self_inner.dirty:
+                        atomic_write_json(reg.path, self_inner.data)
+                finally:
+                    fcntl.flock(self_inner.fd, fcntl.LOCK_UN)
+                    os.close(self_inner.fd)
+                return False
+        return _T()
+
+    @staticmethod
+    def _attempts(data: dict, sid: str, sym: str) -> list:
+        return data["attempts"].setdefault(sid, {}).setdefault(sym, [])
+
+    @staticmethod
+    def _legacy_uses(data: dict, sid: str, sym: str) -> int:
+        return len((data.get("legacy_v1") or {}).get(sid, {}).get(sym, []) or [])
+
+    def _recover_list(self, atts: list) -> list:
+        """Stale-owner recovery for one (sid, sym) list.  Returns changes."""
+        changed = []
+        for a in atts:
+            if a["state"] not in _LOCK_ACTIVE:
+                continue
+            own = a.get("owner") or {}
+            if own.get("host") != self.owner["host"]:
+                continue  # cannot verify a foreign host's process — leave it
+            if own.get("pid") == self.owner["pid"] or _pid_alive(own.get("pid")):
+                continue
+            if a["state"] == LockState.RESERVED.value:
+                a["state"] = LockState.FAILED.value
+                a["reason"] = "owner died before evaluation started (data never exposed)"
+            else:
+                a["state"] = LockState.FAILED.value
+                a["reason"] = "owner died during evaluation — window counts as used"
+            a["finished_at"] = iso_now()
+            changed.append(a["attempt_id"])
+        return changed
+
+    # -- queries -------------------------------------------------------------
+    def uses(self, strategy_id: str, symbol: str) -> int:
+        """Exposed uses: legacy records + attempts that reached evaluation."""
+        data = self._load()
+        atts = data["attempts"].get(strategy_id, {}).get(symbol, [])
+        return self._legacy_uses(data, strategy_id, symbol) + sum(
+            1 for a in atts if a.get("exposed"))
+
+    def state(self, strategy_id: str, symbol: str) -> LockState:
+        data = self._load()
+        atts = data["attempts"].get(strategy_id, {}).get(symbol, [])
+        if any(a["state"] == LockState.CONSUMED.value for a in atts) or \
+                self._legacy_uses(data, strategy_id, symbol):
+            return LockState.CONSUMED
+        if not atts:
+            return LockState.AVAILABLE
+        return LockState(atts[-1]["state"])
+
+    def attempts(self, strategy_id: str, symbol: str) -> list[dict]:
+        return list(self._load()["attempts"].get(strategy_id, {}).get(symbol, []))
+
+    def result(self, strategy_id: str, symbol: str) -> Optional[dict]:
+        for a in self.attempts(strategy_id, symbol):
+            if a["state"] == LockState.CONSUMED.value:
+                return a.get("result")
+        return None
+
+    # -- transitions ----------------------------------------------------------
+    def reserve(self, strategy_id: str, symbol: str, context_id: str) -> dict:
+        """AVAILABLE → RESERVED.  Refused when another live process holds an
+        active attempt or when the window was already exposed once."""
+        with self._txn() as t:
+            atts = self._attempts(t.data, strategy_id, symbol)
+            if self._recover_list(atts):
+                t.dirty = True
+            uses = self._legacy_uses(t.data, strategy_id, symbol) + sum(
+                1 for a in atts if a.get("exposed"))
+            if uses:
+                return {"ok": False, "reason": "ALREADY_USED", "uses": uses}
+            if any(a["state"] in _LOCK_ACTIVE for a in atts):
+                return {"ok": False, "reason": "IN_PROGRESS", "uses": uses}
+            att = {
+                "attempt_id": "L-" + uuid.uuid4().hex[:16],
+                "state": LockState.RESERVED.value,
+                "context_id": context_id,
+                "owner": dict(self.owner),
+                "reserved_at": iso_now(),
+                "exposed": False,
+            }
+            atts.append(att)
+            t.dirty = True
+            return {"ok": True, "token": {"strategy_id": strategy_id, "symbol": symbol,
+                                          "attempt_id": att["attempt_id"]}, "uses": 0}
+
+    def _transition(self, token: Mapping, allowed_from: Sequence[str], to: LockState,
+                    **fields) -> dict:
+        with self._txn() as t:
+            atts = self._attempts(t.data, token["strategy_id"], token["symbol"])
+            for a in atts:
+                if a["attempt_id"] != token["attempt_id"]:
+                    continue
+                if a["state"] not in allowed_from:
+                    raise LockRegistryError(
+                        f"attempt {a['attempt_id']} is {a['state']}, cannot move to {to.value}")
+                if (a.get("owner") or {}).get("pid") != self.owner["pid"]:
+                    raise LockRegistryError("attempt owned by another process")
+                a["state"] = to.value
+                a.update(fields)
+                t.dirty = True
+                return dict(a)
+            raise LockRegistryError(f"unknown attempt {token['attempt_id']}")
+
+    def start(self, token: Mapping) -> dict:
+        """RESERVED → EVALUATION_STARTED: called only after the locked data
+        loaded and passed every quality check, right before exposure."""
+        return self._transition(token, (LockState.RESERVED.value,),
+                                LockState.EVALUATION_STARTED,
+                                started_at=iso_now(), exposed=True)
+
+    def complete(self, token: Mapping, result: Mapping) -> dict:
+        """EVALUATION_STARTED → CONSUMED with an immutable result."""
+        return self._transition(token, (LockState.EVALUATION_STARTED.value,),
+                                LockState.CONSUMED, finished_at=iso_now(),
+                                result=dict(result))
+
+    def block(self, token: Mapping, reason: str) -> dict:
+        """RESERVED → BLOCKED_DATA_MISSING (window never exposed)."""
+        return self._transition(token, (LockState.RESERVED.value,),
+                                LockState.BLOCKED_DATA_MISSING,
+                                finished_at=iso_now(), reason=reason)
+
+    def fail(self, token: Mapping, reason: str) -> dict:
+        """RESERVED/EVALUATION_STARTED → FAILED (exposure flag unchanged)."""
+        return self._transition(token, _LOCK_ACTIVE, LockState.FAILED,
+                                finished_at=iso_now(), reason=reason)
+
+    def recover_stale(self) -> list[str]:
+        with self._txn() as t:
+            changed: list[str] = []
+            for sid, syms in t.data["attempts"].items():
+                for sym, atts in syms.items():
+                    changed += self._recover_list(atts)
+            t.dirty = bool(changed)
+            return changed
 
     def record_use(self, strategy_id: str, symbol: str, context_id: str) -> dict:
-        entry = self._data.setdefault(strategy_id, {})
-        uses = entry.setdefault(symbol, [])
-        uses.append({"context_id": context_id, "ts": iso_now()})
-        atomic_write_json(self.path, self._data)
-        return {
-            "use_number": len(uses),
-            "independent": len(uses) == 1,
-        }
-
-    def uses(self, strategy_id: str, symbol: str) -> int:
-        return len(self._data.get(strategy_id, {}).get(symbol, []))
+        """v1-compatible one-shot use (reserve → start → complete without a
+        result).  The runner no longer calls this: it records a use BEFORE
+        any data check, which is exactly the defect P1-6 removes."""
+        r = self.reserve(strategy_id, symbol, context_id)
+        if not r["ok"]:
+            if r["reason"] == "IN_PROGRESS":
+                raise LockRegistryError("locked test in progress elsewhere")
+            # consumed before: record the extra (non-independent) exposure
+            with self._txn() as t:
+                atts = self._attempts(t.data, strategy_id, symbol)
+                atts.append({"attempt_id": "L-" + uuid.uuid4().hex[:16],
+                             "state": LockState.CONSUMED.value, "context_id": context_id,
+                             "owner": dict(self.owner), "reserved_at": iso_now(),
+                             "started_at": iso_now(), "finished_at": iso_now(),
+                             "exposed": True, "result": {"reuse": True}})
+                t.dirty = True
+            n = self.uses(strategy_id, symbol)
+            return {"use_number": n, "independent": False}
+        self.start(r["token"])
+        self.complete(r["token"], {"legacy_record_use": True})
+        n = self.uses(strategy_id, symbol)
+        return {"use_number": n, "independent": n == 1}
 
 
 # ---------------------------------------------------------------------------
@@ -926,29 +1290,44 @@ class LockTestRegistry:
 
 
 class ProcessLock:
-    """PID-file lock with stale detection (dead PID → reclaimable)."""
+    """PID-file lock with stale detection (dead PID → reclaimable).
+
+    The check-and-write runs under an exclusive flock on ``<path>.guard`` so
+    two starters can never both conclude the lock is free (the previous
+    exists()/write_text() sequence was racy)."""
 
     def __init__(self, path: Path):
         self.path = Path(path)
+        self.guard = self.path.with_name(self.path.name + ".guard")
         self._held = False
 
     def acquire(self) -> bool:
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        if self.path.exists():
-            try:
-                pid = int(self.path.read_text().strip())
-                os.kill(pid, 0)
-                return False  # live owner
-            except (ValueError, ProcessLookupError, PermissionError):
-                pass  # stale lock — reclaim
-        self.path.write_text(str(os.getpid()))
-        self._held = True
-        return True
+        fd = os.open(str(self.guard), os.O_CREAT | os.O_RDWR, 0o644)
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX)
+            if self.path.exists():
+                try:
+                    pid = int(self.path.read_text().strip())
+                except ValueError:
+                    pid = None
+                if pid is not None and _pid_alive(pid):
+                    return False  # live owner
+                # stale (dead / unreadable pid) — reclaim
+            tmp = self.path.with_name(self.path.name + f".{os.getpid()}.tmp")
+            tmp.write_text(str(os.getpid()))
+            os.replace(tmp, self.path)
+            self._held = True
+            return True
+        finally:
+            fcntl.flock(fd, fcntl.LOCK_UN)
+            os.close(fd)
 
     def release(self) -> None:
         if self._held:
             try:
-                self.path.unlink()
+                if self.path.read_text().strip() == str(os.getpid()):
+                    self.path.unlink()
             except FileNotFoundError:
                 pass
             self._held = False

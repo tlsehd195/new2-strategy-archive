@@ -194,13 +194,14 @@ class SearchSpaceStatus:
 
 
 def search_space_status(store, ledger, *, fng_available: bool,
-                        funding_available: bool) -> SearchSpaceStatus:
+                        funding_available: bool, cands=None) -> SearchSpaceStatus:
     """Directive §14 states (SEARCH_SPACE_* etc.).
 
     INSUFFICIENT_DATA means: the only remaining untested candidates are
     blocked by missing datasets — the engine must not spin on empty batches.
     """
-    cands, _ = enumerate_candidates()
+    if cands is None:
+        cands, _ = enumerate_candidates()
     by_family: dict[str, int] = {}
     for _, d in cands:
         by_family[d["family"]] = by_family.get(d["family"], 0) + 1
@@ -234,7 +235,8 @@ def search_space_status(store, ledger, *, fng_available: bool,
         total=len(cands),
         by_family=by_family,
         detail={"untested": len(untested), "reverify": reverify,
-                "survivors": survivors, "data_blocked": data_blocked},
+                "survivors": survivors, "data_blocked": data_blocked,
+                "awaiting_fdr": sum(1 for v in states.values() if v == "AWAITING_FDR")},
     )
 
 
