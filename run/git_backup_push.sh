@@ -14,9 +14,9 @@ STAGE=/tmp/gitbk_stage
 REMOTE="git@github.com:tlsehd195/new2-strategy-archive.git"
 TS=$(date -u +%Y%m%dT%H%M%SZ)
 
-export GIT_SSH_COMMAND="bun /home/z/my-project/NEW2_run/gitssh/gitssh.js"
-export GITSSH_KEY=/home/z/my-project/NEW2_run/gitssh/deploy_key
-export KNOWN_FP=$(cat /home/z/my-project/NEW2_run/gitssh/known_hosts_fp | tr -d '\n')
+# 2026-10-15: gitssh.js + 구 deploy_key 유실 → paramiko 래퍼(GIT_SSH)로 교체
+# (키: /home/z/.ssh/id_ed25519, 호스트키 핀닝: /home/z/.ssh/known_hosts)
+export GIT_SSH=/home/z/.ssh/gh_ssh.py
 
 FAIL=0
 
@@ -37,6 +37,11 @@ cp -rf NEW2_run/research/.  "$REPO/research/"  2>/dev/null || FAIL=1
 cp -f NEW2_run/PREREG_*.md  "$REPO/run/"       2>/dev/null || FAIL=1
 cp -f NEW2_run/*.md         "$REPO/run/"       2>/dev/null
 cp -f NEW2_run/backup_snapshot.sh NEW2_run/git_backup_push.sh NEW2_run/gitssh/gitssh.js NEW2_run/gitssh/deploy_key.pub NEW2_run/gitssh/genkey_ssh2.js "$REPO/run/" 2>/dev/null
+# 2026-10-15: allow-list 누락 수정 — 실행 스크립트(*.py) + discovery 엔진/상태 + audit
+cp -f NEW2_run/*.py "$REPO/run/" 2>/dev/null || true
+mkdir -p "$REPO/run/discovery"
+tar -C NEW2_run --exclude='__pycache__' --exclude='*.pid' -cf - discovery 2>/dev/null | tar -C "$REPO/run" -xf -
+if [ -d NEW2_run/audit ]; then mkdir -p "$REPO/run/audit"; tar -C NEW2_run -cf - audit 2>/dev/null | tar -C "$REPO/run" -xf -; fi
 cp -f worklog.md NEW2_전략탐색_종합정리.md NEW2_분석보고서.md 전략리서치_보고서.md strategy_research_v2.md "$REPO/docs/" 2>/dev/null || FAIL=1
 cp -f NEW2_전략연구_보고서_v*.md "$REPO/docs/"  2>/dev/null || FAIL=1
 cp -f src/instrumentation.ts prisma/schema.prisma "$REPO/src/" 2>/dev/null || FAIL=1
