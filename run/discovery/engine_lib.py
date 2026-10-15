@@ -1,525 +1,962 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+"""NEW2 discovery engine v2 — core library.
+
+REBUILD notice: this module is a from-scratch reimplementation of the
+strategy-discovery engine (the original lives in the private
+``new2-strategy-archive`` repo which is inaccessible from this
+environment, see run/audit/AUDIT_REMAINING_ISSUES.md).  It is NOT a
+patch of the original and it starts a NEW ledger; old experiments are
+never imported, merged, or rewritten.
+
+Design rules enforced here (directive §3-§14):
+- explicit candidate state machine with documented transitions
+- append-only ledger as the authoritative record (JSONL)
+- strategy_id / evaluation_id / experiment_context_id separation
+- Holm within candidate, BH-FDR across candidates, trial ledger
+- multi-symbol verdicts never pass on a single-symbol pass
+- Stouffer without double sqrt(n) weighting and without a rho grid max
+- locked TEST periods are read-only and single-use for final tests
 """
-NEW2 자율탐색 엔진 — 공통 라이브러리 (engine-discovery-v1 잠금 스펙)
-=====================================================================
-기존 프로젝트 잠금 방법론을 그대로 계승 (변경 금지):
-  - 비용: 엔진 CandleCostModel (costs.py:104-117 공식) — FEE 5bp + half-spread 2bp
-    + impact 0.1*sqrt(participation), MAX_PART 0.05, 시나리오 o10k/o100k
-  - 검정: 세포별 t(단측) + 후보 내 Holm 다중검정 보정
-  - 승격 게이트 준용: valid_n>=30, 엔진 비용 차감 후 기대값 양수, 2구간 부호 일치
-  - locked/reserved TEST 구간 절대 배제: BTC 2024-03-25~06-18, ETH 2026-04-28~08-31
-  - 개발 구간: BTC/ETH는 기존 패밀리 잠금 SPANS, 기타 심볼은 ALT_SPANS (2026-04-20까지)
-엔진 자체 신규 규칙 (엄격 방향, 사전 고지):
-  - R1: 게이트는 비중첩(non-overlap) 표본으로만 판정 — 중첩 창의 유의성 과대 계상 차단
-        (raw 중첩 통계는 참고용으로 병기)
-  - R2: 승자 저주 수축 — mean_defl = mean − 2.2414*se > 0 까지 요구
-  - R3: 승격은 절대 자동 선언하지 않음 — SURVIVOR는 promotion_queue 적재 후
-        2027-01-11 / 2027-07-01 잠금 TEST 판정에서만 처리
-v2-audit3 추가 규칙 (감사 Phase 3+4 — 엄격 방향만, 게이트 완화 0):
-  - R4 (F-02 수정, 엄격화): 심볼 정합 — SURVIVOR는 후보의 모든 심볼이
-        POWER·COST·CONSIST·STAT을 통과할 때만. 1심볼 통과+타 심볼 FAIL_*이면
-        FAIL_SYMMETRY (v1의 최고 t 셀 1개 단독 합격 금지).
-  - R5 (F-01 참고 지표, 게이트 아님·완화 아님): 후보 내 Holm 판정 유지 + 탐색 수준
-        Benjamini-Hochberg FDR q 참고 병기(state/원장 누적 기록 — runner).
-  - R6 (F-15 진단, 게이트 아님): 개발·잠금 구간 밖 held-out 구간 raw 통계를
-        생존자의 통과 심볼 셀에 한해 참고 병기 (선택/조정/판정 미사용 — 오염 방지).
-  - R7 (F-06/F-07 수정, 재량 제거): Stouffer ρ=0.119 사전등록 고정 + w_i=1
-        (t는 이미 √n 스케일 — √vn 이중계수 제거, ρ 그리드 max 선택 금지).
-데이터: 캐시만 사용 (NEW2_run/data). 네트워크 다운로드 0바이트.
-"""
-import glob
+
+from __future__ import annotations
+
 import hashlib
 import json
 import math
 import os
+import tempfile
+import time
+import uuid
+from dataclasses import dataclass, field
+from enum import Enum
+from pathlib import Path
+from typing import Iterable, Mapping, Optional, Sequence
 
-import numpy as np
-import pandas as pd
-from scipy import stats
+# ---------------------------------------------------------------------------
+# versions (code identity for experiment_context_id)
+# ---------------------------------------------------------------------------
 
-# F-11 수정 (Phase 2): 런타임 루트를 환경변수로 구성 가능. 기본값은 기존 절대 경로와
-# 동일 — 방법론 잠금 스펙(비용·통계·게이트·잠금 구간)은 일절 변경 없음.
-RUN = os.environ.get("NEW2_ROOT", "/home/z/my-project/NEW2_run")
-BASE = f"{RUN}/data"
-OUT = f"{RUN}/results"
-DISC = f"{RUN}/discovery"
+CODE_VERSION = "discovery-v2.0.0"
+VALIDATION_CFG_VERSION = "valcfg-v2.0.0"
+LEDGER_SCHEMA = "discovery_ledger_v2"
+STATE_SCHEMA = "discovery_state_v2"
 
-# ── 잠금 상수 ──
-BAR_MS = 900_000
-FEE, HALF_SPREAD, IMPACT, MAX_PART = 0.0005, 0.0002, 0.1, 0.05
-SCEN = {"o10k": 10_000.0, "o100k": 100_000.0}
-VN_MIN = 30
-Z_M1, Z_M2 = 1.959964, 2.241403
-NWIN = 960
+# ---------------------------------------------------------------------------
+# candidate states and the transition table
+# ---------------------------------------------------------------------------
 
-SYMBOLS = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "BNBUSDT",
-           "ADAUSDT", "DOGEUSDT", "LINKUSDT", "TRXUSDT", "ZECUSDT"]
-PAIRS = [("BTCUSDT", "ETHUSDT"), ("SOLUSDT", "XRPUSDT"), ("BNBUSDT", "ADAUSDT"),
-         ("DOGEUSDT", "LINKUSDT"), ("TRXUSDT", "ZECUSDT")]
 
-SPANS = {
-    "BTCUSDT": [("2021-05-02", "2022-08-17"), ("2023-04-07", "2024-03-18")],
-    "ETHUSDT": [("2021-05-02", "2022-08-17"), ("2024-12-10", "2026-04-20")],
+class CandidateState(str, Enum):
+    PENDING = "PENDING"
+    RUNNING = "RUNNING"
+    PASS = "PASS"
+    FAIL_COST = "FAIL_COST"
+    FAIL_STAT = "FAIL_STAT"
+    UNDETERMINED_POWER = "UNDETERMINED_POWER"
+    DATA_MISSING = "DATA_MISSING"
+    ERROR = "ERROR"
+    REVERIFY_PENDING = "REVERIFY_PENDING"
+
+
+#: allowed (from, to) transitions.  Any transition not listed (and not the
+#: identity) raises InvalidTransition — states cannot be forced by hand.
+ALLOWED_TRANSITIONS: dict[CandidateState, set[CandidateState]] = {
+    CandidateState.PENDING: {CandidateState.RUNNING},
+    CandidateState.RUNNING: {
+        CandidateState.PASS,
+        CandidateState.FAIL_COST,
+        CandidateState.FAIL_STAT,
+        CandidateState.UNDETERMINED_POWER,
+        CandidateState.DATA_MISSING,
+        CandidateState.ERROR,
+        # crash recovery: a RUNNING candidate whose process died without a
+        # ledger record is moved to the reverify queue by reconcile()
+        CandidateState.REVERIFY_PENDING,
+    },
+    # reverify eligibility is checked by reverify_eligible(), not by the table
+    CandidateState.UNDETERMINED_POWER: {CandidateState.REVERIFY_PENDING},
+    CandidateState.DATA_MISSING: {CandidateState.REVERIFY_PENDING},
+    CandidateState.ERROR: {CandidateState.REVERIFY_PENDING},
+    CandidateState.FAIL_COST: {CandidateState.REVERIFY_PENDING},
+    CandidateState.FAIL_STAT: {CandidateState.REVERIFY_PENDING},
+    CandidateState.REVERIFY_PENDING: {CandidateState.PENDING},
+    CandidateState.PASS: set(),  # terminal: a pass is never silently reused
 }
-ALT_SPANS = [("2021-05-02", "2023-06-01"), ("2023-06-01", "2026-04-20")]
 
-LOCKED = {
-    "BTCUSDT": [("2024-03-25", "2024-06-18")],
-    "ETHUSDT": [("2026-04-28", "2026-08-31")],
+
+class InvalidTransition(ValueError):
+    pass
+
+
+def assert_transition(current: CandidateState, nxt: CandidateState) -> None:
+    if current == nxt:
+        return
+    if nxt not in ALLOWED_TRANSITIONS.get(current, set()):
+        raise InvalidTransition(f"transition {current.value} -> {nxt.value} is not allowed")
+
+
+#: error classes for retry policy.  Transient errors may be retried (limited
+#: times); permanent ones never are.
+TRANSIENT_ERROR_CODES = {
+    "DATA_DOWNLOAD_TEMP",
+    "PROCESS_INTERRUPTED",
+    "DISK_TEMP",
+    "RATE_LIMIT",
+}
+PERMANENT_ERROR_CODES = {
+    "LOGIC_ERROR",
+    "CONFIG_ERROR",
+    "DATA_CORRUPT",
 }
 
-# R6 (F-15 진단): held-out 진단 구간 — 개발 구간·잠금 TEST 구간 어디에도 포함되지
-# 않는 구간(종료 None = 데이터 말미까지). 게이트에 절대 사용하지 않는다
-# (오염 방지 — 2027 잠금 TEST 전 사전 진단 참고 병기 전용).
-HELDOUT = {
-    "BTCUSDT": [("2024-06-19", None)],   # dev SPANS 종료(2024-03-18)·잠금(06-18) 이후
-    "ETHUSDT": [("2026-09-01", None)],   # dev SPANS 종료(2026-04-20)·잠금(08-31) 이후
-}
 
-# R7 (F-06/F-07 수정): Stouffer 결합 상관 계수 — 사전등록 고정값.
-# v1은 ρ∈{0,0.119,0.238,0.5} 그리드에서 max를 골랐다(유리한 ρ 선택 = 다중검정
-# 재량, F-06). v2-audit3부터 운용 코드는 본 상수만 사용한다.
-STOUFFER_RHO = 0.119
+def reverify_eligible(
+    state: CandidateState,
+    *,
+    error_code: Optional[str] = None,
+    attempt_count: int = 0,
+    max_attempts: int = 3,
+    cost_model_version_changed: bool = False,
+    new_data_beyond_dev: bool = False,
+    validation_design_changed: bool = False,
+    data_now_available: bool = False,
+    power_condition_met: bool = False,
+) -> tuple[bool, str]:
+    """Central policy for when a non-final state may be re-verified.
 
-KLINE_FAMILIES = {"flow_z", "ret_rev", "ts_mom", "vol_break", "tod"}
+    Returns (eligible, reason).  This is the single place the rules of
+    directive §3-2 live so the queue cannot invent its own policy.
+    """
 
-
-def ms(s: str) -> int:
-    return int(pd.Timestamp(s, tz="UTC").timestamp() * 1000)
-
-
-def dev_spans(sym: str):
-    return SPANS.get(sym, ALT_SPANS)
-
-
-def sha256_text(t: str) -> str:
-    return hashlib.sha256(t.encode("utf-8")).hexdigest()
-
-
-def cand_hash(family: str, symbols, params: dict) -> str:
-    payload = json.dumps({"family": family, "symbols": list(symbols),
-                          "params": params}, sort_keys=True, ensure_ascii=False)
-    return hashlib.sha1(payload.encode("utf-8")).hexdigest()[:16]
-
-
-# ─────────────────────────────────────────────────────────────
-# 데이터 로더 (캐시 전용)
-# ─────────────────────────────────────────────────────────────
-_kl_cache: dict = {}
-
-
-def load_klines(sym: str) -> pd.DataFrame:
-    if sym in _kl_cache:
-        return _kl_cache[sym]
-    cols = ["open_time", "open", "high", "low", "close", "volume",
-            "close_time", "qv", "n", "tbv", "tbqv", "ig"]
-    files = sorted(glob.glob(f"{BASE}/klines/{sym}-15m-*.csv"))
-    if not files:
-        raise FileNotFoundError(f"klines 없음: {sym}")
-    df = pd.concat([pd.read_csv(f, header=None, names=cols) for f in files],
-                   ignore_index=True)
-    df = df[pd.to_numeric(df["open_time"], errors="coerce").notna()]
-    for c in ["open_time", "open", "volume", "tbv", "qv"]:
-        df[c] = pd.to_numeric(df[c])
-    df["open_time"] = df["open_time"].astype(np.int64)
-    df = df.drop_duplicates("open_time").sort_values("open_time").reset_index(drop=True)
-    _kl_cache[sym] = df
-    return df
+    if state in (CandidateState.PASS, CandidateState.PENDING, CandidateState.RUNNING,
+                 CandidateState.REVERIFY_PENDING):
+        return False, f"state {state.value} is not re-verifiable"
+    if attempt_count >= max_attempts:
+        return False, f"max attempts reached ({attempt_count}/{max_attempts})"
+    if state == CandidateState.UNDETERMINED_POWER:
+        return (True, "power_condition_met") if power_condition_met else (False, "power condition not met")
+    if state == CandidateState.DATA_MISSING:
+        return (True, "data_refresh_check") if data_now_available else (False, "required data still missing")
+    if state == CandidateState.ERROR:
+        if error_code in TRANSIENT_ERROR_CODES:
+            return True, f"transient error retry ({attempt_count}/{max_attempts})"
+        return False, f"permanent error {error_code!r} is never retried"
+    if state == CandidateState.FAIL_COST:
+        return (True, "cost_model_version_changed") if cost_model_version_changed \
+            else (False, "cost model unchanged")
+    if state == CandidateState.FAIL_STAT:
+        if new_data_beyond_dev:
+            return True, "new_data_beyond_dev_window"
+        if validation_design_changed:
+            return True, "validation_design_changed"
+        return False, "no new data and validation design unchanged"
+    return False, f"unhandled state {state.value}"
 
 
-def load_funding(sym: str) -> pd.DataFrame:
-    files = sorted(glob.glob(f"{BASE}/funding/{sym}-fundingRate-*.csv"))
-    if not files:
-        raise FileNotFoundError(f"funding 없음: {sym}")
-    df = pd.concat([pd.read_csv(f) for f in files], ignore_index=True)
-    df["calc_time"] = pd.to_numeric(df["calc_time"], errors="coerce")
-    df = df.dropna(subset=["calc_time"]).copy()
-    df["calc_time"] = df["calc_time"].astype(np.int64)
-    df["rate"] = pd.to_numeric(df["last_funding_rate"], errors="coerce")
-    df = df.dropna(subset=["rate"])
-    return df.drop_duplicates("calc_time").sort_values("calc_time").reset_index(drop=True)
+# ---------------------------------------------------------------------------
+# retry bookkeeping
+# ---------------------------------------------------------------------------
 
 
-def load_fng() -> pd.DataFrame:
-    d = json.load(open(f"{RUN}/research/r3_fng_hist.json"))["data"]
-    df = pd.DataFrame(d)
-    df["ts_ms"] = df["timestamp"].astype(np.int64) * 1000
-    df["value"] = pd.to_numeric(df["value"])
-    return df.sort_values("ts_ms").reset_index(drop=True)
+@dataclass
+class RetryRecord:
+    """Everything directive §3-2 requires to be recorded per candidate."""
+
+    attempt_count: int = 0
+    max_attempts: int = 3
+    last_attempt_at: Optional[str] = None
+    next_retry_after: Optional[str] = None
+    error_code: Optional[str] = None
+    error_message: Optional[str] = None
+    reverify_reason: Optional[str] = None
+    data_version: Optional[str] = None
+
+    def to_json(self) -> dict:
+        return {
+            "attempt_count": self.attempt_count,
+            "max_attempts": self.max_attempts,
+            "last_attempt_at": self.last_attempt_at,
+            "next_retry_after": self.next_retry_after,
+            "error_code": self.error_code,
+            "error_message": self.error_message,
+            "reverify_reason": self.reverify_reason,
+            "data_version": self.data_version,
+        }
+
+    @classmethod
+    def from_json(cls, obj: Mapping) -> "RetryRecord":
+        keys = ("attempt_count", "max_attempts", "last_attempt_at",
+                "next_retry_after", "error_code", "error_message",
+                "reverify_reason", "data_version")
+        return cls(**{k: obj[k] for k in keys if k in obj})
 
 
-# ─────────────────────────────────────────────────────────────
-# 시그널 빌더 — 전부 per-bar int8 배열 (0/±1) 반환
-# ─────────────────────────────────────────────────────────────
-def _rolling_z(x: np.ndarray, win: int = NWIN) -> np.ndarray:
-    s = pd.Series(x)
-    m = s.rolling(win).mean().shift(1).to_numpy()
-    sd = s.rolling(win).std(ddof=1).shift(1).to_numpy()
-    with np.errstate(invalid="ignore"):
-        z = np.where((sd > 0) & np.isfinite(sd) & np.isfinite(x), (x - m) / sd, np.nan)
-    return z
+def backoff_seconds(attempt: int, base: int = 60) -> int:
+    """Exponential backoff, capped at 1 hour."""
+    return min(base * (2 ** max(0, attempt - 1)), 3600)
 
 
-def sig_flow_z(df: pd.DataFrame, L: int, thr: float, mode: str) -> np.ndarray:
-    tbv = df["tbv"].to_numpy(float)
-    vol = df["volume"].to_numpy(float)
-    ts = pd.Series(tbv).rolling(L).sum().to_numpy()
-    vs = pd.Series(vol).rolling(L).sum().to_numpy()
-    R = np.where(vs > 0, ts / vs, np.nan)
-    z = _rolling_z(R)
-    sgn = np.zeros(len(df), dtype=np.int8)
-    if mode == "mom":
-        sgn[z >= thr] = 1
-        sgn[z <= -thr] = -1
-    else:  # rev
-        sgn[z >= thr] = -1
-        sgn[z <= -thr] = 1
-    return sgn
+def iso_now() -> str:
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
 
-def sig_ret_rev(df: pd.DataFrame, k: int, thr: float) -> np.ndarray:
-    close = df["close"].to_numpy(float)
-    r = pd.Series(close).pct_change(k).to_numpy()
-    z = _rolling_z(r)
-    sgn = np.zeros(len(df), dtype=np.int8)
-    sgn[z >= thr] = -1   # 단기 급등 → 역발상 숏
-    sgn[z <= -thr] = 1   # 단기 급락 → 역발상 롱
-    return sgn
+# ---------------------------------------------------------------------------
+# atomic file helpers
+# ---------------------------------------------------------------------------
 
 
-def sig_ts_mom(df: pd.DataFrame, L: int, thr: float) -> np.ndarray:
-    close = df["close"].to_numpy(float)
-    r = pd.Series(close).pct_change(L).to_numpy()
-    z = _rolling_z(r)
-    sgn = np.zeros(len(df), dtype=np.int8)
-    sgn[z >= thr] = 1
-    sgn[z <= -thr] = -1
-    return sgn
+def atomic_write_json(path: Path, obj: object) -> None:
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=str(path.parent), prefix=path.name + ".", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(obj, f, ensure_ascii=False, indent=1, sort_keys=True)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
 
 
-def sig_vol_break(df: pd.DataFrame, Lv: int, thr: float) -> np.ndarray:
-    close = df["close"].to_numpy(float)
-    lr = np.diff(np.log(close), prepend=np.log(close[0]))
-    rv = pd.Series(lr).rolling(Lv).std(ddof=1).to_numpy()
-    vz = _rolling_z(rv)
-    rL = pd.Series(close).pct_change(Lv).to_numpy()
-    sgn = np.zeros(len(df), dtype=np.int8)
-    m = np.isfinite(vz) & np.isfinite(rL)
-    sgn[m & (vz >= thr) & (rL > 0)] = 1    # 변동성 확장 + 상방 돌파 → 모멘텀
-    sgn[m & (vz >= thr) & (rL < 0)] = -1
-    return sgn
+def load_json(path: Path, default: object = None) -> object:
+    path = Path(path)
+    if not path.exists():
+        return default
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 
-def sig_tod(df: pd.DataFrame, h0: int, h1: int, direction: str) -> np.ndarray:
-    kot = df["open_time"].to_numpy(np.int64)
-    hour = ((kot // 3_600_000) % 24)
-    sgn = np.zeros(len(df), dtype=np.int8)
-    base = 1 if direction == "long" else -1
-    sgn[(hour >= h0) & (hour < h1)] = base
-    return sgn
+def append_jsonl(path: Path, record: Mapping) -> None:
+    """Append one JSON line with fsync — the ledger is append-only."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "a", encoding="utf-8") as f:
+        f.write(json.dumps(record, ensure_ascii=False, sort_keys=True) + "\n")
+        f.flush()
+        os.fsync(f.fileno())
 
 
-def sig_funding_z(df: pd.DataFrame, sym: str, zthr: float) -> np.ndarray:
-    """8h 펀딩비 z(90일 창) 극단 → 역발상(펀딩 지불 쪽 반대). 펀딩 시각당 첫 15m 봉 1개만 신호."""
-    fnd = load_funding(sym)
-    rates = fnd["rate"].to_numpy(float)
-    z = _rolling_z(rates, win=270)  # 270*8h = 90일
-    kot = df["open_time"].to_numpy(np.int64)
-    sgn = np.zeros(len(df), dtype=np.int8)
-    fts = fnd["calc_time"].to_numpy(np.int64)
-    for j in np.where(np.isfinite(z) & (np.abs(z) >= zthr))[0]:
-        i0 = int(np.searchsorted(kot, fts[j]))
-        if i0 < len(kot):
-            sgn[i0] = -1 if z[j] > 0 else 1
-    return sgn
+def iter_jsonl(path: Path) -> Iterable[dict]:
+    path = Path(path)
+    if not path.exists():
+        return
+    with open(path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                try:
+                    yield json.loads(line)
+                except json.JSONDecodeError:
+                    # a torn trailing line after a crash is recoverable: skip it
+                    # but only ever the LAST line may be torn
+                    continue
 
 
-def sig_fng(df: pd.DataFrame, lo: int, hi: int) -> np.ndarray:
-    """D-1 확정 F&G 값 → D일 첫 15m 봉 1개만 신호 (하루 1이벤트/방향). 역발상."""
-    fng = load_fng()
-    kot = df["open_time"].to_numpy(np.int64)
-    sgn = np.zeros(len(df), dtype=np.int8)
-    day_ms = 86_400_000
-    vals = fng["value"].to_numpy(int)
-    ts = fng["ts_ms"].to_numpy(np.int64)
-    for j in range(1, len(fng)):
-        v = vals[j - 1]  # D-1 확정값 → D일 적용
-        if v <= lo or v >= hi:
-            d0 = (ts[j] // day_ms) * day_ms
-            i0 = int(np.searchsorted(kot, d0))
-            if i0 < len(kot) and kot[i0] < d0 + day_ms:
-                if v <= lo:
-                    sgn[i0] = 1
-                else:
-                    sgn[i0] = -1
-    return sgn
+# ---------------------------------------------------------------------------
+# IDs  (directive §4-1)
+# ---------------------------------------------------------------------------
+
+#: parameters that describe the *evaluation environment*, not the strategy.
+#: These must never enter strategy_id.
+ENV_KEYS = ("dataset_id", "data_sha256", "cost_model", "code_version",
+            "validation_cfg_version")
 
 
-def apply_filter(df: pd.DataFrame, sgn: np.ndarray, name: str) -> np.ndarray:
-    """조합 변형용 국면 필터: vol_calm(vz<1) / vol_stress(vz>=1), Lv=96."""
-    if name not in ("vol_calm", "vol_stress"):
-        return sgn
-    close = df["close"].to_numpy(float)
-    lr = np.diff(np.log(close), prepend=np.log(close[0]))
-    rv = pd.Series(lr).rolling(96).std(ddof=1).to_numpy()
-    vz = _rolling_z(rv)
-    out = sgn.copy()
-    if name == "vol_calm":
-        out[~(vz < 1)] = 0
-    else:
-        out[~(vz >= 1)] = 0
+def canonical_json(obj: object) -> str:
+    """Canonical JSON: sorted keys, tight separators.
+
+    Normalization happens before this: parameters equal to family defaults
+    are dropped and numerics are rounded so 0.5 and 0.50 hash identically.
+    """
+    return json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def _round_floats(obj: object, sig: int = 10) -> object:
+    if isinstance(obj, float):
+        if obj != obj or obj in (float("inf"), float("-inf")):
+            raise ValueError("non-finite float in strategy definition")
+        return float(f"{obj:.{sig}g}")
+    if isinstance(obj, bool) or obj is None or isinstance(obj, (int, str)):
+        return obj
+    if isinstance(obj, Mapping):
+        return {k: _round_floats(v, sig) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_round_floats(v, sig) for v in obj]
+    raise TypeError(f"unsupported type {type(obj)!r} in strategy definition")
+
+
+def normalize_strategy(defn: Mapping) -> dict:
+    """Canonical strategy definition.
+
+    - drops keys whose value equals the family default (explicit-vs-default
+      differences must not create different strategies)
+    - sorts keys, rounds floats
+    - keeps only strategy-defining keys: family, params, symbols, timeframe,
+      entry, exit, holding, risk (data/cost versions are environment)
+    """
+    allowed = ("family", "params", "symbols", "symbol", "timeframe", "entry",
+               "exit", "holding", "risk", "direction", "primary_cell")
+    out: dict = {}
+    defaults = defn.get("_defaults") or {}
+    for k in sorted(defn.keys()):
+        if k not in allowed:
+            continue  # anything not strategy-defining is excluded by design
+        v = defn[k]
+        if k == "params" and isinstance(v, Mapping):
+            v = {pk: pv for pk, pv in v.items()
+                 if pk not in defaults or defaults[pk] != pv}
+        out[k] = _round_floats(v)
+    if "family" not in out:
+        raise ValueError("strategy definition requires 'family'")
     return out
 
 
-# ─────────────────────────────────────────────────────────────
-# 이벤트 추출 + 비용 + 통계
-# ─────────────────────────────────────────────────────────────
-def _contig_ok(kot: np.ndarray, idx: np.ndarray, h: int) -> np.ndarray:
-    d = np.diff(kot)
-    bad = (d != BAR_MS).astype(np.int64)
-    cs = np.concatenate([[0], np.cumsum(bad)])
-    hi = idx + h + 1  # diffs idx..idx+h (h+1개) 연속 필요: i→entry→exit
-    hi_c = np.minimum(hi, len(bad))
-    return (hi <= len(bad)) & (cs[hi_c] - cs[idx] == 0)
+def strategy_id(defn: Mapping) -> str:
+    canon = canonical_json(normalize_strategy(defn))
+    return "S-" + hashlib.sha256(canon.encode("utf-8")).hexdigest()[:16]
 
 
-def event_study(df: pd.DataFrame, sgn: np.ndarray, horizons, sym: str) -> dict:
-    """시그널 봉 i → 진입 i+1 시가 → 청산 i+1+h 시가. locked TEST 구간 진입 배제."""
-    kot = df["open_time"].to_numpy(np.int64)
-    kop = df["open"].to_numpy(float)
-    kqv = df["qv"].to_numpy(float)
-    sig_idx = np.where(sgn != 0)[0]
-    lms = [(ms(a), ms(b)) for a, b in LOCKED.get(sym, [])]
-    out = {}
-    for h in horizons:
-        idx = sig_idx[_contig_ok(kot, sig_idx, h)]
-        ei = idx + 1
-        xi = ei + h
-        fin = xi < len(kot)
-        idx, ei, xi = idx[fin], ei[fin], xi[fin]
-        ems = kot[ei]
-        keep = np.ones(len(idx), dtype=bool)
-        for a, b in lms:
-            keep &= ~((ems >= a) & (ems < b))
-        idx, ei, xi, ems = idx[keep], ei[keep], xi[keep], ems[keep]
-        raw_bp = (kop[xi] - kop[ei]) / kop[ei] * 1e4 * sgn[idx]
-        out[h] = {"n": int(len(idx)), "entry_ms": ems, "exit_ms": kot[xi],
-                  "sgn": sgn[idx], "raw_bp": raw_bp,
-                  "qv_e": kqv[ei], "qv_x": kqv[xi]}
-    return out
+def experiment_context_id(*, dataset_id: str, data_sha256: str, cost_model: str,
+                          code_version: str = CODE_VERSION,
+                          validation_cfg_version: str = VALIDATION_CFG_VERSION) -> str:
+    canon = canonical_json({
+        "dataset_id": dataset_id,
+        "data_sha256": data_sha256,
+        "cost_model": cost_model,
+        "code_version": code_version,
+        "validation_cfg_version": validation_cfg_version,
+    })
+    return "C-" + hashlib.sha256(canon.encode("utf-8")).hexdigest()[:16]
 
 
-def cost_vec(ov: float, qv_e: np.ndarray, qv_x: np.ndarray):
-    pe = np.where(qv_e > 0, ov / np.maximum(qv_e, 1e-9), np.inf)
-    px = np.where(qv_x > 0, ov / np.maximum(qv_x, 1e-9), np.inf)
-    ok = (qv_e > 0) & (qv_x > 0) & (pe <= MAX_PART) & (px <= MAX_PART)
-    c = 2 * FEE + 2 * HALF_SPREAD + IMPACT * (
-        np.sqrt(np.where(ok, pe, 0.0)) + np.sqrt(np.where(ok, px, 0.0)))
-    return ok, c * 1e4
+def evaluation_id(strategy: str, context: str) -> str:
+    """A fresh id for every evaluation run — re-evaluations of the same
+    strategy never overwrite the old record, they get a new evaluation_id."""
+    raw = f"{strategy}|{context}|{time.time_ns()}|{uuid.uuid4()}"
+    return "E-" + hashlib.sha256(raw.encode("utf-8")).hexdigest()[:20]
 
 
-def nonoverlap_keep(ems: np.ndarray, h: int) -> np.ndarray:
-    """R1 규칙: 시간순 greedy 비중첩 선택 (entry >= 직전 entry + h봉)."""
-    keep = np.zeros(len(ems), dtype=bool)
-    last = -1
-    for j in np.argsort(ems):
-        if ems[j] >= last:
-            keep[j] = True
-            last = ems[j] + h * BAR_MS
-    return keep
+# ---------------------------------------------------------------------------
+# statistics (stdlib only)
+# ---------------------------------------------------------------------------
 
 
-def holm(pvals) -> np.ndarray:
-    p = np.asarray(pvals, dtype=float)
-    m = len(p)
-    order = np.argsort(p)
-    adj = np.empty(m)
-    mx = 0.0
-    for rank, i2 in enumerate(order):
-        mx = max(mx, (m - rank) * p[i2])
-        adj[i2] = min(mx, 1.0)
-    return adj
+def _betacf(a: float, b: float, x: float, itmax: int = 300, eps: float = 3e-12) -> float:
+    qab = a + b
+    qap = a + 1.0
+    qam = a - 1.0
+    c = 1.0
+    d = 1.0 - qab * x / qap
+    if abs(d) < 1e-300:
+        d = 1e-300
+    d = 1.0 / d
+    h = d
+    for m in range(1, itmax + 1):
+        m2 = 2 * m
+        aa = m * (b - m) * x / ((qam + m2) * (a + m2))
+        d = 1.0 + aa * d
+        if abs(d) < 1e-300:
+            d = 1e-300
+        c = 1.0 + aa / c
+        if abs(c) < 1e-300:
+            c = 1e-300
+        d = 1.0 / d
+        h *= d * c
+        aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2))
+        d = 1.0 + aa * d
+        if abs(d) < 1e-300:
+            d = 1e-300
+        c = 1.0 + aa / c
+        if abs(c) < 1e-300:
+            c = 1e-300
+        d = 1.0 / d
+        delta = d * c
+        h *= delta
+        if abs(delta - 1.0) < eps:
+            break
+    return h
 
 
-def one_sided_p(t: float, vn: int) -> float:
-    if vn < 2 or not np.isfinite(t):
+def betainc_reg(a: float, b: float, x: float) -> float:
+    """Regularized incomplete beta I_x(a, b)."""
+    if x <= 0.0:
+        return 0.0
+    if x >= 1.0:
         return 1.0
-    return float(stats.t.sf(t, df=vn - 1))
+    ln_front = (math.lgamma(a + b) - math.lgamma(a) - math.lgamma(b)
+                + a * math.log(x) + b * math.log(1.0 - x))
+    front = math.exp(ln_front)
+    if x < (a + 1.0) / (a + b + 2.0):
+        return front * _betacf(a, b, x) / a
+    return 1.0 - front * _betacf(b, a, 1.0 - x) / b
 
 
-def cell_stats(ev_h: dict, h: int, sym: str) -> dict:
-    """단일 (sym,h) 셀: 비중첩 표본 게이트 통계 + raw 참고 통계.
-    개발 구간 제한: 진입·청산 모두 dev span 내부 (X8 규격 준용)."""
-    ems = ev_h["entry_ms"]
-    xms = ev_h["exit_ms"]
-    raw_bp = ev_h["raw_bp"]
-    ok10, c10 = cost_vec(SCEN["o10k"], ev_h["qv_e"], ev_h["qv_x"])
-    ok100, c100 = cost_vec(SCEN["o100k"], ev_h["qv_e"], ev_h["qv_x"])
-    net10 = raw_bp - c10
-    in_span = np.zeros(len(ems), dtype=bool)
-    for (a, b) in dev_spans(sym):
-        s0, e0 = ms(a), ms(b)
-        in_span |= (ems >= s0) & (xms < e0)
-    base_idx = np.where(in_span & ok10)[0]
-    keep2 = nonoverlap_keep(ems[base_idx], h)
-    sel_idx = base_idx[keep2]
-    sel = net10[sel_idx]
-    keep = sel_idx  # 최종 채택 인덱스 (스팬 내 + 비용가능 + 비중첩)
-    vn = int(len(sel))
-    st = {"sym": sym, "h": h, "n_raw": int(ev_h["n"]),
-          "vn_nonov": vn, "fail_closed_o10k": int((~ok10).sum())}
-    if vn >= 2:
-        mean = float(np.mean(sel))
-        se = float(np.std(sel, ddof=1) / math.sqrt(vn))
-        t = mean / se if se > 0 else 0.0
-        st.update({"mean_net_bp": mean, "se": se, "t": t,
-                   "p": one_sided_p(t, vn)})
-        # 구간별 부호 (일관성 게이트용)
-        s_means = []
-        for (a, b) in dev_spans(sym):
-            s0, e0 = ms(a), ms(b)
-            m_in = (ems[sel_idx] >= s0) & (xms[sel_idx] < e0)
-            if m_in.sum() >= 2:
-                s_means.append(float(np.mean(net10[sel_idx][m_in])))
-            else:
-                s_means.append(None)
-        st["span_means"] = s_means
-        # raw 중첩 참고 (스팬 내 전체, 비용가능)
-        okr = in_span & ok10
-        st["raw_mean_bp"] = float(np.mean(net10[okr])) if okr.sum() else None
-        st["raw_n"] = int(okr.sum())
-    else:
-        st.update({"mean_net_bp": None, "se": None, "t": None, "p": 1.0,
-                   "span_means": [None, None], "raw_mean_bp": None, "raw_n": 0})
-    # o100k 시나리오 (참고 — 비용벽 가혹 시나리오)
-    sel100 = (raw_bp - c100)[sel_idx[ok100[sel_idx]]]
-    st["mean_net_o100k_bp"] = float(np.mean(sel100)) if len(sel100) >= 2 else None
-    return st
+def t_sf(t: float, df: float) -> float:
+    """One-sided survival function P(T > t) for Student's t."""
+    if df <= 0:
+        raise ValueError("df must be positive")
+    if t < 0:
+        return 1.0 - t_sf(-t, df)
+    x = df / (df + t * t)
+    return 0.5 * betainc_reg(df / 2.0, 0.5, x)
 
 
-def _symbol_gate(cells_sym: list):
-    """R4 보조: 단일 심볼 셀 모음에 게이트 체인 적용 (순서 고정 POWER→COST→
-    CONSIST→STAT). 반환: (심볼 판정, 해당 심볼 최고 t 셀).
-    PASS = 4게이트 모두 통과. v1과 동일한 게이트 조건 — 적용 단위만 심볼로 확대."""
-    fin = [c for c in cells_sym if c.get("t") is not None]
-    if not fin:
-        return "UNDETERMINED_POWER", None
-    best = max(fin, key=lambda c: c["t"])
-    if best["vn_nonov"] < VN_MIN:
-        return "UNDETERMINED_POWER", best
-    if best["mean_net_bp"] is None or best["mean_net_bp"] <= 0:
-        return "FAIL_COST", best
-    sm = best["span_means"]
-    if not (len(sm) == 2 and sm[0] is not None and sm[1] is not None
-            and sm[0] > 0 and sm[1] > 0):
-        return "FAIL_CONSIST", best
-    mean_defl = best["mean_net_bp"] - Z_M2 * best["se"]
-    best["mean_defl_bp"] = mean_defl
-    if best["p_holm"] >= 0.05 or mean_defl <= 0:
-        return "FAIL_STAT", best
-    return "PASS", best
+def norm_sf(z: float) -> float:
+    return 0.5 * math.erfc(z / math.sqrt(2.0))
 
 
-# 전체 판정 우선순위 (게이트 순서 — 전 심볼 FAIL 시 가장 앞 게이트 실패를 대표 판정으로)
-_GATE_ORDER = ("UNDETERMINED_POWER", "FAIL_COST", "FAIL_CONSIST", "FAIL_STAT")
-
-
-def verdict_from_cells(cells: list):
-    """R4 (F-02 수정, v2-audit3 — 엄격화): 심볼 단위 판정.
-    각 심볼의 셀 모음에 게이트 체인(POWER→COST→CONSIST→STAT)을 개별 적용한다.
-      · SURVIVOR: 모든 심볼이 4게이트 통과할 때만 부여 (v1은 최고 t 셀 1개 통과로
-        합격 가능 → 1심볼 통과+타 심볼 FAIL_*이면 FAIL_SYMMETRY로 정직 기록).
-      · UNDETERMINED_POWER: 어느 심볼이든 데이터 부족(vn<30/셀 없음)이면 전체를
-        미결정으로 분류해 재검증 큐로 보낸다(성급한 FAIL 선언 금지 — 데이터 보강
-        후 재판정; 게이트 완화 아님 — UNDETERMINED는 절대 합격이 아님).
-      · 전 심볼 FAIL: 게이트 순서 우선(POWER>COST>CONSIST>STAT)으로 대표 판정.
-    Holm 보정은 기존대로 후보 내 전 셀에 공통 적용한다.
-    셀에는 sym_verdict(심볼별 판정), 최고 셀에는 sym_verdicts 요약을 기록한다."""
-    fin = [c for c in cells if c.get("t") is not None]
-    if fin:
-        # Holm (후보 내 전 셀 — 기존 규격 유지)
-        ps = [max(c["p"], 1e-300) for c in fin]
-        padj = holm(ps)
-        for c, p in zip(fin, padj):
-            c["p_holm"] = float(p)
-    by_sym = {}
-    for c in cells:
-        by_sym.setdefault(c["sym"], []).append(c)
-    if not by_sym:
-        return "UNDETERMINED_POWER", None
-    sv, bests = {}, {}
-    for sym, cs in by_sym.items():
-        v, b = _symbol_gate(cs)
-        sv[sym] = v
-        for c in cs:
-            c["sym_verdict"] = v
-        if b is not None:
-            bests[sym] = b
-    if all(v == "PASS" for v in sv.values()):
-        verdict = "SURVIVOR"
-    elif any(v == "UNDETERMINED_POWER" for v in sv.values()):
-        verdict = "UNDETERMINED_POWER"
-    else:
-        passes = [s for s in sv if sv[s] == "PASS"]
-        fails = [s for s in sv if sv[s] != "PASS"]
-        if passes and fails:
-            verdict = "FAIL_SYMMETRY"   # 1심볼 통과 + 1심볼 불통 — 정직 기록 (R4)
+def norm_isf(p: float) -> float:
+    """Inverse survival: z such that P(N > z) = p (bisection, 1e-10)."""
+    if not 0.0 < p < 1.0:
+        raise ValueError("p must be in (0, 1)")
+    lo, hi = -12.0, 12.0
+    for _ in range(200):
+        mid = 0.5 * (lo + hi)
+        if norm_sf(mid) > p:
+            lo = mid
         else:
-            verdict = min((sv[s] for s in fails), key=lambda v: _GATE_ORDER.index(v))
-    best = max(bests.values(), key=lambda c: c["t"]) if bests else None
-    if best is not None:
-        best["sym_verdicts"] = dict(sv)   # 심볼별 세부 판정 요약 (원장/results 직렬화용)
-    return verdict, best
+            hi = mid
+    return 0.5 * (lo + hi)
 
 
-def heldout_spans(sym: str):
-    """R6: 심볼의 held-out 진단 구간 (개발 구간·잠금 TEST 구간 밖, 종료 None=데이터 말미).
-    알트는 ALT_SPANS 종료(2026-04-20) 익일부터 — 잠금 구간 없음."""
-    return HELDOUT.get(sym, [("2026-04-21", None)])
+def norm_ppf(p: float) -> float:
+    """Inverse CDF (quantile): z such that P(N <= z) = p."""
+    return norm_isf(1.0 - p)  # sf(z)=1-p ⇔ CDF(z)=p
 
 
-def heldout_stats(ev_h: dict, sym: str) -> dict:
-    """R6 (F-15 진단): held-out 구간 raw 참고 통계 — 생존자의 통과 심볼 셀에 한해
-    산출·병기된다(runner process_candidate). 게이트에 절대 사용하지 않는다
-    (선택·조정·판정 미사용 — 2027 잠금 TEST 전 사전 진단 참고만, 오염 방지).
-    통계: 비용가능(o10k) 진입 전체(중첩 허용 raw)의 순수익 평균 + 표본 수."""
-    ems = ev_h["entry_ms"]
-    xms = ev_h["exit_ms"]
-    raw_bp = ev_h["raw_bp"]
-    ok10, c10 = cost_vec(SCEN["o10k"], ev_h["qv_e"], ev_h["qv_x"])
-    net10 = raw_bp - c10
-    inh = np.zeros(len(ems), dtype=bool)
-    for (a, b) in heldout_spans(sym):
-        s0 = ms(a)
-        inh |= (ems >= s0) if b is None else ((ems >= s0) & (xms < ms(b)))
-    m = inh & ok10
-    if not m.any():
-        return {"n": 0, "mean_net_bp": None}
-    return {"n": int(m.sum()), "mean_net_bp": float(np.mean(net10[m]))}
+def mean(xs: Sequence[float]) -> float:
+    return sum(xs) / len(xs)
 
 
-def z_pool_stouffer(ts, vns, rho: float = None) -> float:
-    """R7 (F-06/F-07 수정, v2-audit3): Stouffer 결합 — 양수 t 성분만 (쌍대 음수 불가).
+def stdev(xs: Sequence[float], ddof: int = 1) -> float:
+    n = len(xs)
+    if n - ddof <= 0:
+        return float("nan")
+    mu = mean(xs)
+    return math.sqrt(sum((x - mu) ** 2 for x in xs) / (n - ddof))
 
-        z = (Σ t_i) / sqrt( k + 2ρ·k(k−1)/2 )
 
-    · w_i = 1 통일: t 통계량은 이미 √n 스케일이므로 v1의 w=√vn 추가 가중은
-      √n·√n = n 이중계수가 된다(F-07) → 제거하고 등가중 결합으로 고정.
-      var = Σ w_i² + 2ρ·(쌍 개수) = k + 2ρ·k(k−1)/2.
-    · ρ는 사전등록 상수 STOUFFER_RHO=0.119 고정. v1의 ρ 그리드 max 선택은 금지
-      (F-06: 유리한 ρ 선택 = 다중검정 재량). rho 인자는 단위 테스트(T9: 단조성·
-      기댓값·복제 무이득) 전용이며 운용 코드는 상수만 전달한다.
-    · 정합성: k=1 → z=t_1 (불변). 동일 전략 복제(t1=t2=t, ρ=1) → z=t (무이득).
-      모든 t_i=t, ρ=0 → z=t·√k (클래식 Stouffer 등가중). — T9 단위검증 대상."""
-    keep = [(t, v) for t, v in zip(ts, vns) if v >= VN_MIN and t > 0]
-    if not keep:
-        return float("-inf")
-    if rho is None:
-        rho = STOUFFER_RHO
-    k = len(keep)
-    num = float(sum(t for t, _ in keep))
-    var = float(k + 2.0 * rho * (k * (k - 1) / 2.0))
+def t_stat(xs: Sequence[float]) -> tuple[float, int]:
+    """One-sample t statistic for H0: mean <= 0 (tested one-sided)."""
+    n = len(xs)
+    if n < 2:
+        return float("nan"), n
+    s = stdev(xs)
+    if not (s > 0) or math.isnan(s):
+        return float("nan"), n
+    return mean(xs) / (s / math.sqrt(n)), n
+
+
+def p_one_sided_from_t(t: float, df: int) -> float:
+    return t_sf(t, df)
+
+
+def holm_test(pvalues: Sequence[float], alpha: float = 0.05) -> list[bool]:
+    """Holm-Bonferroni step-down.  Returns rejected flags in input order."""
+    m = len(pvalues)
+    if m == 0:
+        return []
+    order = sorted(range(m), key=lambda i: pvalues[i])
+    rejected = [False] * m
+    for rank, idx in enumerate(order):
+        thresh = alpha / (m - rank)
+        if pvalues[idx] <= thresh:
+            rejected[idx] = True
+        else:
+            break
+    return rejected
+
+
+def bh_fdr(pvalues: Sequence[float], q: float = 0.05) -> list[bool]:
+    """Benjamini-Hochberg FDR control across candidates."""
+    m = len(pvalues)
+    if m == 0:
+        return []
+    order = sorted(range(m), key=lambda i: pvalues[i])
+    rejected = [False] * m
+    k = -1
+    for rank in range(m - 1, -1, -1):
+        idx = order[rank]
+        if pvalues[idx] <= q * (rank + 1) / m:
+            k = rank
+            break
+    if k >= 0:
+        for rank in range(k + 1):
+            rejected[order[rank]] = True
+    return rejected
+
+
+def select_non_overlapping(events: Sequence[Mapping], horizon: int) -> list[Mapping]:
+    """Greedy time selection of non-overlapping events.
+
+    Each event must carry ``entry_index``; two events overlap when their
+    [entry, entry+horizon) windows intersect.  Overlapping returns must
+    never be treated as independent observations (directive §5-3).
+    """
+    chosen: list[Mapping] = []
+    last_end = -1
+    for ev in sorted(events, key=lambda e: e["entry_index"]):
+        start = int(ev["entry_index"])
+        if start >= last_end:
+            chosen.append(ev)
+            last_end = start + horizon
+    return chosen
+
+
+def nw_tstat(xs: Sequence[float], lag: Optional[int] = None) -> tuple[float, int]:
+    """Newey-West HAC t-statistic for H0: mean <= 0."""
+    n = len(xs)
+    if n < 3:
+        return float("nan"), n
+    if lag is None:
+        lag = int(math.floor(4 * (n / 100.0) ** (2.0 / 9.0)))
+    mu = mean(xs)
+    u = [x - mu for x in xs]
+    s0 = sum(v * v for v in u)
+    s_lag = 0.0
+    for l in range(1, min(lag, n - 1) + 1):
+        w = 1.0 - l / (lag + 1.0)
+        s_lag += w * sum(u[i] * u[i - l] for i in range(l, n))
+    var = (s0 + 2.0 * s_lag) / n
     if var <= 0:
-        return float("-inf")
-    return num / math.sqrt(var)
+        return float("nan"), n
+    return mu / math.sqrt(var / n), n
+
+
+def block_bootstrap_pvalue(xs: Sequence[float], block: int = 8,
+                           n_boot: int = 1000, seed: int = 0) -> float:
+    """Moving-block bootstrap p-value for H0: mean <= 0 (A-26 fix).
+
+    The data are centred on the observed mean (imposing the H0), the
+    bootstrap distribution of the mean is built from centred blocks, and
+    p = P(mean* >= observed mean).  The previous version compared bootstrap
+    means with the observed mean itself — that measures nothing about H0.
+    """
+    n = len(xs)
+    if n < block * 2:
+        return float("nan")
+    rng = random.Random(seed)
+    obs = mean(xs)
+    centred = [x - obs for x in xs]
+    blocks = [centred[i:i + block] for i in range(0, n - block + 1, block)]
+    nb = len(blocks)
+    count = 0
+    for _ in range(n_boot):
+        sample = [x for _ in range(0, nb) for x in blocks[rng.randrange(nb)]]
+        if mean(sample[:n]) >= obs:
+            count += 1
+    return (count + 1) / (n_boot + 1)
+
+
+import random  # noqa: E402  (used by bootstrap; kept next to its only users)
+
+
+def deflated_sharpe(sr: float, n: int, skew: float, kurtosis: float,
+                    n_trials: int, var_sr: float) -> float:
+    """Bailey & López de Prado Deflated Sharpe Ratio.
+
+    ``var_sr`` is the cross-trial variance of the Sharpe estimates (the
+    dispersion across the trials that were actually run), NOT the sampling
+    variance of one SR.
+    """
+    if n_trials < 1 or n < 2:
+        return float("nan")
+    g = 0.5772156649015329  # Euler-Mascheroni
+    e = math.e
+    n_trials = max(2, n_trials)
+    # Φ⁻¹ here is the standard-normal QUANTILE (inverse CDF)
+    sr0 = math.sqrt(max(var_sr, 1e-300)) * (
+        (1.0 - g) * norm_ppf(1.0 - 1.0 / n_trials)
+        + g * norm_ppf(1.0 - 1.0 / (n_trials * e))
+    )
+    denom = 1.0 - skew * sr + (kurtosis - 1.0) / 4.0 * sr * sr
+    if denom <= 0:
+        return 0.0
+    z = (sr - sr0) * math.sqrt(n - 1) / math.sqrt(denom)
+    return 1.0 - norm_sf(z)
+
+
+def pbo_cscv(returns_matrix: Sequence[Sequence[float]], n_partitions: int = 16,
+             max_combos: int = 12870, seed: int = 0) -> tuple[float, int]:
+    """Probability of Backtest Overfitting via CSCV.
+
+    ``returns_matrix`` is T x N per-period returns for N candidate configs.
+    Returns (pbo, n_combinations_used).
+    """
+    T = len(returns_matrix)
+    N = len(returns_matrix[0]) if T else 0
+    if T < n_partitions or N < 2:
+        return float("nan"), 0
+    idx = list(range(T))
+    block = T // n_partitions
+    blocks = [idx[i * block:(i + 1) * block] for i in range(n_partitions)]
+    if len(blocks[-1]) < block:
+        blocks[-2].extend(blocks.pop())
+    combos = list(__import__("itertools").combinations(range(len(blocks)), len(blocks) // 2))
+    if len(combos) > max_combos:
+        rng = random.Random(seed)
+        combos = rng.sample(combos, max_combos)
+    logits = []
+    for combo in combos:
+        test = [b for b in range(len(blocks)) if b not in combo]
+        train_rows = [r for b in combo for r in blocks[b]]
+        test_rows = [r for b in test for r in blocks[b]]
+        train_mean = [mean([returns_matrix[r][c] for r in train_rows]) for c in range(N)]
+        test_mean = [mean([returns_matrix[r][c] for r in test_rows]) for c in range(N)]
+        best = max(range(N), key=lambda c: train_mean[c])
+        rank = sorted(test_mean).index(test_mean[best])
+        omega = (rank + 1) / (N + 1)
+        if not 0.0 < omega < 1.0:
+            omega = min(max(omega, 1e-6), 1 - 1e-6)
+        logits.append(math.log(omega / (1.0 - omega)))
+    pbo = sum(1 for l in logits if l <= 0) / len(logits)
+    return pbo, len(logits)
+
+
+# ---------------------------------------------------------------------------
+# Stouffer combination (directive §7) — fixed version
+# ---------------------------------------------------------------------------
+
+
+def stouffer_independent(zs: Sequence[float], weights: Optional[Sequence[float]] = None) -> float:
+    """Weighted Stouffer Z for *independent* z-scores.
+
+    Z = sum(w_i z_i) / sqrt(sum(w_i^2)).
+
+    IMPORTANT: the inputs are z-scores (e.g. one-sided z from a cell's
+    p-value).  Weighting t-statistics AGAIN by sqrt(n) here would double
+    count sample size because t already scales with sqrt(n); the old
+    engine's sqrt(n)-weighted t combination was therefore removed.
+    """
+    if not zs:
+        raise ValueError("no z-scores")
+    if any(not math.isfinite(z) for z in zs):
+        raise ValueError("non-finite z-score")
+    w = list(weights) if weights is not None else [1.0] * len(zs)
+    if len(w) != len(zs):
+        raise ValueError("weights length mismatch")
+    if any(wi < 0 for wi in w):
+        raise ValueError("negative weight")
+    if all(wi == 0 for wi in w):
+        raise ValueError("all weights zero")
+    num = sum(wi * zi for wi, zi in zip(w, zs))
+    den = math.sqrt(sum(wi * wi for wi in w))
+    return num / den
+
+
+def stouffer_correlated(zs: Sequence[float], corr: Sequence[Sequence[float]]) -> float:
+    """Stouffer Z under a *known/estimated* correlation matrix R.
+
+    Z = 1'R^-1 z / sqrt(1'R^-1 1).   Callers must estimate R on development
+    data only and treat estimation failure as UNDETERMINED — there is no
+    rho-grid maximum here (that was selection bias, directive §7-2).
+    """
+    n = len(zs)
+    if len(corr) != n or any(len(row) != n for row in corr):
+        raise ValueError("correlation matrix shape mismatch")
+    # invert R (Gauss-Jordan); raise if singular
+    a = [list(map(float, row)) for row in corr]
+    inv = [[1.0 if i == j else 0.0 for j in range(n)] for i in range(n)]
+    for col in range(n):
+        piv = max(range(col, n), key=lambda r: abs(a[r][col]))
+        if abs(a[piv][col]) < 1e-12:
+            raise ValueError("correlation matrix is singular")
+        a[col], a[piv] = a[piv], a[col]
+        inv[col], inv[piv] = inv[piv], inv[col]
+        pv = a[col][col]
+        for j in range(n):
+            a[col][j] /= pv
+            inv[col][j] /= pv
+        for r in range(n):
+            if r == col:
+                continue
+            f = a[r][col]
+            for j in range(n):
+                a[r][j] -= f * a[col][j]
+                inv[r][j] -= f * inv[col][j]
+    ones = [1.0] * n
+    rinv_1 = [sum(inv[i][j] for j in range(n)) for i in range(n)]
+    denom = sum(ones[i] * rinv_1[i] for i in range(n))
+    if denom <= 0:
+        raise ValueError("correlation matrix is not positive definite")
+    num = sum(rinv_1[i] * zs[i] for i in range(n))
+    return num / math.sqrt(denom)
+
+
+def estimate_corr_dev(returns_a: Sequence[float], returns_b: Sequence[float],
+                      *, min_n: int = 30, max_ci_width: float = 0.6,
+                      n_boot: int = 200, seed: int = 0) -> Optional[float]:
+    """Pearson correlation on ALIGNED per-event returns, dev data only.
+
+    Returns None (→ UNDETERMINED upstream) when alignment is too short or
+    the bootstrap CI is too wide to trust.  Never guesses a value.
+    """
+    n = min(len(returns_a), len(returns_b))
+    if n < min_n:
+        return None
+    a = list(returns_a[:n])
+    b = list(returns_b[:n])
+    ma, mb = mean(a), mean(b)
+    cov = sum((x - ma) * (y - mb) for x, y in zip(a, b))
+    va = sum((x - ma) ** 2 for x in a)
+    vb = sum((y - mb) ** 2 for y in b)
+    if va <= 0 or vb <= 0:
+        return None
+    rho = cov / math.sqrt(va * vb)
+    rng = random.Random(seed)
+    rhos = []
+    for _ in range(n_boot):
+        ii = [rng.randrange(n) for _ in range(n)]
+        aa = [a[i] for i in ii]
+        bb = [b[i] for i in ii]
+        ma2, mb2 = mean(aa), mean(bb)
+        c2 = sum((x - ma2) * (y - mb2) for x, y in zip(aa, bb))
+        v2a = sum((x - ma2) ** 2 for x in aa)
+        v2b = sum((y - mb2) ** 2 for y in bb)
+        if v2a > 0 and v2b > 0:
+            rhos.append(c2 / math.sqrt(v2a * v2b))
+    if len(rhos) < n_boot * 0.9:
+        return None
+    rhos.sort()
+    lo, hi = rhos[int(0.025 * len(rhos))], rhos[int(0.975 * len(rhos)) - 1]
+    if hi - lo > max_ci_width:
+        return None
+    return rho
+
+
+# ---------------------------------------------------------------------------
+# verdicts (directive §4, §6, §8)
+# ---------------------------------------------------------------------------
+
+MIN_VALID_N = 30  # preregistered minimum events per cell
+
+
+@dataclass
+class CellResult:
+    symbol: str
+    cell_id: str
+    n: int
+    mean_bp: float
+    t: float
+    p: float
+    status: str  # "PASS" | "FAIL_STAT" | "UNDETERMINED_POWER" | "DATA_MISSING" | "FAIL_COST"
+    holm_rejected: bool = False
+    note: str = ""
+
+    def to_json(self) -> dict:
+        return {
+            "symbol": self.symbol, "cell_id": self.cell_id, "n": self.n,
+            "mean_bp": self.mean_bp, "t": self.t, "p": self.p,
+            "status": self.status, "holm_rejected": self.holm_rejected,
+            "note": self.note,
+        }
+
+
+@dataclass
+class SymbolResult:
+    symbol: str
+    cells: list[CellResult]
+    status: str  # aggregated per symbol, same vocabulary
+    data_available: bool = True
+    note: str = ""
+
+    def to_json(self) -> dict:
+        return {
+            "symbol": self.symbol, "status": self.status,
+            "data_available": self.data_available, "note": self.note,
+            "cells": [c.to_json() for c in self.cells],
+        }
+
+
+#: precedence for the OVERALL label when required symbols disagree.
+#: "not proven" states outrank explicit failures so missing data can never
+#: be laundered into a clean FAIL (and failures still block PASS).
+VERDICT_PRECEDENCE = [
+    CandidateState.DATA_MISSING.value,
+    CandidateState.UNDETERMINED_POWER.value,
+    CandidateState.FAIL_COST.value,
+    CandidateState.FAIL_STAT.value,
+    CandidateState.PASS.value,
+]
+
+
+def _symbol_status(cells: Sequence[CellResult], alpha: float = 0.05) -> str:
+    if any(c.status == "DATA_MISSING" for c in cells):
+        return "DATA_MISSING"
+    if any(c.status == "UNDETERMINED_POWER" for c in cells):
+        return "UNDETERMINED_POWER"
+    if any(c.status == "FAIL_COST" for c in cells):
+        return "FAIL_COST"
+    # Holm across the pre-registered cell family of THIS symbol
+    ps = [c.p for c in cells if math.isfinite(c.p)]
+    flags = holm_test(ps, alpha) if ps else []
+    it = iter(flags)
+    for c in cells:
+        if math.isfinite(c.p):
+            c.holm_rejected = next(it)
+    if any(c.holm_rejected and c.mean_bp > 0 for c in cells):
+        return "PASS"
+    return "FAIL_STAT"
+
+
+def verdict_from_cells(symbol_results: Sequence[SymbolResult],
+                       required_symbols: Sequence[str],
+                       alpha: float = 0.05) -> tuple[str, dict]:
+    """Overall candidate verdict — the §8 rules in code.
+
+    1. per-symbol results are recorded individually (never collapsed)
+    2. a symbol with missing data is UNDETERMINED, not a failure
+    3. a multi-symbol candidate PASSES only if every required symbol passes
+    4. (single-symbol-only effect ⇒ caller may split the candidate)
+    """
+    by_symbol = {r.symbol: r for r in symbol_results}
+    missing_required = [s for s in required_symbols if s not in by_symbol]
+    statuses: dict[str, str] = {}
+    for s in required_symbols:
+        if s in missing_required:
+            statuses[s] = "DATA_MISSING"
+            continue
+        r = by_symbol[s]
+        if not r.cells:
+            statuses[s] = "DATA_MISSING"
+            continue
+        statuses[s] = r.status if r.status else _symbol_status(r.cells, alpha)
+        r.status = statuses[s]
+    extra = {r.symbol: r.status for r in symbol_results if r.symbol not in required_symbols}
+    rank = VERDICT_PRECEDENCE.index
+    overall = min(statuses.values(), key=rank)
+    passed = sorted(s for s, v in statuses.items() if v == "PASS")
+    detail = {
+        "per_symbol": statuses,
+        "extra_symbols_observed": extra,
+        "required_symbols": list(required_symbols),
+        # §8-4 hint: a multi-symbol candidate that failed overall while exactly
+        # one required symbol passed may be SPLIT into a symbol-restricted
+        # NEW candidate (never a retro-edit of this one).
+        "single_symbol_pass_hint": passed if (overall != "PASS" and len(statuses) > 1
+                                              and len(passed) == 1) else [],
+    }
+    return overall, detail
+
+
+# ---------------------------------------------------------------------------
+# locked TEST windows (directive §6, §12) — read-only, single-use
+# ---------------------------------------------------------------------------
+
+#: documented locked TEST windows (worklog Task 32/34 records).  These are
+#: the ONLY final-test windows and they are never touched by selection.
+LOCKED_TEST_PERIODS: dict[str, tuple[str, str]] = {
+    "BTCUSDT": ("2024-03-25", "2024-06-18"),
+    "ETHUSDT": ("2026-04-28", "2026-08-31"),
+}
+
+SYMBOL_DATA_START: dict[str, str] = {
+    "BTCUSDT": "2021-04-01",
+    "ETHUSDT": "2021-04-01",
+    "BNBUSDT": "2021-04-01",
+    "XRPUSDT": "2021-04-01",
+    "SOLUSDT": "2021-08-01",
+    "TRXUSDT": "2021-08-01",
+    "ZECUSDT": "2021-04-01",
+    "DOGEUSDT": "2021-04-01",
+}
+
+
+class LockedWindowError(RuntimeError):
+    pass
+
+
+def _iso(d: str) -> float:
+    return time.mktime(time.strptime(d, "%Y-%m-%d"))
+
+
+def assert_no_locked_overlap(symbol: str, data_start: str, data_end: str,
+                             purpose: str) -> None:
+    """Selection/parameter steps must never read locked-window data."""
+    if symbol not in LOCKED_TEST_PERIODS:
+        return
+    lo, hi = LOCKED_TEST_PERIODS[symbol]
+    if _iso(data_start) <= _iso(hi) and _iso(lo) <= _iso(data_end):
+        raise LockedWindowError(
+            f"{purpose} may not read {symbol} locked TEST window [{lo},{hi}] "
+            f"(requested data [{data_start},{data_end}])"
+        )
+
+
+def locked_window_for(symbol: str) -> Optional[tuple[str, str]]:
+    return LOCKED_TEST_PERIODS.get(symbol)
+
+
+def symbols_without_locked_test(symbols: Sequence[str]) -> list[str]:
+    return [s for s in symbols if s not in LOCKED_TEST_PERIODS]
+
+
+class LockTestRegistry:
+    """Single-use ledger for final locked tests.
+
+    Using a locked window twice for one strategy means the second use is
+    NOT an independent final test and must be recorded as such.
+    """
+
+    def __init__(self, path: Path):
+        self.path = Path(path)
+        self._data: dict = load_json(self.path, default={}) or {}
+
+    def record_use(self, strategy_id: str, symbol: str, context_id: str) -> dict:
+        entry = self._data.setdefault(strategy_id, {})
+        uses = entry.setdefault(symbol, [])
+        uses.append({"context_id": context_id, "ts": iso_now()})
+        atomic_write_json(self.path, self._data)
+        return {
+            "use_number": len(uses),
+            "independent": len(uses) == 1,
+        }
+
+    def uses(self, strategy_id: str, symbol: str) -> int:
+        return len(self._data.get(strategy_id, {}).get(symbol, []))
+
+
+# ---------------------------------------------------------------------------
+# process lock (directive §13)
+# ---------------------------------------------------------------------------
+
+
+class ProcessLock:
+    """PID-file lock with stale detection (dead PID → reclaimable)."""
+
+    def __init__(self, path: Path):
+        self.path = Path(path)
+        self._held = False
+
+    def acquire(self) -> bool:
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        if self.path.exists():
+            try:
+                pid = int(self.path.read_text().strip())
+                os.kill(pid, 0)
+                return False  # live owner
+            except (ValueError, ProcessLookupError, PermissionError):
+                pass  # stale lock — reclaim
+        self.path.write_text(str(os.getpid()))
+        self._held = True
+        return True
+
+    def release(self) -> None:
+        if self._held:
+            try:
+                self.path.unlink()
+            except FileNotFoundError:
+                pass
+            self._held = False
+
+    def __enter__(self) -> "ProcessLock":
+        if not self.acquire():
+            raise BlockingIOError(f"another process holds {self.path}")
+        return self
+
+    def __exit__(self, *exc) -> None:
+        self.release()

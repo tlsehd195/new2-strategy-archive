@@ -1,317 +1,256 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-NEW2 자율탐색 엔진 — 후보 생성기 (grammar-based, 결정론적)
-==========================================================
-패밀리 문법 × 심볼 페어(5쌍 순환) × 파라미터 그리드 → 사전등록 가능한 후보 열거.
-이미 시도된 후보는 discovery_ledger.jsonl의 cand_hash로 중복 제거 (append-only 장부).
-F2/X6 사전 측정분(BTC/ETH × (10,90)/(20,80) × h{4,16,48})은 배제 목록으로 중복 방지.
-조합 단계: 생존 전략 풀에서 ①파라미터 섭동 ②국면 필터 변형 ③Stouffer 풀 결합 생성.
+"""Candidate generator — 7 rule-based families (directive §4, §14).
 
-F-03 (v2-audit3): 판정 기반 후보 분류 — classify_ledger()가 원장을 최신 판정 기준으로
-분류한다. SURVIVOR/FAIL_*는 tested 확정, UNDETERMINED_POWER/DATA_MISSING/ERROR는
-재검증 큐로 분리(후보당 최대 REVERIFY_MAX_RETRIES=2회 재시도, 초과 시 tested 확정).
-재검증 판정은 최초 판정을 덮어쓰지 않고 새 행(kind:"reverify", retry_count 포함)으로
-기록되므로 각 해시의 '최신 행'이 현재 상태를 결정한다. 큐는 원장에서 매 사이클
-재유도된다(state는 파생 캐시 — 크래시 안전).
-
-커서 규약 (크래시 안전): next_batch는 커서를 건드리지 않고 (fam, idx)를 반환.
-runner는 장부 append 성공 후에만 state["cursors"][fam] = idx+1 로 전진 →
-중간 크래시 시 다음 사이클이 동일 후보를 재시도 (장부가 유일한 진실).
+This is a RULE-BASED generator, not an infinite strategy creator and not an
+LLM generator (directive §14: 표현을 혼동하지 마 것).  The parameter grids
+below are NEW v2 definitions; they intentionally keep the documented family
+structure (flow_z / ret_rev / ts_mom / vol_break / tod / fund_z / fng) so
+search-space semantics stay comparable, but grid values are new and the
+resulting counts are recorded in the NEW ledger only.
 """
+
+from __future__ import annotations
+
 import json
-import os
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Iterator, Mapping, Sequence
 
-import engine_lib as E
+from engine_lib import canonical_json, normalize_strategy, strategy_id
 
-DISC = E.DISC
-LEDGER = f"{DISC}/discovery_ledger.jsonl"
+SYMBOLS = ["BTCUSDT", "ETHUSDT"]
+TIMEFRAME = "15m"
 
-# F2/X6 기존 측정분 배제: BTC/ETH 페어 × 임계(10,90)/(20,80) × h{4,16,48}
-FNG_EXCLUDE_PAIRS = {("BTCUSDT", "ETHUSDT")}
-FNG_EXCLUDE_THR = {(10, 90), (20, 80)}
-FNG_EXCLUDE_H = {4, 16, 48}
-
-
-def build_grid():
-    """family → [params, ...] 결정론적 순서."""
-    g = {}
-    g["flow_z"] = [
-        {"L": L, "thr": thr, "mode": mode, "horizons": [h]}
-        for mode in ("mom", "rev")
-        for L in (16, 96, 672)
-        for thr in (1.2816, 1.6449, 2.3263)
-        for h in (4, 16, 48, 96)
-    ]
-    g["ret_rev"] = [
-        {"k": k, "thr": thr, "horizons": [h]}
-        for k in (4, 16, 48)
-        for thr in (1.6449, 2.3263)
-        for h in (4, 16, 48, 96)
-    ]
-    g["ts_mom"] = [
-        {"L": L, "thr": thr, "horizons": [h]}
-        for L in (672, 2880)
-        for thr in (1.0, 1.5)
-        for h in (16, 48, 192)
-    ]
-    g["vol_break"] = [
-        {"Lv": Lv, "thr": thr, "horizons": [h]}
-        for Lv in (96, 672)
-        for thr in (1.5, 2.0)
-        for h in (4, 16, 48)
-    ]
-    g["tod"] = [
-        {"sess": s, "dir": d, "horizons": [h]}
-        for s, (h0, h1) in {"ASIA": (0, 8), "EU": (8, 16), "US": (16, 24)}.items()
-        for d in ("long", "short")
-        for h in (16, 48)
-    ]
-    g["fund_z"] = [
-        {"zthr": zt, "horizons": [h]}
-        for zt in (1.5, 2.0, 2.5)
-        for h in (16, 48, 192)
-    ]
-    g["fng"] = [
-        {"lo": lo, "hi": hi, "horizons": [h]}
-        for (lo, hi) in ((5, 95), (10, 90), (15, 85), (20, 80))
-        for h in (4, 16, 48, 96)
-    ]
-    return g
+_H12 = [8, 16, 24, 32, 48, 64, 96, 128, 192, 256, 384, 768]
+_H5A = [16, 48, 96, 192, 384]
+_H5B = [8, 16, 24, 48, 96]
 
 
-def family_order():
-    return ["flow_z", "ret_rev", "ts_mom", "vol_break", "tod", "fund_z", "fng"]
-
-
-def enumerate_family(family):
-    """family의 전 후보 (pair 포함) — 결정론적 리스트. 각 항목에 fam_idx 부여."""
-    grid = build_grid()[family]
-    out = []
-    for p in grid:
-        for pi, pair in enumerate(E.PAIRS):
-            if family == "fng" and _is_fng_excluded(pair, p):
-                continue
-            out.append({"family": family, "pair_idx": pi, "params": dict(p)})
-    return out
-
-
-def _is_fng_excluded(pair, p):
-    if tuple(sorted(pair)) not in FNG_EXCLUDE_PAIRS:
-        return False
-    if (p["lo"], p["hi"]) not in FNG_EXCLUDE_THR:
-        return False
-    return p["horizons"][0] in FNG_EXCLUDE_H
-
-
-def family_universe_size():
-    return {f: len(enumerate_family(f)) for f in family_order()}
-
-
-def load_tested_hashes():
-    """원장에 행이 존재하는 모든 후보 해시(판정 무관) — next_batch/조합의 중복
-    제안 방지 전용. 재검증 큐 항목도 행이 있으므로 여기서 제외된다(큐로 재시도).
-    판정 기반 분류(terminal vs 큐)는 classify_ledger() 참조."""
-    tested = set()
-    if os.path.exists(LEDGER):
-        with open(LEDGER) as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                try:
-                    h = json.loads(line).get("cand_hash")
-                except Exception:
-                    continue
-                if h:
-                    tested.add(h)
-    return tested
-
-
-# ── F-03 (Phase 3): 판정 기반 후보 분류 — 재검증 큐 ──
-# tested 확정 판정(재시도 없음) vs 재검증 대상 판정의 경계. 엄격 유지:
-# UNDETERMINED/데이터누락/오류는 '실패 확정'도 '합격'도 아니므로 데이터 보강 후
-# 유한 회수(최대 2회)만 허용하고, 소진 시 tested 확정(큐 무한순환 방지).
-REVERIFY_VERDICTS = ("UNDETERMINED_POWER", "DATA_MISSING", "ERROR")
-REVERIFY_MAX_RETRIES = 2
-
-
-def classify_ledger():
-    """원장 전 행을 '최신 판정' 기준으로 분류한다 (F-03).
-    반환: (tested_terminal, all_hashes, reverify_queue)
-      tested_terminal : 더 이상 시도하지 않는 후보 해시 집합 — SURVIVOR/FAIL_* 확정
-                        또는 재검증 소진(retry_count ≥ REVERIFY_MAX_RETRIES).
-      all_hashes      : 원장에 1개 이상 행이 있는 모든 후보 해시 (중복 제안 방지).
-      reverify_queue  : 재검증 대기 목록 — 최신 판정이 REVERIFY_VERDICTS에 속하고
-                        retry_count < REVERIFY_MAX_RETRIES. 항목: {cand_hash,
-                        family, symbols, params, variant, retry_count, last_verdict}.
-                        원장 순서(=최초 발견 순, 오래된 항목 우선) 유지.
-    재검증 판정은 새 행(kind:"reverify")으로 추가 기록되므로 최초 판정 행은
-    무수정 보존된다(append-only 원칙)."""
-    latest = {}
-    order = []
-    if os.path.exists(LEDGER):
-        with open(LEDGER) as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                try:
-                    r = json.loads(line)
-                except Exception:
-                    continue
-                h = r.get("cand_hash")
-                if not h:
-                    continue   # fdr_ref 등 비후보 행 제외
-                if h not in latest:
-                    order.append(h)
-                latest[h] = {
-                    "cand_hash": h,
-                    "family": r.get("family"),
-                    "symbols": r.get("symbols"),
-                    "params": r.get("params"),
-                    "variant": r.get("variant"),
-                    "retry_count": int(r.get("retry_count") or 0),
-                    "last_verdict": r.get("verdict"),
-                }
-    tested, queue = set(), []
-    for h in order:
-        e = latest[h]
-        if e["last_verdict"] in REVERIFY_VERDICTS:
-            if e["retry_count"] < REVERIFY_MAX_RETRIES:
-                queue.append(e)
-            else:
-                tested.add(h)   # 재검증 소진 → tested 확정 (큐 무한순환 방지)
-        else:
-            tested.add(h)
-    return tested, set(order), queue
-
-
-def next_batch(state, batch_size):
-    """패밀리 라운드로빈 미시도 후보. 반환 항목에 fam_idx 포함, 커서 미변경.
-    배치 내 중복 방지: proposed 집합으로 동일 사이클 내 재제안 차단.
-    tested = 원장 전 행 해시(재검증 큐 항목 포함) — 큐 항목은 next_batch가 아니라
-    재검증 경로로만 재시도된다(이중 제안 차단). 전 후보가 소진되면 빈 배치 반환
-    → runner가 UNIVERSE_EXHAUSTED 판정(F-03 고갈 처리)."""
-    tested = load_tested_hashes()
-    proposed = set(tested)
-    batch = []
-    fams = family_order()
-    lists = {f: enumerate_family(f) for f in fams}
-    progress = True
-    while len(batch) < batch_size and progress:
-        progress = False
-        for f in fams:
-            if len(batch) >= batch_size:
-                break
-            lst = lists[f]
-            i = state["cursors"].get(f, 0)
-            while i < len(lst):
-                c = lst[i]
-                syms = [E.PAIRS[c["pair_idx"]][0], E.PAIRS[c["pair_idx"]][1]]
-                ch = E.cand_hash(c["family"], syms, c["params"])
-                if ch in proposed:
-                    i += 1
-                    continue
-                proposed.add(ch)
-                batch.append({**c, "symbols": syms, "cand_hash": ch,
-                              "kind": "base", "fam_idx": i})
-                progress = True
-                break
-    return batch
-
-
-# ─────────────────────────────────────────────────────────────
-# 조합 단계: 생존 전략 → 변형/결합 후보
-# ─────────────────────────────────────────────────────────────
-PARAM_AXES = {
-    "flow_z": {"L": [16, 96, 672], "thr": [1.2816, 1.6449, 2.3263],
-               "mode": ["mom", "rev"]},
-    "ret_rev": {"k": [4, 16, 48], "thr": [1.6449, 2.3263]},
-    "ts_mom": {"L": [672, 2880], "thr": [1.0, 1.5]},
-    "vol_break": {"Lv": [96, 672], "thr": [1.5, 2.0]},
-    "tod": {"dir": ["long", "short"]},
-    "fund_z": {"zthr": [1.5, 2.0, 2.5]},
-    "fng": {"lo": [5, 10, 15, 20], "hi": [80, 85, 90, 95]},
+#: family defaults — explicit-vs-omitted must not change identity (§4-3).
+#: These are the FIRST grid value of each family, so every generated
+#: definition normalizes to the same canonical form whether or not the
+#: default value is written out.
+FAMILY_DEFAULTS: dict[str, dict] = {
+    "flow_z": {"z_window": 24, "entry_z": 1.0, "horizon": 8},
+    "ret_rev": {"lookback": 4, "thresh_z": 1.0, "horizon": 8},
+    "ts_mom": {"lookback": 32, "thresh_z": 0.5, "horizon": 16},
+    "vol_break": {"vol_window": 32, "k": 1.0, "horizon": 8},
+    "tod": {"utc_start": 0, "utc_end": 2, "horizon": 16},
+    "fund_z": {"funding_window": 30, "thresh_z": 1.5, "horizon": 16},
+    "fng": {"threshold": 10, "confirm_days": 1, "horizon": 8},
 }
 
 
-def neighbors(family, params, max_n=4):
-    """파라미터 축 ±1스텝 섭동 (조합 변형)."""
-    out = []
-    axes = PARAM_AXES.get(family, {})
-    for axis, vals in axes.items():
-        if axis not in params:
-            continue
-        try:
-            i = vals.index(params[axis])
-        except ValueError:
-            continue
-        for j in (i - 1, i + 1):
-            if 0 <= j < len(vals) and vals[j] != params[axis]:
-                q = dict(params)
-                q[axis] = vals[j]
-                out.append(("perturb", {axis: vals[j]}, q))
-        if len(out) >= max_n:
-            break
-    return out[:max_n]
+def _mk(family: str, params: dict, direction: str, note: str = "") -> dict:
+    return {
+        "family": family,
+        "params": dict(params),
+        "_defaults": dict(FAMILY_DEFAULTS[family]),
+        "symbols": list(SYMBOLS),
+        "timeframe": TIMEFRAME,
+        "direction": direction,
+        "entry": f"{family}:preregistered_rule",
+        "exit": "time_exit",
+        "holding": params["horizon"],
+        "risk": {"sizing": "vol_inverse", "max_leverage": 1.0},
+        "primary_cell": {"symbol": SYMBOLS[0], "horizon": params["horizon"]},
+        "_note": note,
+    }
 
 
-def combo_candidates(state, tested, max_combo):
-    """생존 풀 기반 조합 후보: 섭동 + 국면 필터 변형 (실제 이벤트 스터디로 재검증)."""
-    out = []
-    survivors = state.get("survivors", [])
-    if not survivors:
-        return out
-    specs = state.get("survivor_specs", {})
-    for sv_cid in survivors:
-        sv = specs.get(sv_cid)
-        if not sv:
-            continue
-        for _tag, delta, q in neighbors(sv["family"], sv["params"]):
-            ch = E.cand_hash(sv["family"], sv["symbols"],
-                             {**sv["params"], "variant": ("perturb", delta)})
-            if ch in tested:
-                continue
-            out.append({"family": sv["family"], "symbols": sv["symbols"],
-                        "params": q, "cand_hash": ch, "kind": "combo",
-                        "variant": {"type": "perturb", "delta": delta},
-                        "surv_ref": sv_cid})
-            if len(out) >= max_combo:
-                return out
-        for fname in ("vol_calm", "vol_stress"):
-            ch = E.cand_hash(sv["family"], sv["symbols"],
-                             {**sv["params"], "variant": ("filter", fname)})
-            if ch in tested:
-                continue
-            out.append({"family": sv["family"], "symbols": sv["symbols"],
-                        "params": sv["params"], "cand_hash": ch, "kind": "combo",
-                        "variant": {"type": "filter", "name": fname},
-                        "surv_ref": sv_cid})
-            if len(out) >= max_combo:
-                return out
-    return out
+def family_flow_z() -> Iterator[dict]:
+    # taker-buy share z-score; preregistered contrarian: buy panic → short
+    for zw in (24, 48, 96, 192, 384):
+        for ez in (1.0, 1.5, 2.0, 2.5, 3.0, 4.0):
+            for h in _H12:
+                yield _mk("flow_z", {"z_window": zw, "entry_z": ez, "horizon": h},
+                          "short_on_high_buy_share")
 
 
-def stouffer_pair_candidates(state, max_n=3):
-    """생존 2개 이상 → Stouffer 결합 (해석형, combo_exhaustive_scan 방법 준용:
-    w=√vn, ρ 그리드 {0,0.119,0.238,0.5}, max Z_pool, 양수 t 성분만)."""
-    survivors = state.get("survivors", [])
-    out = []
-    if len(survivors) < 2:
-        return out
-    done_pairs = {tuple(sorted(p)) for p in state.get("stouffer_done", [])}
-    specs = state.get("survivor_specs", {})
-    for i in range(len(survivors)):
-        for j in range(i + 1, len(survivors)):
-            a, b = survivors[i], survivors[j]
-            if tuple(sorted((a, b))) in done_pairs:
+def family_ret_rev() -> Iterator[dict]:
+    # short-horizon return reversal: down-threshold → long
+    for lb in (4, 8, 16, 32):
+        for tz in (1.0, 1.5, 2.0, 2.5, 3.0, 4.0):
+            for h in (8, 16, 24, 48, 96):
+                yield _mk("ret_rev", {"lookback": lb, "thresh_z": tz, "horizon": h},
+                          "long_on_down_move")
+
+
+def family_ts_mom() -> Iterator[dict]:
+    # time-series momentum, both signs by return sign
+    for lb in (32, 64, 192):
+        for tz in (0.5, 1.0, 2.0, 2.5):
+            for h in _H5A:
+                yield _mk("ts_mom", {"lookback": lb, "thresh_z": tz, "horizon": h},
+                          "follow_sign")
+
+
+def family_vol_break() -> Iterator[dict]:
+    # volatility breakout: close above roll-max + k*sigma → long
+    for vw in (32, 64, 96):
+        for k in (1.0, 1.5, 2.0, 2.5):
+            for h in (8, 16, 48, 96, 192):
+                yield _mk("vol_break", {"vol_window": vw, "k": k, "horizon": h},
+                          "long_breakout")
+
+
+def family_tod() -> Iterator[dict]:
+    # time-of-day effects on 2-hour UTC windows (12 windows × 5 horizons);
+    # direction preregistered by window parity — a v2 design choice, recorded
+    for h0 in range(0, 24, 2):
+        d = "long" if (h0 // 2) % 2 == 0 else "short"
+        for h in _H5A:
+            yield _mk("tod", {"utc_start": h0, "utc_end": h0 + 2, "horizon": h},
+                      f"{d}_in_session")
+
+
+def family_fund_z() -> Iterator[dict]:
+    # extreme funding z → contrarian (crowd pays → take other side)
+    for w in (30, 90, 180):
+        for tz in (1.5, 2.0, 3.0):
+            for h in _H5A:
+                yield _mk("fund_z", {"funding_window": w, "thresh_z": tz, "horizon": h},
+                          "short_on_high_funding")
+
+
+def family_fng() -> Iterator[dict]:
+    # Fear&Greed extremes → contrarian; requires the FNG dataset (may be
+    # DATA_MISSING at runtime — that path must stay honest).
+    for th, d in ((10, "long"), (20, "long"), (80, "short"), (90, "short")):
+        for conf in (1, 2, 3):
+            for h in (8, 16, 24, 48, 96, 192):
+                yield _mk("fng", {"threshold": th, "confirm_days": conf, "horizon": h}, d)
+    # two pre-registered extreme-cluster variants (74 total)
+    yield _mk("fng", {"threshold": 5, "confirm_days": 2, "horizon": 48}, "long")
+    yield _mk("fng", {"threshold": 95, "confirm_days": 2, "horizon": 96}, "short")
+
+
+FAMILY_GENERATORS = {
+    "flow_z": family_flow_z,
+    "ret_rev": family_ret_rev,
+    "ts_mom": family_ts_mom,
+    "vol_break": family_vol_break,
+    "tod": family_tod,
+    "fund_z": family_fund_z,
+    "fng": family_fng,
+}
+
+FAMILY_DATA_REQUIREMENTS = {
+    "flow_z": ["klines"],
+    "ret_rev": ["klines"],
+    "ts_mom": ["klines"],
+    "vol_break": ["klines"],
+    "tod": ["klines"],
+    "fund_z": ["klines", "funding"],
+    "fng": ["klines", "fng"],
+}
+
+
+def enumerate_candidates() -> tuple[list[tuple[str, dict]], list[dict]]:
+    """Full deterministic search space with semantic dedup.
+
+    Returns ([(strategy_id, canonical_def)], dedup_log).  Semantically
+    identical definitions (identical canonical JSON after normalization)
+    collapse to one candidate and every collapse is logged (directive §4-3):
+    over-merging is impossible by construction because the key IS the full
+    canonical strategy definition, not a subset of it.
+    """
+    seen: dict[str, dict] = {}
+    out: list[tuple[str, dict]] = []
+    dedup_log: list[dict] = []
+    for fam, gen in FAMILY_GENERATORS.items():
+        for defn in gen():
+            canon = normalize_strategy(defn)
+            sid = strategy_id(defn)
+            if sid in seen:
+                dedup_log.append({
+                    "family": fam,
+                    "strategy_id": sid,
+                    "collapsed_definition": canon,
+                })
                 continue
-            sa, sb = specs.get(a), specs.get(b)
-            if not sa or not sb:
-                continue
-            out.append({"kind": "combo_stouffer", "pair": [a, b],
-                        "cells": [sa.get("best_cell"), sb.get("best_cell")]})
-            if len(out) >= max_n:
-                return out
-    return out
+            seen[sid] = canon
+            out.append((sid, canon))
+    return out, dedup_log
+
+
+def split_single_symbol_candidate(defn: Mapping, symbol: str) -> tuple[str, dict]:
+    """Directive §8-4: an effect that only exists for one symbol becomes a
+    symbol-restricted candidate — a NEW strategy, never a retro-edited one."""
+    d = dict(defn)
+    d["symbols"] = [symbol]
+    # horizon lives top-level (canonical form may drop default params)
+    horizon = d.get("holding", (d.get("params") or {}).get("horizon"))
+    d["primary_cell"] = {"symbol": symbol, "horizon": horizon}
+    d.pop("_note", None)
+    return strategy_id(d), normalize_strategy(d)
+
+
+@dataclass
+class SearchSpaceStatus:
+    state: str
+    total: int
+    by_family: dict
+    detail: dict
+
+
+def search_space_status(store, ledger, *, fng_available: bool,
+                        funding_available: bool) -> SearchSpaceStatus:
+    """Directive §14 states (SEARCH_SPACE_* etc.).
+
+    INSUFFICIENT_DATA means: the only remaining untested candidates are
+    blocked by missing datasets — the engine must not spin on empty batches.
+    """
+    cands, _ = enumerate_candidates()
+    by_family: dict[str, int] = {}
+    for _, d in cands:
+        by_family[d["family"]] = by_family.get(d["family"], 0) + 1
+    states = store.all_states()
+    untested = [s for s, _ in cands if states.get(s, "PENDING") == "PENDING"]
+    blocked_families = set()
+    if not fng_available:
+        blocked_families.add("fng")
+    if not funding_available:
+        blocked_families.add("fund_z")
+    untestable = [s for s, d in cands
+                  if d["family"] in blocked_families]
+    untested_actionable = [s for s in untested if s not in set(untestable)]
+    reverify = sum(1 for v in states.values() if v == "REVERIFY_PENDING")
+    survivors = sum(1 for v in states.values() if v == "PASS")
+    data_blocked = len([s for s in untested if s in set(untestable)])
+    if not cands:
+        st = "SEARCH_SPACE_EXHAUSTED"
+    elif reverify > 0:
+        st = "REVERIFY_PENDING"
+    elif untested_actionable:
+        st = "UNTESTED_CANDIDATES_AVAILABLE"
+    elif survivors > 0:
+        st = "SURVIVORS_AVAILABLE"
+    elif untested:
+        st = "INSUFFICIENT_DATA"
+    else:
+        st = "SEARCH_SPACE_EXHAUSTED"
+    return SearchSpaceStatus(
+        state=st,
+        total=len(cands),
+        by_family=by_family,
+        detail={"untested": len(untested), "reverify": reverify,
+                "survivors": survivors, "data_blocked": data_blocked},
+    )
+
+
+def dump_space_manifest(path: Path) -> dict:
+    cands, dedup = enumerate_candidates()
+    by_family: dict[str, int] = {}
+    for _, d in cands:
+        by_family[d["family"]] = by_family.get(d["family"], 0) + 1
+    manifest = {
+        "generator": "rule_based_v2",
+        "families": sorted(by_family),
+        "counts": by_family,
+        "total_unique": len(cands),
+        "duplicates_collapsed": len(dedup),
+        "note": "NEW v2 grid definitions; NOT the original archive space",
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(manifest, ensure_ascii=False, indent=1), encoding="utf-8")
+    return manifest

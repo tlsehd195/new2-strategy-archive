@@ -1,0 +1,197 @@
+"""Event-study evaluator — no-look-ahead, cost + funding aware (directive §9-1, §11).
+
+Construction (identical in spirit to the public repo's futures engine):
+- a signal decided on bar t uses ONLY bars[:t+1] (a physical prefix view —
+  peeking raises IndexError);
+- entry fills at bar t+1 open, exit at bar t+1+H open;
+- per-side costs from the shared CandleCostModel with sqrt-participation
+  impact, fail-closed when participation is exceeded;
+- funding is charged for the actual holding window from the caller-supplied
+  funding series — never estimated (missing funding for a held period is
+  recorded, and the event is dropped, NOT filled with a guess).
+"""
+
+from __future__ import annotations
+
+import math
+from dataclasses import dataclass, field
+from typing import Callable, Optional, Sequence
+
+from costs_bridge import CostContext
+from data_quality import Bar
+
+
+class PrefixView:
+    """Read-only view of bars[:end] — strategies cannot touch the future."""
+
+    __slots__ = ("_bars", "_end")
+
+    def __init__(self, bars: Sequence[Bar], end: int):
+        self._bars = bars
+        self._end = end
+
+    def __len__(self) -> int:
+        return self._end
+
+    def __getitem__(self, i: int) -> Bar:
+        if i < 0:
+            i += self._end
+        if not 0 <= i < self._end:
+            raise IndexError("index outside the visible (closed) history")
+        return self._bars[i]
+
+
+SignalFn = Callable[[PrefixView], int]
+"""Return +1 (long) / -1 (short) / 0 (flat) for the decision at bar t.
+The function receives the prefix view ending at t."""
+
+
+@dataclass
+class EventRecord:
+    symbol: str
+    entry_index: int
+    exit_index: int
+    side: int
+    entry_ts: int
+    exit_ts: int
+    gross_bp: float
+    cost_bp: float
+    funding_bp: float
+    net_bp: float
+    partial_fill_skipped: bool = False
+
+    def to_json(self) -> dict:
+        return dict(self.__dict__)
+
+
+@dataclass
+class EventStudyResult:
+    symbol: str
+    events: list[EventRecord] = field(default_factory=list)
+    skipped_overlapped: int = 0
+    dropped_missing_funding: int = 0
+    participation_refusals: int = 0
+    signals_total: int = 0
+
+    def to_json(self) -> dict:
+        return {
+            "symbol": self.symbol,
+            "n_events": len(self.events),
+            "skipped_overlapped": self.skipped_overlapped,
+            "dropped_missing_funding": self.dropped_missing_funding,
+            "participation_refusals": self.participation_refusals,
+            "signals_total": self.signals_total,
+            "events": [e.to_json() for e in self.events],
+        }
+
+
+def funding_paid_bp(funding: Sequence[tuple[int, float]], start_ts: int, end_ts: int,
+                    side: int) -> Optional[float]:
+    """Funding cost in bp of notional over (start_ts, end_ts] for `side`.
+
+    Long pays when rate > 0.  Returns None when the funding series does not
+    COVER the window (fail-closed: the caller drops the event instead of
+    guessing, directive §11-3).
+    """
+    if not funding:
+        return None
+    times = [t for t, _ in funding]
+    if times[0] > start_ts or times[-1] < end_ts:
+        return None
+    total = 0.0
+    for t, r in funding:
+        if start_ts < t <= end_ts:
+            total += side * r
+    return total * 1e4
+
+
+def run_event_study(bars: Sequence[Bar], symbol: str, signal_fn: SignalFn,
+                    horizon: int, cost: CostContext, order_value: float,
+                    funding: Optional[Sequence[tuple[int, float]]] = None,
+                    *, warmup: int = 1) -> EventStudyResult:
+    """Evaluate one strategy definition on one symbol.
+
+    Events whose holding window would overlap a previously accepted event
+    are skipped and COUNTED — they are not independent observations.
+    """
+    res = EventStudyResult(symbol=symbol)
+    n = len(bars)
+    last_exit_index = -1
+    for t in range(warmup, n - 1):
+        view = PrefixView(bars, t + 1)          # decide with closed bars only
+        side = signal_fn(view)
+        if side not in (1, -1):
+            continue
+        res.signals_total += 1
+        entry_i = t + 1
+        exit_i = entry_i + horizon
+        if entry_i <= last_exit_index:
+            res.skipped_overlapped += 1
+            continue
+        if exit_i >= n:
+            break
+        entry_bar, exit_bar = bars[entry_i], bars[exit_i]
+        if entry_bar.quote_volume <= 0 or exit_bar.quote_volume <= 0:
+            res.participation_refusals += 1
+            continue
+        try:
+            cost_bp = cost.round_trip_bp(order_value,
+                                         entry_bar.quote_volume,
+                                         exit_bar.quote_volume)
+        except ValueError:
+            # participation cap exceeded → fail-closed refusal, counted
+            res.participation_refusals += 1
+            continue
+        if funding is not None:
+            fp = funding_paid_bp(funding, entry_bar.ts, exit_bar.ts, side)
+            if fp is None:
+                res.dropped_missing_funding += 1
+                continue
+        else:
+            fp = 0.0
+        gross = side * (exit_bar.open / entry_bar.open - 1.0) * 1e4
+        net = gross - cost_bp - fp
+        res.events.append(EventRecord(
+            symbol=symbol, entry_index=entry_i, exit_index=exit_i, side=side,
+            entry_ts=entry_bar.ts, exit_ts=exit_bar.ts,
+            gross_bp=gross, cost_bp=cost_bp, funding_bp=fp, net_bp=net,
+        ))
+        last_exit_index = exit_i
+    return res
+
+
+# ---------------------------------------------------------------------------
+# per-cell statistics from events
+# ---------------------------------------------------------------------------
+
+
+def cell_stats(events: Sequence[EventRecord], symbol: str, cell_id: str,
+               *, min_n: int = 30) -> dict:
+    """Statistics for one pre-registered cell (symbol, direction, horizon).
+
+    Uses non-overlapping events only (the evaluator already enforces this)
+    and a HAC t-statistic because event returns can still be autocorrelated
+    through shared regimes.  n < min_n → UNDETERMINED_POWER, never PASS.
+    """
+    from engine_lib import MIN_VALID_N, nw_tstat, t_sf
+    min_n = max(min_n, MIN_VALID_N)
+    nets = [e.net_bp for e in events]
+    n = len(nets)
+    if n == 0:
+        return {"symbol": symbol, "cell_id": cell_id, "n": 0,
+                "status": "DATA_MISSING", "mean_bp": float("nan"),
+                "t": float("nan"), "p": float("nan")}
+    mu = sum(nets) / n
+    if n < min_n:
+        return {"symbol": symbol, "cell_id": cell_id, "n": n,
+                "status": "UNDETERMINED_POWER", "mean_bp": mu,
+                "t": float("nan"), "p": float("nan")}
+    t, _ = nw_tstat(nets)
+    if not math.isfinite(t):
+        return {"symbol": symbol, "cell_id": cell_id, "n": n,
+                "status": "UNDETERMINED_POWER", "mean_bp": mu,
+                "t": t, "p": float("nan")}
+    p = t_sf(t, n - 1)
+    status = "PASS" if (p < 0.05 and mu > 0) else "FAIL_STAT"
+    return {"symbol": symbol, "cell_id": cell_id, "n": n, "mean_bp": mu,
+            "t": t, "p": p, "status": status}
