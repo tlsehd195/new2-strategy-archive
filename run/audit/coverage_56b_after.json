@@ -1,0 +1,362 @@
+{
+ "BTCUSDT": {
+  "klines": {
+   "n": 67,
+   "nzip": 32,
+   "span": [
+    [
+     2021,
+     4
+    ],
+    [
+     2026,
+     10
+    ]
+   ],
+   "missing": [],
+   "zip_only": [],
+   "suspicious": []
+  },
+  "funding": {
+   "n": 67,
+   "nzip": 0,
+   "span": [
+    [
+     2021,
+     4
+    ],
+    [
+     2026,
+     10
+    ]
+   ],
+   "missing": [],
+   "zip_only": [],
+   "suspicious": []
+  }
+ },
+ "ETHUSDT": {
+  "klines": {
+   "n": 67,
+   "nzip": 44,
+   "span": [
+    [
+     2021,
+     4
+    ],
+    [
+     2026,
+     10
+    ]
+   ],
+   "missing": [],
+   "zip_only": [],
+   "suspicious": []
+  },
+  "funding": {
+   "n": 67,
+   "nzip": 0,
+   "span": [
+    [
+     2021,
+     4
+    ],
+    [
+     2026,
+     10
+    ]
+   ],
+   "missing": [],
+   "zip_only": [],
+   "suspicious": []
+  }
+ },
+ "SOLUSDT": {
+  "klines": {
+   "n": 66,
+   "nzip": 25,
+   "span": [
+    [
+     2021,
+     4
+    ],
+    [
+     2026,
+     9
+    ]
+   ],
+   "missing": [],
+   "zip_only": [],
+   "suspicious": []
+  },
+  "funding": {
+   "n": 67,
+   "nzip": 0,
+   "span": [
+    [
+     2021,
+     4
+    ],
+    [
+     2026,
+     10
+    ]
+   ],
+   "missing": [],
+   "zip_only": [],
+   "suspicious": []
+  }
+ },
+ "XRPUSDT": {
+  "klines": {
+   "n": 66,
+   "nzip": 25,
+   "span": [
+    [
+     2021,
+     4
+    ],
+    [
+     2026,
+     9
+    ]
+   ],
+   "missing": [],
+   "zip_only": [],
+   "suspicious": []
+  },
+  "funding": {
+   "n": 67,
+   "nzip": 0,
+   "span": [
+    [
+     2021,
+     4
+    ],
+    [
+     2026,
+     10
+    ]
+   ],
+   "missing": [],
+   "zip_only": [],
+   "suspicious": []
+  }
+ },
+ "BNBUSDT": {
+  "klines": {
+   "n": 66,
+   "nzip": 25,
+   "span": [
+    [
+     2021,
+     4
+    ],
+    [
+     2026,
+     9
+    ]
+   ],
+   "missing": [],
+   "zip_only": [],
+   "suspicious": []
+  },
+  "funding": {
+   "n": 67,
+   "nzip": 0,
+   "span": [
+    [
+     2021,
+     4
+    ],
+    [
+     2026,
+     10
+    ]
+   ],
+   "missing": [],
+   "zip_only": [],
+   "suspicious": []
+  }
+ },
+ "ADAUSDT": {
+  "klines": {
+   "n": 66,
+   "nzip": 66,
+   "span": [
+    [
+     2021,
+     4
+    ],
+    [
+     2026,
+     9
+    ]
+   ],
+   "missing": [],
+   "zip_only": [],
+   "suspicious": []
+  },
+  "funding": {
+   "n": 67,
+   "nzip": 0,
+   "span": [
+    [
+     2021,
+     4
+    ],
+    [
+     2026,
+     10
+    ]
+   ],
+   "missing": [],
+   "zip_only": [],
+   "suspicious": []
+  }
+ },
+ "DOGEUSDT": {
+  "klines": {
+   "n": 66,
+   "nzip": 25,
+   "span": [
+    [
+     2021,
+     4
+    ],
+    [
+     2026,
+     9
+    ]
+   ],
+   "missing": [],
+   "zip_only": [],
+   "suspicious": []
+  },
+  "funding": {
+   "n": 67,
+   "nzip": 0,
+   "span": [
+    [
+     2021,
+     4
+    ],
+    [
+     2026,
+     10
+    ]
+   ],
+   "missing": [],
+   "zip_only": [],
+   "suspicious": []
+  }
+ },
+ "LINKUSDT": {
+  "klines": {
+   "n": 66,
+   "nzip": 66,
+   "span": [
+    [
+     2021,
+     4
+    ],
+    [
+     2026,
+     9
+    ]
+   ],
+   "missing": [],
+   "zip_only": [],
+   "suspicious": []
+  },
+  "funding": {
+   "n": 67,
+   "nzip": 0,
+   "span": [
+    [
+     2021,
+     4
+    ],
+    [
+     2026,
+     10
+    ]
+   ],
+   "missing": [],
+   "zip_only": [],
+   "suspicious": []
+  }
+ },
+ "TRXUSDT": {
+  "klines": {
+   "n": 66,
+   "nzip": 25,
+   "span": [
+    [
+     2021,
+     4
+    ],
+    [
+     2026,
+     9
+    ]
+   ],
+   "missing": [],
+   "zip_only": [],
+   "suspicious": []
+  },
+  "funding": {
+   "n": 67,
+   "nzip": 0,
+   "span": [
+    [
+     2021,
+     4
+    ],
+    [
+     2026,
+     10
+    ]
+   ],
+   "missing": [],
+   "zip_only": [],
+   "suspicious": []
+  }
+ },
+ "ZECUSDT": {
+  "klines": {
+   "n": 66,
+   "nzip": 25,
+   "span": [
+    [
+     2021,
+     4
+    ],
+    [
+     2026,
+     9
+    ]
+   ],
+   "missing": [],
+   "zip_only": [],
+   "suspicious": []
+  },
+  "funding": {
+   "n": 67,
+   "nzip": 0,
+   "span": [
+    [
+     2021,
+     4
+    ],
+    [
+     2026,
+     10
+    ]
+   ],
+   "missing": [],
+   "zip_only": [],
+   "suspicious": []
+  }
+ }
+}

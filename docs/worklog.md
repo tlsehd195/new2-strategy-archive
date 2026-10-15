@@ -1236,3 +1236,47 @@ Stage Summary:
 - Phase 1 완료 — 코드 수정 0줄, 장부 실험기록 0행 수정(복구·병합만). 이전 지적 16건 확인·2건 기각 유지·신규 11건 발견(치명 1·높음 4)
 - 핵심 결론: v1 엔진의 게이트 설계 방향은 건전하나 ①다중검정 통제가 후보 내에 한정 ②best 셀 단독 합격 ③재검증 큐 부재 ④백업 인프라가 가장 소중한 산출물을 보호하지 못함(F-26) ⑤데이터 구멍이 게이트·2027 판정을 무음으로 훼손(F-27~30)
 - 다음: Phase 1-g(원장·상태 재구성) → Phase 2(실행 안정성+백업 개정 최우선) → 3(후보) → 4(통계 R4~R8) → 5(데이터) → 6(백테스트) → 7(테스트·문서·최종보고)
+
+---
+Task ID: 56-b
+Agent: general-purpose (subagent, 감사 Phase 5 — 데이터 파이프라인 복원)
+Task: F-24/27/28/29/30/31 실측 + 재다운로드 + 커버리지 재검증
+
+Work Log:
+- 실측 먼저: data/klines·funding 파일 목록/형식 확인(klines 12컬럼, 구분: 기존 헤더 없음 / vision 신규분 헤더 있음 — engine_lib.load_klines가 header=None+to_numeric coerce로 양쪽 허용 확인, funding 3컬럼 calc_time,funding_interval_hours,last_funding_rate). 측정 스크립트 audit/measure_coverage_56b.py로 before/after 스냅샷 저장.
+- 전 세션 인계 상태 복원: download_missing_data.py(전 세션 작성)에 3-tuple unpack 버그 4곳(vfn 반환값 (n,err,soft) 미반영) + zip_extracted 로그 미정의변수 발견 → 수정. 기존 파일 검사 시 행수 하한을 50%로 완화(구조 검증 유지)해 Binance 자체 갭 월(SOL/XRP/TRX/ZEC 2022-02·04, 2400/2688행)이 corrupt 오탐으로 백업되던 문제 차단. vision 원본은 authoritative=True(구조만 hard 검증).
+- 전 세션에서 8개 원본 파일(SOL/XRP/TRX/ZEC 15m 2022-02·04)이 잘못 백업됐었으나 디스크 복구 완료 상태였음을 cmp로 전수 확인(8/8 byte-identical) — 정상 데이터 무손실.
+- vision 월별 재다운로드 실행(재실행 안전, 기존 유효파일 skip): 이번 세션 ADAUSDT 131(15m klines 66개월 2021-04~2026-09 + funding 65), LINKUSDT 132(66+66). 404 0건. 전체 56-b 누계 642 zip(전 세션 379: BTC klines 2024-04~05, ETH klines 2024-06~10·2026-05~08, BTC/ETH·기타 funding 갭, SOL/XRP/BNB/DOGE/TRX/ZEC 2022-10~2024-10 구멍 등).
+- 2026-10 진행월: funding REST(fapi fundingRate)로 DOGE/TRX/ZEC/ADA/LINK 5개 보강 완료(전 세션 BTC/ETH/SOL/XRP/BNB 포함 전 심볼 10/10 충족). klines REST는 fapi IP 418 밴(Retry-After 약 10.5h, 프로브 1회만 시도하고 즉시 중단 — 밴 연장 방지)으로 8개 심볼 미수집, 기록만(BTC/ETH는 전 세션 REST분 보유).
+- 검증: 전 심볼 × 전 월(2021-04~2026-10) 스트리밍 검증 — 결측월 0, 스팬 이탈 0, 비숫자 행 0, zip-only(F-31) 0. 남은 행수 미달은 전부 정상케이스: 2026-10 부분월(klines 8심볼 결측 기록, funding 42~43행) + 2022-02 네이티브 갭(vision 원본과 동일 2400행).
+- 산출물: audit/coverage_56b_before.json, coverage_56b_now.json, coverage_56b_after.json, verify_56b_final.txt, download_56b_log.jsonl(JSONL 전수 로그), download_missing_data.py(수정 완료, --no-rest/--symbols/--kinds 플래그).
+
+Stage Summary:
+- F-24 해제: ADAUSDT·LINKUSDT 15m klines 2021-04~2026-09 66개월 신규 복원(662파일, zip+CSV 병존 규약 준수).
+- F-27 해제: SOL/XRP/BNB/DOGE/TRX/ZEC klines+funding 2022-10~2024-10 구멍 전부 충전(전 세션 수행분 재검증 통과).
+- F-28 해제: BTCUSDT klines 2024-04·2024-05 복원. F-29 해제: ETHUSDT klines 2026-05~08 복원.
+- F-30 해제: 전 심볼 funding 2021-04~2026-10 완전 커버리지(BTC 2024-04 이후 포함, 이번 세션 REST 5심볼 마무리).
+- F-31 해제: zip-only 월 0건 확인(전량 CSV 병존).
+- 남은 결측(기록만): 2026-10 klines 부분월 8심볼(SOL/XRP/BNB/ADA/DOGE/LINK/TRX/ZEC) — vision 미게시 + fapi klines 418 IP밴(~10:30 UTC 해제 예정). 밴 해제 후 download_missing_data.py 재실행(--symbols=... --kinds=klines)로 자동 보강 가능. BTC/ETH 2026-10은 REST 부분월 보유(1343봉).
+- 기존 정상 데이터 덮어쓰기 0건(이번 세션 corrupt_replaced=0), discovery/·엔진 코드 무수정, 데이터 총량 klines 10심볼 × 66~67개월, funding 10심볼 × 67개월 완전 직사각형(2026-10 klines 8심볼 제외).
+
+---
+Task ID: 56
+Agent: Z.ai Code (main, 감사 프로젝트 Phase 1-g 재구성 + Phase 2 실행 안정성 + F-26 백업 복원 + 정기 사이클 재개)
+Task: 사용자 "전부 해결" 지시 — ①Phase 1-g 원장·상태 재구성 ②Phase 2 수정+테스트 ③F-26 개정 백업 ④크론 459256 사이클 재개. 병행 에이전트(56-b, 데이터 파이프라인)와 파일 충돌 없이 분업(discovery/=본 섹션, data/56-b)
+
+Work Log:
+- [동시성 실측] 이전 턴 에이전트 루프가 생존하여 같은 프로젝트 작업 중임을 실측(download_missing_data.py 00:04:14·00:13:24 수정, audit/coverage_56b_now.json 00:09:30 생성). 충돌 방지: 본 섹션은 56-b가 자체 원칙으로 제외한 discovery/·run_cycle.sh·백업만 수정 — data/ 미접촉
+- [Phase 1-g 원장 재구성] 아카이브 결과 150JSON+PREREG 150(commit 92716f6)을 1차 증거로 로컬 복원(results 300파일·PREREG 150파일, divergence 0). 소실 행 88건 append-only 재구성(recovered_from 태그) → 원장 150행=고유 126. 검증 전부 통과: 기존 62행↔결과 JSON 전수 정합, PREREG sha256 150/150 일치, 커서 통과 후보 미테스트 0건, 판정 분포 FC115·UP18·DM16·FCONS1 = 아카이브 기대치 정확 일치, SURVIVOR 0건. state.json 재구축(cycle 16, cursors 실측, tested=126 고유·150행 분리 표기). 고유 126 = Task 53 기록과 교차 확인. 스냅샷: audit/backup_pre_1g/
+- [Phase 2 수정(방법론 0변경)] F-11(engine_lib 경로 NEW2_ROOT 환경변수, 기본값 기존과 동일)·F-09(save_state 원자적 os.replace+fsync, state 파손 시 원장 기반 rebuild_state_from_ledger+reconcile.log)·F-08/35(후보 단위 ERROR → CYCLE_PARTIAL exit 2, SKIPPED exit 3)·F-04(pipefail+PIPESTATUS)·F-05(PID 락+사망 즉시 회수+무소유 락 age 판정)·F-23 종결(사이클 말미 상태 카운터 원장 재계산: tested=고유, tested_rows=행). T5 과정에서 신규 결함 발견·수정: write_prereg이 try 밖에 위치 → PREREG 단계 실패가 전체 사이클 사망(사전등록-후-실행 원칙 보존하며 ERROR 행 기록으로 수정)
+- [Phase 2 테스트 16/16 PASS] T4 종료코드 전파 0/1/2+비정상→1 · T2 라이브 락→3 · T3 무소유 신선 락→3/사망 PID 즉시 회수/스테일 회수 · T5 bogus family→ERROR 행+errors.log · T13 샌드박스 실엔진 1사이클 통합(원자적 저장 .tmp 잔존 0) · T1 state 파손→원장 재구성(원장 무변경 검증). 테스트는 전부 /tmp 격리 샌드박스(NEW2_ROOT)에서 실행 — 실제 장부 무접촉
+- [F-26 개정 백업 — 근본 해소] git_backup_push.sh 신규 작성: allow-list에 discovery/·audit/ 기본 포함+자체검증(누락 시 exit 6), 원격 fetch 후 그 위에 추가 커밋(덮어쓰기 구조 금지), force-push 없음, push 실패 시에도 로컬 커밋 보존. dry-run 검증(트리에 run/discovery 9파일 포함 확인) 후 실제 push → **BACKUP_PUSH_OK commit 472d8d1 — deploy key에 쓰기 권한 존재 실측**. 아카이브 원격에 엔진·감사 산출물·원장·보고서 재보호 완료. 과거 원격 무음 삭제(bf177c9) 재발 구조 원천 차단
+- [데이터 완료 확인(56-b 수령)] 전 심볼 klines·funding 완전 직사각형, ADA/LINK 로더 실측 192,864행(2021-04-01→2026-09-30). 잔여: 2026-10 알트 8심볼 klines 부분월(fapi 418 IP밴, ~10:30 UTC 해제 후 56-b 스크립트 재실행으로 자동 보강) — 잠금 TEST 판정(2027)에는 영향 없는 진행월
+- [사이클 재개 — 크론 459256] 완결 데이터로 **Cycle 17 실행: CYCLE_OK, 종료코드 0, dur 9s**. tested=136/779(고유), verdicts FC9·UP1, SURVIVOR 0, 커서 전진 정합. 크론 조건 ①~④ 중 해당 없음 → DISC-auto 섹션 미기록(정상 사이클, cycles.md 자동 기록만). state 정합: tested 136=원장 고유, tested_rows 160=원장 행
+- [금지사항 준수] 잠금 TEST 구간(BTC 2024-03-25~06-18·ETH 2026-04-28~08-31) 미사용 — event_study 배제 로직 무변경. 장부 과거 행 0 수정(재구성은 append-only+태그). 게이트 R1~R3·비용·통계 수식 1줄도 미변경. 자동 승격 선언 없음
+
+Stage Summary:
+- **감사 Phase 1-g 완료 + Phase 2 완료(수정 6건+발견 1건, 테스트 16/16) + F-26 원격 백업 복원(쓰기 권한 확보) + 정기 루프 재개(Cycle 17 OK)**
+- 원장은 150행(고유 126)으로 완전 복원 — 사이클 8~16의 소실 이력이 1차 증거 기반으로 재건되었고 전수 검증 통과. 잔여 유니버스 653
+- 남은 감사 작업: Phase 3(재검증 큐·고갈 처리)·4(통계 R4~R8 재구현)·5(데이터 품질 검사기·data_version — 보강은 56-b 완료)·6(펀딩 비용 R8·포트폴리오 시뮬레이터)·7(테스트 T8~T12 확장·문서 동기화·최종 보고서)
+- 백업은 이제 언제든 `bash NEW2_run/git_backup_push.sh`로 실행 가능(원격 쓰기 확인됨) — 본 턴 종료 시 최종 1회 실행 예정

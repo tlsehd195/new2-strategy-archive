@@ -1,0 +1,35 @@
+[BTCUSDT] klines issues=1 funding issues=1
+   KL: 2026-10 rows=1343 (<90% of 2976)
+   FD: 2026-10 rows=42 (<80% of 93)
+[ETHUSDT] klines issues=1 funding issues=1
+   KL: 2026-10 rows=1343 (<90% of 2976)
+   FD: 2026-10 rows=42 (<80% of 93)
+[SOLUSDT] klines issues=2 funding issues=1
+   KL: 2022-02 rows=2400 (<90% of 2688)
+   KL: 2026-10 MISSING
+   FD: 2026-10 rows=43 (<80% of 93)
+[XRPUSDT] klines issues=2 funding issues=1
+   KL: 2022-02 rows=2400 (<90% of 2688)
+   KL: 2026-10 MISSING
+   FD: 2026-10 rows=43 (<80% of 93)
+[BNBUSDT] klines issues=1 funding issues=1
+   KL: 2026-10 MISSING
+   FD: 2026-10 rows=43 (<80% of 93)
+[ADAUSDT] klines issues=1 funding issues=1
+   KL: 2026-10 MISSING
+   FD: 2026-10 rows=43 (<80% of 93)
+[DOGEUSDT] klines issues=1 funding issues=1
+   KL: 2026-10 MISSING
+   FD: 2026-10 rows=43 (<80% of 93)
+[LINKUSDT] klines issues=1 funding issues=1
+   KL: 2026-10 MISSING
+   FD: 2026-10 rows=43 (<80% of 93)
+[TRXUSDT] klines issues=2 funding issues=1
+   KL: 2022-02 rows=2400 (<90% of 2688)
+   KL: 2026-10 MISSING
+   FD: 2026-10 rows=43 (<80% of 93)
+[ZECUSDT] klines issues=2 funding issues=1
+   KL: 2022-02 rows=2400 (<90% of 2688)
+   KL: 2026-10 MISSING
+   FD: 2026-10 rows=43 (<80% of 93)
+TOTAL: klines=14, funding=10

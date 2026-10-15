@@ -398,9 +398,14 @@ def main():
     n_error = verdicts.get("ERROR", 0)
     st["last_ts"] = now_iso()
     st["last_status"] = "partial" if n_error else "ok"
+    # F-23 종결: 상태 카운터를 사이클 말미에 원장에서 재계산 (원장 = 유일한 진실)
+    # tested = 고유 해시 수, tested_rows = 원장 행 수
+    tested_now = G.load_tested_hashes()
+    rows_now = sum(1 for ln in open(LEDGER) if ln.strip())
+    st["tested_rows"] = rows_now
+    st["tested"] = len(tested_now)
     save_state(st)
 
-    tested_now = G.load_tested_hashes()
     universe = G.family_universe_size()
     total_universe = sum(universe.values())
     digest = (f"## Cycle {cycle} — {now_iso()}\n"

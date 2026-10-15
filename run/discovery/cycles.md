@@ -33,3 +33,7 @@
 - 검증: 기존 62행↔결과 JSON 전수 정합 · PREREG sha256 150/150 일치 · 커서 통과 후보 미테스트 0건 · next_batch 제안 10건 전부 미테스트 신규
 - state.json 재구축: cycle=16 · tested(고유)=126 · tested_rows=150 · SURVIVOR 0건 — 승격 큐 변동 없음 (R3 준수)
 
+## Cycle 17 — 2026-10-15T00:25:07Z
+- tested=136/779(문법 유니버스) verdicts={'FAIL_COST': 9, 'UNDETERMINED_POWER': 1} survivors_total=0
+- 패밀리 커서: {"flow_z": 28, "ret_rev": 25, "ts_mom": 24, "vol_break": 15, "tod": 15, "fund_z": 15, "fng": 14}
+
