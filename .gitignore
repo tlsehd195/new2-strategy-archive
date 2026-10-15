@@ -2,3 +2,5 @@ copy_err.log
 fetch_err.log
 push_err.log
 *.tmp56b
+__pycache__/
+*.pyc

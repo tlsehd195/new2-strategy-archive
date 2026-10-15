@@ -11,6 +11,7 @@
 #   0 = CYCLE_OK        (runner 0)
 #   2 = CYCLE_PARTIAL   (runner 2: 후보 단위 오류율 ≥ 30%)
 #   3 = CYCLE_SKIPPED   (runner 3: 다른 프로세스가 state/run.lock 보유)
+#   4 = CYCLE_BLOCKED_DATA (runner 4: evolution 모드에서 사용할 수 있는 시장 데이터 없음 — 아무것도 평가하지 않음)
 #   1 = CYCLE_FAILED    (runner 1/기타 비정상 종료, 잘못된 인자, 로그 기록 실패와 runner 성공/부분 처리의 조합)
 #
 # 로그 기록(tee) 실패 정책 (runner 종료코드 × 로그 결과):
@@ -31,6 +32,7 @@
 #   NEW2_DISC_AUDIT      감사 로그 경로 (기본: $NEW2_DISCOVERY_ROOT/cycle_audit.log, append)
 #   NEW2_DISC_TEE        로그 기록 명령 (기본: tee; 테스트에서 가짜 기록기로 교체)
 #   PYTHON               파이썬 실행 파일 (기본: python3)
+#   NEW2_DISC_MODE       legacy(기본) | evolve | full — runner.py --mode 로 전달
 #   REFRESH=1            미지원 — runner가 경고하고 요약에 기록한다
 # ============================================================
 set -uo pipefail
@@ -57,6 +59,12 @@ if ! [[ "$BATCH" =~ ^[1-9][0-9]{0,5}$ ]]; then
   exit 1
 fi
 
+MODE="${NEW2_DISC_MODE:-legacy}"
+case "$MODE" in
+  legacy|evolve|full) ;;
+  *) usage; echo "CYCLE_FAILED usage: invalid NEW2_DISC_MODE '$MODE'"; exit 1 ;;
+esac
+
 ROOT="${NEW2_DISCOVERY_ROOT:-$SCRIPT_DIR}"
 LOG="${NEW2_DISC_LOG:-$ROOT/cycle_log.txt}"
 AUDIT="${NEW2_DISC_AUDIT:-$ROOT/cycle_audit.log}"
@@ -77,7 +85,7 @@ mkdir -p "$(dirname "$LOG")" 2>/dev/null || { audit "event=FAILED reason=log_dir
 
 # ── 실행: runner / 로그 기록기 / 출력 축약기 종료코드를 각각 보존 ──
 # PIPESTATUS는 파이프라인 직후 첫 명령에서만 유효하므로 곧바로 복사한다.
-"$PY" "$SCRIPT_DIR/runner.py" --batch "$BATCH" 2>&1 | "$TEE" -a "$LOG" | tail -n 15
+"$PY" "$SCRIPT_DIR/runner.py" --batch "$BATCH" --mode "$MODE" 2>&1 | "$TEE" -a "$LOG" | tail -n 15
 st=("${PIPESTATUS[@]}")
 rc="${st[0]}"
 tee_rc="${st[1]:-1}"
@@ -109,6 +117,13 @@ case "$rc" in
   3)
     [ "$log_failed" -ne 0 ] && audit "event=LOG_ERROR_ON_SKIP runner_rc=3"
     echo "CYCLE_SKIPPED"; exit 3 ;;
+  4)
+    if [ "$log_failed" -ne 0 ]; then
+      audit "event=CYCLE_FAILED reason=log_failure_after_blocked_data runner_rc=4"
+      echo "CYCLE_FAILED rc=4 blocked-data cycle but log pipeline failed (writer rc=$tee_rc, log=$LOG)"
+      exit 1
+    fi
+    echo "CYCLE_BLOCKED_DATA batch=$BATCH mode=$MODE"; exit 4 ;;
   *)
     [ "$log_failed" -ne 0 ] && audit "event=LOG_ERROR_ON_FAILURE runner_rc=$rc"
     echo "CYCLE_FAILED rc=$rc"; exit 1 ;;

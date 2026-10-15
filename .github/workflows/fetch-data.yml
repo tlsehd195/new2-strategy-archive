@@ -1,0 +1,37 @@
+name: fetch-market-data
+# Manual only. Downloads public monthly archives (data.binance.vision), runs the
+# quality gate, uploads the result. It does NOT run the research cycle and never
+# touches the locked TEST ledger (Actions runners are ephemeral).
+on:
+  workflow_dispatch:
+    inputs:
+      start:
+        description: "first month, YYYY-MM"
+        default: "2021-01"
+      end:
+        description: "last month, YYYY-MM"
+        default: "2026-09"
+permissions:
+  contents: read
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Download and quality-check
+        env:
+          NEW2_DATA_DIR: ${{ github.workspace }}/data
+        run: |
+          mkdir -p "$NEW2_DATA_DIR"
+          python3 run/discovery/data_fetch.py --allow-network \
+            --symbols BTCUSDT ETHUSDT --start "${{ inputs.start }}" --end "${{ inputs.end }}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: market-data
+          path: data
+          retention-days: 14

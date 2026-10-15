@@ -201,3 +201,35 @@ flags `cost_status`, which makes `portfolio_passes` false.  The candle model
 uses no order book and no measured spread (`COST_MODEL_SCOPE`); it is
 `UNVERIFIED_COST_MODEL` until calibrated, and an UNVERIFIED pass is never
 promotable.
+
+## 8. Adaptive generation (evolution mode, ADR 0004)
+
+- **DEV is never a test.**  The search reads only DEV metrics through
+  `search.dev_feedback` (any other stage raises `FeedbackLeak`); DEV results
+  rank and screen, they never confirm.
+- **Validation = preregistered batches.**  Members, alpha, method and seed
+  are written to `evolution/validation_batches.jsonl` before evaluation.
+  Inside a batch, per symbol: Romano–Wolf studentized StepM on daily net
+  returns (events booked on their exit UTC day; flat days 0) — strong FWER
+  under arbitrary dependence between strategies.  Batch k on one validation
+  window gets `alpha_total·6/π²/k²` (sum ≤ alpha_total: valid however the
+  later batches were chosen).  Multi-symbol strategies must be rejected on
+  every symbol.  SPA / Reality Check / BH / BY are diagnostics only.
+- **Robustness filters** (cost ×1.5/×2, regimes, MDD, concentration, DEV
+  parameter neighbours, walk-forward, sample size, PBO/CSCV over all DEV
+  trials) only remove candidates; an uncomputable PBO is `BLOCKED_STATISTICS`.
+- **Locked windows = campaigns** (`state/locked_window_campaigns.jsonl`,
+  shared with the legacy path): members and alpha fixed before access;
+  campaign c on a window gets `alpha_total·6/π²/c²`, Bonferroni inside; at
+  most 3 campaigns per window, then `WINDOW_RETIRED`.  Campaigns aborted
+  before any exposure do not count.  A legacy locked PASS additionally needs
+  `p ≤` its campaign member alpha.
+- **Statuses** (per strategy and context, append-only, transition table):
+  RESEARCH_ONLY → VALIDATION_SURVIVOR → PAPER_TEST_READY; terminal REJECTED /
+  INCONCLUSIVE; BLOCKED_DATA / BLOCKED_COST / BLOCKED_STATISTICS resume only
+  to the status recorded in `resume_to`.  Promotion links the record ids of
+  the dev, validation, robustness and locked evidence; any missing evidence
+  blocks it.
+- Assumptions stated, not proven: stationarity / weak dependence of daily
+  strategy returns (bootstrap validity), daily aggregation of 15m events,
+  `q = n^(-1/3)` mean block length.
