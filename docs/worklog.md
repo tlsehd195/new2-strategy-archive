@@ -1280,3 +1280,45 @@ Stage Summary:
 - 원장은 150행(고유 126)으로 완전 복원 — 사이클 8~16의 소실 이력이 1차 증거 기반으로 재건되었고 전수 검증 통과. 잔여 유니버스 653
 - 남은 감사 작업: Phase 3(재검증 큐·고갈 처리)·4(통계 R4~R8 재구현)·5(데이터 품질 검사기·data_version — 보강은 56-b 완료)·6(펀딩 비용 R8·포트폴리오 시뮬레이터)·7(테스트 T8~T12 확장·문서 동기화·최종 보고서)
 - 백업은 이제 언제든 `bash NEW2_run/git_backup_push.sh`로 실행 가능(원격 쓰기 확인됨) — 본 턴 종료 시 최종 1회 실행 예정
+
+---
+Task ID: 57
+Agent: general-purpose (subagent, 감사 Phase 3+4 — 후보 관리·통계 강화) / 기록은 메인 에이전트가 실측 검증 기반 대필 (응답 타임아웃으로 자체 보고 미수령 — 산출물·코드 실측으로만 기록)
+Task: F-01/02/03/06/07/15/23 재구현 + R4~R7 게이트 개정 (v2-audit3)
+
+Work Log:
+- [산출물 실측 검증] engine_lib.py·generator.py·runner.py·run_cycle.sh 전부 수정 확인 (mtime 00:49~00:57Z), py_compile COMPILE_OK
+- [Phase 4 적용 확인] R4: 심볼 단위 판정 — 1심볼 통과+타심볼 불통 시 FAIL_SYMMETRY (엄격화, engine_lib.py:467) / R5: 탐색 수준 BH-FDR 참고 기록 / R6: HELDOUT 상수 + heldout_stats() (게이트 미사용 참고병기) / R7: z_pool_stouffer ρ 고정·이중계수 제거 (engine_lib.py:502)
+- [Phase 3 적용 확인] generator.py classify_ledger() — 판정 기반 분류(REVERIFY_VERDICTS = UNDETERMINED_POWER/DATA_MISSING/ERROR), 재검증 판정은 kind:"reverify" 신규 행 + retry_count (최대 2회, 최초 판정 덮어쓰기 없음), ENGINE="NEW2-discovery-v2-audit3"
+- [격리 스모크 실측(메인 수행)] /tmp 하드링크 샌드박스(NEW2_ROOT) 1사이클 → **CYCLE_OK cycle=18, exit 0, dur 8s**: tested=140/779(고유), reverify_queue=20 적재 확인, verdicts FC4·UP4, errors 0 — 재검증 큐·심볼 판정 정상 작동 실측
+- [금지사항] 게이트 완화 0 (R4는 엄격화), 장부 과거 행 0 수정, locked TEST 구간 미접촉
+
+Stage Summary:
+- Phase 3+4 완료 — F-03 재검증 큐(문서만 있던 기능) 실구현, F-02 best-cell 단독 합격 제거(FAIL_SYMMETRY), F-01 BH-FDR 참고 기록, F-06/07 Stouffer 사전등록화, F-15 held-out 진단 병기
+---
+Task ID: 58
+Agent: general-purpose (subagent, 감사 Phase 5잔여+6) / portfolio_sim은 메인 에이전트 보완작성 (서브에이전트 미완성분)
+Task: funding_cost(R8)·data_quality_check(F-13)·data_version·portfolio_sim(F-17) 신설
+
+Work Log:
+- [funding_cost.py] 보유 구간 (entry,exit] 펀딩 합산 — 자가 단위테스트 **5/5 PASS** 실측 (부호·누적·간격·fail-closed·klines 커버리지)
+- [data_quality_check.py] 실측 실행: klines 10심볼 17s · funding 10심볼 18s — **갭 8세그먼트/소실 1,920봉, funding 갭 1세그먼트** = 56-b 보고의 2026-10 부분월 + 2022-02 네이티브 갭과 정확 일치 (신규 결함 0). 리포트: audit/data_quality_report_20261015.{json,md}
+- [data_version.json] 심볼별 파일 수·바이트·mtime·sha256 지문 생성 (재발화 방지 지문 구조)
+- [portfolio_sim.py] 서브에이전트 미작성 → 메인이 작성: 슬롯 3·심볼 중복 차단·fail-closed·펀딩 반영(funding_cost 사용)·MDD/Sharpe/Sortino/스킵률. 과정에서 자체 결함 2건 발견·수정(①funding_cost에 numpy 슬라이스 전달 → DataFrame 전달로 수정 ②반환 float/dict 이원화 방어) — 최종 실측: ret_rev BTC 샘플 net −39,657.4bp·MDD −42,880bp·Sharpe −4.54·스킵률 0.8502 (비용 벽 하 손실 전략의 정직한 진단값 — 판정 아님), results/portfolio_sim_20261015T011105Z.json 저장
+
+Stage Summary:
+- Phase 5잔여+6 완료 — R8 펀딩 비용·F-13 품질검사기·F-17 포트폴리오 시뮬레이터 모두 실측 통과
+---
+Task ID: 59
+Agent: Z.ai Code (main, 감사 프로젝트 최종 정리 — Phase 7·백업·보고)
+Task: 잔여 서브에이전트 산출물 통합 검증 + worklog 정리 + 최종 오프사이트 백업
+
+Work Log:
+- [통합 검증] 57/58 서브에이전트 응답 2회 모두 타임아웃되었으나 산출물 전부 실측 확인 (코드·테스트·실행 결과) — 미수령 보고는 실측 기반 대필 기록
+- [최종 상태] 엔진 v2-audit3: 사이클 18 스모크 CYCLE_OK(샌드박스), 실 루프는 크론 459256(3시간)이 v2-audit3 코드로 운영. tested 140/779 고유, 재검증 큐 20
+- [최종 백업] git_backup_push.sh(F-26 개정판: discovery/·audit/ 자체검증 포함)로 아카이브 push — 결과는 backup/git_log.md
+- [잔여 과제(후속 세션)] ①2026-10 알트 8심볼 klines 부분월 보강(fapi 418 해제 후 download_missing_data.py 재실행) ②최종 감사 보고서 A-H 규격 완성판 작성(Phase 1~7 전체 자료는 worklog·audit/에 누적) ③README/HANDOVER 문서 동기화 ④2027-01-11/07-01 잠금 TEST 판정 코드(별도 구현)
+
+Stage Summary:
+- 감사 프로젝트 Phase 1·1-g·2·3·4·5·6 완료 + Phase 7(테스트·백업) 완료 — 이전 소실된 v2-audit2를 초과하는 v2-audit3로 재건 완료
+- 핵심 수치: 원장 160행(고유 140), 수정 22건+신규 발견 13건(F-26~36) 전부 처리 또는 기록, 테스트 16/16+5/5+스모크 통과, 오프사이트 백업 원격 쓰기 검증 완료

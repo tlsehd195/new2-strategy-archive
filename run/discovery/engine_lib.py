@@ -16,6 +16,16 @@ NEW2 자율탐색 엔진 — 공통 라이브러리 (engine-discovery-v1 잠금 
   - R2: 승자 저주 수축 — mean_defl = mean − 2.2414*se > 0 까지 요구
   - R3: 승격은 절대 자동 선언하지 않음 — SURVIVOR는 promotion_queue 적재 후
         2027-01-11 / 2027-07-01 잠금 TEST 판정에서만 처리
+v2-audit3 추가 규칙 (감사 Phase 3+4 — 엄격 방향만, 게이트 완화 0):
+  - R4 (F-02 수정, 엄격화): 심볼 정합 — SURVIVOR는 후보의 모든 심볼이
+        POWER·COST·CONSIST·STAT을 통과할 때만. 1심볼 통과+타 심볼 FAIL_*이면
+        FAIL_SYMMETRY (v1의 최고 t 셀 1개 단독 합격 금지).
+  - R5 (F-01 참고 지표, 게이트 아님·완화 아님): 후보 내 Holm 판정 유지 + 탐색 수준
+        Benjamini-Hochberg FDR q 참고 병기(state/원장 누적 기록 — runner).
+  - R6 (F-15 진단, 게이트 아님): 개발·잠금 구간 밖 held-out 구간 raw 통계를
+        생존자의 통과 심볼 셀에 한해 참고 병기 (선택/조정/판정 미사용 — 오염 방지).
+  - R7 (F-06/F-07 수정, 재량 제거): Stouffer ρ=0.119 사전등록 고정 + w_i=1
+        (t는 이미 √n 스케일 — √vn 이중계수 제거, ρ 그리드 max 선택 금지).
 데이터: 캐시만 사용 (NEW2_run/data). 네트워크 다운로드 0바이트.
 """
 import glob
@@ -58,6 +68,19 @@ LOCKED = {
     "BTCUSDT": [("2024-03-25", "2024-06-18")],
     "ETHUSDT": [("2026-04-28", "2026-08-31")],
 }
+
+# R6 (F-15 진단): held-out 진단 구간 — 개발 구간·잠금 TEST 구간 어디에도 포함되지
+# 않는 구간(종료 None = 데이터 말미까지). 게이트에 절대 사용하지 않는다
+# (오염 방지 — 2027 잠금 TEST 전 사전 진단 참고 병기 전용).
+HELDOUT = {
+    "BTCUSDT": [("2024-06-19", None)],   # dev SPANS 종료(2024-03-18)·잠금(06-18) 이후
+    "ETHUSDT": [("2026-09-01", None)],   # dev SPANS 종료(2026-04-20)·잠금(08-31) 이후
+}
+
+# R7 (F-06/F-07 수정): Stouffer 결합 상관 계수 — 사전등록 고정값.
+# v1은 ρ∈{0,0.119,0.238,0.5} 그리드에서 max를 골랐다(유리한 ρ 선택 = 다중검정
+# 재량, F-06). v2-audit3부터 운용 코드는 본 상수만 사용한다.
+STOUFFER_RHO = 0.119
 
 KLINE_FAMILIES = {"flow_z", "ret_rev", "ts_mom", "vol_break", "tod"}
 
@@ -375,16 +398,13 @@ def cell_stats(ev_h: dict, h: int, sym: str) -> dict:
     return st
 
 
-def verdict_from_cells(cells: list):
-    """게이트 순서: POWER → COST → CONSIST → STAT. (engine-discovery-v1 R1/R2)"""
-    fin = [c for c in cells if c.get("t") is not None]
+def _symbol_gate(cells_sym: list):
+    """R4 보조: 단일 심볼 셀 모음에 게이트 체인 적용 (순서 고정 POWER→COST→
+    CONSIST→STAT). 반환: (심볼 판정, 해당 심볼 최고 t 셀).
+    PASS = 4게이트 모두 통과. v1과 동일한 게이트 조건 — 적용 단위만 심볼로 확대."""
+    fin = [c for c in cells_sym if c.get("t") is not None]
     if not fin:
         return "UNDETERMINED_POWER", None
-    # Holm (후보 내 전 셀)
-    ps = [max(c["p"], 1e-300) for c in fin]
-    padj = holm(ps)
-    for c, p in zip(fin, padj):
-        c["p_holm"] = float(p)
     best = max(fin, key=lambda c: c["t"])
     if best["vn_nonov"] < VN_MIN:
         return "UNDETERMINED_POWER", best
@@ -398,20 +418,108 @@ def verdict_from_cells(cells: list):
     best["mean_defl_bp"] = mean_defl
     if best["p_holm"] >= 0.05 or mean_defl <= 0:
         return "FAIL_STAT", best
-    return "SURVIVOR", best
+    return "PASS", best
 
 
-def z_pool_stouffer(ts, vns, rho: float) -> float:
-    """양수 t 성분 결합 (쌍대 음수 불가 정리 준용). w=√vn."""
+# 전체 판정 우선순위 (게이트 순서 — 전 심볼 FAIL 시 가장 앞 게이트 실패를 대표 판정으로)
+_GATE_ORDER = ("UNDETERMINED_POWER", "FAIL_COST", "FAIL_CONSIST", "FAIL_STAT")
+
+
+def verdict_from_cells(cells: list):
+    """R4 (F-02 수정, v2-audit3 — 엄격화): 심볼 단위 판정.
+    각 심볼의 셀 모음에 게이트 체인(POWER→COST→CONSIST→STAT)을 개별 적용한다.
+      · SURVIVOR: 모든 심볼이 4게이트 통과할 때만 부여 (v1은 최고 t 셀 1개 통과로
+        합격 가능 → 1심볼 통과+타 심볼 FAIL_*이면 FAIL_SYMMETRY로 정직 기록).
+      · UNDETERMINED_POWER: 어느 심볼이든 데이터 부족(vn<30/셀 없음)이면 전체를
+        미결정으로 분류해 재검증 큐로 보낸다(성급한 FAIL 선언 금지 — 데이터 보강
+        후 재판정; 게이트 완화 아님 — UNDETERMINED는 절대 합격이 아님).
+      · 전 심볼 FAIL: 게이트 순서 우선(POWER>COST>CONSIST>STAT)으로 대표 판정.
+    Holm 보정은 기존대로 후보 내 전 셀에 공통 적용한다.
+    셀에는 sym_verdict(심볼별 판정), 최고 셀에는 sym_verdicts 요약을 기록한다."""
+    fin = [c for c in cells if c.get("t") is not None]
+    if fin:
+        # Holm (후보 내 전 셀 — 기존 규격 유지)
+        ps = [max(c["p"], 1e-300) for c in fin]
+        padj = holm(ps)
+        for c, p in zip(fin, padj):
+            c["p_holm"] = float(p)
+    by_sym = {}
+    for c in cells:
+        by_sym.setdefault(c["sym"], []).append(c)
+    if not by_sym:
+        return "UNDETERMINED_POWER", None
+    sv, bests = {}, {}
+    for sym, cs in by_sym.items():
+        v, b = _symbol_gate(cs)
+        sv[sym] = v
+        for c in cs:
+            c["sym_verdict"] = v
+        if b is not None:
+            bests[sym] = b
+    if all(v == "PASS" for v in sv.values()):
+        verdict = "SURVIVOR"
+    elif any(v == "UNDETERMINED_POWER" for v in sv.values()):
+        verdict = "UNDETERMINED_POWER"
+    else:
+        passes = [s for s in sv if sv[s] == "PASS"]
+        fails = [s for s in sv if sv[s] != "PASS"]
+        if passes and fails:
+            verdict = "FAIL_SYMMETRY"   # 1심볼 통과 + 1심볼 불통 — 정직 기록 (R4)
+        else:
+            verdict = min((sv[s] for s in fails), key=lambda v: _GATE_ORDER.index(v))
+    best = max(bests.values(), key=lambda c: c["t"]) if bests else None
+    if best is not None:
+        best["sym_verdicts"] = dict(sv)   # 심볼별 세부 판정 요약 (원장/results 직렬화용)
+    return verdict, best
+
+
+def heldout_spans(sym: str):
+    """R6: 심볼의 held-out 진단 구간 (개발 구간·잠금 TEST 구간 밖, 종료 None=데이터 말미).
+    알트는 ALT_SPANS 종료(2026-04-20) 익일부터 — 잠금 구간 없음."""
+    return HELDOUT.get(sym, [("2026-04-21", None)])
+
+
+def heldout_stats(ev_h: dict, sym: str) -> dict:
+    """R6 (F-15 진단): held-out 구간 raw 참고 통계 — 생존자의 통과 심볼 셀에 한해
+    산출·병기된다(runner process_candidate). 게이트에 절대 사용하지 않는다
+    (선택·조정·판정 미사용 — 2027 잠금 TEST 전 사전 진단 참고만, 오염 방지).
+    통계: 비용가능(o10k) 진입 전체(중첩 허용 raw)의 순수익 평균 + 표본 수."""
+    ems = ev_h["entry_ms"]
+    xms = ev_h["exit_ms"]
+    raw_bp = ev_h["raw_bp"]
+    ok10, c10 = cost_vec(SCEN["o10k"], ev_h["qv_e"], ev_h["qv_x"])
+    net10 = raw_bp - c10
+    inh = np.zeros(len(ems), dtype=bool)
+    for (a, b) in heldout_spans(sym):
+        s0 = ms(a)
+        inh |= (ems >= s0) if b is None else ((ems >= s0) & (xms < ms(b)))
+    m = inh & ok10
+    if not m.any():
+        return {"n": 0, "mean_net_bp": None}
+    return {"n": int(m.sum()), "mean_net_bp": float(np.mean(net10[m]))}
+
+
+def z_pool_stouffer(ts, vns, rho: float = None) -> float:
+    """R7 (F-06/F-07 수정, v2-audit3): Stouffer 결합 — 양수 t 성분만 (쌍대 음수 불가).
+
+        z = (Σ t_i) / sqrt( k + 2ρ·k(k−1)/2 )
+
+    · w_i = 1 통일: t 통계량은 이미 √n 스케일이므로 v1의 w=√vn 추가 가중은
+      √n·√n = n 이중계수가 된다(F-07) → 제거하고 등가중 결합으로 고정.
+      var = Σ w_i² + 2ρ·(쌍 개수) = k + 2ρ·k(k−1)/2.
+    · ρ는 사전등록 상수 STOUFFER_RHO=0.119 고정. v1의 ρ 그리드 max 선택은 금지
+      (F-06: 유리한 ρ 선택 = 다중검정 재량). rho 인자는 단위 테스트(T9: 단조성·
+      기댓값·복제 무이득) 전용이며 운용 코드는 상수만 전달한다.
+    · 정합성: k=1 → z=t_1 (불변). 동일 전략 복제(t1=t2=t, ρ=1) → z=t (무이득).
+      모든 t_i=t, ρ=0 → z=t·√k (클래식 Stouffer 등가중). — T9 단위검증 대상."""
     keep = [(t, v) for t, v in zip(ts, vns) if v >= VN_MIN and t > 0]
     if not keep:
         return float("-inf")
-    w = np.array([math.sqrt(v) for _, v in keep])
-    t = np.array([x for x, _ in keep])
-    num = float(np.dot(w, t))
-    var = float(np.dot(w, w))
-    if rho > 0 and len(w) > 1:
-        var += 2 * rho * float((np.outer(w, w) - np.diag(w * w)).sum())
+    if rho is None:
+        rho = STOUFFER_RHO
+    k = len(keep)
+    num = float(sum(t for t, _ in keep))
+    var = float(k + 2.0 * rho * (k * (k - 1) / 2.0))
     if var <= 0:
         return float("-inf")
     return num / math.sqrt(var)

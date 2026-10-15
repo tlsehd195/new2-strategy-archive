@@ -8,6 +8,13 @@ NEW2 자율탐색 엔진 — 후보 생성기 (grammar-based, 결정론적)
 F2/X6 사전 측정분(BTC/ETH × (10,90)/(20,80) × h{4,16,48})은 배제 목록으로 중복 방지.
 조합 단계: 생존 전략 풀에서 ①파라미터 섭동 ②국면 필터 변형 ③Stouffer 풀 결합 생성.
 
+F-03 (v2-audit3): 판정 기반 후보 분류 — classify_ledger()가 원장을 최신 판정 기준으로
+분류한다. SURVIVOR/FAIL_*는 tested 확정, UNDETERMINED_POWER/DATA_MISSING/ERROR는
+재검증 큐로 분리(후보당 최대 REVERIFY_MAX_RETRIES=2회 재시도, 초과 시 tested 확정).
+재검증 판정은 최초 판정을 덮어쓰지 않고 새 행(kind:"reverify", retry_count 포함)으로
+기록되므로 각 해시의 '최신 행'이 현재 상태를 결정한다. 큐는 원장에서 매 사이클
+재유도된다(state는 파생 캐시 — 크래시 안전).
+
 커서 규약 (크래시 안전): next_batch는 커서를 건드리지 않고 (fam, idx)를 반환.
 runner는 장부 append 성공 후에만 state["cursors"][fam] = idx+1 로 전진 →
 중간 크래시 시 다음 사이클이 동일 후보를 재시도 (장부가 유일한 진실).
@@ -102,6 +109,9 @@ def family_universe_size():
 
 
 def load_tested_hashes():
+    """원장에 행이 존재하는 모든 후보 해시(판정 무관) — next_batch/조합의 중복
+    제안 방지 전용. 재검증 큐 항목도 행이 있으므로 여기서 제외된다(큐로 재시도).
+    판정 기반 분류(terminal vs 큐)는 classify_ledger() 참조."""
     tested = set()
     if os.path.exists(LEDGER):
         with open(LEDGER) as f:
@@ -110,15 +120,79 @@ def load_tested_hashes():
                 if not line:
                     continue
                 try:
-                    tested.add(json.loads(line)["cand_hash"])
+                    h = json.loads(line).get("cand_hash")
                 except Exception:
                     continue
+                if h:
+                    tested.add(h)
     return tested
+
+
+# ── F-03 (Phase 3): 판정 기반 후보 분류 — 재검증 큐 ──
+# tested 확정 판정(재시도 없음) vs 재검증 대상 판정의 경계. 엄격 유지:
+# UNDETERMINED/데이터누락/오류는 '실패 확정'도 '합격'도 아니므로 데이터 보강 후
+# 유한 회수(최대 2회)만 허용하고, 소진 시 tested 확정(큐 무한순환 방지).
+REVERIFY_VERDICTS = ("UNDETERMINED_POWER", "DATA_MISSING", "ERROR")
+REVERIFY_MAX_RETRIES = 2
+
+
+def classify_ledger():
+    """원장 전 행을 '최신 판정' 기준으로 분류한다 (F-03).
+    반환: (tested_terminal, all_hashes, reverify_queue)
+      tested_terminal : 더 이상 시도하지 않는 후보 해시 집합 — SURVIVOR/FAIL_* 확정
+                        또는 재검증 소진(retry_count ≥ REVERIFY_MAX_RETRIES).
+      all_hashes      : 원장에 1개 이상 행이 있는 모든 후보 해시 (중복 제안 방지).
+      reverify_queue  : 재검증 대기 목록 — 최신 판정이 REVERIFY_VERDICTS에 속하고
+                        retry_count < REVERIFY_MAX_RETRIES. 항목: {cand_hash,
+                        family, symbols, params, variant, retry_count, last_verdict}.
+                        원장 순서(=최초 발견 순, 오래된 항목 우선) 유지.
+    재검증 판정은 새 행(kind:"reverify")으로 추가 기록되므로 최초 판정 행은
+    무수정 보존된다(append-only 원칙)."""
+    latest = {}
+    order = []
+    if os.path.exists(LEDGER):
+        with open(LEDGER) as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    r = json.loads(line)
+                except Exception:
+                    continue
+                h = r.get("cand_hash")
+                if not h:
+                    continue   # fdr_ref 등 비후보 행 제외
+                if h not in latest:
+                    order.append(h)
+                latest[h] = {
+                    "cand_hash": h,
+                    "family": r.get("family"),
+                    "symbols": r.get("symbols"),
+                    "params": r.get("params"),
+                    "variant": r.get("variant"),
+                    "retry_count": int(r.get("retry_count") or 0),
+                    "last_verdict": r.get("verdict"),
+                }
+    tested, queue = set(), []
+    for h in order:
+        e = latest[h]
+        if e["last_verdict"] in REVERIFY_VERDICTS:
+            if e["retry_count"] < REVERIFY_MAX_RETRIES:
+                queue.append(e)
+            else:
+                tested.add(h)   # 재검증 소진 → tested 확정 (큐 무한순환 방지)
+        else:
+            tested.add(h)
+    return tested, set(order), queue
 
 
 def next_batch(state, batch_size):
     """패밀리 라운드로빈 미시도 후보. 반환 항목에 fam_idx 포함, 커서 미변경.
-    배치 내 중복 방지: proposed 집합으로 동일 사이클 내 재제안 차단."""
+    배치 내 중복 방지: proposed 집합으로 동일 사이클 내 재제안 차단.
+    tested = 원장 전 행 해시(재검증 큐 항목 포함) — 큐 항목은 next_batch가 아니라
+    재검증 경로로만 재시도된다(이중 제안 차단). 전 후보가 소진되면 빈 배치 반환
+    → runner가 UNIVERSE_EXHAUSTED 판정(F-03 고갈 처리)."""
     tested = load_tested_hashes()
     proposed = set(tested)
     batch = []

@@ -1,0 +1,28 @@
+{
+ "family": "ret_rev",
+ "symbols": [
+  "BTCUSDT"
+ ],
+ "params": {
+  "k": 16,
+  "thr": 2.3263,
+  "horizons": [
+   16
+  ]
+ },
+ "variant": null,
+ "days": 829,
+ "events_total": 8129,
+ "skip_slot": 0,
+ "skip_symbol_dup": 6911,
+ "skip_rate": 0.8502,
+ "net_bp_total": -39658.4,
+ "mean_bp_per_day": -47.8388,
+ "mdd_bp": -42880.01,
+ "sharpe_annualized": -4.538,
+ "sortino_annualized": -4.503,
+ "scenario": "o10k",
+ "max_slots": 3,
+ "engine": "NEW2-discovery-v2-audit3",
+ "note": "진단용(판정 아님) — 2027 잠금 TEST 심사 입력. 이벤트 스터디와 수치가 다른 이유: 슬롯 제한·심볼 중복 차단·일 단위 집계 제약"
+}

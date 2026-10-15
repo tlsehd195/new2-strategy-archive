@@ -4,7 +4,10 @@
 # ============================================================
 # 변경(F-04·F-05·F-35·F-11): pipefail+PIPESTATUS 종료코드 전파,
 # PID 기반 락 + 스테일 락 회수, 크론 명세 종료코드 준수, NEW2_ROOT 구성화.
-# 방법론·엔진 알고리즘은 일절 변경 없음 (runner.py가 게이트 R1~R3 준수).
+# v2-audit3(감사 Phase 3+4): runner.py가 게이트 R1~R7 준수 — R4 심볼 정합(엄격화),
+# R5 탐색 수준 BH-FDR 참고(게이트 아님), R6 held-out 진단 참고(게이트 미사용),
+# R7 Stouffer ρ 고정. 재검증 큐(F-03)·UNIVERSE_EXHAUSTED·라벨 v2-audit3.
+# 본 래퍼의 실행 로직은 Phase 2판 그대로 (방법론 변경 없음).
 #
 # 종료코드(크론 명세): 0=CYCLE_OK, 2=CYCLE_PARTIAL(후보 단위 오류),
 #                      1=CYCLE_FAILED, 3=SKIPPED(락)
