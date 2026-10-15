@@ -77,8 +77,10 @@
 | Bailey et al. (2017) PBO/CSCV | 적용(게이트) | 기존 `pbo_cscv`가 원문과 일치함을 확인(ω̄=rank/(N+1), logit≤0 비율). |
 | Foster & Stine (2008) α-investing | 검토 후 보류 | p-값의 조건부 타당성이 필요한데 같은 창을 재사용하므로 부적합. 1/k² 지출로 대체. |
 | Newey & West (1987) | 기존 유지 | 기존 Bartlett HAC 구현. 이번 작업에서 원문 재대조는 하지 않음. |
-| Bailey & López de Prado (2014) DSR | 보류 | 원문 수식을 확보하지 못함. 게이트에 쓰지 않고, 기존 `deflated_sharpe`는 미사용으로 둠. |
-| Hansen–Lunde–Nason MCS, Hsu–Hsu–Kuan, Sullivan–Timmermann–White, Diebold–Mariano, Giacomini–White | 보류 | 원문 미확인. StepM이 "구분 불가 후보 억지 순위화 금지" 역할을 부분적으로 맡음(기각 집합만 통과, 순위 없음). |
+| Bailey & López de Prado (2014) DSR | 적용(진단, 게이트 아님) | 1차 원문은 읽지 못했다. 독립된 두 구현이 인용한 수식(SE에 왜도·첨도 반영, E[max SR]=√V·[(1−γ)Φ⁻¹(1−1/N)+γΦ⁻¹(1−1/(Ne))])을 교차 확인해 기존 `deflated_sharpe`와 일치시킴. 시도 수 N·분산 V는 컨텍스트 전체 DEV 시도에서 계산. 출처 한계 때문에 통과 기준에 쓰지 않고 `robustness.checks.dsr`에 기록만 함. |
+| Hansen–Lunde–Nason (2011) MCS T_max | 적용(진단) | CREATES 워킹페이퍼 본문의 알고리즘 확인: t_i.=d̄_i./√var, 최대 t 제거, p값의 누적 최댓값. **차이**: 원문은 이동블록 부트스트랩, 여기는 정상 부트스트랩이고 분산은 부트스트랩 분산(원문 부록 추정량은 미확인). 순위로 쓰지 않고 배치의 `mcs` 집합만 기록. |
+| Hsu–Hsu–Kuan (2010) Step-SPA | 보류 | 초록만 확인(SPA의 단계적 확장). 본문 없음. StepM이 단계적 통제를 이미 제공. |
+| Sullivan–Timmermann–White, Diebold–Mariano, Giacomini–White | 보류 | 원문 미확인. StepM이 "구분 불가 후보 억지 순위화 금지" 역할을 부분적으로 맡음(기각 집합만 통과, 순위 없음). |
 | GA/GP 계열(Allen–Karjalainen, Dempster–Jones, Long 외 2026 등) | 미적용 | 원문 미확인. 변형 연산자와 파레토 탐색은 일반 공학 설계이며, 논문 방법을 구현했다고 주장하지 않음. |
 | 암호화폐 기술적 분석·장중 수익률·미시구조 논문(8, 9, 24–31, 42–46) | 보류 | 원문 미확인. 지표 레지스트리에 개별 효과를 추가하지 않음. |
 | 강화학습·딥러닝·가격 예측(47–61) | 보류 | 사용자 우선순위상 마지막 단계. 구현하지 않음. |

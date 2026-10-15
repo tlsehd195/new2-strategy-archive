@@ -21,6 +21,16 @@ Implemented from the source texts (checked 2026-10-15; see docs/adr/0003):
   reject every remaining z_k above it, repeat until nothing new is rejected.
   Asymptotic STRONG FWER control under arbitrary dependence between the
   strategies (the joint bootstrap keeps the cross-sectional dependence).
+* Model Confidence Set — Hansen, Lunde & Nason (2011), working-paper text
+  (CREATES RP 2010-76): d_ij = L_i - L_j, t_i. = dbar_i. / sqrt(var(dbar_i.)),
+  T_max,M = max_i t_i., elimination rule e = argmax t_i. (the object with the
+  largest relative loss), p-value = bootstrap share of T*_max >= T_max, MCS
+  p-value of the j-th eliminated object = running maximum of the test
+  p-values (the last survivor gets 1).  The paper bootstraps with a MOVING
+  block; here the stationary bootstrap (random block length) is used, and the
+  variance of dbar_i. is the bootstrap variance (the paper defers the
+  estimator to an appendix that was not read).  The MCS is a SET of
+  statistically indistinguishable models — it is never turned into a ranking.
 * Benjamini & Yekutieli (2001) Theorem 1.3: BH with q / sum_{i<=m} 1/i
   controls FDR under ANY dependence (BH itself needs PRDS, their Thm 1.2).
 
@@ -46,7 +56,7 @@ import random
 from typing import Mapping, Optional, Sequence
 
 #: version tag recorded in every decision (changing any rule => new tag)
-MC_METHOD_VERSION = "mc-v1(stationary-bootstrap,RC,SPA,StepM-studentized,BY,alpha-spending-1/k^2)"
+MC_METHOD_VERSION = "mc-v2(stationary-bootstrap,RC,SPA,StepM-studentized,MCS-Tmax,BY,alpha-spending-1/k^2)"
 
 
 # ---------------------------------------------------------------------------
@@ -205,6 +215,61 @@ def stepm(series: Mapping[str, Sequence[float]], *, alpha: float, B: int = 1000,
             "note": "sigma from Hansen-2005 bootstrap-population variance, held fixed "
                     "across resamples (Romano-Wolf allow sigma*; fixed sigma is the "
                     "simpler consistent choice under their Assumption 4.1)"}
+
+
+def mcs(series: Mapping[str, Sequence[float]], *, alpha: float = 0.10, B: int = 1000,
+        q: Optional[float] = None, seed: int = 0) -> dict:
+    """Model Confidence Set (T_max, Hansen–Lunde–Nason 2011) over daily NET
+    RETURN series (higher is better; the loss is the negative return).
+    Returns each model's MCS p-value, the set with p >= alpha and the
+    elimination order.  Statistically indistinguishable models all stay in
+    the set — callers must not rank inside it."""
+    keys, n = _check_matrix(series)
+    q = q or default_q(n)
+    if not 0.0 < alpha < 1.0:
+        raise ValueError("alpha must be in (0, 1)")
+    if len(keys) < 2:
+        return {"method": "hln2011_mcs_tmax", "alpha": alpha, "p": {keys[0]: 1.0},
+                "set": list(keys), "eliminated": [], "B": B, "q": q, "n": n, "seed": seed}
+    rng = random.Random(seed)
+    loss = {k: [-x for x in series[k]] for k in keys}
+    lbar = {k: _mean(loss[k]) for k in keys}
+    boot = []
+    for _ in range(B):
+        ix = stationary_bootstrap_indices(n, q, rng)
+        boot.append({k: _mean([loss[k][i] for i in ix]) for k in keys})
+    M = list(keys)
+    eliminated: list[str] = []
+    pvals: dict[str, float] = {}
+    running = 0.0
+    while len(M) > 1:
+        mbar = _mean([lbar[k] for k in M])
+        dbar = {k: lbar[k] - mbar for k in M}
+        dstar = []
+        for b in boot:
+            mb = _mean([b[k] for k in M])
+            dstar.append({k: b[k] - mb for k in M})
+        sd = {}
+        for k in M:
+            xs = [d[k] for d in dstar]
+            mu = _mean(xs)
+            var = sum((x - mu) ** 2 for x in xs) / (B - 1)
+            if var <= 0:
+                raise ValueError(f"zero bootstrap variance for {k}: MCS statistic undefined")
+            sd[k] = math.sqrt(var)
+        t = {k: dbar[k] / sd[k] for k in M}
+        t_obs = max(t.values())
+        count = sum(1 for d in dstar if max((d[k] - dbar[k]) / sd[k] for k in M) >= t_obs)
+        running = max(running, count / B)
+        worst = max(M, key=lambda k: (t[k], k))
+        pvals[worst] = running
+        eliminated.append(worst)
+        M.remove(worst)
+    pvals[M[0]] = 1.0
+    return {"method": "hln2011_mcs_tmax", "alpha": alpha, "p": pvals,
+            "set": sorted(k for k, v in pvals.items() if v >= alpha),
+            "eliminated": eliminated, "B": B, "q": q, "n": n, "m": len(keys), "seed": seed,
+            "note": "stationary (not moving-block) bootstrap; bootstrap variance of dbar_i."}
 
 
 def by_fdr(pvalues: Sequence[float], m_family: int, q: float = 0.05) -> list[bool]:

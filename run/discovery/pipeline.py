@@ -53,7 +53,7 @@ from evaluator import cell_stats, run_event_study
 from evolution import EVOLUTION_GENERATOR_VERSION, LineageStore, SpecStore, mutate
 from search import SearchConfig, dev_feedback
 from stats_mc import (
-    MC_METHOD_VERSION, by_fdr, daily_series, default_q, reality_check, spa_test,
+    MC_METHOD_VERSION, by_fdr, daily_series, default_q, mcs, reality_check, spa_test,
     spending_alpha, stationary_bootstrap_indices, stepm,
 )
 from strategy_spec import (
@@ -685,6 +685,12 @@ class EvolutionPipeline:
                         res["spa_error"] = str(err)
                 else:
                     res["rejected"] = []
+                if len(series) >= 2:
+                    try:
+                        m_ = mcs(series, alpha=0.10, B=vc["bootstrap_B"], q=q, seed=batch["seed"])
+                        res["mcs"] = {"set": m_["set"], "p": m_["p"], "alpha": m_["alpha"]}
+                    except ValueError as err:
+                        res["mcs_error"] = str(err)
                 hp = {m: per_member[m][sym]["hac_p"] for m in w["members"]}
                 ids = sorted(k for k, v in hp.items() if v is not None)
                 res["diag_bh"] = sorted(k for k, ok in zip(ids, bh_fdr_family(
@@ -768,6 +774,48 @@ class EvolutionPipeline:
         pbo, n = pbo_cscv(mat, n_partitions=self.cfg["robustness"]["pbo_partitions"])
         return {"computable": math.isfinite(pbo), "pbo": pbo if math.isfinite(pbo) else None,
                 "combinations": n, "trials": len(sids), "days": len(days)}
+
+    def _dsr(self, sid: str) -> dict:
+        """Deflated Sharpe Ratio (Bailey & López de Prado 2014) of the strategy's
+        DEV daily series against ALL strategies with a DEV series in this
+        context (the selection set).  Diagnostic only (non-gating): the
+        number of effectively independent trials is unknowable here and the
+        daily series of one search are strongly dependent."""
+        from engine_lib import deflated_sharpe
+        ctx = self.context_id()
+        latest = {r["strategy_id"]: r for r in iter_jsonl(self.series_path) if r["context_id"] == ctx}
+
+        def pooled(r):
+            acc: dict[int, float] = {}
+            for _sym, (d0, vals) in r["series"].items():
+                for i, v in enumerate(vals):
+                    acc[d0 + i] = acc.get(d0 + i, 0.0) + v
+            days = sorted(acc)
+            return [acc[d] for d in range(days[0], days[-1] + 1)] if days else []
+        srs = {}
+        for s_, r in latest.items():
+            x = pooled(r)
+            if len(x) < 30:
+                continue
+            mu = sum(x) / len(x)
+            sd = (sum((v - mu) ** 2 for v in x) / (len(x) - 1)) ** 0.5
+            if sd > 0:
+                srs[s_] = (mu / sd, x)
+        if sid not in srs or len(srs) < 2:
+            return {"computable": False, "trials": len(srs)}
+        sr, x = srs[sid]
+        n = len(x)
+        mu = sum(x) / n
+        sd = (sum((v - mu) ** 2 for v in x) / (n - 1)) ** 0.5
+        skew = sum(((v - mu) / sd) ** 3 for v in x) / n
+        kurt = sum(((v - mu) / sd) ** 4 for v in x) / n          # Pearson (normal = 3)
+        all_sr = [v[0] for v in srs.values()]
+        m_ = sum(all_sr) / len(all_sr)
+        var_sr = sum((v - m_) ** 2 for v in all_sr) / (len(all_sr) - 1)
+        d = deflated_sharpe(sr, n, skew, kurt, len(srs), var_sr)
+        return {"computable": math.isfinite(d), "dsr": d if math.isfinite(d) else None,
+                "sr_daily": sr, "n_days": n, "trials": len(srs), "var_sr": var_sr,
+                "skew": skew, "kurtosis": kurt}
 
     def robustness(self, sid: str) -> dict:
         ctx = self.context_id()
@@ -870,6 +918,7 @@ class EvolutionPipeline:
         # overfitting probability of the whole search (CSCV on DEV series)
         pbo = self._pbo()
         checks["pbo"] = {"pass": bool(pbo["computable"]) and pbo["pbo"] <= rc["max_pbo"], **pbo}
+        checks["dsr"] = {"pass": True, "gating": False, **self._dsr(sid)}
         failed = sorted(k for k, v in checks.items() if not v["pass"])
         rec = self._append_eval({"stage": "robustness", "strategy_id": sid, "context_id": ctx,
                                  "status": "OK", "checks": checks, "failed": failed,

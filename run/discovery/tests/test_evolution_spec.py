@@ -257,3 +257,40 @@ class TestMultipleComparison(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestMCSAndDSR(unittest.TestCase):
+    def test_mcs_eliminates_clearly_inferior_keeps_equals(self):
+        rng = random.Random(5)
+        s = {f"a{i}": [rng.gauss(0.3, 1) for _ in range(250)] for i in range(3)}
+        s["bad"] = [rng.gauss(-0.8, 1) for _ in range(250)]
+        out = stats_mc.mcs(s, alpha=0.10, B=300, seed=1)
+        self.assertEqual(out["eliminated"][0], "bad")
+        self.assertNotIn("bad", out["set"])
+        self.assertTrue(set(out["set"]) <= {"a0", "a1", "a2"} and len(out["set"]) >= 1)
+        self.assertEqual(max(out["p"].values()), 1.0)
+
+    def test_mcs_null_keeps_most_models(self):
+        keep = []
+        for r in range(15):
+            rng = random.Random(100 + r)
+            s = {f"k{i}": [rng.gauss(0, 1) for _ in range(200)] for i in range(4)}
+            keep.append(len(stats_mc.mcs(s, alpha=0.10, B=150, seed=r)["set"]))
+        self.assertGreaterEqual(sum(keep) / len(keep), 3.0)   # indistinguishable => not forced out
+
+    def test_mcs_single_and_bad_input(self):
+        self.assertEqual(stats_mc.mcs({"a": [0.1] * 20 + [-0.1] * 20})["set"], ["a"])
+        with self.assertRaises(ValueError):
+            stats_mc.mcs({"a": [1.0] * 30, "b": [1.0] * 30})      # zero variance
+
+    def test_dsr_matches_reference_values(self):
+        from engine_lib import deflated_sharpe
+        # reference formulas (Bailey & López de Prado 2014; cross-checked against two
+        # independent implementations): SR0 = sqrt(V)*((1-g)Phi^-1(1-1/N) + g Phi^-1(1-1/(Ne)))
+        from engine_lib import norm_ppf
+        g, N, V, sr, n = 0.5772156649015329, 50, 0.04, 0.5, 250
+        sr0 = math.sqrt(V) * ((1 - g) * norm_ppf(1 - 1 / N) + g * norm_ppf(1 - 1 / (N * math.e)))
+        z = (sr - sr0) * math.sqrt(n - 1) / math.sqrt(1 - 0.0 * sr + (3.0 - 1.0) / 4.0 * sr * sr)
+        expect = 0.5 * math.erfc(-z / math.sqrt(2))
+        self.assertAlmostEqual(deflated_sharpe(sr, n, 0.0, 3.0, N, V), expect, places=9)
+        self.assertLess(deflated_sharpe(sr, n, 0.0, 3.0, 500, V), deflated_sharpe(sr, n, 0.0, 3.0, 5, V))
