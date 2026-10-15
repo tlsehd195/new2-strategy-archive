@@ -11,7 +11,15 @@
 #   0 = CYCLE_OK        (runner 0)
 #   2 = CYCLE_PARTIAL   (runner 2: 후보 단위 오류율 ≥ 30%)
 #   3 = CYCLE_SKIPPED   (runner 3: 다른 프로세스가 state/run.lock 보유)
-#   1 = CYCLE_FAILED    (runner 1/기타 비정상 종료, 잘못된 인자, 로그 파이프라인 실패)
+#   4 = CYCLE_BLOCKED_DATA (runner 4: evolution 모드에서 사용할 수 있는 시장 데이터 없음 — 아무것도 평가하지 않음)
+#   1 = CYCLE_FAILED    (runner 1/기타 비정상 종료, 잘못된 인자, 로그 기록 실패와 runner 성공/부분 처리의 조합)
+#
+# 로그 기록(tee) 실패 정책 (runner 종료코드 × 로그 결과):
+#   runner 0 + 로그 실패 -> 1  (성공 기록이 남지 않은 사이클은 성공이 아니다)
+#   runner 1+ + 로그 실패 -> 1  (runner 실패와 로그 실패를 모두 stderr/감사 로그에 기록)
+#   runner 2 + 로그 실패 -> 1  (부분 처리 결과의 기록이 유실됨 -> FAILED로 승격)
+#   runner 3 + 로그 실패 -> 3  (아무것도 실행되지 않음 -> SKIPPED 유지, 로그 오류는 기록)
+#   runner 종료코드는 어떤 경우에도 로그 실패로 덮어쓰이지 않고 stderr/감사 로그에 별도 기록된다.
 #
 # 중복 실행 방지는 runner.py가 state/run.lock(ProcessLock, PID+flock)으로 단일 구현한다.
 # 이전 판의 /tmp mkdir 락과 하드코딩 경로(/home/z/...)는 제거되었다.
@@ -21,7 +29,10 @@
 #   NEW2_DATA_DIR        데이터 디렉터리 (runner가 fail-closed 검사)
 #   COINTRADER_SRC       비용모델 단일 소스(공개 NEW2 checkout의 src)
 #   NEW2_DISC_LOG        로그 파일 경로 (기본: $NEW2_DISCOVERY_ROOT/cycle_log.txt)
+#   NEW2_DISC_AUDIT      감사 로그 경로 (기본: $NEW2_DISCOVERY_ROOT/cycle_audit.log, append)
+#   NEW2_DISC_TEE        로그 기록 명령 (기본: tee; 테스트에서 가짜 기록기로 교체)
 #   PYTHON               파이썬 실행 파일 (기본: python3)
+#   NEW2_DISC_MODE       legacy(기본) | evolve | full — runner.py --mode 로 전달
 #   REFRESH=1            미지원 — runner가 경고하고 요약에 기록한다
 # ============================================================
 set -uo pipefail
@@ -41,33 +52,79 @@ case "${1:-}" in
   -h|--help) usage; exit 0 ;;
 esac
 
-BATCH="${1:-${NEW2_DISC_BATCH:-10}}"
+if [ "$#" -eq 1 ]; then BATCH="$1"; else BATCH="${NEW2_DISC_BATCH:-10}"; fi
 if ! [[ "$BATCH" =~ ^[1-9][0-9]{0,5}$ ]]; then
   usage
   echo "CYCLE_FAILED usage: invalid batch '$BATCH'"
   exit 1
 fi
 
+MODE="${NEW2_DISC_MODE:-legacy}"
+case "$MODE" in
+  legacy|evolve|full) ;;
+  *) usage; echo "CYCLE_FAILED usage: invalid NEW2_DISC_MODE '$MODE'"; exit 1 ;;
+esac
+
 ROOT="${NEW2_DISCOVERY_ROOT:-$SCRIPT_DIR}"
 LOG="${NEW2_DISC_LOG:-$ROOT/cycle_log.txt}"
+AUDIT="${NEW2_DISC_AUDIT:-$ROOT/cycle_audit.log}"
 PY="${PYTHON:-python3}"
-mkdir -p "$ROOT" || { echo "CYCLE_FAILED cannot create $ROOT"; exit 1; }
+TEE="${NEW2_DISC_TEE:-tee}"
 
-# ── 실행: runner 종료코드와 로그 파이프라인(tee) 실패를 모두 보존 ──
-"$PY" "$SCRIPT_DIR/runner.py" --batch "$BATCH" 2>&1 | tee -a "$LOG" | tail -n 15
+# 감사 로그: 한 줄 key=value. 감사 로그 자체가 쓰기 실패해도 stderr에는 항상 남긴다.
+audit() {
+  local line
+  line="$(date -u +%Y-%m-%dT%H:%M:%SZ) batch=${BATCH} $*"
+  echo "CYCLE_AUDIT $line" >&2
+  { printf '%s\n' "$line" >>"$AUDIT"; } 2>/dev/null \
+    || echo "CYCLE_AUDIT_WRITE_FAILED audit=$AUDIT" >&2
+}
+
+mkdir -p "$ROOT" 2>/dev/null || { audit "event=FAILED reason=root_dir_create_failed path=$ROOT"; echo "CYCLE_FAILED cannot create $ROOT"; exit 1; }
+mkdir -p "$(dirname "$LOG")" 2>/dev/null || { audit "event=FAILED reason=log_dir_create_failed log=$LOG"; echo "CYCLE_FAILED cannot create log directory for $LOG"; exit 1; }
+
+# ── 실행: runner / 로그 기록기 / 출력 축약기 종료코드를 각각 보존 ──
+# PIPESTATUS는 파이프라인 직후 첫 명령에서만 유효하므로 곧바로 복사한다.
+"$PY" "$SCRIPT_DIR/runner.py" --batch "$BATCH" --mode "$MODE" 2>&1 | "$TEE" -a "$LOG" | tail -n 15
 st=("${PIPESTATUS[@]}")
 rc="${st[0]}"
 tee_rc="${st[1]:-1}"
+tail_rc="${st[2]:-1}"
+
+log_failed=0
+if [ "$tee_rc" -ne 0 ] || [ "$tail_rc" -ne 0 ]; then
+  log_failed=1
+  echo "CYCLE_LOG_ERROR log pipeline failed (writer rc=$tee_rc, tail rc=$tail_rc, log=$LOG, runner rc=$rc)" >&2
+fi
+audit "event=RUN runner_rc=$rc log_writer_rc=$tee_rc tail_rc=$tail_rc log=$LOG"
 
 case "$rc" in
   0)
-    if [ "$tee_rc" -ne 0 ]; then
-      echo "CYCLE_FAILED log pipeline failed (tee rc=$tee_rc, log=$LOG)"
+    if [ "$log_failed" -ne 0 ]; then
+      audit "event=CYCLE_FAILED reason=log_failure_after_runner_ok"
+      echo "CYCLE_FAILED log pipeline failed (runner rc=0, writer rc=$tee_rc, log=$LOG)"
       exit 1
     fi
     echo "CYCLE_OK batch=$BATCH"
     exit 0 ;;
-  2) echo "CYCLE_PARTIAL batch=$BATCH"; exit 2 ;;
-  3) echo "CYCLE_SKIPPED"; exit 3 ;;
-  *) echo "CYCLE_FAILED rc=$rc"; exit 1 ;;
+  2)
+    if [ "$log_failed" -ne 0 ]; then
+      audit "event=CYCLE_FAILED reason=log_failure_after_partial runner_rc=2"
+      echo "CYCLE_FAILED partial cycle but log pipeline failed (writer rc=$tee_rc, log=$LOG)"
+      exit 1
+    fi
+    echo "CYCLE_PARTIAL batch=$BATCH"; exit 2 ;;
+  3)
+    [ "$log_failed" -ne 0 ] && audit "event=LOG_ERROR_ON_SKIP runner_rc=3"
+    echo "CYCLE_SKIPPED"; exit 3 ;;
+  4)
+    if [ "$log_failed" -ne 0 ]; then
+      audit "event=CYCLE_FAILED reason=log_failure_after_blocked_data runner_rc=4"
+      echo "CYCLE_FAILED rc=4 blocked-data cycle but log pipeline failed (writer rc=$tee_rc, log=$LOG)"
+      exit 1
+    fi
+    echo "CYCLE_BLOCKED_DATA batch=$BATCH mode=$MODE"; exit 4 ;;
+  *)
+    [ "$log_failed" -ne 0 ] && audit "event=LOG_ERROR_ON_FAILURE runner_rc=$rc"
+    echo "CYCLE_FAILED rc=$rc"; exit 1 ;;
 esac

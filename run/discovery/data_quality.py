@@ -1,16 +1,90 @@
-"""Data quality checks and dataset versioning (directive §9)."""
+"""Data quality checks and dataset versioning (directive §9, auto-evolution §2-1).
+
+One quality verdict for every input file: OK / WARN / BLOCK.  A BLOCK verdict
+means the data never reaches a backtest — the dataset handle carries no bars
+(``DatasetHandle.bars == []``) and the caller records DATA_MISSING.  Warnings
+are recorded with the evaluation but do not stop it.  There is no third path:
+an issue is either blocking or a recorded warning, never only a log line.
+
+Issue codes (``QualityReport.issues``):
+
+======================  ========  ===========================================
+code                    severity  meaning
+======================  ========  ===========================================
+NO_ROWS                 BLOCK     file has no parsable bar
+PARSE_ERROR             BLOCK     an interior row could not be parsed (corruption)
+TORN_TAIL               BLOCK     the LAST line is incomplete (interrupted write);
+                                  distinct code: re-download, not a data fact
+DUPLICATE_TS            BLOCK     repeated open time
+TIME_INVERSION          BLOCK     open time goes backwards
+MISALIGNED_TS           BLOCK     open time not on the 15m grid / gap not a
+                                  multiple of the interval
+MISSING_BARS            BLOCK     gap of >= 1 bar not covered by a documented
+                                  exchange exception
+KNOWN_EXCHANGE_GAP      WARN      gap fully inside a documented exchange halt
+NON_FINITE              BLOCK     NaN / inf in a price or volume field
+BAD_OHLC                BLOCK     low/high/open/close relation violated
+NON_POSITIVE_PRICE      BLOCK     price <= 0
+NEGATIVE_VOLUME         BLOCK     volume / quote volume / taker volume < 0
+TAKER_GT_VOLUME         BLOCK     taker-buy volume above total volume
+ZERO_VOLUME             WARN      bars without trades (counted, legitimate on
+                                  quiet venues but recorded)
+EXTREME_MOVES           WARN/BLK  single prints are WARN; systematic jumps BLOCK
+STALE                   WARN      last bar older than the freshness limit (only
+                                  when a reference time is given)
+HEADER                  (info)    a recognised header line — not an error
+======================  ========  ===========================================
+
+Known exchange exceptions live in ``data_exceptions.json`` (versioned, part
+of the experiment context through its hash).  Gaps are only excused when a
+documented record covers EVERY missing bar; nothing is guessed.
+"""
 
 from __future__ import annotations
 
 import hashlib
+import json
 import math
-import os
-import struct
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import Iterable, Optional, Sequence
 
 MAX_MS_GAP_15M = 15 * 60 * 1000
+INTERVAL_15M_MS = MAX_MS_GAP_15M
+QUALITY_POLICY_VERSION = "dq-v2"
+
+BLOCK = "BLOCK"
+WARN = "WARN"
+OK = "OK"
+
+#: kline CSV header tokens (Binance vision files are sometimes headerless,
+#: newer ones carry this header)
+_KLINE_HEADER_FIRST = {"open_time", "opentime", "open time", "timestamp", "ts"}
+_FUNDING_HEADER_FIRST = {"calc_time", "calctime", "funding_time", "fundingtime"}
+
+EXCEPTIONS_PATH = Path(__file__).resolve().parent / "data_exceptions.json"
+
+
+def load_known_exceptions(path: Optional[Path] = None) -> list[dict]:
+    """Documented exchange data exceptions.  A missing file means no
+    exceptions (fail-closed: every gap blocks)."""
+    p = Path(path) if path else EXCEPTIONS_PATH
+    if not p.exists():
+        return []
+    raw = json.loads(p.read_text(encoding="utf-8"))
+    out = []
+    for e in raw.get("exceptions", []):
+        if not {"symbol", "start_ts", "end_ts", "kind", "source"} <= set(e):
+            raise ValueError(f"data exception entry lacks required fields: {e}")
+        out.append(dict(e))
+    return out
+
+
+def exceptions_identity(path: Optional[Path] = None) -> dict:
+    p = Path(path) if path else EXCEPTIONS_PATH
+    data = p.read_bytes() if p.exists() else b""
+    return {"file": p.name, "sha256": hashlib.sha256(data).hexdigest(),
+            "n": len(load_known_exceptions(p))}
 
 
 @dataclass
@@ -26,15 +100,17 @@ class Bar:
 
     @classmethod
     def from_row(cls, row: Sequence[str]) -> "Bar":
+        ts = int(row[0])
+        tb = row[9].strip() if len(row) > 9 else ""
         return cls(
-            ts=int(row[0]),
+            ts=ts,
             open=float(row[1]),
             high=float(row[2]),
             low=float(row[3]),
             close=float(row[4]),
             volume=float(row[5]),
             quote_volume=float(row[7]),
-            taker_buy_volume=float(row[9]) if len(row) > 9 and row[9] not in ("", "0") else 0.0,
+            taker_buy_volume=float(tb) if tb not in ("",) else 0.0,
         )
 
 
@@ -44,103 +120,239 @@ class QualityReport:
     n_rows: int = 0
     duplicate_timestamps: int = 0
     time_inversions: int = 0
-    missing_candles: int = 0          # gaps in the 15m grid (excluding known halts)
+    missing_candles: int = 0          # bars missing from the 15m grid (unexcused)
+    known_gap_bars: int = 0           # bars missing inside documented exceptions
+    misaligned_timestamps: int = 0
     bad_ohlc: int = 0
-    negative_values: int = 0
+    negative_values: int = 0          # rows with non-positive price or negative volume
+    non_positive_price: int = 0
+    negative_volume: int = 0
+    non_finite: int = 0
+    taker_gt_volume: int = 0
+    zero_volume: int = 0
     extreme_moves: int = 0            # |log return| > 20% in one 15m bar
+    parse_errors: int = 0             # interior rows that failed to parse
+    header_rows: int = 0
+    torn_tail: bool = False
     first_ts: Optional[int] = None
     last_ts: Optional[int] = None
     latest_candle_ts: Optional[int] = None
     file_sha256: str = ""
     errors: list[str] = field(default_factory=list)
+    issues: list[dict] = field(default_factory=list)
     unrecoverable: bool = False
+    policy_version: str = QUALITY_POLICY_VERSION
+
+    def add(self, code: str, severity: str, detail: str = "", **extra) -> None:
+        self.issues.append({"code": code, "severity": severity, "detail": detail, **extra})
+        if severity == BLOCK:
+            self.errors.append(f"{code}: {detail}" if detail else code)
 
     def to_json(self) -> dict:
-        return dict(self.__dict__)
+        d = dict(self.__dict__)
+        d["verdict"] = self.verdict
+        return d
+
+    @property
+    def verdict(self) -> str:
+        if self.unrecoverable or any(i["severity"] == BLOCK for i in self.issues):
+            return BLOCK
+        if any(i["severity"] == WARN for i in self.issues):
+            return WARN
+        return OK
 
     @property
     def ok(self) -> bool:
-        return (
-            not self.unrecoverable
-            and self.duplicate_timestamps == 0
-            and self.time_inversions == 0
-            and self.bad_ohlc == 0
-            and self.negative_values == 0
-            and self.missing_candles == 0
-        )
+        """True iff the data may be used (verdict OK or WARN)."""
+        return self.verdict != BLOCK
+
+    def blocking_codes(self) -> list[str]:
+        return sorted({i["code"] for i in self.issues if i["severity"] == BLOCK})
+
+
+def _finite(*xs: float) -> bool:
+    return all(isinstance(x, (int, float)) and math.isfinite(x) for x in xs)
+
+
+def _excused(symbol: str, gap_start: int, gap_end: int,
+             exceptions: Sequence[dict]) -> Optional[dict]:
+    """A documented exception that covers EVERY missing bar in
+    (gap_start, gap_end), or None."""
+    for e in exceptions:
+        if e.get("symbol") not in (symbol, "*"):
+            continue
+        if int(e["start_ts"]) <= gap_start + INTERVAL_15M_MS and gap_end - INTERVAL_15M_MS <= int(e["end_ts"]):
+            return e
+    return None
 
 
 def check_bars(bars: Sequence[Bar], symbol: str, *,
                expected_interval_ms: int = MAX_MS_GAP_15M,
-               max_gap_multiplier: int = 2,
-               max_abs_logret: float = 0.20) -> QualityReport:
-    """Fail-closed quality gate.  Missing candles are counted, never
-    interpolated — a gap is a fact about the data, not noise to paint over
-    (directive §9-2: 임의 보간 금지)."""
+               max_gap_multiplier: int = 1,
+               max_abs_logret: float = 0.20,
+               exceptions: Optional[Sequence[dict]] = None,
+               now_ms: Optional[int] = None,
+               max_age_bars: Optional[int] = None) -> QualityReport:
+    """Fail-closed quality gate over parsed bars.
+
+    Missing candles are counted, never interpolated.  ``max_gap_multiplier``
+    is kept for API compatibility: the grid check is exact — consecutive
+    open times must differ by exactly one interval; ANY larger multiple is
+    ``gap/interval - 1`` missing bars (the old ``gap > 2*interval`` rule let
+    a single missing bar, i.e. a 30-minute step, pass unnoticed).
+    """
+    if max_gap_multiplier != 1:
+        raise ValueError("max_gap_multiplier is fixed at 1 (exact grid); "
+                         "excuse real exchange gaps via data_exceptions.json")
+    exc = load_known_exceptions() if exceptions is None else list(exceptions)
     rep = QualityReport(symbol=symbol)
     rep.n_rows = len(bars)
     if rep.n_rows == 0:
         rep.unrecoverable = True
-        rep.errors.append("no rows")
+        rep.add("NO_ROWS", BLOCK, "no rows")
         return rep
 
+    iv = int(expected_interval_ms)
     seen: set[int] = set()
     prev: Optional[Bar] = None
     for b in bars:
         if b.ts in seen:
             rep.duplicate_timestamps += 1
         seen.add(b.ts)
+        if b.ts % iv != 0:
+            rep.misaligned_timestamps += 1
+        vals = (b.open, b.high, b.low, b.close, b.volume, b.quote_volume, b.taker_buy_volume)
+        if not _finite(*vals):
+            rep.non_finite += 1
+        else:
+            if not (b.low <= b.high and b.low <= b.open <= b.high
+                    and b.low <= b.close <= b.high):
+                rep.bad_ohlc += 1
+            bad_px = b.open <= 0 or b.high <= 0 or b.low <= 0 or b.close <= 0
+            bad_vol = b.volume < 0 or b.quote_volume < 0 or b.taker_buy_volume < 0
+            if bad_px:
+                rep.non_positive_price += 1
+            if bad_vol:
+                rep.negative_volume += 1
+            if bad_px or bad_vol:
+                rep.negative_values += 1
+            if b.taker_buy_volume > b.volume * (1 + 1e-9) + 1e-12:
+                rep.taker_gt_volume += 1
+            if b.volume == 0:
+                rep.zero_volume += 1
         if prev is not None:
-            if b.ts < prev.ts:
-                rep.time_inversions += 1
             gap = b.ts - prev.ts
-            if gap > expected_interval_ms * max_gap_multiplier:
-                rep.missing_candles += int(round(gap / expected_interval_ms)) - 1
-        if not (b.low <= b.high and b.low <= max(b.open, b.close)
-                and b.high >= min(b.open, b.close) and b.low <= b.open <= b.high
-                and b.low <= b.close <= b.high):
-            rep.bad_ohlc += 1
-        if b.open <= 0 or b.high <= 0 or b.low <= 0 or b.close <= 0 \
-                or b.volume < 0 or b.quote_volume < 0:
-            rep.negative_values += 1
-        if prev is not None and prev.close > 0 and b.close > 0:
-            if abs(math.log(b.close / prev.close)) > max_abs_logret:
-                rep.extreme_moves += 1
+            if gap < 0:
+                rep.time_inversions += 1
+            elif gap > iv:
+                if gap % iv:
+                    rep.misaligned_timestamps += 1
+                n_missing = gap // iv - 1
+                if n_missing > 0:
+                    e = _excused(symbol, prev.ts, b.ts, exc)
+                    if e is not None:
+                        rep.known_gap_bars += n_missing
+                        rep.add("KNOWN_EXCHANGE_GAP", WARN,
+                                f"{n_missing} bars after {prev.ts} ({e['kind']}: {e['source']})",
+                                start_ts=prev.ts, end_ts=b.ts)
+                    else:
+                        rep.missing_candles += n_missing
+            elif 0 < gap < iv:
+                rep.misaligned_timestamps += 1
+            if _finite(prev.close, b.close) and prev.close > 0 and b.close > 0:
+                if abs(math.log(b.close / prev.close)) > max_abs_logret:
+                    rep.extreme_moves += 1
         prev = b
     rep.first_ts = bars[0].ts
     rep.last_ts = bars[-1].ts
     rep.latest_candle_ts = max(b.ts for b in bars)
-    # a single unusual print is recorded, not fatal; systematic corruption is
-    if rep.extreme_moves > max(5, rep.n_rows * 0.001):
-        rep.errors.append(f"suspicious number of extreme moves: {rep.extreme_moves}")
-    if rep.bad_ohlc > 0 or rep.negative_values > 0 or rep.time_inversions > 0 \
-            or rep.duplicate_timestamps > 0:
+
+    if rep.duplicate_timestamps:
+        rep.add("DUPLICATE_TS", BLOCK, f"{rep.duplicate_timestamps} duplicate open times")
+    if rep.time_inversions:
+        rep.add("TIME_INVERSION", BLOCK, f"{rep.time_inversions} time inversions")
+    if rep.misaligned_timestamps:
+        rep.add("MISALIGNED_TS", BLOCK, f"{rep.misaligned_timestamps} off-grid timestamps")
+    if rep.missing_candles:
+        rep.add("MISSING_BARS", BLOCK, f"{rep.missing_candles} missing 15m bars")
+    if rep.non_finite:
+        rep.add("NON_FINITE", BLOCK, f"{rep.non_finite} rows with NaN/inf")
+    if rep.bad_ohlc:
+        rep.add("BAD_OHLC", BLOCK, f"{rep.bad_ohlc} rows violate low<=open,close<=high")
+    if rep.non_positive_price:
+        rep.add("NON_POSITIVE_PRICE", BLOCK, f"{rep.non_positive_price} rows with price <= 0")
+    if rep.negative_volume:
+        rep.add("NEGATIVE_VOLUME", BLOCK, f"{rep.negative_volume} rows with negative volume")
+    if rep.taker_gt_volume:
+        rep.add("TAKER_GT_VOLUME", BLOCK, f"{rep.taker_gt_volume} rows taker volume > volume")
+    if rep.zero_volume:
+        rep.add("ZERO_VOLUME", WARN, f"{rep.zero_volume} bars without volume")
+    if rep.extreme_moves:
+        systematic = rep.extreme_moves > max(5, rep.n_rows * 0.001)
+        rep.add("EXTREME_MOVES", BLOCK if systematic else WARN,
+                f"{rep.extreme_moves} |logret| > {max_abs_logret}")
+    if now_ms is not None and max_age_bars is not None:
+        st = staleness(rep.last_ts, now_ms, max_age_bars=max_age_bars)
+        if st["stale"]:
+            rep.add("STALE", WARN, f"last bar {st['age_bars']:.0f} bars old")
+    structural = {"DUPLICATE_TS", "TIME_INVERSION", "MISALIGNED_TS", "NON_FINITE",
+                  "BAD_OHLC", "NON_POSITIVE_PRICE", "NEGATIVE_VOLUME", "TAKER_GT_VOLUME"}
+    if structural & set(rep.blocking_codes()):
         rep.unrecoverable = True
         rep.errors.append("structural corruption — file must be re-downloaded")
     return rep
 
 
-def load_kline_csv(path: Path, symbol: str) -> tuple[list[Bar], QualityReport]:
+def _is_header(first_field: str, tokens: set) -> bool:
+    return first_field.strip().strip('"').lower() in tokens
+
+
+def load_kline_csv(path: Path, symbol: str, *,
+                   exceptions: Optional[Sequence[dict]] = None) -> tuple[list[Bar], QualityReport]:
+    """Parse a kline CSV.  A header on the FIRST line is recognised; any
+    other unparsable row is PARSE_ERROR (interior) or TORN_TAIL (the last
+    line, when the file does not end with a newline) — both block, with
+    distinct codes so an interrupted write is not mistaken for corrupt data."""
     raw = Path(path).read_bytes()
-    rep_file_sha = hashlib.sha256(raw).hexdigest()
+    file_sha = hashlib.sha256(raw).hexdigest()
+    text = raw.decode("utf-8", errors="replace")
+    lines = text.split("\n")
+    ends_with_newline = text.endswith("\n")
+    if ends_with_newline:
+        lines = lines[:-1]
     bars: list[Bar] = []
-    torn_tail = False
-    for i, line in enumerate(raw.decode("utf-8", errors="replace").splitlines()):
-        line = line.strip()
+    parse_errors: list[int] = []
+    header_rows = 0
+    torn = False
+    last_idx = len(lines) - 1
+    for i, line in enumerate(lines):
+        line = line.strip().rstrip("\r")
         if not line:
             continue
         parts = line.split(",")
-        if len(parts) < 8:
-            torn_tail = i == len(raw.decode("utf-8", errors="replace").splitlines()) - 1
+        if i == 0 and _is_header(parts[0], _KLINE_HEADER_FIRST):
+            header_rows += 1
             continue
         try:
+            if len(parts) < 8:
+                raise ValueError(f"{len(parts)} columns")
             bars.append(Bar.from_row(parts))
         except (ValueError, IndexError):
-            continue
-    rep = check_bars(bars, symbol)
-    rep.file_sha256 = rep_file_sha
-    if torn_tail:
-        rep.errors.append("torn trailing line (crash during write?)")
+            if i == last_idx and not ends_with_newline:
+                torn = True
+            else:
+                parse_errors.append(i + 1)
+    rep = check_bars(bars, symbol, exceptions=exceptions)
+    rep.file_sha256 = file_sha
+    rep.header_rows = header_rows
+    rep.parse_errors = len(parse_errors)
+    if parse_errors:
+        rep.unrecoverable = True
+        rep.add("PARSE_ERROR", BLOCK, f"{len(parse_errors)} unparsable interior rows",
+                lines=parse_errors[:20])
+    if torn:
+        rep.torn_tail = True
+        rep.add("TORN_TAIL", BLOCK, "incomplete last line (interrupted write) — re-download")
     return bars, rep
 
 
@@ -165,6 +377,7 @@ class DatasetHandle:
             "first_ts": self.first_ts,
             "last_ts": self.last_ts,
             "quality_ok": self.quality.ok,
+            "quality_verdict": getattr(self.quality, "verdict", None),
         }
 
 
@@ -175,14 +388,13 @@ def dataset_for(symbol: str, kline_path: Path, *, required: bool = True) -> Opti
         return None
     bars, rep = load_kline_csv(kline_path, symbol)
     if not rep.ok:
-        # fail-closed: corrupted data is never silently used
-        h = DatasetHandle(
+        # fail-closed: data with a BLOCK verdict never carries bars
+        return DatasetHandle(
             dataset_id=f"{symbol}-15m-REJECTED",
             symbol=symbol, bars=[], sha256=rep.file_sha256,
             first_ts=0, last_ts=0, quality=rep,
-            missing=[f"quality gate failed: {rep.errors}"],
+            missing=[f"quality gate failed: {rep.blocking_codes()} {rep.errors}"],
         )
-        return h
     return DatasetHandle(
         dataset_id=f"{symbol}-15m-{rep.file_sha256[:12]}",
         symbol=symbol, bars=bars, sha256=rep.file_sha256,
@@ -190,26 +402,88 @@ def dataset_for(symbol: str, kline_path: Path, *, required: bool = True) -> Opti
     )
 
 
-def load_funding_csv(path: Path) -> list[tuple[int, float]]:
-    """Return [(calc_time_ms, rate)] sorted by time; corrupt lines skipped
-    and counted by the caller through len comparison."""
+# ---------------------------------------------------------------------------
+# funding
+# ---------------------------------------------------------------------------
+
+FUNDING_NOMINAL_MS = 8 * 3_600_000
+FUNDING_TOL_MS = 60_000
+
+
+def load_funding_csv_checked(path: Path) -> tuple[list[tuple[int, float]], dict]:
+    """Parse a funding CSV (calc_time, funding_interval_hours, rate).
+
+    Returns (pairs sorted by time, report).  A header on the first line is
+    recognised; every other unparsable row is a parse error (fail-closed in
+    :func:`funding_quality`), the torn last line is reported separately."""
+    raw = Path(path).read_bytes()
+    text = raw.decode("utf-8", errors="replace")
+    ends = text.endswith("\n")
+    lines = text.split("\n")
+    if ends:
+        lines = lines[:-1]
     out: list[tuple[int, float]] = []
-    for line in Path(path).read_text(encoding="utf-8", errors="replace").splitlines():
-        parts = line.strip().split(",")
-        if len(parts) < 3:
+    intervals: dict[int, int] = {}
+    errors: list[int] = []
+    torn = False
+    for i, line in enumerate(lines):
+        line = line.strip().rstrip("\r")
+        if not line:
+            continue
+        parts = line.split(",")
+        if i == 0 and _is_header(parts[0], _FUNDING_HEADER_FIRST):
             continue
         try:
-            out.append((int(parts[0]), float(parts[2])))
+            if len(parts) < 3:
+                raise ValueError("columns")
+            t = int(parts[0])
+            r = float(parts[2])
+            if not math.isfinite(r):
+                raise ValueError("non-finite rate")
         except ValueError:
+            if i == len(lines) - 1 and not ends:
+                torn = True
+            else:
+                errors.append(i + 1)
             continue
+        try:
+            h = float(parts[1])
+            if math.isfinite(h) and h > 0:
+                intervals[t] = int(round(h * 3_600_000))
+        except ValueError:
+            pass
+        out.append((t, r))
     out.sort(key=lambda x: x[0])
-    return out
+    return out, {"parse_errors": errors, "torn_tail": torn, "intervals": intervals,
+                 "sha256": hashlib.sha256(raw).hexdigest()}
 
 
-def funding_quality(pairs: Sequence[tuple[int, float]]) -> dict:
+def load_funding_csv(path: Path) -> list[tuple[int, float]]:
+    """Compatibility wrapper: pairs only.  Callers that gate on quality use
+    :func:`load_funding_csv_checked` (parse errors are no longer invisible)."""
+    return load_funding_csv_checked(path)[0]
+
+
+def funding_gaps(pairs: Sequence[tuple[int, float]],
+                 intervals: Optional[dict] = None) -> list[tuple[int, int]]:
+    """(a, b) pairs of consecutive settlements further apart than the declared
+    (or nominal 8h) interval — settlements are missing in between."""
+    gaps = []
+    intervals = intervals or {}
+    for (a, _), (b, _) in zip(pairs, pairs[1:]):
+        allowed = intervals.get(b, intervals.get(a, FUNDING_NOMINAL_MS))
+        if b - a > allowed + FUNDING_TOL_MS:
+            gaps.append((a, b))
+    return gaps
+
+
+def funding_quality(pairs: Sequence[tuple[int, float]], *,
+                    parse_errors: Iterable[int] = (), torn_tail: bool = False,
+                    intervals: Optional[dict] = None) -> dict:
     issues: list[str] = []
+    warnings: list[str] = []
     if not pairs:
-        return {"ok": False, "issues": ["no funding rows"]}
+        return {"ok": False, "issues": ["no funding rows"], "warnings": [], "gaps": []}
     ts = [t for t, _ in pairs]
     dup = len(ts) - len(set(ts))
     if dup:
@@ -217,18 +491,27 @@ def funding_quality(pairs: Sequence[tuple[int, float]]) -> dict:
     inv = sum(1 for a, b in zip(ts, ts[1:]) if b < a)
     if inv:
         issues.append(f"{inv} time inversions")
-    gaps: list[int] = []
-    for a, b in zip(ts, ts[1:]):
-        gap_h = (b - a) / 3_600_000
-        if gap_h > 9.0:  # nominal 8h cadence
-            gaps.append(int(round(gap_h / 8)))
+    pe = list(parse_errors)
+    if pe:
+        issues.append(f"PARSE_ERROR: {len(pe)} unparsable funding rows")
+    if torn_tail:
+        issues.append("TORN_TAIL: incomplete last funding row")
+    if any(not math.isfinite(r) for _, r in pairs):
+        issues.append("non-finite funding rate")
+    gaps = funding_gaps(pairs, intervals)
+    if gaps:
+        # not a dataset-wide block: every holding window that spans a gap is
+        # dropped by the evaluator (FundingIndex) — never summed short
+        warnings.append(f"{len(gaps)} gaps in the settlement series")
     return {
         "ok": not issues,
         "issues": issues,
+        "warnings": warnings,
         "n": len(pairs),
         "first": ts[0],
         "last": ts[-1],
         "missing_periods_estimate": len(gaps),
+        "gaps": [list(g) for g in gaps],
     }
 
 

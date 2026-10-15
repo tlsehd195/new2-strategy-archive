@@ -1,0 +1,8 @@
+cmd: NEW2_DISCOVERY_ROOT=/tmp/tmp.aA168UF0pb COINTRADER_SRC=/home/claude/NEW2_public/src bash run/discovery/run_cycle.sh 1  (default NEW2_DATA_DIR=/home/z/my-project/NEW2_run/data)
+2026-10-15T08:23:20Z
+CONFIG_ERROR: NEW2_DATA_DIR does not exist: /home/z/my-project/NEW2_run/data (fail-closed — set the variable to the real data directory)
+CYCLE_AUDIT 2026-10-15T08:23:20Z batch=1 event=RUN runner_rc=1 log_writer_rc=0 tail_rc=0 log=/tmp/tmp.aA168UF0pb/cycle_log.txt
+CYCLE_FAILED rc=1
+exit=1
+--- audit log
+2026-10-15T08:23:20Z batch=1 event=RUN runner_rc=1 log_writer_rc=0 tail_rc=0 log=/tmp/tmp.aA168UF0pb/cycle_log.txt

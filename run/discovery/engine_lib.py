@@ -39,7 +39,7 @@ from typing import Iterable, Mapping, Optional, Sequence
 # versions (code identity for experiment_context_id)
 # ---------------------------------------------------------------------------
 
-CODE_VERSION = "discovery-v2.1.0"          # human label only — identity is CODE_HASH
+CODE_VERSION = "discovery-v2.2.0"          # human label only — identity is CODE_HASH
 VALIDATION_CFG_VERSION = "valcfg-v2.1.0"
 LEDGER_SCHEMA = "discovery_ledger_v2"
 STATE_SCHEMA = "discovery_state_v2"
@@ -197,6 +197,10 @@ class RetryRecord:
     error_message: Optional[str] = None
     reverify_reason: Optional[str] = None
     data_version: Optional[str] = None
+    #: evaluation id announced when the candidate entered RUNNING — lets
+    #: reconcile() tell "ledger record written, state not yet updated" from
+    #: "interrupted before any record" (no duplicate evaluation on restart)
+    pending_evaluation_id: Optional[str] = None
 
     def to_json(self) -> dict:
         return {
@@ -208,13 +212,14 @@ class RetryRecord:
             "error_message": self.error_message,
             "reverify_reason": self.reverify_reason,
             "data_version": self.data_version,
+            "pending_evaluation_id": self.pending_evaluation_id,
         }
 
     @classmethod
     def from_json(cls, obj: Mapping) -> "RetryRecord":
         keys = ("attempt_count", "max_attempts", "last_attempt_at",
                 "next_retry_after", "error_code", "error_message",
-                "reverify_reason", "data_version")
+                "reverify_reason", "data_version", "pending_evaluation_id")
         return cls(**{k: obj[k] for k in keys if k in obj})
 
 
@@ -258,30 +263,144 @@ def load_json(path: Path, default: object = None) -> object:
         return json.load(f)
 
 
+class JsonlCorruption(RuntimeError):
+    """An append-only JSONL file has an unparsable line that is NOT a torn
+    tail of an interrupted write and has not been explicitly quarantined.
+    Research history would silently go missing — the caller must stop."""
+
+
+def _quarantine_path(path: Path) -> Path:
+    return Path(path).with_name(Path(path).name + ".quarantine.jsonl")
+
+
+def _quarantined(path: Path) -> dict:
+    q = _quarantine_path(path)
+    out: dict = {}
+    if q.exists():
+        for line in q.read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                rec = json.loads(line)
+                out[int(rec["offset"])] = rec["sha256"]
+    return out
+
+
+def _quarantine(path: Path, offset: int, raw: bytes, kind: str, reason: str) -> None:
+    q = _quarantine_path(path)
+    rec = {"offset": int(offset), "length": len(raw),
+           "sha256": hashlib.sha256(raw).hexdigest(), "kind": kind, "reason": reason,
+           "bytes_preview": raw[:200].decode("utf-8", errors="replace"),
+           "recorded_at": iso_now()}
+    with open(q, "a", encoding="utf-8") as f:
+        f.write(json.dumps(rec, sort_keys=True) + "\n")
+        f.flush()
+        os.fsync(f.fileno())
+
+
+def repair_jsonl_tail(path: Path) -> Optional[dict]:
+    """Make an append-only file safe to append to after a crash.
+
+    If the last line has no terminating newline it is a torn write: its bytes
+    are recorded in ``<file>.quarantine.jsonl`` (nothing is deleted or
+    rewritten) and a newline is appended so the next record cannot be glued
+    onto it.  A complete JSON object that only lacks the newline is kept as a
+    record.  Returns what was done, or None."""
+    path = Path(path)
+    if not path.exists() or path.stat().st_size == 0:
+        return None
+    with open(path, "rb") as f:
+        data = f.read()
+    if data.endswith(b"\n"):
+        return None
+    start = data.rfind(b"\n") + 1
+    tail = data[start:]
+    kind = "valid_unterminated"
+    try:
+        json.loads(tail.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        kind = "torn_tail"
+        _quarantine(path, start, tail, kind, "interrupted write (no terminating newline)")
+    with open(path, "ab") as f:
+        f.write(b"\n")
+        f.flush()
+        os.fsync(f.fileno())
+    return {"offset": start, "kind": kind, "length": len(tail)}
+
+
+def acknowledge_corrupt_line(path: Path, offset: int, reason: str) -> None:
+    """Explicit, recorded decision that an interior corrupt line is known
+    (e.g. after manual inspection).  The line itself is never removed."""
+    path = Path(path)
+    with open(path, "rb") as f:
+        f.seek(offset)
+        raw = f.readline().rstrip(b"\n")
+    _quarantine(path, offset, raw, "acknowledged_interior", reason)
+
+
 def append_jsonl(path: Path, record: Mapping) -> None:
-    """Append one JSON line with fsync — the ledger is append-only."""
+    """Append one JSON line with fsync — the ledger is append-only.  A torn
+    tail left by a crash is quarantined first (never merged with the new
+    record)."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
+    repair_jsonl_tail(path)
     with open(path, "a", encoding="utf-8") as f:
         f.write(json.dumps(record, ensure_ascii=False, sort_keys=True) + "\n")
         f.flush()
         os.fsync(f.fileno())
 
 
-def iter_jsonl(path: Path) -> Iterable[dict]:
+def scan_jsonl(path: Path) -> tuple[list[dict], dict]:
+    """Read every record and classify every unparsable line.
+
+    report = {"torn_tail": offset|None, "quarantined": [offsets],
+              "corrupt": [(line_no, offset)]} — ``corrupt`` lines are interior,
+    unknown corruption."""
     path = Path(path)
+    report: dict = {"torn_tail": None, "quarantined": [], "corrupt": []}
     if not path.exists():
-        return
-    with open(path, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                try:
-                    yield json.loads(line)
-                except json.JSONDecodeError:
-                    # a torn trailing line after a crash is recoverable: skip it
-                    # but only ever the LAST line may be torn
-                    continue
+        return [], report
+    data = path.read_bytes()
+    known = _quarantined(path)
+    out: list[dict] = []
+    pos = 0
+    line_no = 0
+    while pos < len(data):
+        nl = data.find(b"\n", pos)
+        end = len(data) if nl < 0 else nl
+        raw = data[pos:end]
+        line_no += 1
+        if raw.strip():
+            try:
+                obj = json.loads(raw.decode("utf-8"))
+                if not isinstance(obj, dict):
+                    raise ValueError("not an object")
+                out.append(obj)
+            except (UnicodeDecodeError, ValueError):
+                if pos in known and known[pos] == hashlib.sha256(raw).hexdigest():
+                    report["quarantined"].append(pos)
+                elif nl < 0:
+                    report["torn_tail"] = pos       # last line, no newline: interrupted write
+                else:
+                    report["corrupt"].append((line_no, pos))
+        if nl < 0:
+            break
+        pos = nl + 1
+    return out, report
+
+
+def iter_jsonl(path: Path, *, strict: bool = True) -> Iterable[dict]:
+    """Records of an append-only JSONL file.
+
+    Only a torn LAST line (interrupted write, no newline) and explicitly
+    quarantined lines are skipped.  Any other unparsable line raises
+    :class:`JsonlCorruption` (``strict``) — the old reader skipped corrupt
+    lines anywhere, so evaluation history could vanish unnoticed."""
+    recs, rep = scan_jsonl(path)
+    if strict and rep["corrupt"]:
+        raise JsonlCorruption(f"{path}: {len(rep['corrupt'])} corrupt interior line(s) "
+                              f"(line, byte offset) {rep['corrupt'][:5]} — history incomplete; "
+                              "inspect and acknowledge_corrupt_line() or restore from backup")
+    return iter(recs)
 
 
 # ---------------------------------------------------------------------------
@@ -317,6 +436,29 @@ def _round_floats(obj: object, sig: int = 10) -> object:
     raise TypeError(f"unsupported type {type(obj)!r} in strategy definition")
 
 
+class DefaultsMismatch(ValueError):
+    """A definition carries ``_defaults`` that differ from the family registry."""
+
+
+def registry_defaults(family: Optional[str], declared: Optional[Mapping] = None) -> dict:
+    """The ONE source of family defaults used for identity (auto-evolution §2-2).
+
+    Identity used to drop parameters equal to the caller-supplied
+    ``_defaults`` while execution filled the REGISTRY defaults back in — a
+    definition with different ``_defaults`` (or none) could therefore share
+    an id with a strategy whose signals differ.  Known families now always
+    use the registry; a conflicting ``_defaults`` is refused.  Unknown
+    families (test fixtures, combos) keep their declared defaults."""
+    from generator import FAMILY_DEFAULTS
+    if family in FAMILY_DEFAULTS:
+        reg = dict(FAMILY_DEFAULTS[family])
+        if declared and dict(declared) != reg:
+            raise DefaultsMismatch(f"{family}: declared _defaults {dict(declared)} differ from "
+                                   f"the registry {reg}")
+        return reg
+    return dict(declared or {})
+
+
 def normalize_strategy(defn: Mapping) -> dict:
     """Canonical strategy definition.
 
@@ -326,10 +468,14 @@ def normalize_strategy(defn: Mapping) -> dict:
     - keeps only strategy-defining keys: family, params, symbols, timeframe,
       entry, exit, holding, risk (data/cost versions are environment)
     """
+    if defn.get("schema") == "strategy_spec_v1":
+        # declarative specs (auto-evolution §3-1): fully resolved canonical form
+        from strategy_spec import canonicalize_spec
+        return canonicalize_spec(defn)
     allowed = ("family", "params", "symbols", "symbol", "timeframe", "entry",
                "exit", "holding", "risk", "direction", "primary_cell")
     out: dict = {}
-    defaults = defn.get("_defaults") or {}
+    defaults = registry_defaults(defn.get("family"), defn.get("_defaults"))
     for k in sorted(defn.keys()):
         if k not in allowed:
             continue  # anything not strategy-defining is excluded by design
@@ -406,7 +552,8 @@ def experiment_context(components: Mapping) -> tuple[str, dict]:
 #: hand-maintained label; this hash is what actually identifies the code.
 CODE_FILES = ("engine_lib.py", "runner.py", "evaluator.py", "portfolio.py",
               "generator.py", "generation.py", "data_quality.py",
-              "costs_bridge.py", "store.py", "promotion.py")
+              "costs_bridge.py", "store.py", "promotion.py", "campaigns.py", "stats_mc.py",
+              "config/promotion_v1.json", "config/promotion_v2.json")
 
 
 def code_identity(base: Optional[Path] = None, files: Sequence[str] = CODE_FILES) -> dict:
@@ -1171,6 +1318,26 @@ class LockTestRegistry:
         if not atts:
             return LockState.AVAILABLE
         return LockState(atts[-1]["state"])
+
+    def entry_status(self, strategy_id: str, symbol: str) -> dict:
+        """Read-only: may a NEW locked-TEST attempt start for this strategy+symbol?
+
+        Not enterable when the window was exposed before (legacy v1 use, or an
+        attempt that reached EVALUATION_STARTED/CONSUMED/exposed-FAILED) or when
+        another attempt is active.  BLOCKED_DATA_MISSING and never-exposed FAILED
+        attempts do not consume the window.  Mutates nothing."""
+        data = self._load()
+        atts = data["attempts"].get(strategy_id, {}).get(symbol, [])
+        uses = self._legacy_uses(data, strategy_id, symbol) + sum(1 for a in atts if a.get("exposed"))
+        active = any(a["state"] in _LOCK_ACTIVE for a in atts)
+        if uses:
+            reason = "ALREADY_CONSUMED"
+        elif active:
+            reason = "IN_PROGRESS"
+        else:
+            reason = "AVAILABLE"
+        return {"symbol": symbol, "state": self.state(strategy_id, symbol).value,
+                "uses": uses, "enterable": reason == "AVAILABLE", "reason": reason}
 
     def attempts(self, strategy_id: str, symbol: str) -> list[dict]:
         return list(self._load()["attempts"].get(strategy_id, {}).get(symbol, []))

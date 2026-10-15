@@ -1,0 +1,4 @@
+cmd: bash -n discovery/run_cycle.sh
+2026-10-15T08:32:22Z
+exit=0
+shellcheck: not installed

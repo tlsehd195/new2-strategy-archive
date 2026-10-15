@@ -40,6 +40,36 @@ FAMILY_DEFAULTS: dict[str, dict] = {
 }
 
 
+import hashlib as _hashlib
+
+#: pin of FAMILY_DEFAULTS.  Canonical definitions OMIT default-valued
+#: parameters, so changing a default would silently change what an existing
+#: strategy id computes.  Changing the table requires a new GENERATOR_VERSION
+#: (generation.py) and a new pin — the import fails otherwise.
+FAMILY_DEFAULTS_SHA256 = "d5881add55a5196c769b0d8ad475cf98c293d5616c20aa95b094d5bd46a1d174"
+
+
+def _defaults_sha() -> str:
+    return _hashlib.sha256(canonical_json(FAMILY_DEFAULTS).encode("utf-8")).hexdigest()
+
+
+if _defaults_sha() != FAMILY_DEFAULTS_SHA256:  # pragma: no cover - guarded by tests
+    raise RuntimeError("FAMILY_DEFAULTS changed without updating FAMILY_DEFAULTS_SHA256 "
+                       "(and the generator version): default-omitted strategy ids would "
+                       "silently change meaning")
+
+
+def resolve_params(defn: Mapping) -> dict:
+    """Execution parameters of a legacy-family definition: registry defaults
+    overlaid with the (possibly default-stripped) canonical params.  EVERY
+    consumer (signal builder, auxiliary-series builder, spec translation)
+    must use this — never ``defn["params"]`` directly."""
+    fam = defn["family"]
+    if fam not in FAMILY_DEFAULTS:
+        raise KeyError(f"unknown legacy family {fam!r}")
+    return {**FAMILY_DEFAULTS[fam], **(defn.get("params") or {})}
+
+
 def _mk(family: str, params: dict, direction: str, note: str = "") -> dict:
     return {
         "family": family,

@@ -1,5 +1,10 @@
 # NEW2 자율 전략 탐색 엔진 — 잔여 핵심 결함 수정 및 독립 검증 보고서
 
+> **상태 갱신 (2026-10-15, 후속 작업):** 이 보고서가 기술한 draft PR #1은 이후 **병합**되었다(머지 커밋 `66646cd`).
+> 아래 "168개 테스트"는 병합 시점(`34477ca`)의 기록이며 현재 값이 아니다. 현재 테스트 수·종료 코드·저장소 상태는
+> [`AUDIT_FINAL_RESIDUAL_20261015.md`](AUDIT_FINAL_RESIDUAL_20261015.md)가 후속 수정(run_cycle 종료 코드 조합, FDR 완료 조건 분리,
+> 과거 PASS 처리, 결정 충돌 감지, 환경 ID 보강)과 함께 갱신한다. "런타임 미배포·실데이터 BLOCKED_DATA_MISSING" 상태는 그대로다.
+
 - 작성: 2026-10-15 (UTC)
 - 대상: `tlsehd195/new2-strategy-archive` · `run/discovery/`
 - 증거 파일: `run/audit/evidence_residual_20261015/` (재현 로그, 수치 검증, E2E, 전체 테스트 로그 2회)

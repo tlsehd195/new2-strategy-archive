@@ -75,3 +75,9 @@ R-3 → R-2 → R-6 → R-4 → R-1(테스트, 최대 작업) → 회귀(실사�
 
 후속 감사에서 지적된 잔여 결함(후보 간 BH-FDR이 평가 순서·시점에 의존, 포트폴리오 곡선의 MTM 누락, 비용 실패 시 유리한 fallback, 강제청산 회계, 잠금 TEST 사용 기록 선행, 환경 ID 불완전, 사전등록 재사용, 조합 승격 미연결, run_cycle.sh 인자·종료 코드)의 수정·검증 결과는
 `AUDIT_RESIDUAL_FIXES_20261015.md` 와 `evidence_residual_20261015/` 에 있다. 이 문서의 위 표는 작성 당시 기록으로 그대로 보존한다.
+
+## 7. 최종 잔여 결함 수정 (2026-10-15 후속)
+
+run_cycle.sh 종료 코드 조합·로그 실패 정책, FDR 가족의 4개 개념 분리(`manifest_complete` / `current_context_complete` / `fdr_decision_ready` / `locked_test_eligible`),
+과거 컨텍스트 PASS의 재평가 규칙, FDR 결정의 증거 해시와 충돌 감지, 환경 ID 보강(전략 공간, 시리즈 해시 순서 불변)을 수정했다.
+세부 결과와 남은 위험은 [`AUDIT_FINAL_RESIDUAL_20261015.md`](AUDIT_FINAL_RESIDUAL_20261015.md) 참조.
