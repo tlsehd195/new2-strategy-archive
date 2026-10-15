@@ -1,0 +1,26 @@
+{
+ "engine": "NEW2-discovery-v1",
+ "cycle": 16,
+ "cursors": {
+  "flow_z": 26,
+  "ret_rev": 23,
+  "ts_mom": 22,
+  "vol_break": 14,
+  "tod": 14,
+  "fund_z": 14,
+  "fng": 13
+ },
+ "tested": 126,
+ "tested_rows": 150,
+ "survivors": [],
+ "survivor_specs": {},
+ "stouffer_done": [],
+ "promotion_queue": [],
+ "last_ts": "2026-10-14T18:08:25Z",
+ "last_status": "ok",
+ "rebuilt": {
+  "ts": "20261015T000110Z",
+  "by": "phase1g_reconstruct.py",
+  "note": "원장이 유일한 진실 — 본 파일은 원장 기반 재구성 캐시. tested=고유 해시 수, tested_rows=원장 행 수 (F-23 분리 표기)"
+ }
+}

@@ -1178,3 +1178,61 @@ Stage Summary:
 - 엔진 운영 정상 재개: v2-audit2, cycle 16, tested 126/779, 생존자 0(정상 — 비용 벽), 재검증 큐 6건(undetermined_power 정상 축적, data_missing 0)
 - 잔여 참고: next dev 재시작 시 instrumentation 부트 가드가 서비스 관리 인수(포트 헬스체크로 수동 스폰분과 중복 없이 공존)
 - [Task 53 추가 실측 — 서비스 영속성] setsid+nohup 스폰분(3020/3021/3022+next dev)이 Bash 호출 경계에서 전부 회수됨을 재실측(교훈 §7.3 확장: 크론 턴에서는 어떤 detach 트릭으로도 영속 스폰 불가 — 부팅 트리 소속 프로세스만 생존). 조치 불필요: 복원된 src/instrumentation.ts 부트 가드가 다음 next dev 기동 시 3종을 detached 스폰(부팅 트리 소속 → 영속, 오늘 아침 3020 생존 메커니즘과 동일). 데이터 공백: 3종 장부 18:03Z→다음 기동까지(청산·F&G 일일 행·maker fill), 다음 기동 시점은 플랫폼 재부팅 또는 워크스페이스 진입
+
+---
+Task ID: DISC-auto
+Agent: Z.ai Code (main, cron Job 459256 정기 자동 실행 — 'NEW2 자율탐색 루프, 엔진 v2-audit2' 명세)
+Task: (1) discovery 상태파일 점검 (2) run_cycle.sh 실행(타임아웃 600s) (3) 종료코드·4조건 판정 (4) 절대 금지사항 준수 (5) 디스크 확인 (6) 백업 이중실행 회피
+
+Work Log:
+- [인프라 부재 — 사이클 실행 불가] 명세의 /home/z/my-project/NEW2_run/discovery/ 디렉터리 자체가 부재(state.json·cycles.md·worklog.md·run_cycle.sh·discovery_ledger.jsonl 전원 없음). NEW2_run/ 실존 하위 디렉터리는 data/·research/·results/ 3개뿐
+- [원인 조사(조건 ② 준용)] 프로젝트 전수 grep에서 'v2-audit'·'run_cycle'·'discovery_ledger'·'UNIVERSE_EXHAUSTED' 참조 0건. git 전체 이력(--all)에 discovery 경로 관련 커밋 0건. 요약 문서가 언급한 백업 커밋 710f558도 이력에 부재하며 git remote 미구성(원격 푸시 검증 불가) — git_backup_push.sh 파일 역시 부재
+- [판단] 태스크 명세가 본 환경에 존재하지 않은(또는 소실된) 타 세션의 디렉터리 구조를 참조. 상태·스크립트·장부를 임의 생성·위조하지 않음(장부 재작성 금지·무결성 원칙 준용) — 인프라 복원 없이는 사이클 실행 불가로 판정, 종료코드 개념상 CYCLE_FAILED(인프라 레벨)에 해당 → 4조건 ②에 따라 본 섹션 기록
+- [실제 루프 상태 대조] 본 장부 Task 34 기준 메인 NEW2 루프는 '종료 유지(최종)'. 재개 트리거 ①F2/X6-R 재검증(2027-01경) ②P3 청산 캐스케이드(2027-01-11경) ③사용자 신규 지시 — 2026-10-15 기준 어느 트리거도 도래하지 않음. 산출물 무결성 확인: 보고서 v3~v26·NEW2_전략탐색_종합정리.md·PREREG 29건·results 전원 실존(v26 최종 = Task 34 기록과 정합)
+- [P3 수집기 생존 확인] :3020/stats — 2026-10-14T20:49:37Z 재기동·Binance WS open·OKX 폴링 정상·누적 1,944건(2026-10-13T00:07→2026-10-14T20:48 UTC) — 2027-01-11 90일 트리거 인프라 유효 유지
+- [디스크] 여유 7.6GB(≥1GB) — 조건 충족. [백업] git_backup_push.sh 부재 + 이중실행 금지 → 본 루프에서 백업 미실행
+
+Stage Summary:
+- 정기 자동 실행(엔진 v2-audit2) **실행 불가 — 참조 discovery 인프라가 본 환경에 존재하지 않음**. 사이클 0회 실행, 상태·장부·데이터 일체 생성·수정 없음(본 섹션 append만 수행)
+- 이전 세션 요약의 '백업 완료(710f558·원격 push)·discovery 루프' 기술이 본 환경과 불일치 — **'12:30Z 이후 데이터 손실 복구'가 실제 수행된 적 없음이 재확인됨**(복구 산출물 부재). 단, 본 환경의 실제 NEW2 자산(보고서 v3~v26·종합정리·PREREG·results·P3 수집기)은 자체 정합 상태로 무결
+- 잔존 조치(사용자 판단 필요): ① 크론 잡 459256 명세 갱신 또는 폐기 ② discovery 루프 인프라의 검증된 원본 소스 확보 시에만 복구 ③ 본 환경 실제 루프는 Task 34 종료 상태 유지가 정합 — 재개는 기존 트리거(2027-01) 또는 사용자 신규 지시에 따름
+- 금지사항 준수: locked TEST 구간(BTC 2024-03-25~06-18·ETH 2026-04-28~08-31) 미접촉, 장부 과거분 무변경, 게이트 미완화, 승격 선언 없음
+
+
+---
+Task ID: 54
+Agent: Z.ai Code (main, 감사 프로젝트 Phase 0-1 — 보관 저장소 접속·전면 복구·감사 재개)
+Task: 사용자 제공 보관 저장소(tlsehd195/new2-strategy-archive, 비공개) 접속 → 3차 플랫폼 복원 피해 전면 복구 → 감사 프로젝트 재개
+
+Work Log:
+- [접속 수단 확정] 사용자가 Deploy Key 등록(읽기 전용) → 본 샌드박스의 paramiko 기반 GIT_SSH 전송기(~/.ssh/gh_ssh.py, GitHub 호스트키 고정)로 접속 성공. 이전 세션의 DISC-auto 결론("백업 부재")은 **공개 저장소만 검색한 오 판정**으로 확정 수정 — 비공개 저장소라 익명 검색에서 보이지 않았던 것
+- [아카이브 실측] 16 커밋. 710f558(11:37Z)·2dd67c9·daa5ca6(14:56Z)에 run/discovery/ 엔진 9파일 존재. **bf177c9(18:11Z restore-reconcile)에서 원격에서 삭제됨** — 원인: git_backup_push.sh allow-list가 NEW2_run/discovery/를 수집하지 않는데 2차 복구 때 백업 리포가 신규 init되어 "엔진 없는 트리"가 원격을 덮어씀(무음 원격 삭제 — 신규 결함 F-26). HEAD(92716f6)에는 엔진 코드 없음
+- [v2-audit2 산출물 운명 확정] 16건 수정·AUDIT_PHASE1/FINAL 보고서·14종 테스트 스위트·portfolio_sim.py·data_quality_check.py는 **원격 push 이력 자체가 없음**(allow-list 누락) → 3차 디스크 복원(10-14 ~20:49Z)으로 영구 소실. 단, v2 게이트 규격(R4~R8 개정 전문)은 PREREG_discd008~016 86건에 문서화되어 있어 재구현 근거로 사용 가능
+- [복구 실행] 엔진 v1 9파일을 daa5ca6에서 추출 → /home/z/my-project/NEW2_run/discovery/ 복원, 4핵심파일 cmp 바이트 일치 검증. README·HANDOVER는 f2ebc27에서 추출(NEW2_run/*_archive.md). 본 장부를 아카이브판(Tasks 1~53, 상위집합 검증 완료)으로 교체 + DISC-auto 기록 보존 append
+- [상태 스냅샷] 복원된 state.json=cycle 7·tested 62행(53 유니크+9중복)·생존자 0. 사이클 8~16의 원장 행은 소실했으나 PREREG 86건 생존 — 결정론 엔진 특성상 재실행으로 재검증 가능. 로컬 데이터 캐시 301M(klines 454파일 포함) 생존 확인
+- [감사 재개] 사용자 감사 지침 전문 접수 — 이전 감사 1회분(Task 49~51)이 수행했던 25건 판정·16건 수정은 소실되어 **처음부터 재검증·재구현** 필요. 이번에는 모든 산출물을 즉시 아카이브 허용목록에 포함하는 개정 백업으로 보호
+
+Stage Summary:
+- 3차 사고 전면 복구 완료(엔진·문서·장부). F-26(백업 허용목록 누락 → 원격 무음 삭제) 신규 확정 — 이전 감사의 F-25와 동계열
+- 복구 불가 확정분: v2-audit2 코드·감사 보고서·테스트 스위트(재구현 필요, 규격 문서는 생존)
+- 이번 감사 프로젝트는 v1 코드 기준으로 Phase 1(조사 보고서)부터 재착수
+
+---
+Task ID: 55
+Agent: Z.ai Code (main, 감사 프로젝트 Phase 1 재수행 — 코드 수정 전 조사 보고서)
+Task: 두 저장소·런타임 전수 재조사 → 이전 검토 지적사항 코드 대조 재판정 → 후보 수 재계산 → 신규 결함 확정 → 조사 보고서 작성
+
+Work Log:
+- [코드 전수 정독] engine_lib.py 415줄·generator.py 243줄·runner.py 355줄·run_cycle.sh 24줄 = 930줄 전부 정독(복원된 v1 기준)
+- [유니버스 실측] generator 코드 직접 실행 → 779 정확 일치(flow_z 360·ret_rev 120·ts_mom 60·vol_break 60·tod 60·fund_z 45·fng 74 — fng는 F2/X6 배제 6건 반영)
+- [원장 실측] 62행=53유니크+9중복(사이클 2·3·4, seq 1↔8/2↔9/3↔10 쌍 — 초기 next_batch 버그 잔재, 현행 코드는 proposed-set 수정 상태), FAIL_COST 56·UNDETERMINED_POWER 6, 전부 base
+- [이전 지적 재판정] F-01(후보 내 Holm 한정)·F-02(best 셀 단독 합격)·F-03(재검증 큐 부재)·F-04(pipefail)·F-05(스테일 락)·F-06(ρ max)·F-07(√vn 이중계수)·F-08(오류 무음)·F-09(비원자 state)·F-11(하드코딩)·F-15(알트 잠금 부재)·F-16(펀딩 비용)·F-23(tested 정의) **전부 코드에서 재확인**. F-22(룩어헤드)·F-12(combo 해시) 기각 유지. F-25는 수정 이력 존재로 현재판 재현 불가
+- [신규 결함 11건] F-26(백업 allow-list 누락→원격 무음 삭제·v2-audit2 영구소실, 치명)·F-27(알트 6종 klines 25개월 구멍 — CONSIST 게이트 비인접 레짐 비교 왜곡)·F-28(BTC 2024-04~05 결측=잠금TEST 내부)·F-29(ETH 2026-05~08 결측=잠금TEST 내부)·F-30(BTC funding 2024-03 종료)·F-31(zip 전용 월 로더 무시)·F-32(results JSON에 cand_hash/cycle 부재)·F-33(README·HANDOVER 원격 삭제)·F-34(o100k 참고치 하위집합 편향)·F-35(SKIPPED exit 0 ≠ 명세 3)·F-36(백업 크론 생존 확인 불가)
+- [비용모델 대조] 원본 costs.py(gh/main 실측)=Upbit KRW 현물 기본값(fee=UPBIT_KRW_FEE_RATE·half_spread 2bp·impact 0.1·fail-closed 5%), 엔진=왕복 변환 적용 — 보수적 방향이나 실측 체결 데이터 미검증 추정임을 명시
+- [재구성 계획 확정] 아카이브 results/disc_*_results.json 150건(FAIL_COST 115·UNDETERMINED 18·DATA_MISSING 16·FAIL_CONSIST 1)이 사이클 8~16의 1차 증거 — 원장 append-only 재구성 절차 수립(재구성 행 recovered_from 표기, PREREG sha256 전수 검증)
+- [산출물] NEW2_run/audit/AUDIT_PHASE1_조사보고서.md (§1-1 12개 항목 전부 + Finding 판정표 + 복구 계획 + Phase 2~7 계획)
+
+Stage Summary:
+- Phase 1 완료 — 코드 수정 0줄, 장부 실험기록 0행 수정(복구·병합만). 이전 지적 16건 확인·2건 기각 유지·신규 11건 발견(치명 1·높음 4)
+- 핵심 결론: v1 엔진의 게이트 설계 방향은 건전하나 ①다중검정 통제가 후보 내에 한정 ②best 셀 단독 합격 ③재검증 큐 부재 ④백업 인프라가 가장 소중한 산출물을 보호하지 못함(F-26) ⑤데이터 구멍이 게이트·2027 판정을 무음으로 훼손(F-27~30)
+- 다음: Phase 1-g(원장·상태 재구성) → Phase 2(실행 안정성+백업 개정 최우선) → 3(후보) → 4(통계 R4~R8) → 5(데이터) → 6(백테스트) → 7(테스트·문서·최종보고)

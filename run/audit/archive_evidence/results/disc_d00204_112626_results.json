@@ -1,0 +1,61 @@
+{
+ "cid": "d00204_112626",
+ "ts": "2026-10-14T11:26:27Z",
+ "family": "vol_break",
+ "symbols": [
+  "BTCUSDT",
+  "ETHUSDT"
+ ],
+ "params": {
+  "Lv": 96,
+  "thr": 1.5,
+  "horizons": [
+   4
+  ]
+ },
+ "variant": null,
+ "kind": "base",
+ "verdict": "FAIL_COST",
+ "cells": [
+  {
+   "sym": "BTCUSDT",
+   "h": 4,
+   "n_raw": 19804,
+   "vn_nonov": 2186,
+   "fail_closed_o10k": 5,
+   "mean_net_bp": -33.82962260264543,
+   "se": 2.274786896797296,
+   "t": -14.871556825949112,
+   "p": 1.0,
+   "span_means": [
+    -33.17668892260802,
+    -34.81727860601234
+   ],
+   "raw_mean_bp": -34.43640351976628,
+   "raw_n": 8564,
+   "mean_net_o100k_bp": -70.0514104862026,
+   "p_holm": 1.0
+  },
+  {
+   "sym": "ETHUSDT",
+   "h": 4,
+   "n_raw": 18200,
+   "vn_nonov": 2713,
+   "fail_closed_o10k": 0,
+   "mean_net_bp": -36.92677952032817,
+   "se": 2.7080954159435935,
+   "t": -13.635701055038938,
+   "p": 1.0,
+   "span_means": [
+    -44.08992133944097,
+    -30.048300128998015
+   ],
+   "raw_mean_bp": -36.58850745386268,
+   "raw_n": 10590,
+   "mean_net_o100k_bp": -81.83139578875773,
+   "p_holm": 1.0
+  }
+ ],
+ "prereg": "/home/z/my-project/NEW2_run/PREREG_discd00204_112626_2026-10-14.md",
+ "engine": "NEW2-discovery-v1"
+}

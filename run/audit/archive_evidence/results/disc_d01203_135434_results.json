@@ -1,0 +1,22 @@
+{
+ "cid": "d01203_135434",
+ "ts": "2026-10-14T13:54:34Z",
+ "family": "ts_mom",
+ "symbols": [
+  "DOGEUSDT",
+  "LINKUSDT"
+ ],
+ "params": {
+  "L": 672,
+  "thr": 1.0,
+  "horizons": [
+   192
+  ]
+ },
+ "variant": null,
+ "kind": "base",
+ "verdict": "DATA_MISSING",
+ "cells": [],
+ "prereg": "/home/z/my-project/NEW2_run/PREREG_discd01203_135434_2026-10-14.md",
+ "engine": "NEW2-discovery-v2-audit2"
+}

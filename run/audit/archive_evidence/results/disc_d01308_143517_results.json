@@ -1,0 +1,62 @@
+{
+ "cid": "d01308_143517",
+ "ts": "2026-10-14T14:35:17Z",
+ "family": "flow_z",
+ "symbols": [
+  "TRXUSDT",
+  "ZECUSDT"
+ ],
+ "params": {
+  "L": 16,
+  "thr": 1.2816,
+  "mode": "mom",
+  "horizons": [
+   96
+  ]
+ },
+ "variant": null,
+ "kind": "base",
+ "verdict": "FAIL_COST",
+ "cells": [
+  {
+   "sym": "TRXUSDT",
+   "h": 96,
+   "n_raw": 25340,
+   "vn_nonov": 866,
+   "fail_closed_o10k": 2528,
+   "mean_net_bp": -234.9549768874714,
+   "se": 15.261608703417098,
+   "t": -15.395164523833232,
+   "p": 1.0,
+   "span_means": [
+    -256.1695436934517,
+    -214.51009958012065
+   ],
+   "raw_mean_bp": -238.15348986226718,
+   "raw_n": 20226,
+   "mean_net_o100k_bp": -228.9614132481188,
+   "p_holm": 1.0
+  },
+  {
+   "sym": "ZECUSDT",
+   "h": 96,
+   "n_raw": 24695,
+   "vn_nonov": 691,
+   "fail_closed_o10k": 7227,
+   "mean_net_bp": -174.7573883811983,
+   "se": 28.89880126047001,
+   "t": -6.047219287958661,
+   "p": 0.999999998792938,
+   "span_means": [
+    -272.0116925023779,
+    -21.255259115306544
+   ],
+   "raw_mean_bp": -198.20674949348464,
+   "raw_n": 13774,
+   "mean_net_o100k_bp": -73.73275663952349,
+   "p_holm": 1.0
+  }
+ ],
+ "prereg": "/home/z/my-project/NEW2_run/PREREG_discd01308_143517_2026-10-14.md",
+ "engine": "NEW2-discovery-v2-audit2"
+}

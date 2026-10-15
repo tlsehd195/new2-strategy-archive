@@ -1,0 +1,34 @@
+{
+ "ts": "20261015T000206Z",
+ "ledger_rows": 150,
+ "unique_hash": 126,
+ "state_cycle": 16,
+ "next_batch_n": 10,
+ "next_batch_families": [
+  "flow_z",
+  "fng",
+  "fund_z",
+  "ret_rev",
+  "tod",
+  "ts_mom",
+  "vol_break"
+ ],
+ "already_tested_proposals": 0,
+ "verdict_distribution": {
+  "FAIL_COST": 115,
+  "UNDETERMINED_POWER": 18,
+  "DATA_MISSING": 16,
+  "FAIL_CONSIST": 1
+ },
+ "expected": {
+  "FAIL_COST": 115,
+  "UNDETERMINED_POWER": 18,
+  "DATA_MISSING": 16,
+  "FAIL_CONSIST": 1
+ },
+ "dist_match": true,
+ "survivors": [],
+ "universe_total": 779,
+ "remaining": 653,
+ "cycles_md_section": "appended"
+}

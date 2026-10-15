@@ -1,0 +1,65 @@
+  {"ts": "2026-10-14T23:45:02+00:00", "ev": "start", "pid": 4246, "dry_run": false}
+  {"ts": "2026-10-14T23:45:02+00:00", "ev": "symbol_begin", "sym": "BTCUSDT", "kind": "klines"}
+  {"ts": "2026-10-14T23:45:08+00:00", "ev": "vision_zip_saved", "kind": "klines", "sym": "BTCUSDT", "month": "2024-05", "bytes": 144408}
+  {"ts": "2026-10-14T23:45:13+00:00", "ev": "rest_klines_saved", "sym": "BTCUSDT", "month": "2026-10", "rows": 1343}
+  {"ts": "2026-10-14T23:45:13+00:00", "ev": "symbol_begin", "sym": "BTCUSDT", "kind": "funding"}
+  {"ts": "2026-10-14T23:45:16+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2022-09", "bytes": 960}
+  {"ts": "2026-10-14T23:45:16+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2022-10", "bytes": 950}
+  {"ts": "2026-10-14T23:45:16+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2022-11", "bytes": 1000}
+  {"ts": "2026-10-14T23:45:16+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2022-12", "bytes": 982}
+  {"ts": "2026-10-14T23:45:17+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2023-01", "bytes": 863}
+  {"ts": "2026-10-14T23:45:17+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2023-02", "bytes": 808}
+  {"ts": "2026-10-14T23:45:19+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2024-04", "bytes": 842}
+  {"ts": "2026-10-14T23:45:20+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2024-05", "bytes": 830}
+  {"ts": "2026-10-14T23:45:20+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2024-06", "bytes": 721}
+  {"ts": "2026-10-14T23:45:20+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2024-07", "bytes": 847}
+  {"ts": "2026-10-14T23:45:20+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2024-08", "bytes": 904}
+  {"ts": "2026-10-14T23:45:21+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2024-09", "bytes": 924}
+  {"ts": "2026-10-14T23:45:21+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2024-10", "bytes": 801}
+  {"ts": "2026-10-14T23:45:21+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2024-11", "bytes": 746}
+  {"ts": "2026-10-14T23:45:22+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2024-12", "bytes": 808}
+  {"ts": "2026-10-14T23:45:22+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2025-01", "bytes": 825}
+  {"ts": "2026-10-14T23:45:22+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2025-02", "bytes": 854}
+  {"ts": "2026-10-14T23:45:23+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2025-03", "bytes": 938}
+  {"ts": "2026-10-14T23:45:23+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2025-04", "bytes": 929}
+  {"ts": "2026-10-14T23:45:23+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2025-05", "bytes": 943}
+  {"ts": "2026-10-14T23:45:24+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2025-06", "bytes": 946}
+  {"ts": "2026-10-14T23:45:24+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2025-07", "bytes": 796}
+  {"ts": "2026-10-14T23:45:24+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2025-08", "bytes": 927}
+  {"ts": "2026-10-14T23:45:24+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2025-09", "bytes": 941}
+  {"ts": "2026-10-14T23:45:25+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2025-10", "bytes": 944}
+  {"ts": "2026-10-14T23:45:25+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2025-11", "bytes": 941}
+  {"ts": "2026-10-14T23:45:25+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2025-12", "bytes": 963}
+  {"ts": "2026-10-14T23:45:26+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2026-01", "bytes": 965}
+  {"ts": "2026-10-14T23:45:26+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2026-02", "bytes": 937}
+  {"ts": "2026-10-14T23:45:26+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2026-03", "bytes": 1008}
+  {"ts": "2026-10-14T23:45:26+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2026-04", "bytes": 960}
+  {"ts": "2026-10-14T23:45:27+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2026-05", "bytes": 980}
+  {"ts": "2026-10-14T23:45:27+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2026-06", "bytes": 964}
+  {"ts": "2026-10-14T23:45:27+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2026-07", "bytes": 914}
+  {"ts": "2026-10-14T23:45:27+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2026-08", "bytes": 896}
+  {"ts": "2026-10-14T23:45:28+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "BTCUSDT", "month": "2026-09", "bytes": 924}
+  {"ts": "2026-10-14T23:45:28+00:00", "ev": "rest_funding_saved", "sym": "BTCUSDT", "month": "2026-10", "rows": 42}
+  {"ts": "2026-10-14T23:45:28+00:00", "ev": "symbol_begin", "sym": "ETHUSDT", "kind": "klines"}
+  {"ts": "2026-10-14T23:45:34+00:00", "ev": "vision_zip_saved", "kind": "klines", "sym": "ETHUSDT", "month": "2024-06", "bytes": 140804}
+  {"ts": "2026-10-14T23:45:35+00:00", "ev": "vision_zip_saved", "kind": "klines", "sym": "ETHUSDT", "month": "2024-07", "bytes": 146832}
+  {"ts": "2026-10-14T23:45:35+00:00", "ev": "vision_zip_saved", "kind": "klines", "sym": "ETHUSDT", "month": "2024-08", "bytes": 147025}
+  {"ts": "2026-10-14T23:45:35+00:00", "ev": "vision_zip_saved", "kind": "klines", "sym": "ETHUSDT", "month": "2024-09", "bytes": 141102}
+  {"ts": "2026-10-14T23:45:36+00:00", "ev": "vision_zip_saved", "kind": "klines", "sym": "ETHUSDT", "month": "2024-10", "bytes": 145396}
+  {"ts": "2026-10-14T23:45:39+00:00", "ev": "vision_zip_saved", "kind": "klines", "sym": "ETHUSDT", "month": "2026-06", "bytes": 142640}
+  {"ts": "2026-10-14T23:45:39+00:00", "ev": "vision_zip_saved", "kind": "klines", "sym": "ETHUSDT", "month": "2026-07", "bytes": 145574}
+  {"ts": "2026-10-14T23:45:40+00:00", "ev": "vision_zip_saved", "kind": "klines", "sym": "ETHUSDT", "month": "2026-08", "bytes": 144452}
+  {"ts": "2026-10-14T23:45:41+00:00", "ev": "rest_klines_saved", "sym": "ETHUSDT", "month": "2026-10", "rows": 1343}
+  {"ts": "2026-10-14T23:45:41+00:00", "ev": "symbol_begin", "sym": "ETHUSDT", "kind": "funding"}
+  {"ts": "2026-10-14T23:45:43+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "ETHUSDT", "month": "2022-09", "bytes": 1016}
+  {"ts": "2026-10-14T23:45:44+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "ETHUSDT", "month": "2022-10", "bytes": 1004}
+  {"ts": "2026-10-14T23:45:44+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "ETHUSDT", "month": "2022-11", "bytes": 987}
+  {"ts": "2026-10-14T23:45:44+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "ETHUSDT", "month": "2022-12", "bytes": 964}
+  {"ts": "2026-10-14T23:45:45+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "ETHUSDT", "month": "2023-01", "bytes": 819}
+  {"ts": "2026-10-14T23:45:45+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "ETHUSDT", "month": "2023-02", "bytes": 821}
+  {"ts": "2026-10-14T23:45:45+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "ETHUSDT", "month": "2023-03", "bytes": 963}
+  {"ts": "2026-10-14T23:45:46+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "ETHUSDT", "month": "2023-04", "bytes": 945}
+  {"ts": "2026-10-14T23:45:46+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "ETHUSDT", "month": "2023-05", "bytes": 990}
+  {"ts": "2026-10-14T23:45:46+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "ETHUSDT", "month": "2023-06", "bytes": 888}
+  {"ts": "2026-10-14T23:45:47+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "ETHUSDT", "month": "2023-07", "bytes": 861}
+  {"ts": "2026-10-14T23:45:47+00:00", "ev": "vision_zip_saved", "kind": "funding", "sym": "ETHUSDT", "month": "2023-08", "bytes": 897}

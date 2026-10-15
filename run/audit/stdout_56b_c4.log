@@ -1,0 +1,12 @@
+  {"ts": "2026-10-15T00:20:49+00:00", "ev": "start", "pid": 5819, "dry_run": false, "syms": ["DOGEUSDT", "TRXUSDT", "ZECUSDT"], "kinds": ["klines", "funding"]}
+  {"ts": "2026-10-15T00:20:49+00:00", "ev": "symbol_begin", "sym": "DOGEUSDT", "kind": "klines"}
+  {"ts": "2026-10-15T00:20:59+00:00", "ev": "symbol_begin", "sym": "DOGEUSDT", "kind": "funding"}
+  {"ts": "2026-10-15T00:21:08+00:00", "ev": "symbol_begin", "sym": "TRXUSDT", "kind": "klines"}
+  {"ts": "2026-10-15T00:21:18+00:00", "ev": "symbol_begin", "sym": "TRXUSDT", "kind": "funding"}
+  {"ts": "2026-10-15T00:21:28+00:00", "ev": "symbol_begin", "sym": "ZECUSDT", "kind": "klines"}
+  {"ts": "2026-10-15T00:21:38+00:00", "ev": "symbol_begin", "sym": "ZECUSDT", "kind": "funding"}
+  {"ts": "2026-10-15T00:21:48+00:00", "ev": "done", "stats": {"downloaded": 0, "zip_extracted": 0, "corrupt_replaced": 0, "rest_saved": 0, "failed": 0, "skipped": 396}, "failures": []}
+
+=== SUMMARY ===
+{"downloaded": 0, "zip_extracted": 0, "corrupt_replaced": 0, "rest_saved": 0, "failed": 0, "skipped": 396}
+failures: NONE

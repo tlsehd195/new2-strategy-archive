@@ -1,0 +1,16 @@
+  {"ts": "2026-10-15T00:22:21+00:00", "ev": "start", "pid": 6012, "dry_run": false, "syms": ["DOGEUSDT", "TRXUSDT", "ZECUSDT", "ADAUSDT", "LINKUSDT"], "kinds": ["funding"]}
+  {"ts": "2026-10-15T00:22:21+00:00", "ev": "symbol_begin", "sym": "DOGEUSDT", "kind": "funding"}
+  {"ts": "2026-10-15T00:22:31+00:00", "ev": "rest_funding_saved", "sym": "DOGEUSDT", "month": "2026-10", "rows": 43}
+  {"ts": "2026-10-15T00:22:32+00:00", "ev": "symbol_begin", "sym": "TRXUSDT", "kind": "funding"}
+  {"ts": "2026-10-15T00:22:42+00:00", "ev": "rest_funding_saved", "sym": "TRXUSDT", "month": "2026-10", "rows": 43}
+  {"ts": "2026-10-15T00:22:42+00:00", "ev": "symbol_begin", "sym": "ZECUSDT", "kind": "funding"}
+  {"ts": "2026-10-15T00:22:52+00:00", "ev": "rest_funding_saved", "sym": "ZECUSDT", "month": "2026-10", "rows": 43}
+  {"ts": "2026-10-15T00:22:52+00:00", "ev": "symbol_begin", "sym": "ADAUSDT", "kind": "funding"}
+  {"ts": "2026-10-15T00:23:02+00:00", "ev": "rest_funding_saved", "sym": "ADAUSDT", "month": "2026-10", "rows": 43}
+  {"ts": "2026-10-15T00:23:02+00:00", "ev": "symbol_begin", "sym": "LINKUSDT", "kind": "funding"}
+  {"ts": "2026-10-15T00:23:12+00:00", "ev": "rest_funding_saved", "sym": "LINKUSDT", "month": "2026-10", "rows": 43}
+  {"ts": "2026-10-15T00:23:12+00:00", "ev": "done", "stats": {"downloaded": 0, "zip_extracted": 0, "corrupt_replaced": 0, "rest_saved": 5, "failed": 0, "skipped": 330}, "failures": []}
+
+=== SUMMARY ===
+{"downloaded": 0, "zip_extracted": 0, "corrupt_replaced": 0, "rest_saved": 5, "failed": 0, "skipped": 330}
+failures: NONE

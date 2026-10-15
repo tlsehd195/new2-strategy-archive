@@ -1,0 +1,22 @@
+{
+ "cid": "d01207_135434",
+ "ts": "2026-10-14T13:54:34Z",
+ "family": "fng",
+ "symbols": [
+  "DOGEUSDT",
+  "LINKUSDT"
+ ],
+ "params": {
+  "lo": 5,
+  "hi": 95,
+  "horizons": [
+   16
+  ]
+ },
+ "variant": null,
+ "kind": "base",
+ "verdict": "DATA_MISSING",
+ "cells": [],
+ "prereg": "/home/z/my-project/NEW2_run/PREREG_discd01207_135434_2026-10-14.md",
+ "engine": "NEW2-discovery-v2-audit2"
+}

@@ -1,0 +1,65 @@
+{
+ "cid": "d01603_180816",
+ "ts": "2026-10-14T18:08:20Z",
+ "family": "ts_mom",
+ "symbols": [
+  "BTCUSDT",
+  "ETHUSDT"
+ ],
+ "params": {
+  "L": 672,
+  "thr": 1.5,
+  "horizons": [
+   48
+  ]
+ },
+ "variant": null,
+ "kind": "base",
+ "verdict": "FAIL_COST",
+ "cells": [
+  {
+   "sym": "BTCUSDT",
+   "h": 48,
+   "n_raw": 87735,
+   "vn_nonov": 684,
+   "fail_closed_o10k": 16,
+   "mean_funding_bp": 0.13844356725146198,
+   "mean_net_bp": -18.613004031468805,
+   "se": 9.403893228908105,
+   "t": -1.979287044035269,
+   "p": 0.9759075803480819,
+   "mean_net_f_bp": -18.751447598720265,
+   "span_means": [
+    -13.70638062504317,
+    -25.16075062502655
+   ],
+   "raw_mean_bp": -25.55477615507615,
+   "raw_n": 23075,
+   "mean_net_o100k_bp": -61.05827153375077,
+   "p_holm": 1.0
+  },
+  {
+   "sym": "ETHUSDT",
+   "h": 48,
+   "n_raw": 89184,
+   "vn_nonov": 849,
+   "fail_closed_o10k": 3537,
+   "mean_funding_bp": 0.24628409893992934,
+   "mean_net_bp": -28.83963952358781,
+   "se": 11.22802432635006,
+   "t": -2.568540883537864,
+   "p": 0.9948085705412953,
+   "mean_net_f_bp": -29.085923622527734,
+   "span_means": [
+    -18.74475438680756,
+    -37.9182610559942
+   ],
+   "raw_mean_bp": -31.525771244054813,
+   "raw_n": 28332,
+   "mean_net_o100k_bp": -79.73407522606345,
+   "p_holm": 1.0
+  }
+ ],
+ "prereg": "/home/z/my-project/NEW2_run/PREREG_discd01603_180816_2026-10-14.md",
+ "engine": "NEW2-discovery-v2-audit2"
+}

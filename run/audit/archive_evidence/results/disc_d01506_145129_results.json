@@ -1,0 +1,21 @@
+{
+ "cid": "d01506_145129",
+ "ts": "2026-10-14T14:51:29Z",
+ "family": "fund_z",
+ "symbols": [
+  "BNBUSDT",
+  "ADAUSDT"
+ ],
+ "params": {
+  "zthr": 1.5,
+  "horizons": [
+   192
+  ]
+ },
+ "variant": null,
+ "kind": "base",
+ "verdict": "DATA_MISSING",
+ "cells": [],
+ "prereg": "/home/z/my-project/NEW2_run/PREREG_discd01506_145129_2026-10-14.md",
+ "engine": "NEW2-discovery-v2-audit2"
+}

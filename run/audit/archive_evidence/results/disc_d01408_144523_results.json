@@ -1,0 +1,66 @@
+{
+ "cid": "d01408_144523",
+ "ts": "2026-10-14T14:45:24Z",
+ "family": "flow_z",
+ "symbols": [
+  "SOLUSDT",
+  "XRPUSDT"
+ ],
+ "params": {
+  "L": 16,
+  "thr": 1.6449,
+  "mode": "mom",
+  "horizons": [
+   4
+  ]
+ },
+ "variant": null,
+ "kind": "base",
+ "verdict": "FAIL_COST",
+ "cells": [
+  {
+   "sym": "SOLUSDT",
+   "h": 4,
+   "n_raw": 12657,
+   "vn_nonov": 3944,
+   "fail_closed_o10k": 0,
+   "mean_funding_bp": 0.015944979716024342,
+   "mean_net_bp": -74.10441093190306,
+   "se": 1.8154896458812966,
+   "t": -40.81786481130297,
+   "p": 1.0,
+   "mean_net_f_bp": -74.1203559116191,
+   "span_means": [
+    -89.41488896696941,
+    -59.22262628181858
+   ],
+   "raw_mean_bp": -76.1250352155323,
+   "raw_n": 10868,
+   "mean_net_o100k_bp": -191.19901356425237,
+   "p_holm": 1.0
+  },
+  {
+   "sym": "XRPUSDT",
+   "h": 4,
+   "n_raw": 12729,
+   "vn_nonov": 3814,
+   "fail_closed_o10k": 0,
+   "mean_funding_bp": -0.0034303880440482454,
+   "mean_net_bp": -90.35430952745183,
+   "se": 1.883931921561799,
+   "t": -47.960496073842826,
+   "p": 1.0,
+   "mean_net_f_bp": -90.35087913940781,
+   "span_means": [
+    -103.84819924980329,
+    -77.59019139212552
+   ],
+   "raw_mean_bp": -92.21988050346702,
+   "raw_n": 10794,
+   "mean_net_o100k_bp": -222.61874233092908,
+   "p_holm": 1.0
+  }
+ ],
+ "prereg": "/home/z/my-project/NEW2_run/PREREG_discd01408_144523_2026-10-14.md",
+ "engine": "NEW2-discovery-v2-audit2"
+}
