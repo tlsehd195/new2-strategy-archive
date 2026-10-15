@@ -936,9 +936,13 @@ class Runner:
             report["conflict"] = str(e)
             report["fdr_decision_ready"] = False
             return report
+        entry = self.locked_test_eligible(decision)
         report["decision"] = {"survivors": decision["survivors"], "m": decision["m"],
                               "n_with_statistic": decision["n_with_statistic"],
-                              "locked_test_eligible": decision.get("locked_test_eligible")}
+                              "statistical_survivors": decision["survivors"],
+                              "survivors_validation_pass": decision.get("survivors_validation_pass"),
+                              "locked_test_eligible": entry["eligible"],
+                              "lock_blocked": entry["blocked"]}
         by_eid = {r.get("evaluation_id"): r for r in records}
         survivors = set(decision["survivors"])
         for sid, st in sorted(states.items()):
@@ -952,6 +956,41 @@ class Runner:
             (report["resolved"] if out else report["waiting"]).append(
                 {"strategy_id": sid, "status": out} if out else sid)
         return report
+
+    def lock_entry_status(self, sid: str, defn: Mapping) -> dict:
+        """May a NEW locked-TEST attempt start for this candidate?  Independent of the
+        statistics: a window consumed earlier (any context, any symbol of the
+        candidate) can never be entered again.  Read-only."""
+        required = list(defn["symbols"])
+        per = {sym: self.lock_registry.entry_status(sid, sym) for sym in required}
+        no_lock = symbols_without_locked_test(required)
+        if no_lock:
+            reason = "NO_LOCKED_TEST"
+        elif any(v["reason"] == "ALREADY_CONSUMED" for v in per.values()):
+            reason = "ALREADY_CONSUMED"
+        elif any(v["reason"] == "IN_PROGRESS" for v in per.values()):
+            reason = "IN_PROGRESS"
+        else:
+            reason = "AVAILABLE"
+        return {"eligible": reason == "AVAILABLE", "reason": reason, "per_symbol": per,
+                "no_locked_test": list(no_lock)}
+
+    def locked_test_eligible(self, decision: Mapping) -> dict:
+        """Split the statistical survivors (BH + validation PASS) from the candidates
+        that may actually enter the locked TEST now."""
+        eligible: list[str] = []
+        blocked: dict = {}
+        for sid in decision.get("survivors_validation_pass") or []:
+            defn = self._defn_by_sid.get(sid)
+            if defn is None:
+                blocked[sid] = "NOT_IN_GENERATION"
+                continue
+            e = self.lock_entry_status(sid, defn)
+            if e["eligible"]:
+                eligible.append(sid)
+            else:
+                blocked[sid] = e["reason"]
+        return {"eligible": sorted(eligible), "blocked": dict(sorted(blocked.items()))}
 
     def _resolve(self, sid: str, dev_rec: Mapping, survived: bool, decision: Mapping) -> Optional[str]:
         defn = self._defn_by_sid[sid]
@@ -970,10 +1009,25 @@ class Runner:
                                  "DATA_MISSING", "ERROR") else "FAIL_STAT"
             lock_info["note"] = "independent validation not passed — locked TEST not consumed"
         else:
-            out = self._locked_test(sid, defn, ctx)
-            if out is None:
+            entry = self.lock_entry_status(sid, defn)
+            lock_info["entry"] = entry
+            if entry["reason"] == "IN_PROGRESS":
                 return None          # another live process holds the window
-            final, lock_info = out
+            if entry["reason"] == "ALREADY_CONSUMED":
+                final = "FAIL_STAT"
+                lock_info["reused"] = True
+                lock_info["note"] = ("locked window already consumed earlier "
+                                     f"({ {s: v['uses'] for s, v in entry['per_symbol'].items()} }) — "
+                                     "not an independent test; nothing reserved")
+            elif entry["reason"] == "NO_LOCKED_TEST":
+                final = "DATA_MISSING"
+                lock_info["note"] = (f"NO_LOCKED_TEST for {entry['no_locked_test']} — "
+                                     "cannot claim final; nothing consumed")
+            else:
+                out = self._locked_test(sid, defn, ctx)
+                if out is None:
+                    return None      # another live process holds the window
+                final, lock_info = out
         rec = {
             "phase": "final", "status": final, "strategy_id": sid,
             "evaluation_id": evaluation_id(sid, ctx), "run_id": self.run_id,

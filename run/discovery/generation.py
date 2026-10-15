@@ -268,7 +268,10 @@ def family_status(records: Iterable[Mapping], manifest: Mapping, context_id: str
     * ``current_context_complete`` – EVERY member has a dev outcome produced UNDER THIS
       CONTEXT.  A PASS (or any dev record) from another context never counts.
     * ``fdr_decision_ready``     – both of the above and no inconsistent evidence
-    * ``locked_test_eligible``   – only filled by ``decide_family`` (needs the BH result)
+    * ``locked_test_eligible``   – NOT a family property: BH survivors + validation PASS are
+      ``survivors_validation_pass`` in the decision; whether the window may still be entered
+      depends on the lock-TEST consumption history and is decided by the runner
+      (``Runner.lock_entry_status`` / ``Runner.locked_test_eligible``)
     * ``complete``               – compatibility alias of ``fdr_decision_ready``
 
     The tested value of a candidate is the FIRST dev-phase record under this
@@ -337,7 +340,6 @@ def family_status(records: Iterable[Mapping], manifest: Mapping, context_id: str
         "manifest_problems": manifest_problems,
         "current_context_complete": ready_current,
         "fdr_decision_ready": ready,
-        "locked_test_eligible": [],
         "complete": ready,           # compat alias = fdr_decision_ready
         # --- population breakdown (every member lands in exactly one of the first three) --
         "evaluated": len(first),
@@ -391,7 +393,8 @@ def decide_family(status: Mapping, *, q: float = FDR_Q) -> dict:
         "n_without_statistic": status["m"] - len(sids),
         "without_statistic": sorted(status.get("without_statistic", [])),
         "survivors": survivors,
-        "locked_test_eligible": sorted(s for s in survivors if vv.get(s) == "PASS"),
+        "statistical_survivors": survivors,
+        "survivors_validation_pass": sorted(s for s in survivors if vv.get(s) == "PASS"),
         "prior_context_pass_retained": sorted(status.get("prior_context_pass", {})),
         "first_records": dict(status["first_records"]),
         "input_hash": fdr_input_hash(status, q),
@@ -422,18 +425,25 @@ class FdrDecisionStore:
         return list(iter_jsonl(self.conflict_path))
 
     @staticmethod
-    def _same_evidence(old: Mapping, new: Mapping) -> bool:
-        if old.get("input_hash") and new.get("input_hash"):
-            return (old["input_hash"] == new["input_hash"]
-                    and old.get("manifest_hash") == new.get("manifest_hash")
-                    and old.get("method") == new.get("method") and old.get("q") == new.get("q"))
-        # legacy decision without an evidence hash: compare what it did record
-        return all(old.get(k) == new.get(k) for k in ("m", "survivors", "first_records", "q", "method"))
+    def _same_evidence(old: Mapping, new: Mapping) -> tuple[bool, str]:
+        """Evidence equality is decided by the evidence hash ONLY.  A stored decision
+        without ``input_hash`` (legacy) has no verifiable original evidence: equal
+        result values do not prove equal inputs (the p-values may differ), so it is
+        never accepted as 'the same' — the caller treats it as a conflict/hold."""
+        if not old.get("input_hash"):
+            return False, "stored decision has no input_hash: original evidence not verifiable"
+        if not new.get("input_hash"):
+            return False, "new decision has no input_hash"
+        same = (old["input_hash"] == new["input_hash"]
+                and old.get("manifest_hash") == new.get("manifest_hash")
+                and old.get("method") == new.get("method") and old.get("q") == new.get("q"))
+        return same, "" if same else "inputs differ from the stored decision"
 
     def record(self, decision: Mapping) -> dict:
         existing = self.get(decision["generation_id"], decision["context_id"])
         if existing is not None:
-            if self._same_evidence(existing, decision):
+            same, why = self._same_evidence(existing, decision)
+            if same:
                 return existing
             self.conflict_path.parent.mkdir(parents=True, exist_ok=True)
             with open(self.conflict_path, "a", encoding="utf-8") as f:
@@ -444,7 +454,7 @@ class FdrDecisionStore:
                                     "new_input_hash": decision.get("input_hash"),
                                     "stored_survivors": existing.get("survivors"),
                                     "new_survivors": decision.get("survivors"),
-                                    "reason": "inputs differ from the stored decision"},
+                                    "reason": why},
                                    sort_keys=True) + "\n")
                 f.flush()
                 os.fsync(f.fileno())

@@ -1172,6 +1172,26 @@ class LockTestRegistry:
             return LockState.AVAILABLE
         return LockState(atts[-1]["state"])
 
+    def entry_status(self, strategy_id: str, symbol: str) -> dict:
+        """Read-only: may a NEW locked-TEST attempt start for this strategy+symbol?
+
+        Not enterable when the window was exposed before (legacy v1 use, or an
+        attempt that reached EVALUATION_STARTED/CONSUMED/exposed-FAILED) or when
+        another attempt is active.  BLOCKED_DATA_MISSING and never-exposed FAILED
+        attempts do not consume the window.  Mutates nothing."""
+        data = self._load()
+        atts = data["attempts"].get(strategy_id, {}).get(symbol, [])
+        uses = self._legacy_uses(data, strategy_id, symbol) + sum(1 for a in atts if a.get("exposed"))
+        active = any(a["state"] in _LOCK_ACTIVE for a in atts)
+        if uses:
+            reason = "ALREADY_CONSUMED"
+        elif active:
+            reason = "IN_PROGRESS"
+        else:
+            reason = "AVAILABLE"
+        return {"symbol": symbol, "state": self.state(strategy_id, symbol).value,
+                "uses": uses, "enterable": reason == "AVAILABLE", "reason": reason}
+
     def attempts(self, strategy_id: str, symbol: str) -> list[dict]:
         return list(self._load()["attempts"].get(strategy_id, {}).get(symbol, []))
 

@@ -39,7 +39,7 @@ importantly, what they do NOT guarantee.  It reflects the code as of the
 | `manifest_complete` | is the preregistered list whole, free of duplicate ids and consistent with its stored hash? |
 | `current_context_complete` | does EVERY member have a dev outcome produced **under this context**? |
 | `fdr_decision_ready` | both of the above, and no dev record for an unregistered id |
-| `locked_test_eligible` | (in the decision) BH survivors whose independent validation also passed |
+| `locked_test_eligible` | not a family property. The decision stores `statistical_survivors` and `survivors_validation_pass`; whether the window may still be entered is read from the lock registry at run time (`Runner.lock_entry_status`): a window consumed earlier — any context, any symbol of the candidate — is never enterable again |
 | `complete` | compatibility alias of `fdr_decision_ready`; internal logic uses the specific fields |
 
 Population breakdown reported next to them: `unevaluated_current`,
@@ -70,7 +70,9 @@ method + version, q, m and `input_hash` (a hash of the exact first-record ids an
 p-values).  Recording identical evidence again is idempotent.  Different evidence
 for an existing decision raises `FdrDecisionConflict`, leaves the stored decision
 untouched, appends the conflict to `state/fdr_decisions.conflicts.jsonl`, and the
-runner reports the family as not decision-ready (no candidate is resolved).
+runner reports the family as not decision-ready (no candidate is resolved).  A stored
+decision WITHOUT `input_hash` (legacy) is never accepted as "the same": equal result values
+do not prove equal p-values, so it is handled as a conflict/hold and left untouched.
 
 ### 2.5 What is and is not guaranteed
 

@@ -2,7 +2,7 @@
 
 작성일: 2026-10-15 · 대상: `tlsehd195/new2-strategy-archive` (`run/discovery/`) · 증거: `run/audit/evidence_final_20261015/`
 
-**최종 판정: `PARTIAL`** — 지시문의 코드 수정 항목(run_cycle.sh 종료 코드 조합, FDR 완료 조건 분리, 과거 PASS 처리, 결정 충돌 감지, 환경 ID 보강)은 모두 실제 코드로 구현했고 신규 테스트 34개를 포함한 전체 202개 테스트가 2회 연속 통과했다. 그러나 실데이터 사이클은 `BLOCKED_DATA_MISSING`이고, 비용 모델·BH의 PRDS 가정은 검증되지 않았으며, 본 프로젝트(NEW2)에는 통합·배포하지 않았다. 따라서 `COMPLETE`로 표시하지 않는다.
+**최종 판정: `PARTIAL`** — 지시문의 코드 수정 항목(run_cycle.sh 종료 코드 조합, FDR 완료 조건 분리, 과거 PASS 처리, 결정 충돌 감지, 환경 ID 보강)은 모두 실제 코드로 구현했고 신규 테스트 44개를 포함한 전체 212개 테스트가 2회 연속 통과했다. 그러나 실데이터 사이클은 `BLOCKED_DATA_MISSING`이고, 비용 모델·BH의 PRDS 가정은 검증되지 않았으며, 본 프로젝트(NEW2)에는 통합·배포하지 않았다. 따라서 `COMPLETE`로 표시하지 않는다.
 
 ## A. 저장소 상태
 
@@ -29,14 +29,14 @@
 ### B-2. FDR 세대 완료 조건 / 과거 PASS 오용 — **FIXED**
 - **기존 문제**: `family_status()`의 `complete`가 "다른 컨텍스트에서 얻은 terminal PASS"를 현재 컨텍스트의 평가 완료로 취급했다. 그 후보는 현재 환경의 통계값이 없는 채로 m에 들어가 "통계값 없음"으로 처리되었다.
 - **변경**: `generation.py::family_status`, `runner.py` (`finalize_fdr`, `prior_pass_needing_reevaluation`, `reevaluate_prior_pass`, 사이클 1b단계).
-  - 개념 분리: `manifest_complete`, `current_context_complete`, `fdr_decision_ready`, `locked_test_eligible`(결정 시점에 계산). 기존 `complete`는 `fdr_decision_ready`의 호환 별칭으로 유지하고 의미를 문서화.
+  - 개념 분리: `manifest_complete`, `current_context_complete`, `fdr_decision_ready`, `locked_test_eligible`(결정이 아니라 실행 시점에 잠금 레지스트리의 소비 이력으로 판정; 결정에는 `statistical_survivors`/`survivors_validation_pass`만 저장, `_resolve`도 같은 정책 사용). 기존 `complete`는 `fdr_decision_ready`의 호환 별칭으로 유지하고 의미를 문서화.
   - 모집단 분류: `unevaluated_current`, `without_statistic`(별도 상태, 1.0 대체 없음), `prior_context_pass`(과거 `context_id`·평가 ID·dev 평가 ID·재평가 필요 보존), `prior_context_only`, `errored_current_only`, `duplicate_dev_records`, `unregistered_records`, `reevaluation_required`.
   - 과거 컨텍스트 PASS는 PASS 상태와 잠금 TEST 결과를 유지한 채, **dev 단계만** 현재 컨텍스트에서 재실행(`prior_pass_reeval` 원장 기록). 잠금 TEST는 건드리지 않는다. 같은 컨텍스트의 불변 결과는 재계산 없이 사용.
 - **테스트**: `tests/test_final_fdr_context.py` — 지시문 12개 시나리오 전부(전체 평가, 일부 미평가, 통계값 없음, 과거 PASS, 컨텍스트 변경, manifest 변경, 동일 환경 재실행, 후보 순서 변경, 중복 기록, 충돌, 후보 누락, 중복 등록) + 러너 수준 3개. 각 테스트가 결정 가능 여부·m·생존자·미평가 수·재평가 필요를 검증. **변이 검증**: 옛 동작(과거 PASS를 완료로 계산)으로 되돌리면 `test_4`가 실제로 실패함을 확인한 뒤 원복.
 - **제한**: 과거 PASS 재평가 경로는 고정 p-값을 주입하는 가짜 평가기로 검증했다. 실데이터 경로는 실행하지 못했다.
 
 ### B-3. FDR 결정 불변성·충돌 — **FIXED**
-- **변경**: `FdrDecisionStore`에 `input_hash`(generation, manifest hash, context, 방법·버전, q, m, 후보별 첫 평가 ID와 p)를 저장. 동일 증거 재기록은 멱등. 증거가 다르면 `FdrDecisionConflict`를 발생시키고 기존 결정은 그대로 두며 `state/fdr_decisions.conflicts.jsonl`에 기록. 러너는 충돌 시 가족을 "결정 불가"로 보고하고 어떤 후보도 해결하지 않는다. 해시가 없는 옛 형식 결정은 m·생존자·첫 기록·q·방법으로 비교.
+- **변경**: `FdrDecisionStore`에 `input_hash`(generation, manifest hash, context, 방법·버전, q, m, 후보별 첫 평가 ID와 p)를 저장. 동일 증거 재기록은 멱등. 증거가 다르면 `FdrDecisionConflict`를 발생시키고 기존 결정은 그대로 두며 `state/fdr_decisions.conflicts.jsonl`에 기록. 러너는 충돌 시 가족을 "결정 불가"로 보고하고 어떤 후보도 해결하지 않는다. `input_hash`가 없는 구형 결정은 결과값이 같아도 원래 증거를 확인할 수 없으므로 충돌/보류로 처리(덮어쓰지 않음).
 - **테스트**: 위 시나리오 9·10, 러너 수준 충돌 테스트(저장된 결정을 훼손해 확인).
 - **제한**: 결정의 `input_hash`는 새 필드다. 기존 실제 `fdr_decisions.jsonl`은 이 저장소에 없어 마이그레이션이 필요하지 않았고, 옛 형식 비교 경로만 두었다.
 
@@ -56,17 +56,17 @@
 
 | 명령 | 종료 코드 | 결과 | 로그 |
 |---|---|---|---|
-| `cd run && COINTRADER_SRC=/home/claude/NEW2_public/src python3 -m unittest discover -s discovery/tests -v` (1회차, 08:20:43Z–08:21:55Z) | 0 | Ran **202**, OK, 72.6s | `full_suite_run1.log` |
-| 같은 명령 (2회차, 08:21:55Z–08:23:06Z) | 0 | Ran **202**, OK, 70.8s | `full_suite_run2.log` |
+| `cd run && COINTRADER_SRC=/home/claude/NEW2_public/src python3 -m unittest discover -s discovery/tests -v` (1회차, 08:32:22Z–08:33:36Z) | 0 | Ran **212**, OK, 74.5s | `full_suite_run1.log` |
+| 같은 명령 (2회차, 08:33:36Z–08:34:51Z) | 0 | Ran **212**, OK, 74.4s | `full_suite_run2.log` |
 | `python3 -m compileall -q discovery` | 0 | 오류 없음 | `compile.log` |
 | `bash -n discovery/run_cycle.sh` | 0 | 문법 오류 없음 | `shell_syntax.log` |
 | `shellcheck` | — | **미설치, 실행하지 못함** | `shell_syntax.log` |
 | `ruff check discovery --select F` | 1 | 20건(전부 이번에 건드리지 않은 기존 코드의 미사용 import/변수; 이전 판과 동일, 신규 0) | `static.log` |
 | `NEW2_DISCOVERY_ROOT=<tmp> bash run/discovery/run_cycle.sh 1` (실데이터 시도) | 1 | `NEW2_DATA_DIR` 없음 → fail-closed | `real_data_cycle_attempt.log` |
 
-- 전체 202 = 기존 168 + run_cycle 조합 10 + FDR/환경 24. 통과 202, 실패 0, 건너뜀 0.
+- 전체 212 = 기존 168 + run_cycle 조합 10 + FDR/환경/잠금 진입/구형 결정 34. 통과 212, 실패 0, 건너뜀 0.
 - 지시문 §7 항목 대응: 신규 잔여 결함 테스트(위 두 파일), FDR 결정 재현성(시나리오 7·8·9), 환경 ID 변경(`TestContextBehaviour`, `TestContextId`), 잠금 TEST 상태 전이·비용 오류·강제 청산 회계·승격 게이트(기존 `test_residual_fixes.py`, 회귀로 재실행되어 통과).
-- 처음 병렬로 한 번 돌린 결과는 증거로 채택하지 않고, 위 순차 2회로 다시 만들었다.
+- 증거 로그는 PR #2 후속 수정(잠금 진입 정책, 구형 FDR 결정) 이후 순차 2회 실행으로 다시 만들었다.
 
 ## D. FDR 검증 (고정 p-값 6개 후보 합성 시나리오)
 
@@ -100,7 +100,7 @@
 - [x] FDR 결정이 불변 입력 증거와 연결되고 충돌 시 오류 발생
 - [x] 환경 ID가 데이터·설정·코드·전략 공간 변경을 식별
 - [x] 기존 잠금 TEST·원장 데이터 보존(상태 파일 변경 없음, 삭제 없음)
-- [x] 신규 테스트와 전체 회귀 테스트 통과(202/202, 2회)
+- [x] 신규 테스트와 전체 회귀 테스트 통과(212/212, 2회)
 - [x] 문서가 현재 코드·로그·PR 상태와 일치
 - [x] 실데이터·비용 모델 미검증 공개
 - [x] 실거래 주문·자금 이동 없음
@@ -108,5 +108,5 @@
 - [ ] `shellcheck` 정적 검사 — 미설치
 - [ ] 본 프로젝트 통합·배포 — 미실행
 
-1. **엔진 구조적 신뢰성**: 합성·고정 데이터 및 격리된 가짜 실행기 범위에서 지시문의 결함 시나리오가 의도대로 처리됨을 202개 테스트로 확인했다 → **조건부 개선(실데이터·PRDS·shellcheck 미검증)**.
+1. **엔진 구조적 신뢰성**: 합성·고정 데이터 및 격리된 가짜 실행기 범위에서 지시문의 결함 시나리오가 의도대로 처리됨을 212개 테스트로 확인했다 → **조건부 개선(실데이터·PRDS·shellcheck 미검증)**.
 2. **전략 수익성**: 실데이터와 현실적 거래 비용으로 독립 검증하지 않았으므로 **NOT_VALIDATED**.

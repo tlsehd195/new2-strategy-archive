@@ -6,6 +6,7 @@ ledger, state and locked TEST windows are never touched.
 """
 import json
 import random
+import shutil
 import sys
 import tempfile
 import unittest
@@ -58,7 +59,9 @@ class TestFamilyNotions(unittest.TestCase):
         self.assertEqual((fam["m"], fam["evaluated"], fam["unevaluated_current"]), (6, 6, []))
         d = decide_family(fam)
         self.assertEqual(d["survivors"], EXPECTED_SURVIVORS)
-        self.assertEqual(d["locked_test_eligible"], EXPECTED_SURVIVORS)   # validation PASS for all
+        self.assertEqual(d["statistical_survivors"], EXPECTED_SURVIVORS)
+        self.assertEqual(d["survivors_validation_pass"], EXPECTED_SURVIVORS)   # validation PASS for all
+        self.assertNotIn("locked_test_eligible", d)        # lock history is not part of the immutable decision
         self.assertEqual(d["m"], 6)
         self.assertFalse(fam["reevaluation_required"])
 
@@ -263,7 +266,9 @@ class TestRunnerFinalization(unittest.TestCase):
             self.assertTrue(f["fdr_decision_ready"])
             self.assertEqual(f["n_without_statistic"], 1)
             self.assertEqual(f["decision"]["survivors"], EXPECTED_SURVIVORS)
-            self.assertEqual(f["decision"]["locked_test_eligible"], EXPECTED_SURVIVORS)
+            self.assertEqual(f["decision"]["statistical_survivors"], EXPECTED_SURVIVORS)
+            self.assertEqual(f["decision"]["locked_test_eligible"], EXPECTED_SURVIVORS)   # no lock history yet
+            self.assertEqual(f["decision"]["lock_blocked"], {})
 
     def test_prior_context_pass_is_reevaluated_not_trusted(self):
         with tempfile.TemporaryDirectory() as td:
@@ -315,6 +320,196 @@ class TestRunnerFinalization(unittest.TestCase):
             self.assertEqual(rep["resolved"], [])
             self.assertEqual(len(r.fdr_store.conflicts()), 1)
             self.assertEqual(r.fdr_store.get(gid, ctx)["input_hash"], "0" * 64)   # untouched
+
+
+def _consume(r, sid, sym, ctx):
+    """Drive one locked-TEST attempt through reserve -> start -> complete."""
+    res = r.lock_registry.reserve(sid, sym, ctx)
+    assert res["ok"], res
+    r.lock_registry.start(res["token"])
+    r.lock_registry.complete(res["token"], {"pass": True, "status": "PASS"})
+
+
+class TestLockEntryPolicy(unittest.TestCase):
+    """Statistical survivors vs. candidates that may actually enter the locked TEST."""
+
+    def _runner(self, td):
+        r = _fake_runner_cls()(make_paths(td), candidates_fn=lambda: (SPACE, []))
+        r.register_all()
+        r._current_context()
+        return r
+
+    def _finals(self, r):
+        return {x["strategy_id"]: x for x in r.ledger.records() if x.get("phase") == "final"}
+
+    def test_consumed_candidate_is_survivor_but_not_eligible(self):
+        with tempfile.TemporaryDirectory() as td:
+            r = self._runner(td)
+            sid = SIDS[1]                                   # survivor (p=.008), validation PASS
+            for sym in ("BTCUSDT", "ETHUSDT"):
+                _consume(r, sid, sym, "C2-earlier")
+            before = {sym: r.lock_registry.attempts(sid, sym) for sym in ("BTCUSDT", "ETHUSDT")}
+            s = r.cycle(max_candidates=6)
+            dec = s.fdr_family["decision"]
+            self.assertIn(sid, dec["statistical_survivors"])
+            self.assertIn(sid, dec["survivors_validation_pass"])
+            self.assertNotIn(sid, dec["locked_test_eligible"])
+            self.assertEqual(dec["lock_blocked"], {sid: "ALREADY_CONSUMED"})
+            self.assertEqual(sorted(dec["locked_test_eligible"]), sorted(set(EXPECTED_SURVIVORS) - {sid}))
+            fin = self._finals(r)[sid]
+            self.assertEqual(fin["status"], "FAIL_STAT")
+            self.assertTrue(fin["locked_test"]["reused"])
+            self.assertIn("already consumed", fin["locked_test"]["note"])
+            self.assertEqual({sym: r.lock_registry.attempts(sid, sym) for sym in ("BTCUSDT", "ETHUSDT")},
+                             before)                         # no new reservation, history intact
+            for sym in ("BTCUSDT", "ETHUSDT"):
+                self.assertEqual(r.lock_registry.uses(sid, sym), 1)
+
+    def test_per_symbol_consumption_blocks_the_whole_candidate(self):
+        with tempfile.TemporaryDirectory() as td:
+            r = self._runner(td)
+            sid = SIDS[0]
+            _consume(r, sid, "BTCUSDT", "C2-earlier")       # ETH never exposed
+            e = r.lock_entry_status(sid, r._defn_by_sid[sid])
+            self.assertFalse(e["eligible"])
+            self.assertEqual(e["reason"], "ALREADY_CONSUMED")
+            self.assertFalse(e["per_symbol"]["BTCUSDT"]["enterable"])
+            self.assertEqual(e["per_symbol"]["BTCUSDT"]["state"], "CONSUMED")
+            self.assertTrue(e["per_symbol"]["ETHUSDT"]["enterable"])
+            self.assertEqual(e["per_symbol"]["ETHUSDT"]["state"], "AVAILABLE")
+            r.cycle(max_candidates=6)
+            self.assertEqual(r.lock_registry.attempts(sid, "ETHUSDT"), [])   # ETH window not burnt
+            self.assertEqual(r.lock_registry.uses(sid, "ETHUSDT"), 0)
+            self.assertEqual(self._finals(r)[sid]["status"], "FAIL_STAT")
+
+    def test_legacy_v1_use_counts_as_consumed(self):
+        with tempfile.TemporaryDirectory() as td:
+            r = self._runner(td)
+            sid = SIDS[2]
+            r.lock_registry.record_use(sid, "ETHUSDT", {"note": "v1 record"})
+            e = r.lock_entry_status(sid, r._defn_by_sid[sid])
+            self.assertEqual(e["reason"], "ALREADY_CONSUMED")
+            self.assertEqual(e["per_symbol"]["ETHUSDT"]["uses"], 1)
+
+    def test_unexposed_blocked_attempt_does_not_consume(self):
+        with tempfile.TemporaryDirectory() as td:
+            r = self._runner(td)
+            sid = SIDS[2]
+            toks = [r.lock_registry.reserve(sid, sym, r._ctx) for sym in ("BTCUSDT", "ETHUSDT")]
+            for t in toks:
+                r.lock_registry.block(t["token"], "data missing")
+            e = r.lock_entry_status(sid, r._defn_by_sid[sid])
+            self.assertTrue(e["eligible"], e)
+            r.cycle(max_candidates=6)                       # still enters (and is BLOCKED again: no klines)
+            self.assertEqual(len(r.lock_registry.attempts(sid, "BTCUSDT")), 2)
+            self.assertEqual(r.lock_registry.uses(sid, "BTCUSDT"), 0)
+
+    def test_active_attempt_is_in_progress_not_eligible(self):
+        with tempfile.TemporaryDirectory() as td:
+            r = self._runner(td)
+            sid = SIDS[0]
+            r.lock_registry.reserve(sid, "BTCUSDT", r._ctx)
+            e = r.lock_entry_status(sid, r._defn_by_sid[sid])
+            self.assertEqual(e["reason"], "IN_PROGRESS")
+            self.assertFalse(e["eligible"])
+            s = r.cycle(max_candidates=6)
+            self.assertEqual(s.fdr_family["decision"]["lock_blocked"].get(sid), "IN_PROGRESS")
+            self.assertNotIn(sid, self._finals(r))                # waits, is not resolved
+            self.assertEqual(r.store.entry(sid).state, "AWAITING_FDR")
+
+    def test_prior_pass_with_consumed_test_is_never_reentered(self):
+        with tempfile.TemporaryDirectory() as td:
+            r = self._runner(td)
+            sid = SIDS[0]
+            r.store.set(sid, CandidateState.RUNNING)
+            r.store.set(sid, CandidateState.AWAITING_FDR, data_version="C2-old")
+            r.store.set(sid, CandidateState.PASS, data_version="C2-old")
+            for sym in ("BTCUSDT", "ETHUSDT"):
+                _consume(r, sid, sym, "C2-old")
+            before = [r.lock_registry.attempts(sid, sym) for sym in ("BTCUSDT", "ETHUSDT")]
+            for _ in range(3):
+                s = r.cycle(max_candidates=6)
+            dec = s.fdr_family["decision"]
+            self.assertIn(sid, dec["statistical_survivors"])
+            self.assertNotIn(sid, dec["locked_test_eligible"])
+            self.assertEqual(dec["lock_blocked"][sid], "ALREADY_CONSUMED")
+            self.assertEqual(r.store.entry(sid).state, "PASS")
+            self.assertNotIn(sid, self._finals(r))                # no second final verdict
+            self.assertEqual([r.lock_registry.attempts(sid, sym) for sym in ("BTCUSDT", "ETHUSDT")], before)
+
+
+class TestLegacyFdrDecisions(unittest.TestCase):
+    """A stored decision without input_hash cannot prove which evidence it rested on."""
+
+    def setUp(self):
+        self.man = build_manifest(SPACE)
+        self.recs = full_records(self.man)
+        self.new = decide_family(family_status(self.recs, self.man, GEN_CTX))
+
+    def _legacy(self, **over):
+        d = {k: v for k, v in self.new.items()
+             if k not in ("input_hash", "manifest_hash", "input_spec", "decided_at")}
+        d.update(over)
+        return d
+
+    def test_same_results_same_p_still_not_accepted(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "fdr.jsonl"
+            path.write_text(json.dumps(self._legacy(), sort_keys=True) + "\n")
+            before = path.read_text()
+            store = FdrDecisionStore(path)
+            with self.assertRaises(FdrDecisionConflict):
+                store.record(self.new)
+            self.assertEqual(path.read_text(), before)            # never overwritten
+            self.assertIn("not verifiable", store.conflicts()[0]["reason"])
+
+    def test_same_results_but_different_p_values(self):
+        # identical survivors / m / first records / q / method, different underlying p-values
+        shifted = [dict(r, primary_dev_p=(r["primary_dev_p"] * 1.05 if r["primary_dev_p"] else None))
+                   for r in self.recs]
+        other = decide_family(family_status(shifted, self.man, GEN_CTX))
+        self.assertEqual(other["survivors"], self.new["survivors"])
+        self.assertEqual(other["first_records"], self.new["first_records"])
+        self.assertNotEqual(other["input_hash"], self.new["input_hash"])
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "fdr.jsonl"
+            path.write_text(json.dumps(self._legacy(), sort_keys=True) + "\n")
+            before = path.read_text()
+            store = FdrDecisionStore(path)
+            for cand in (other, self.new):
+                with self.assertRaises(FdrDecisionConflict):
+                    store.record(cand)
+            self.assertEqual(path.read_text(), before)
+            self.assertEqual(len(store.conflicts()), 2)
+
+    def test_new_decision_without_hash_is_not_trusted_either(self):
+        with tempfile.TemporaryDirectory() as td:
+            store = FdrDecisionStore(Path(td) / "fdr.jsonl")
+            store.record(self.new)
+            with self.assertRaises(FdrDecisionConflict):
+                store.record({k: v for k, v in self.new.items() if k != "input_hash"})
+
+    def test_runner_holds_the_family_on_a_legacy_decision(self):
+        r = _fake_runner_cls()(make_paths(tempfile.mkdtemp()), candidates_fn=lambda: (SPACE, []))
+        self.addCleanup(shutil.rmtree, str(r.paths.root.parent), True)
+        r.register_all()
+        r._current_context()
+        gid, ctx = r.generation_id, r._ctx
+        r.cycle(max_candidates=5)                               # 5 of 6: no decision yet
+        path = r.paths.state_dir / "fdr_decisions.jsonl"
+        legacy = {"generation_id": gid, "context_id": ctx, "method": "BH_full_generation_fixed_sample_v1",
+                  "q": 0.05, "m": 6, "survivors": EXPECTED_SURVIVORS, "n_with_statistic": 5,
+                  "n_without_statistic": 1, "first_records": {}}
+        path.write_text(json.dumps(legacy, sort_keys=True) + "\n")
+        before = path.read_text()
+        s = r.cycle(max_candidates=5)                           # family completes -> legacy decision found
+        self.assertIn("conflict", s.fdr_family)
+        self.assertFalse(s.fdr_family["fdr_decision_ready"])
+        self.assertIsNone(s.fdr_family["decision"])
+        self.assertEqual(path.read_text(), before)
+        self.assertFalse(any(x.get("phase") == "final" for x in r.ledger.records()))
+        self.assertFalse((r.paths.state_dir / "lock_test_usage.json").exists())   # no TEST touched
+        self.assertEqual(len(r.fdr_store.conflicts()), 1)
 
 
 class TestContextBehaviour(unittest.TestCase):

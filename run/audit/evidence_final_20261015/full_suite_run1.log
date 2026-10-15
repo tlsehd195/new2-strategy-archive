@@ -1,5 +1,5 @@
 cmd: cd run && COINTRADER_SRC=/home/claude/NEW2_public/src python3 -m unittest discover -s discovery/tests -v
-start: 2026-10-15T08:20:43Z
+start: 2026-10-15T08:32:22Z
 test_bad_ohlc (test_engine.TestDataQuality.test_bad_ohlc) ... ok
 test_clean_bars_pass (test_engine.TestDataQuality.test_clean_bars_pass) ... ok
 test_dataset_id_changes_with_content (test_engine.TestDataQuality.test_dataset_id_changes_with_content) ... ok
@@ -113,6 +113,16 @@ test_6_manifest_hash_change (test_final_fdr_context.TestFamilyNotions.test_6_man
 test_7_same_context_rerun_is_idempotent (test_final_fdr_context.TestFamilyNotions.test_7_same_context_rerun_is_idempotent) ... ok
 test_8_candidate_order_invariance (test_final_fdr_context.TestFamilyNotions.test_8_candidate_order_invariance) ... ok
 test_9_recording_the_same_decision_twice (test_final_fdr_context.TestFamilyNotions.test_9_recording_the_same_decision_twice) ... ok
+test_new_decision_without_hash_is_not_trusted_either (test_final_fdr_context.TestLegacyFdrDecisions.test_new_decision_without_hash_is_not_trusted_either) ... ok
+test_runner_holds_the_family_on_a_legacy_decision (test_final_fdr_context.TestLegacyFdrDecisions.test_runner_holds_the_family_on_a_legacy_decision) ... ok
+test_same_results_but_different_p_values (test_final_fdr_context.TestLegacyFdrDecisions.test_same_results_but_different_p_values) ... ok
+test_same_results_same_p_still_not_accepted (test_final_fdr_context.TestLegacyFdrDecisions.test_same_results_same_p_still_not_accepted) ... ok
+test_active_attempt_is_in_progress_not_eligible (test_final_fdr_context.TestLockEntryPolicy.test_active_attempt_is_in_progress_not_eligible) ... ok
+test_consumed_candidate_is_survivor_but_not_eligible (test_final_fdr_context.TestLockEntryPolicy.test_consumed_candidate_is_survivor_but_not_eligible) ... ok
+test_legacy_v1_use_counts_as_consumed (test_final_fdr_context.TestLockEntryPolicy.test_legacy_v1_use_counts_as_consumed) ... ok
+test_per_symbol_consumption_blocks_the_whole_candidate (test_final_fdr_context.TestLockEntryPolicy.test_per_symbol_consumption_blocks_the_whole_candidate) ... ok
+test_prior_pass_with_consumed_test_is_never_reentered (test_final_fdr_context.TestLockEntryPolicy.test_prior_pass_with_consumed_test_is_never_reentered) ... ok
+test_unexposed_blocked_attempt_does_not_consume (test_final_fdr_context.TestLockEntryPolicy.test_unexposed_blocked_attempt_does_not_consume) ... ok
 test_conflicting_stored_decision_blocks_finalization (test_final_fdr_context.TestRunnerFinalization.test_conflicting_stored_decision_blocks_finalization) ... ok
 test_prior_context_pass_is_reevaluated_not_trusted (test_final_fdr_context.TestRunnerFinalization.test_prior_context_pass_is_reevaluated_not_trusted) ... ok
 test_report_exposes_all_four_notions (test_final_fdr_context.TestRunnerFinalization.test_report_exposes_all_four_notions) ... ok
@@ -205,8 +215,8 @@ test_8_batch_argument (test_run_cycle_combinations.TestRunCycleMatrix.test_8_bat
 test_audit_write_failure_is_reported_not_fatal_to_status (test_run_cycle_combinations.TestRunCycleMatrix.test_audit_write_failure_is_reported_not_fatal_to_status) ... ok
 
 ----------------------------------------------------------------------
-Ran 202 tests in 72.575s
+Ran 212 tests in 74.531s
 
 OK
 exit=0
-end: 2026-10-15T08:21:55Z
+end: 2026-10-15T08:33:36Z
