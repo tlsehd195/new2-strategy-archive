@@ -32,25 +32,37 @@ from engine_lib import (  # noqa: E402
     CODE_VERSION,
     VALIDATION_CFG_VERSION,
     CandidateState,
+    LockRegistryError,
     LockTestRegistry,
     LockedWindowError,
+    ProcessLock,
     TRANSIENT_ERROR_CODES,
     assert_no_locked_overlap,
     atomic_write_json,
-    bh_fdr,
+    code_identity,
     evaluation_id,
-    experiment_context_id,
+    experiment_context,
     iso_now,
-    load_json,
     locked_window_for,
+    new_run_id,
+    runtime_identity,
     symbols_without_locked_test,
 )
-from costs_bridge import CostContext, UNVERIFIED_COST_MODEL  # noqa: E402
+from costs_bridge import COST_MODEL_SCOPE, CostContext, UNVERIFIED_COST_MODEL  # noqa: E402
 from evaluator import cell_stats, run_event_study  # noqa: E402
+from generation import (  # noqa: E402
+    FDR_SPEC,
+    ContextStore,
+    FdrDecisionStore,
+    PreregistrationStore,
+    build_manifest,
+    decide_family,
+    family_status,
+)
 from generator import FAMILY_DATA_REQUIREMENTS, SYMBOLS, enumerate_candidates  # noqa: E402
-from portfolio import PortfolioConfig, simulate_portfolio  # noqa: E402
+from portfolio import PortfolioConfig, portfolio_passes, simulate_portfolio  # noqa: E402
 from store import CandidateStore, Ledger, ReverifyQueue, reconcile  # noqa: E402
-from promotion import PromotionQueue, combo_promotion_gate, promotion_gate  # noqa: E402
+from promotion import PromotionQueue, combo_promotion_gate, is_combo, promotion_gate  # noqa: E402
 
 
 def load_fng_series(data_dir: Path) -> Optional[dict]:
@@ -443,6 +455,31 @@ def build_aux(bars: Sequence[Bar], defn: Mapping,
 # ---------------------------------------------------------------------------
 
 ORDER_VALUE_DEFAULT = 10_000.0
+READ_START = "2021-01-01"
+READ_END_NO_LOCK = "2026-12-31"
+
+#: data cleaning / timing rules that change results (P1-7).  Changing any of
+#: these changes the experiment context id.
+DATA_POLICY = {
+    "version": "datapol-v1",
+    "timezone": "UTC (epoch ms; day boundaries in UTC)",
+    "kline_interval_ms": 900_000,
+    "window_cut": "hard truncation to [start 00:00, end 23:59:59.999] UTC before the quality gate",
+    "missing_candles": "fail-closed, never interpolated (max_gap_multiplier=2)",
+    "max_abs_logret_15m": 0.20,
+    "funding_known_at": "calc_time <= bar close (no early use)",
+    "funding_quality": "duplicates/inversions fail-closed; event dropped when holding window not covered",
+    "fng_known_at": "values of UTC days strictly before the bar's day",
+    "read_start": READ_START,
+    "read_end": "day before the symbol's locked TEST window, else " + READ_END_NO_LOCK,
+}
+
+
+def _series_sha(pairs) -> str:
+    h = hashlib.sha256()
+    for t, r in pairs:
+        h.update(f"{int(t)}:{float(r)!r};".encode())
+    return h.hexdigest()
 
 
 @dataclass
@@ -450,6 +487,10 @@ class CycleSummary:
     status: str  # SUCCESS | SUCCESS_WITH_WARNINGS | PARTIAL_FAILURE | FAILED | INTERRUPTED
     started_at: str = ""
     finished_at: str = ""
+    run_id: str = ""
+    batch_requested: int = 0
+    generation_id: str = ""
+    context_id: str = ""
     total_candidates: int = 0
     evaluated: int = 0
     verdict_counts: dict = field(default_factory=dict)
@@ -459,6 +500,8 @@ class CycleSummary:
     runtime_seconds: float = 0.0
     fatal: Optional[str] = None
     search_space_state: str = ""
+    fdr_family: dict = field(default_factory=dict)
+    finalized: list = field(default_factory=list)
     notes: list = field(default_factory=list)
 
     def to_json(self) -> dict:
@@ -466,18 +509,33 @@ class CycleSummary:
 
 
 class Runner:
-    def __init__(self, paths: PathConfig, *, order_value: float = ORDER_VALUE_DEFAULT):
+    def __init__(self, paths: PathConfig, *, order_value: float = ORDER_VALUE_DEFAULT,
+                 cost: Optional[CostContext] = None,
+                 candidates_fn: Optional[Callable] = None,
+                 allow_test_cost: bool = False):
         self.paths = paths
         self.order_value = order_value
-        self.cost = CostContext.futures_default()
+        self.cost = cost or CostContext.futures_default()
+        if self.cost.test_only and not allow_test_cost:
+            raise ValueError("test-only cost context refused by the production runner")
+        self.candidates_fn = candidates_fn or enumerate_candidates
         self.store = CandidateStore(paths.state_dir / "state.json")
         self.queue = ReverifyQueue(paths.state_dir / "queue.json", self.store)
         self.ledger = Ledger(paths.state_dir / "discovery_ledger.jsonl")
         self.lock_registry = LockTestRegistry(paths.state_dir / "lock_test_usage.json")
         self.promo = PromotionQueue(paths.state_dir / "promotion_queue.jsonl")
+        self.prereg = PreregistrationStore(paths.state_dir)
+        self.fdr_store = FdrDecisionStore(paths.state_dir / "fdr_decisions.jsonl")
+        self.contexts = ContextStore(paths.state_dir)
+        self.run_id = new_run_id()
         self._interrupted = False
         self._fng_cache: Optional[dict] = None
-        self._preregistered = False
+        self._fng_loaded = False
+        self._data_cache: dict = {}
+        self._manifest: Optional[dict] = None
+        self._cands: list = []
+        self._defn_by_sid: dict = {}
+        self._ctx: Optional[str] = None
         for _sig in (signal.SIGINT, signal.SIGTERM):
             try:
                 signal.signal(_sig, self._on_signal)
@@ -487,134 +545,167 @@ class Runner:
     def _on_signal(self, *a) -> None:  # pragma: no cover
         self._interrupted = True
 
-    # -- single candidate --------------------------------------------------
+    # -- generation / preregistration (P1-8) ---------------------------------
     def register_all(self) -> dict:
-        cands, dedup = enumerate_candidates()
+        cands, dedup = self.candidates_fn()
+        manifest = build_manifest(cands, dedup, settings={
+            "validation": self._validation_cfg(), "data_policy": DATA_POLICY})
+        info = self.prereg.ensure(manifest)
+        self._manifest = manifest
+        self._cands = list(cands)
+        self._defn_by_sid = dict(cands)
         known = self.store.all_states()
         for sid, _ in cands:
             if sid not in known:
                 self.store.set(sid, CandidateState.PENDING)
-        self._write_preregistration(cands, dedup)
-        return {"registered": len(cands), "duplicates_collapsed": len(dedup)}
+        return {"registered": len(cands), "duplicates_collapsed": len(dedup),
+                "generation_id": manifest["generation_id"], "created": info["created"]}
 
-    def _write_preregistration(self, cands, dedup) -> dict:
-        """Directive §5-2 preregistration ledger (R-3).
+    def _ensure_registered(self) -> None:
+        if self._manifest is None:
+            self.register_all()
 
-        Written ONCE, at first registration, BEFORE any evaluation.  The
-        search space is fixed at preregistration time; a later change of
-        the generator grid must create a NEW generation file, never an
-        edit of this one.  Re-running registration never rewrites it.
-        """
-        p = self.paths.state_dir / "preregistration.json"
-        existing = load_json(p, default=None)
-        if existing:
-            self._preregistered = True
-            return existing
-        by_family: dict = {}
-        for _, d in cands:
-            by_family[d["family"]] = by_family.get(d["family"], 0) + 1
-        doc = {
-            "preregistered_at": iso_now(),
-            "generator_version": "rule_based_v2",
-            "code_version": CODE_VERSION,
-            "validation_cfg_version": VALIDATION_CFG_VERSION,
-            "total_candidates": len(cands),
-            "duplicates_collapsed_at_generation": len(dedup),
-            "family_grid_counts": by_family,
-            "selection_rule": (
-                "Holm within symbol cell family; BH-FDR across candidates "
-                "under the same experiment context BEFORE the locked TEST is "
-                "consumed; locked TEST single-use per strategy+symbol"
-            ),
-            "dev_selection_data": (
-                "pre-locked-window dev split per symbol (split_windows, "
-                "embargo = horizon bars)"
-            ),
-            "note": (
-                "The search space was fixed before evaluation. Changing the "
-                "grid invalidates this preregistration and requires a NEW "
-                "generation file."
-            ),
+    @property
+    def generation_id(self) -> str:
+        self._ensure_registered()
+        return self._manifest["generation_id"]
+
+    # -- data + experiment context (P1-7) ----------------------------------
+    def _pf_cfg(self) -> PortfolioConfig:
+        return PortfolioConfig(initial_capital=self.order_value)
+
+    def _validation_cfg(self) -> dict:
+        from engine_lib import LOCKED_TEST_PERIODS, MIN_VALID_N
+        from portfolio import PORTFOLIO_MODEL_VERSION, PORTFOLIO_PASS_CRITERIA
+        return {
+            "version": VALIDATION_CFG_VERSION,
+            "validation_months": VALIDATION_MONTHS,
+            "min_valid_n": MIN_VALID_N,
+            "cell_alpha": 0.05,
+            "cell_test": "one-sided Newey-West HAC t on non-overlapping events",
+            "embargo": "horizon bars between dev and validation",
+            "locked_windows": {k: list(v) for k, v in sorted(LOCKED_TEST_PERIODS.items())},
+            "order_value": self.order_value,
+            "portfolio": dict(self._pf_cfg().__dict__),
+            "portfolio_model": PORTFOLIO_MODEL_VERSION,
+            "portfolio_pass": PORTFOLIO_PASS_CRITERIA,
+            "fdr": FDR_SPEC,
         }
-        atomic_write_json(p, doc)
-        self._preregistered = True
-        return doc
-
-    def _preregistered_flag(self) -> bool:
-        return bool(load_json(self.paths.state_dir / "preregistration.json",
-                              default=None))
 
     @staticmethod
-    def _primary_dev_p(rec: Mapping) -> Optional[float]:
-        """Pre-registered primary cell's dev p-value of a ledger record."""
-        v = rec.get("primary_dev_p")
-        try:
-            f = float(v)
-        except (TypeError, ValueError):
-            return None
-        return f if math.isfinite(f) else None
+    def _read_end(sym: str) -> str:
+        import datetime as dt
+        lock_s = locked_window_for(sym)
+        return (dt.date.fromisoformat(lock_s[0]) - dt.timedelta(days=1)).isoformat() \
+            if lock_s else READ_END_NO_LOCK
 
-    def _bh_fdr_survival(self, sid: str, ctx: str, p_dev: Optional[float]) -> dict:
-        """Directive §5-3 (R-2): cross-candidate BH-FDR over the dev
-        p-values of every candidate evaluated under the SAME experiment
-        context (dataset+cost+code+cfg).  A candidate that does not survive
-        never consumes the locked TEST window — the most scarce resource of
-        the whole pipeline.  The ledger stays the authoritative record.
-        """
-        ps: list[tuple[str, float]] = []
-        for r in self.ledger.records():
-            if r.get("context_id") != ctx:
-                continue
-            p = self._primary_dev_p(r)
-            if p is not None:
-                ps.append((r["strategy_id"], p))
-        if p_dev is not None and math.isfinite(p_dev) and \
-                sid not in {s for s, _ in ps}:
-            ps.append((sid, float(p_dev)))
-        if not ps:
-            return {"trials": 0, "survived": False, "q": 0.05,
-                    "note": "no finite primary dev p-values"}
-        flags = bh_fdr([p for _, p in ps], q=0.05)
-        for (s, _), ok in zip(ps, flags):
-            if s == sid:
-                return {"trials": len(ps), "survived": bool(ok), "q": 0.05}
-        return {"trials": len(ps), "survived": False, "q": 0.05,
-                "note": "candidate absent from family"}
+    def _sym_data(self, sym: str) -> dict:
+        """Per-symbol dev/validation data, loaded once per runner.  The read
+        window is fixed BEFORE any bars are loaded so locked-TEST data is
+        never even read into memory (A-16, §6); each symbol gets its OWN
+        read_end (A-29)."""
+        if sym in self._data_cache:
+            return self._data_cache[sym]
+        import datetime as dt
+        read_end = self._read_end(sym)
+        h = merged_bars(self.paths.data_dir, sym, READ_START, read_end)
+        entry: dict = {"handle": h, "funding": None, "fq": None, "missing": []}
+        if not h.bars:
+            entry["missing"] = list(h.missing or [f"{sym}: no data"])
+        else:
+            first_d = dt.datetime.fromtimestamp(h.first_ts / 1000, tz=dt.timezone.utc).date().isoformat()
+            if locked_window_for(sym):
+                assert_no_locked_overlap(sym, first_d, read_end, "dev/validation selection")
+            # A-17: holding-period funding applies to EVERY family; missing or
+            # corrupt funding is fail-closed, never replaced with a guess
+            f = load_funding_window(self.paths.data_dir, sym, first_d, read_end)
+            fq = funding_quality(f)
+            entry["fq"] = fq
+            if fq["ok"]:
+                entry["funding"] = f
+            else:
+                entry["missing"] = [f"{sym}: funding unavailable/quality {fq['issues']}"]
+        self._data_cache[sym] = entry
+        return entry
 
+    def _fng(self) -> Optional[dict]:
+        if not self._fng_loaded:
+            self._fng_cache = load_fng_series(self.paths.data_dir)
+            self._fng_loaded = True
+        return self._fng_cache
+
+    def _current_context(self) -> str:
+        """Experiment context over the generation's symbol union, so every
+        candidate of the generation is tested under ONE context (the FDR
+        family must not fragment by family-specific inputs)."""
+        self._ensure_registered()
+        syms = sorted({s for _, d in self._cands for s in d.get("symbols", [])})
+        data: dict = {}
+        for sym in syms:
+            e = self._sym_data(sym)
+            h = e["handle"]
+            kl = ({"sha256": h.sha256, "first_ts": h.first_ts, "last_ts": h.last_ts,
+                   "rows": len(h.bars)} if h.bars else {"missing": list(e["missing"])})
+            if e["funding"] is not None:
+                fu = {"sha256": _series_sha(e["funding"]), "n": len(e["funding"])}
+            else:
+                fu = {"missing": (e["fq"] or {}).get("issues") or ["not loaded (klines missing)"]}
+            data[sym] = {"klines": kl, "funding": fu}
+        fng = self._fng()
+        data["_fng"] = ({"sha256": _series_sha(sorted(fng.items())), "n": len(fng)}
+                        if fng else {"missing": "FNG dataset absent"})
+        comps = {
+            "data": data,
+            "data_policy": DATA_POLICY,
+            "cost": self.cost.identity(),
+            "code": {"code_hash": code_identity()["code_hash"]},
+            "validation": self._validation_cfg(),
+            "runtime": runtime_identity(),
+        }
+        ctx, norm = experiment_context(comps)
+        self.contexts.ensure(ctx, norm)
+        self._ctx = ctx
+        return ctx
+
+    # -- single candidate (dev phase) ------------------------------------------
     def run_one(self, sid: str, defn: Mapping) -> dict:
+        self._ensure_registered()
+        if self._ctx is None:
+            self._current_context()
         cur = self.store.entry(sid)
         if CandidateState(cur.state) is not CandidateState.PENDING:
             return {"skipped": True, "state": cur.state}
         self.store.set(sid, CandidateState.RUNNING)
         started = time.time()
-        ev_id = evaluation_id(sid, "pending-context")
+        ctx = self._ctx
+        ev_id = evaluation_id(sid, ctx)
+        base = {"phase": "dev", "generation_id": self.generation_id, "context_id": ctx,
+                "run_id": self.run_id, "code_version": CODE_VERSION,
+                "validation_cfg_version": VALIDATION_CFG_VERSION,
+                "in_generation": sid in self._defn_by_sid}
         try:
             rec = self._evaluate(sid, defn)
         except LockedWindowError as e:
             # selection must never read the locked window — hard stop
-            rec = {"status": "ERROR", "error_code": "CONFIG_ERROR",
-                   "error_message": str(e)}
-        except FileNotFoundError as e:
-            rec = {"status": "DATA_MISSING", "missing": [str(e)]}
-        except LookupError as e:
+            rec = {"status": "ERROR", "error_code": "CONFIG_ERROR", "error_message": str(e)}
+        except (FileNotFoundError, LookupError) as e:
             rec = {"status": "DATA_MISSING", "missing": [str(e)]}
         except Exception as e:  # noqa: BLE001 — classified below
-            code = "LOGIC_ERROR"
-            rec = {"status": "ERROR", "error_code": code,
+            rec = {"status": "ERROR", "error_code": "LOGIC_ERROR",
                    "error_message": f"{type(e).__name__}: {e}"}
+        rec = {**base, **rec}
         rec["evaluation_id"] = ev_id
         rec["strategy_id"] = sid
         rec["runtime_seconds"] = time.time() - started
         status = rec["status"]
         self.ledger.append(rec)
-        nxt = CandidateState(status)
-        if status == "PASS":
-            self.store.set(sid, CandidateState.PASS)
+        if status == "AWAITING_FDR":
+            self.store.set(sid, CandidateState.AWAITING_FDR, data_version=ctx)
         elif status in ("FAIL_COST", "FAIL_STAT", "UNDETERMINED_POWER", "DATA_MISSING"):
-            self.store.set(sid, nxt,
+            self.store.set(sid, CandidateState(status),
                            error_code=rec.get("error_code"),
                            error_message=rec.get("error_message"),
-                           data_version=rec.get("context_id"))
+                           data_version=ctx)
             self._maybe_enqueue_reverify(sid, status)
         else:
             e_code = rec.get("error_code", "LOGIC_ERROR")
@@ -636,249 +727,348 @@ class Runner:
             return  # permanent — never retried
         if reason:
             from engine_lib import backoff_seconds
-            self.queue.enqueue(sid, reason)
-            q = self.queue
-            q.requeue_with_backoff(sid, backoff_seconds(e.retry.attempt_count + 1))
+            if self.queue.enqueue(sid, reason):
+                self.queue.requeue_with_backoff(sid, backoff_seconds(e.retry.attempt_count + 1))
 
     def _evaluate(self, sid: str, defn: Mapping) -> dict:
         fam = defn["family"]
         required = list(defn["symbols"])
         horizon = int(defn["holding"])
-        needs = FAMILY_DATA_REQUIREMENTS[fam]
-        # 1) data — per-symbol read window is fixed BEFORE any bars are loaded
-        #    so locked-TEST data is never even read into memory (A-16, §6).
-        #    A-29: each symbol gets its OWN read_end from its own locked
-        #    window — a later lock on one symbol must not truncate another's
-        #    independent-validation data.
-        import datetime as dt
+        needs = FAMILY_DATA_REQUIREMENTS.get(fam, ["klines"])
         handles: dict[str, DatasetHandle] = {}
         fundings: dict[str, list] = {}
         missing: list[str] = []
         for sym in required:
-            lock_s = locked_window_for(sym)
-            sym_read_end = (dt.date.fromisoformat(lock_s[0]) - dt.timedelta(days=1)).isoformat() \
-                if lock_s else "2026-12-31"
-            h = merged_bars(self.paths.data_dir, sym, "2021-01-01", sym_read_end)
-            if not h.bars:
-                missing.extend(h.missing or [f"{sym}: no data"])
+            e = self._sym_data(sym)
+            if e["missing"]:
+                missing.extend(e["missing"])
                 continue
-            if lock_s:
-                first_d = dt.datetime.fromtimestamp(
-                    h.first_ts / 1000, tz=dt.timezone.utc).date().isoformat()
-                assert_no_locked_overlap(sym, first_d, sym_read_end,
-                                         "dev/validation selection")
-            handles[sym] = h
-            # A-17: holding-period funding is part of the accounting for EVERY
-            # family (futures position ⇒ funding applies).  Unavailable or
-            # corrupt funding is fail-closed, never replaced with a guess.
-            first_d = dt.datetime.fromtimestamp(
-                h.first_ts / 1000, tz=dt.timezone.utc).date().isoformat()
-            f = load_funding_window(self.paths.data_dir, sym, first_d, sym_read_end)
-            fq = funding_quality(f)
-            if not fq["ok"]:
-                missing.append(f"{sym}: funding unavailable/quality {fq['issues']}")
-            else:
-                fundings[sym] = f
+            handles[sym] = e["handle"]
+            fundings[sym] = e["funding"]
+        common = {"primary_symbol": required[0], "primary_dev_p": None,
+                  "dataset": {s: handles[s].identity() for s in handles},
+                  "cost_model": {"version": self.cost.version,
+                                 "status": "VERIFIED" if self.cost.verified else UNVERIFIED_COST_MODEL,
+                                 "params": dict(self.cost.params),
+                                 "test_only": self.cost.test_only,
+                                 "scope": COST_MODEL_SCOPE}}
         if missing:
-            return {"status": "DATA_MISSING", "missing": missing}
+            return {**common, "status": "DATA_MISSING", "missing": missing}
+        fng = None
         if "fng" in needs:
-            if self._fng_cache is None:
-                self._fng_cache = load_fng_series(self.paths.data_dir)
-            if self._fng_cache is None:
-                return {"status": "DATA_MISSING",
+            fng = self._fng()
+            if fng is None:
+                return {**common, "status": "DATA_MISSING",
                         "missing": ["FNG dataset not present in this environment"]}
-        # 2) context
-        ds_ids = "+".join(sorted(h.dataset_id for h in handles.values()))
-        sha = hashlib.sha256("".join(sorted(h.sha256 for h in handles.values())).encode()).hexdigest()
-        ctx = experiment_context_id(dataset_id=ds_ids, data_sha256=sha,
-                                    cost_model=self.cost.version)
-        # staleness note (never blocks a dev evaluation, but is recorded)
+        ctx = self._ctx
         last_bars = max(h.last_ts for h in handles.values())
         st = staleness(last_bars, int(time.time() * 1000))
-        # 3) event studies on dev + validation windows per symbol
-        results_dev: dict[str, list] = {}
-        results_val: dict[str, list] = {}
+        # event studies on dev + validation windows per symbol
+        results_dev: dict[str, dict] = {}
+        results_val: dict[str, dict] = {}
+        es_counts: dict[str, dict] = {}
         val_missing: list[str] = []
         for sym, h in handles.items():
-            aux = build_aux(h.bars, defn, fundings.get(sym), fng=self._fng_cache)
+            aux = build_aux(h.bars, defn, fundings.get(sym), fng=fng)
             sig_fn = build_signal_fn(defn, aux)
             win = split_windows(sym, h.first_ts, h.last_ts, horizon)
             d0, d1 = win["dev"]
             sub = h.bars[:d1 + 1]
             es = run_event_study(sub, sym, sig_fn, horizon, self.cost,
                                  self.order_value, fundings.get(sym))
-            cs = cell_stats(es.events, sym, f"{fam}|dev", )
-            results_dev[sym] = cs
+            results_dev[sym] = cell_stats(es.events, sym, f"{fam}|dev")
+            cnt = {k: v for k, v in es.to_json().items() if k != "events"}
             v0, v1 = win["validation"]
             if v1 > v0 + horizon and 0 <= v0 < len(h.bars) and v1 < len(h.bars):
                 subv = h.bars[v0:v1 + 1]
-                auxv = build_aux(subv, defn, fundings.get(sym), fng=self._fng_cache)
+                auxv = build_aux(subv, defn, fundings.get(sym), fng=fng)
                 sigv = build_signal_fn(defn, auxv)
                 esv = run_event_study(subv, sym, sigv, horizon, self.cost,
                                       self.order_value, fundings.get(sym))
                 results_val[sym] = cell_stats(esv.events, sym, f"{fam}|val")
+                cnt = {"dev": cnt, "val": {k: v for k, v in esv.to_json().items() if k != "events"}}
             else:
                 val_missing.append(sym)
-        # 4) dev verdict (multi-symbol rules, §8)
+                cnt = {"dev": cnt}
+            es_counts[sym] = cnt
+        # dev verdict (multi-symbol rules, §8)
         from engine_lib import CellResult, SymbolResult, verdict_from_cells
-        cells = [CellResult(symbol=r["symbol"], cell_id=r["cell_id"], n=r["n"],
-                            mean_bp=r["mean_bp"], t=r["t"], p=r["p"],
-                            status=r["status"]) for r in results_dev.values()]
-        symres = [SymbolResult(symbol=c.symbol, cells=[c],
-                               status=_agg_symbol_status([c])) for c in cells]
-        dev_verdict, dev_detail = verdict_from_cells(symres, required)
-        # 5) independent validation verdict
+
+        def _verdict(results: Mapping) -> tuple[str, dict]:
+            cells = [CellResult(symbol=r["symbol"], cell_id=r["cell_id"], n=r["n"],
+                                mean_bp=r["mean_bp"], t=r["t"], p=r["p"],
+                                status=r["status"]) for r in results.values()]
+            symres = [SymbolResult(symbol=c.symbol, cells=[c],
+                                   status=_agg_symbol_status([c])) for c in cells]
+            return verdict_from_cells(symres, required)
+
+        dev_verdict, dev_detail = _verdict(results_dev)
         if val_missing:
-            val_verdict = "DATA_MISSING"
-            val_detail = {"missing_symbols": val_missing}
+            val_verdict, val_detail = "DATA_MISSING", {"missing_symbols": val_missing}
         else:
-            vcells = [CellResult(symbol=r["symbol"], cell_id=r["cell_id"], n=r["n"],
-                                 mean_bp=r["mean_bp"], t=r["t"], p=r["p"],
-                                 status=r["status"]) for r in results_val.values()]
-            vsymres = [SymbolResult(symbol=c.symbol, cells=[c],
-                                    status=_agg_symbol_status([c])) for c in vcells]
-            val_verdict, val_detail = verdict_from_cells(vsymres, required)
-        # cross-candidate BH-FDR (R-2): computed for every dev-PASS record
-        # BEFORE the locked TEST window is even considered
-        primary_sym = required[0]
+            val_verdict, val_detail = _verdict(results_val)
         primary_p = None
-        for r in results_dev.values():
-            if r["symbol"] == primary_sym and math.isfinite(r.get("p", float("nan"))):
-                primary_p = r["p"]
-                break
-        fdr = self._bh_fdr_survival(sid, ctx, primary_p)
-        final = dev_verdict
-        lock_info: dict = {"windows": {s: locked_window_for(s) for s in required}}
-        promotion_check: Optional[dict] = None
-        if dev_verdict == "PASS" and not fdr["survived"]:
-            final = "FAIL_STAT"
-            lock_info["note"] = ("did NOT survive BH-FDR across candidates "
-                                 f"({fdr['trials']} trials) — locked TEST not consumed")
-            lock_info.update({"bh_fdr": fdr})
-        elif dev_verdict == "PASS":
-            if val_verdict != "PASS":
-                final = val_verdict if val_verdict in ("FAIL_STAT", "FAIL_COST",
-                                                       "UNDETERMINED_POWER",
-                                                       "DATA_MISSING") else "FAIL_STAT"
-            else:
-                # 6) locked TEST, once per strategy+symbol
-                lock_pass: dict[str, Optional[bool]] = {}
-                independent = True
-                for sym in required:
-                    if locked_window_for(sym) is None:
-                        lock_pass[sym] = None
-                        continue
-                    use = self.lock_registry.record_use(sid, sym, ctx)
-                    independent = independent and use["independent"]
-                    lh = merged_bars(self.paths.data_dir, sym, locked_window_for(sym)[0],
-                                     locked_window_for(sym)[1])
-                    if not lh.bars:
-                        lock_pass[sym] = None
-                        continue
-                    # A-31 (R-8): the locked window needs its OWN funding load —
-                    # the dev/val funding series is capped at read_end (the day
-                    # before the lock) and would fail coverage for every lock
-                    # event, silently turning every locked test into a failure.
-                    lf = load_funding_window(self.paths.data_dir, sym,
-                                             locked_window_for(sym)[0],
-                                             locked_window_for(sym)[1])
-                    lfq = funding_quality(lf)
-                    if not lfq["ok"]:
-                        # fail-closed: no funding, no locked evaluation, and the
-                        # registry use is recorded honestly (it was consumed)
-                        lock_pass[sym] = None
-                        lock_info["note"] = (f"locked-window funding unavailable "
-                                             f"for {sym} — not evaluated")
-                        continue
-                    auxl = build_aux(lh.bars, defn, lf, fng=self._fng_cache)
-                    sigl = build_signal_fn(defn, auxl)
-                    esl = run_event_study(lh.bars, sym, sigl, horizon, self.cost,
-                                          self.order_value, lf)
-                    cl = cell_stats(esl.events, sym, f"{fam}|lock")
-                    lock_pass[sym] = cl["status"] == "PASS"
-                lock_info.update({"pass": lock_pass, "independent": independent})
-                vals = [v for v in lock_pass.values() if v is not None]
-                if any(v is None for v in lock_pass.values()):
-                    # A-32 (R-8, §6): a symbol without an evaluated locked test
-                    # can NEVER yield a final PASS — "not final" states only.
-                    final = "DATA_MISSING" if not vals else "UNDETERMINED_POWER"
-                    lock_info["note"] = ("NO_LOCKED_TEST for some symbols — "
-                                         "cannot claim final")
-                elif not vals:
-                    final = "DATA_MISSING"
-                    lock_info["note"] = "NO_LOCKED_TEST — cannot claim final"
-                elif all(vals) and independent:
-                    final = "PASS"
-                elif not all(vals):
-                    final = "FAIL_STAT"
-                else:
-                    final = "FAIL_STAT"
-                    lock_info["note"] = "locked window re-used — not independent"
-                # R-6: promotion gate wiring — PASS records are gated and
-                # eligible ones land in the append-only promotion queue
-                if final == "PASS":
-                    chk = promotion_gate(
-                        state="PASS",
-                        preregistered=self._preregistered or self._preregistered_flag(),
-                        independent_validation_passed=(val_verdict == "PASS"),
-                        lock_test_passed=True,
-                        lock_test_used=max(
-                            (self.lock_registry.uses(sid, s) for s in required),
-                            default=0),
-                        required_symbols=required,
-                    )
-                    chk.strategy_id = sid
-                    promotion_check = chk.to_json()
-                    if chk.eligible:
-                        self.promo.register(chk, sid, ctx)
-        # 7) portfolio check for dev-passing candidates (survivor track)
+        r0 = results_dev.get(required[0])
+        if r0 is not None and isinstance(r0.get("p"), float) and math.isfinite(r0["p"]):
+            primary_p = r0["p"]
+        if dev_verdict == "PASS":
+            status = "AWAITING_FDR"      # P0-1: no final verdict before the family is complete
+        elif dev_verdict == "ERROR":
+            status = "ERROR"
+        else:
+            status = dev_verdict
+        # portfolio simulation for dev-passing candidates (dev data only)
         portfolio: Optional[dict] = None
         if dev_verdict == "PASS":
             grid_bars = {s: handles[s].bars[:win_for(handles[s], horizon)[1] + 1]
                          for s in handles}
             sigs: list[dict] = []
             for sym, h in handles.items():
-                aux = build_aux(h.bars, defn, fundings.get(sym), fng=self._fng_cache)
+                aux = build_aux(h.bars, defn, fundings.get(sym), fng=fng)
                 sig_fn = build_signal_fn(defn, aux)
                 for i in range(1, len(grid_bars[sym]) - horizon - 1):
                     side = sig_fn(PrefixShim(grid_bars[sym], i + 1))
                     if side:
                         sigs.append({"symbol": sym, "decision_index": i,
                                      "side": side, "horizon": horizon})
-            pf = simulate_portfolio(grid_bars, sigs,
-                                    {s: fundings.get(s, []) for s in grid_bars},
-                                    self.cost,
-                                    PortfolioConfig(initial_capital=self.order_value))
-            portfolio = pf.to_json()
-            portfolio["passed"] = (pf.final_equity > pf.initial_capital
-                                   and pf.max_drawdown < 0.5
-                                   and pf.liquidation_events == 0)
+            try:
+                pf = simulate_portfolio(grid_bars, sigs,
+                                        {s: fundings.get(s, []) for s in grid_bars},
+                                        self.cost, self._pf_cfg(), context_id=ctx)
+                portfolio = pf.to_json()
+                portfolio["passed"], portfolio["pass_failures"] = portfolio_passes(portfolio)
+            except ValueError as e:   # e.g. symbols on different grids
+                portfolio = {"error": str(e), "passed": False, "context_id": ctx}
         rec = {
-            "status": final,
-            "context_id": ctx,
-            "primary_symbol": required[0],
+            **common,
+            "status": status,
             "primary_dev_p": primary_p,
-            "multiple_testing": fdr,
-            "dataset": {s: handles[s].identity() for s in handles},
-            "cost_model": {"version": self.cost.version,
-                           "status": UNVERIFIED_COST_MODEL if not self.cost.verified else "VERIFIED",
-                           "params": self.cost.model.__dict__},
-            "code_version": CODE_VERSION,
-            "validation_cfg_version": VALIDATION_CFG_VERSION,
             "dev_verdict": dev_verdict,
             "dev_detail": dev_detail,
             "validation_verdict": val_verdict,
             "validation_detail": val_detail,
-            "cells_dev": [r for r in results_dev.values()],
-            "cells_val": [r for r in results_val.values()],
-            "locked_test": lock_info,
-            "promotion_check": promotion_check,
+            "cells_dev": list(results_dev.values()),
+            "cells_val": list(results_val.values()),
+            "event_study_counts": es_counts,
             "portfolio": portfolio,
             "staleness": st,
         }
+        if status == "ERROR":
+            rec["error_code"] = "LOGIC_ERROR"
+            rec["error_message"] = "statistical computation error in a dev cell"
         return rec
 
-    # -- cycle ---------------------------------------------------------------
+    # -- generation FDR finalization (P0-1) + locked TEST (P1-6) ------------
+    def finalize_fdr(self) -> dict:
+        self._ensure_registered()
+        if self._ctx is None:
+            self._current_context()
+        gid, ctx = self.generation_id, self._ctx
+        records = list(self.ledger.records())
+        states = self.store.all_states()
+        terminal_pass = {s for s, st in states.items() if st == CandidateState.PASS.value}
+        fam = family_status(records, self._manifest, ctx, terminal_pass=terminal_pass)
+        report = {"generation_id": gid, "context_id": ctx, "m": fam["m"],
+                  "evaluated": fam["evaluated"], "missing": len(fam["missing"]),
+                  "complete": fam["complete"], "decision": None, "resolved": [],
+                  "waiting": []}
+        if not fam["complete"]:
+            return report
+        decision = self.fdr_store.get(gid, ctx) or self.fdr_store.record(decide_family(fam))
+        report["decision"] = {"survivors": decision["survivors"], "m": decision["m"],
+                              "n_with_statistic": decision["n_with_statistic"]}
+        by_eid = {r.get("evaluation_id"): r for r in records}
+        survivors = set(decision["survivors"])
+        for sid, st in sorted(states.items()):
+            if st != CandidateState.AWAITING_FDR.value or sid not in self._defn_by_sid:
+                continue
+            dev_rec = by_eid.get(decision["first_records"].get(sid))
+            if dev_rec is None:
+                report["waiting"].append(sid)   # waiting under another context
+                continue
+            out = self._resolve(sid, dev_rec, sid in survivors, decision)
+            (report["resolved"] if out else report["waiting"]).append(
+                {"strategy_id": sid, "status": out} if out else sid)
+        return report
+
+    def _resolve(self, sid: str, dev_rec: Mapping, survived: bool, decision: Mapping) -> Optional[str]:
+        defn = self._defn_by_sid[sid]
+        required = list(defn["symbols"])
+        ctx = self._ctx
+        lock_info: dict = {"windows": {s: locked_window_for(s) for s in required},
+                           "consumed": False}
+        promotion_check = None
+        if not survived:
+            final = "FAIL_STAT"
+            lock_info["note"] = (f"did NOT survive the generation BH-FDR "
+                                 f"(m={decision['m']}) — locked TEST not consumed")
+        elif dev_rec.get("validation_verdict") != "PASS":
+            vv = dev_rec.get("validation_verdict")
+            final = vv if vv in ("FAIL_STAT", "FAIL_COST", "UNDETERMINED_POWER",
+                                 "DATA_MISSING", "ERROR") else "FAIL_STAT"
+            lock_info["note"] = "independent validation not passed — locked TEST not consumed"
+        else:
+            out = self._locked_test(sid, defn, ctx)
+            if out is None:
+                return None          # another live process holds the window
+            final, lock_info = out
+        rec = {
+            "phase": "final", "status": final, "strategy_id": sid,
+            "evaluation_id": evaluation_id(sid, ctx), "run_id": self.run_id,
+            "generation_id": self.generation_id, "context_id": ctx,
+            "dev_evaluation_id": dev_rec.get("evaluation_id"),
+            "multiple_testing": {"method": decision["method"], "q": decision["q"],
+                                 "m": decision["m"], "survived": survived},
+            "validation_verdict": dev_rec.get("validation_verdict"),
+            "locked_test": lock_info,
+            "cost_model": dev_rec.get("cost_model"),
+        }
+        if final == "PASS":
+            promotion_check = self._promote(sid, defn, dev_rec, decision)
+            rec["claim_scope"] = ("VERIFIED_COST" if self.cost.verified
+                                  else UNVERIFIED_COST_MODEL)
+        rec["promotion_check"] = promotion_check
+        self.ledger.append(rec)
+        self.store.set(sid, CandidateState(final), data_version=ctx)
+        if final in ("DATA_MISSING",):
+            self._maybe_enqueue_reverify(sid, final)
+        return final
+
+    def _locked_test(self, sid: str, defn: Mapping, ctx: str) -> Optional[tuple[str, dict]]:
+        required = list(defn["symbols"])
+        fam = defn["family"]
+        horizon = int(defn["holding"])
+        info: dict = {"windows": {s: locked_window_for(s) for s in required},
+                      "consumed": False}
+        no_lock = symbols_without_locked_test(required)
+        if no_lock:
+            info["note"] = f"NO_LOCKED_TEST for {no_lock} — cannot claim final; nothing consumed"
+            return "DATA_MISSING", info
+        tokens: dict = {}
+        for sym in required:
+            r = self.lock_registry.reserve(sid, sym, ctx)
+            if not r["ok"]:
+                for t in tokens.values():
+                    self.lock_registry.fail(t, f"sibling reservation refused ({r['reason']})")
+                if r["reason"] == "IN_PROGRESS":
+                    return None
+                info["note"] = (f"locked window of {sym} already used {r['uses']}x — "
+                                "not an independent test")
+                info["reused"] = True
+                return "FAIL_STAT", info
+            tokens[sym] = r["token"]
+        # load + check EVERY symbol's locked data before anything is exposed,
+        # so a missing ETH window can never burn the BTC window
+        loaded: dict = {}
+        blocked: list[str] = []
+        for sym in required:
+            lo, hi = locked_window_for(sym)
+            lh = merged_bars(self.paths.data_dir, sym, lo, hi)
+            if not lh.bars:
+                blocked.append(f"{sym}: locked klines missing/rejected {lh.missing}")
+                continue
+            # A-31: the locked window needs its OWN funding load
+            lf = load_funding_window(self.paths.data_dir, sym, lo, hi)
+            lfq = funding_quality(lf)
+            if not lfq["ok"]:
+                blocked.append(f"{sym}: locked-window funding {lfq['issues']}")
+                continue
+            loaded[sym] = (lh, lf)
+        if blocked:
+            for t in tokens.values():
+                self.lock_registry.block(t, "; ".join(blocked))
+            info["blocked"] = blocked
+            info["note"] = "locked data unavailable — BLOCKED_DATA_MISSING, window NOT consumed"
+            return "DATA_MISSING", info
+        fng = self._fng() if "fng" in FAMILY_DATA_REQUIREMENTS.get(fam, []) else None
+        results: dict = {}
+        try:
+            for sym in required:
+                self.lock_registry.start(tokens[sym])
+            info["consumed"] = True
+            for sym in required:
+                lh, lf = loaded[sym]
+                auxl = build_aux(lh.bars, defn, lf, fng=fng)
+                sigl = build_signal_fn(defn, auxl)
+                esl = run_event_study(lh.bars, sym, sigl, horizon, self.cost,
+                                      self.order_value, lf)
+                cl = cell_stats(esl.events, sym, f"{fam}|lock")
+                res = {"status": cl["status"], "n": cl["n"], "mean_bp": cl.get("mean_bp"),
+                       "p": cl.get("p"), "pass": cl["status"] == "PASS",
+                       "lock_data_sha256": lh.sha256}
+                self.lock_registry.complete(tokens[sym], res)
+                results[sym] = res
+        except Exception as e:
+            for sym, t in tokens.items():
+                if sym not in results:
+                    try:
+                        self.lock_registry.fail(t, f"{type(e).__name__}: {e}")
+                    except LockRegistryError:
+                        pass
+            raise
+        info["results"] = results
+        info["pass"] = {s: r["pass"] for s, r in results.items()}
+        info["independent"] = all(self.lock_registry.uses(sid, s) == 1 for s in required)
+        sts = [r["status"] for r in results.values()]
+        if all(r["pass"] for r in results.values()) and info["independent"]:
+            return "PASS", info
+        if "ERROR" in sts:
+            return "ERROR", info
+        if "FAIL_STAT" in sts or not info["independent"]:
+            return "FAIL_STAT", info
+        info["note"] = "locked window consumed but under-powered — cannot be re-tested independently"
+        return "UNDETERMINED_POWER", info
+
+    def _promote(self, sid: str, defn: Mapping, dev_rec: Mapping, decision: Mapping) -> dict:
+        required = list(defn["symbols"])
+        lock_results = [self.lock_registry.result(sid, s) for s in required]
+        lock_passed = (all(bool(r and r.get("pass")) for r in lock_results)
+                       if all(r is not None for r in lock_results) else None)
+        kw = dict(
+            state="PASS",
+            preregistered=self.prereg.is_preregistered(sid, self.generation_id),
+            fdr_survived=sid in set(decision["survivors"]),
+            independent_validation_passed=dev_rec.get("validation_verdict") == "PASS",
+            lock_test_passed=lock_passed,
+            lock_test_used=max((self.lock_registry.uses(sid, s) for s in required), default=0),
+            required_symbols=required,
+            cost_verified=bool(self.cost.verified),
+        )
+        if is_combo(defn):
+            chk = combo_promotion_gate(portfolio_result=dev_rec.get("portfolio"),
+                                       context_id=self._ctx, **kw)
+        else:
+            chk = promotion_gate(**kw)
+        chk.strategy_id = sid
+        if chk.eligible:
+            if self.promo.duplicates(sid) == 0:
+                self.promo.register(chk, sid, self._ctx, test_only=self.cost.test_only)
+            else:
+                chk.notes.append("already in the promotion queue — not registered twice")
+        return chk.to_json()
+
+    # -- re-evaluation scheduling --------------------------------------------
+    def schedule_context_reevaluation(self) -> list[str]:
+        """Candidates whose LAST evaluation ran under a different experiment
+        context are re-verified under the current one (new data / cost /
+        code / config = a new experiment).  Same-context retries stay under
+        the normal reverify policy."""
+        self._ensure_registered()
+        ctx = self._ctx
+        latest = self.ledger.latest_by_strategy()
+        out: list[str] = []
+        for sid, _ in self._cands:
+            st = CandidateState(self.store.entry(sid).state)
+            if st in (CandidateState.PENDING, CandidateState.RUNNING,
+                      CandidateState.REVERIFY_PENDING, CandidateState.PASS):
+                continue
+            last = latest.get(sid)
+            if last is None or last.get("context_id") == ctx:
+                continue
+            if self.queue.enqueue(sid, "context_changed"):
+                out.append(sid)
+        return out
+
     def _current_last_ts(self, symbol: str) -> int:
         """Cheap freshness probe: last bar ts of the newest MONTHLY kline file
         (daily files are ignored).  Used only to detect data growth (A-20)."""
@@ -945,40 +1135,57 @@ class Runner:
                     break
         return triggered
 
+    # -- cycle ---------------------------------------------------------------
     def cycle(self, max_candidates: int = 10) -> CycleSummary:
-        s = CycleSummary(status="SUCCESS", started_at=iso_now())
+        s = CycleSummary(status="SUCCESS", started_at=iso_now(), run_id=self.run_id,
+                         batch_requested=max_candidates)
         t0 = time.time()
         reg = self.register_all()
+        s.generation_id = reg["generation_id"]
         s.total_candidates = reg["registered"]
         s.duplicates_collapsed = reg["duplicates_collapsed"]
-        rec = reconcile(self.store, self.queue, self.ledger)
+        if reg["created"]:
+            s.notes.append(f"new search generation {reg['generation_id']} preregistered")
+        reconcile(self.store, self.queue, self.ledger)
+        recovered = self.lock_registry.recover_stale()
+        if recovered:
+            s.notes.append(f"lock attempts recovered after dead owners: {recovered}")
+        s.context_id = self._current_context()
+        resched = self.schedule_context_reevaluation()
+        if resched:
+            s.notes.append(f"{len(resched)} candidates re-queued: experiment context changed")
         self.trigger_data_driven_reverify()  # A-20: new-data reverify trigger
-        # 1) queue first (re-verifications), then fresh PENDING
         done = 0
         verdicts: dict[str, int] = {}
         errors = 0
+
+        def _count(r: dict) -> None:
+            nonlocal errors
+            if not r.get("skipped"):
+                st = r.get("status", "ERROR")
+                verdicts[st] = verdicts.get(st, 0) + 1
+                if st == "ERROR":
+                    errors += 1
+
+        # 1) queue first (re-verifications), then fresh PENDING
         while done < max_candidates:
             if self._interrupted:
                 s.status = "INTERRUPTED"
                 break
             item = self.queue.pop_ready()
-            if item is not None:
-                sid = item["strategy_id"]
-                defn = find_defn(sid)
-                if defn is None:
-                    errors += 1
-                    continue
-                r = self.run_one(sid, defn)
-                done += 1
-                if not r.get("skipped"):
-                    st = r.get("status", "ERROR")
-                    verdicts[st] = verdicts.get(st, 0) + 1
-                    if st == "ERROR":
-                        errors += 1
-            else:
+            if item is None:
                 break
-        # fresh candidates
-        for sid, defn in enumerate_candidates()[0]:
+            sid = item["strategy_id"]
+            defn = self._defn_by_sid.get(sid)
+            if defn is None:
+                errors += 1
+                s.notes.append(f"queued {sid} is not in generation {s.generation_id} — "
+                               "not evaluated (recorded, not silently dropped)")
+                continue
+            r = self.run_one(sid, defn)
+            done += 1
+            _count(r)
+        for sid, defn in self._cands:
             if done >= max_candidates:
                 break
             if self._interrupted:
@@ -987,11 +1194,15 @@ class Runner:
             if CandidateState(self.store.entry(sid).state) is CandidateState.PENDING:
                 r = self.run_one(sid, defn)
                 done += 1
-                if not r.get("skipped"):
-                    st = r.get("status", "ERROR")
-                    verdicts[st] = verdicts.get(st, 0) + 1
-                    if st == "ERROR":
-                        errors += 1
+                _count(r)
+        # 2) generation-wide FDR decision + locked tests of survivors
+        if s.status != "INTERRUPTED":
+            fdr = self.finalize_fdr()
+            s.fdr_family = {k: fdr[k] for k in ("m", "evaluated", "missing", "complete",
+                                                "decision")}
+            s.finalized = fdr["resolved"]
+            for x in fdr["resolved"]:
+                verdicts["final_" + x["status"]] = verdicts.get("final_" + x["status"], 0) + 1
         s.evaluated = done
         s.verdict_counts = verdicts
         s.errors = errors
@@ -1001,7 +1212,8 @@ class Runner:
         fng_available = fng_dir.exists() and any(fng_dir.glob("*.csv"))  # A-19
         space = search_space_status(self.store, self.ledger,
                                     fng_available=fng_available,
-                                    funding_available=(self.paths.data_dir / "funding").exists())
+                                    funding_available=(self.paths.data_dir / "funding").exists(),
+                                    cands=self._cands)
         s.search_space_state = space.state
         if errors and done and errors / max(1, done) >= 0.3:
             s.status = "PARTIAL_FAILURE"
@@ -1036,6 +1248,8 @@ class PrefixShim:
 
 
 def _agg_symbol_status(cells) -> str:
+    if any(c.status == "ERROR" for c in cells):
+        return "ERROR"
     if any(c.status == "DATA_MISSING" for c in cells):
         return "DATA_MISSING"
     if any(c.status == "UNDETERMINED_POWER" for c in cells):
@@ -1052,11 +1266,44 @@ def find_defn(sid: str):
     return None
 
 
-def main(argv: Sequence[str]) -> int:
+class UsageError(ValueError):
+    pass
+
+
+def parse_args(argv: Sequence[str]) -> int:
+    """``--batch N`` (or ``--batch=N``), N a positive integer; default 10.
+    Anything else is a usage error — never silently ignored."""
     args = list(argv)
     batch = 10
-    if "--batch" in args:
-        batch = int(args[args.index("--batch") + 1])
+    i = 0
+    while i < len(args):
+        a = args[i]
+        if a == "--batch":
+            if i + 1 >= len(args):
+                raise UsageError("--batch needs a value")
+            val = args[i + 1]
+            i += 2
+        elif a.startswith("--batch="):
+            val = a.split("=", 1)[1]
+            i += 1
+        else:
+            raise UsageError(f"unknown argument {a!r}")
+        if not val.isdigit() or int(val) < 1:
+            raise UsageError(f"--batch must be a positive integer, got {val!r}")
+        batch = int(val)
+    return batch
+
+
+EXIT_CODES = {"SUCCESS": 0, "SUCCESS_WITH_WARNINGS": 0, "PARTIAL_FAILURE": 2,
+              "FAILED": 1, "INTERRUPTED": 1}
+
+
+def main(argv: Sequence[str]) -> int:
+    try:
+        batch = parse_args(argv)
+    except UsageError as e:
+        print(f"USAGE_ERROR: {e}", file=sys.stderr)
+        return 1
     try:
         paths = PathConfig.from_env()
     except PathConfigError as e:
@@ -1068,13 +1315,22 @@ def main(argv: Sequence[str]) -> int:
         print("WARNING: REFRESH=1 is NOT supported by the v2 discovery engine. "
               "Data updates are performed by run/download_missing_data.py; "
               "every evaluation records data staleness honestly.", file=sys.stderr)
-    r = Runner(paths)
-    s = r.cycle(max_candidates=batch)
+    lock = ProcessLock(paths.state_dir / "run.lock")
+    if not lock.acquire():
+        print(f"CYCLE_SKIPPED lock held ({paths.state_dir / 'run.lock'})")
+        return 3
+    try:
+        r = Runner(paths)
+        s = r.cycle(max_candidates=batch)
+    except Exception as e:  # noqa: BLE001 — a crash is FAILED, never success
+        print(json.dumps({"status": "FAILED", "fatal": f"{type(e).__name__}: {e}"}))
+        return 1
+    finally:
+        lock.release()
     if os.environ.get("REFRESH") == "1":
         s.notes.append("REFRESH=1 requested but NOT supported — no data was refreshed")
-    print(json.dumps(s.to_json()))
-    return {"SUCCESS": 0, "SUCCESS_WITH_WARNINGS": 0, "PARTIAL_FAILURE": 2,
-            "FAILED": 1, "INTERRUPTED": 1}[s.status]
+    print(json.dumps(s.to_json(), default=str))
+    return EXIT_CODES[s.status]
 
 
 if __name__ == "__main__":

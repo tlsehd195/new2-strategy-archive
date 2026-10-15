@@ -1,0 +1,11 @@
+# 작업 시작 시점(cc91f2d) 기존 테스트 결과 — 실제 실행 출력 요약
+$ cd run && COINTRADER_SRC=<NEW2 clone>/src python3 -m unittest discover -s discovery/tests
+....................................F......................................................
+FAIL: test_run_cycle_sh_duplicate_prevention (test_engine.TestOps.test_run_cycle_sh_duplicate_prevention)
+  File "run/discovery/tests/test_engine.py", line 786, in test_run_cycle_sh_duplicate_prevention
+    self.assertEqual(r.returncode, 3)
+AssertionError: 1 != 3
+Ran 91 tests in 52.455s
+FAILED (failures=1)
+# 원인: run_cycle.sh가 NEW2_ROOT=/home/z/my-project/NEW2_run 하드코딩 + /tmp mkdir 락을 사용 →
+#       state/run.lock(PID) 을 보지 않고 `cd /home/z/my-project` 실패로 exit 1.

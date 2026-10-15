@@ -1,0 +1,22 @@
+== D1 portfolio equity curve (long 100 contracts @100, size 1.0, lev 1, zero cost) ==
+prices      : [100, 100, 100, 80, 50, 50, 100, 100, 100, 100]
+equity_curve: [10000.0, 10000.0, 10000.0, 8000.0, 5000.0, 5000.0, 10000.0, 10000.0, 10000.0, 10000.0]
+hand MDD = (10000-5000)/10000 = 0.5 ; program MDD = 0.5 ; final 10000.0
+== D1b fees+funding (fee 10bp, funding 1bp @bar4) ==
+hand: 10000 - 10 (entry) - 1 (funding) - 10 (exit) = 9979 ; program: 9979.0 fees 20.0 funding 1.0 curve[-1] 9979.0
+== D1c liquidation (lev 2, low 50 <= liq 50.5) ==
+hand: 10000 - 10 (entry fee) - 5000 (margin) = 4990 ; program: 4990.0 liq events 1 fees 10.0
+== D2 cost failure ==
+order 10000 vs bar 100000000.0: cost_fraction=0.001700
+order 10000 vs bar 100000.0: CostRefused status=FAIL_COST: participation 10.0000% > max_participation 5.0000% — order refused, not priced
+order 10000 vs bar 0.0: CostDataMissing status=DATA_MISSING: bar traded value 0.0 — cannot price the order
+exit-unpriceable portfolio: cost_status FAIL_COST | failures [{'where': 'exit', 'symbol': 'A', 'index': 10, 'status': 'FAIL_COST', 'error': 'participation 500.0000% > max_participation 5.0000% — order refused, not priced'}] | total_cost_bp (entry only) 14.0711 (before fix: 7.0 bp fallback, status OK)
+== D3 experiment context change ==
+base C2-a00da5df857c090010fd | funding changed C2-b74e1e51efb05eb1f585 | repeat C2-a00da5df857c090010fd
+== D4 candidate space hash ==
+6-cand generation G-27ca3788a4b4cba1 | reversed order G-27ca3788a4b4cba1 | minus one G-75a52068e998d666
+real space: 779 candidates 7 families -> G-b4b7ab1922a370f8 b4b7ab1922a370f83accca5f
+== D5 locked TEST state transitions ==
+no locked data  -> DATA_MISSING ['BLOCKED_DATA_MISSING'] uses 0
+data present    -> PASS ['BLOCKED_DATA_MISSING', 'CONSUMED'] uses 1 result {'status': 'PASS', 'n': 621, 'mean_bp': 58.7613932150049, 'p': 0.0, 'pass': True, 'lock_data_sha256': '91c30acc69e31e6b0c54b45a666243b83df5360fc96a2e9d237ce1864722cb85'}
+second attempt  -> FAIL_STAT locked window of BTCUSDT already used 1x — not an independent test uses 1

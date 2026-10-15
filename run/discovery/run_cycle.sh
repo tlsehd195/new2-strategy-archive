@@ -1,76 +1,73 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # ============================================================
-# NEW2 자율탐색 루프 — 1사이클 실행 래퍼 v2 (감사 Phase 2)
+# NEW2 자율탐색 루프 — 1사이클 실행 래퍼 v3 (잔여결함 수정 P1-10)
 # ============================================================
-# 변경(F-04·F-05·F-35·F-11): pipefail+PIPESTATUS 종료코드 전파,
-# PID 기반 락 + 스테일 락 회수, 크론 명세 종료코드 준수, NEW2_ROOT 구성화.
-# v2-audit3(감사 Phase 3+4): runner.py가 게이트 R1~R7 준수 — R4 심볼 정합(엄격화),
-# R5 탐색 수준 BH-FDR 참고(게이트 아님), R6 held-out 진단 참고(게이트 미사용),
-# R7 Stouffer ρ 고정. 재검증 큐(F-03)·UNIVERSE_EXHAUSTED·라벨 v2-audit3.
-# 본 래퍼의 실행 로직은 Phase 2판 그대로 (방법론 변경 없음).
+# 사용:  bash run/discovery/run_cycle.sh [BATCH]
+#        BATCH = 양의 정수(1~999999). 미지정 시 $NEW2_DISC_BATCH, 그것도 없으면 10.
+#        BATCH는 runner.py --batch 로 그대로 전달된다.
+#        어느 작업 디렉터리에서 실행해도 된다(스크립트 위치 기준으로 runner.py를 찾음).
 #
-# 종료코드(크론 명세): 0=CYCLE_OK, 2=CYCLE_PARTIAL(후보 단위 오류),
-#                      1=CYCLE_FAILED, 3=SKIPPED(락)
-# 사용: bash /home/z/my-project/NEW2_run/discovery/run_cycle.sh
-# 환경변수: NEW2_DISC_BATCH(기본 10) NEW2_DISC_BUDGET(기본 540초)
-#           NEW2_ROOT(기본 /home/z/my-project/NEW2_run)
-#           REFRESH=1 → 데이터 갱신 요구는 무시(개발 구간 잠금, v1 동일)
+# 종료코드(크론 명세):
+#   0 = CYCLE_OK        (runner 0)
+#   2 = CYCLE_PARTIAL   (runner 2: 후보 단위 오류율 ≥ 30%)
+#   3 = CYCLE_SKIPPED   (runner 3: 다른 프로세스가 state/run.lock 보유)
+#   1 = CYCLE_FAILED    (runner 1/기타 비정상 종료, 잘못된 인자, 로그 파이프라인 실패)
+#
+# 중복 실행 방지는 runner.py가 state/run.lock(ProcessLock, PID+flock)으로 단일 구현한다.
+# 이전 판의 /tmp mkdir 락과 하드코딩 경로(/home/z/...)는 제거되었다.
+#
+# 환경변수(모두 선택):
+#   NEW2_DISCOVERY_ROOT  state/, results/, cycle_log.txt 위치 (기본: 이 디렉터리)
+#   NEW2_DATA_DIR        데이터 디렉터리 (runner가 fail-closed 검사)
+#   COINTRADER_SRC       비용모델 단일 소스(공개 NEW2 checkout의 src)
+#   NEW2_DISC_LOG        로그 파일 경로 (기본: $NEW2_DISCOVERY_ROOT/cycle_log.txt)
+#   PYTHON               파이썬 실행 파일 (기본: python3)
+#   REFRESH=1            미지원 — runner가 경고하고 요약에 기록한다
 # ============================================================
-set -u
+set -uo pipefail
 
-NEW2_ROOT="${NEW2_ROOT:-/home/z/my-project/NEW2_run}"
-DISC="$NEW2_ROOT/discovery"
-LOCK="${TMPDIR:-/tmp}/new2_disc.lock"
-LOCK_STALE_S="${NEW2_DISC_LOCK_STALE:-14400}"   # 스테일 판정: 4시간
-GRACE_S="${NEW2_DISC_LOCK_GRACE:-300}"          # PID 사망 후 회수 유예: 5분
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || { echo "CYCLE_FAILED cannot resolve script dir"; exit 1; }
 
-# ── 락 (F-05: PID 기록 + 스테일 회수) ──
-# 정책: ①살아있는 PID 소유 → skip(3) ②PID 기록됨 + 사망 확인 → 즉시 회수
-# (죽은 소유자는 락을 쥐고 있지 않음 — PID 재사용 시 kill -0이 살아있음으로 보수적으로 skip)
-# ③PID 기록 없음 → 보수적 age 판정(grace 내 skip, stale 초과만 회수)
-if mkdir "$LOCK" 2>/dev/null; then
-  echo "$$" > "$LOCK/pid"
-else
-  lpid="$(cat "$LOCK/pid" 2>/dev/null || true)"
-  lock_age=$(( $(date +%s) - $(stat -c %Y "$LOCK" 2>/dev/null || date +%s) ))
-  if [ -n "$lpid" ] && kill -0 "$lpid" 2>/dev/null; then
-    echo "CYCLE_SKIPPED lock held by live pid=$lpid"
-    exit 3
-  fi
-  if [ -z "$lpid" ] && [ "$lock_age" -lt "$GRACE_S" ]; then
-    echo "CYCLE_SKIPPED unowned lock too fresh (age=${lock_age}s < grace=${GRACE_S}s)"
-    exit 3
-  fi
-  if [ -n "$lpid" ] || [ "$lock_age" -ge "$LOCK_STALE_S" ]; then
-    echo "[lock] stale lock reclaimed (pid=${lpid:-none} dead/absent, age=${lock_age}s)" \
-      >> "$DISC/cycle_log.txt" 2>/dev/null
-    rm -rf "$LOCK"
-    if ! mkdir "$LOCK" 2>/dev/null; then
-      echo "CYCLE_SKIPPED lock re-acquisition failed"
-      exit 3
-    fi
-    echo "$$" > "$LOCK/pid"
-  else
-    echo "CYCLE_SKIPPED unowned lock within grace (age=${lock_age}s)"
-    exit 3
-  fi
+usage() {
+  echo "usage: run_cycle.sh [BATCH]   (BATCH: positive integer, default \${NEW2_DISC_BATCH:-10})" >&2
+}
+
+if [ "$#" -gt 1 ]; then
+  usage
+  echo "CYCLE_FAILED usage: too many arguments"
+  exit 1
 fi
-trap 'rm -rf "$LOCK" 2>/dev/null' EXIT
+case "${1:-}" in
+  -h|--help) usage; exit 0 ;;
+esac
 
-cd "$NEW2_ROOT/.." || exit 1
-mkdir -p "$DISC"
-
-if [ "${REFRESH:-0}" = "1" ]; then
-  echo "[refresh] 데이터 갱신은 기본 비활성 (engine-discovery-v1: 개발 구간 잠금). 무시."
+BATCH="${1:-${NEW2_DISC_BATCH:-10}}"
+if ! [[ "$BATCH" =~ ^[1-9][0-9]{0,5}$ ]]; then
+  usage
+  echo "CYCLE_FAILED usage: invalid batch '$BATCH'"
+  exit 1
 fi
 
-# ── 실행 (F-04: 파이프 종료코드 유실 방지) ──
-set -o pipefail
-python3 "$DISC/runner.py" 2>&1 | tee -a "$DISC/cycle_log.txt" | tail -15
-rc=${PIPESTATUS[0]}
+ROOT="${NEW2_DISCOVERY_ROOT:-$SCRIPT_DIR}"
+LOG="${NEW2_DISC_LOG:-$ROOT/cycle_log.txt}"
+PY="${PYTHON:-python3}"
+mkdir -p "$ROOT" || { echo "CYCLE_FAILED cannot create $ROOT"; exit 1; }
 
-# 종료코드 정규화 (F-35): runner 0/1/2 그대로, 그 외 비정상은 1
+# ── 실행: runner 종료코드와 로그 파이프라인(tee) 실패를 모두 보존 ──
+"$PY" "$SCRIPT_DIR/runner.py" --batch "$BATCH" 2>&1 | tee -a "$LOG" | tail -n 15
+st=("${PIPESTATUS[@]}")
+rc="${st[0]}"
+tee_rc="${st[1]:-1}"
+
 case "$rc" in
-  0|1|2) exit "$rc" ;;
-  *)     exit 1 ;;
+  0)
+    if [ "$tee_rc" -ne 0 ]; then
+      echo "CYCLE_FAILED log pipeline failed (tee rc=$tee_rc, log=$LOG)"
+      exit 1
+    fi
+    echo "CYCLE_OK batch=$BATCH"
+    exit 0 ;;
+  2) echo "CYCLE_PARTIAL batch=$BATCH"; exit 2 ;;
+  3) echo "CYCLE_SKIPPED"; exit 3 ;;
+  *) echo "CYCLE_FAILED rc=$rc"; exit 1 ;;
 esac

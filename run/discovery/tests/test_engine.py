@@ -826,12 +826,17 @@ class TestOps(unittest.TestCase):
             self.assertEqual(s.evaluated, 2)
             self.assertEqual(s.verdict_counts.get("DATA_MISSING"), 2)
             self.assertGreaterEqual(s.reverify_queue, 1)
-            prereg = json.loads((paths.state_dir / "preregistration.json").read_text())
-            self.assertEqual(prereg["total_candidates"], 779)
-            self.assertIn("family_grid_counts", prereg)
+            # P1-8: the preregistration is now a write-once, hash-verified
+            # generation manifest (the old single file had no hash and was
+            # reused merely because it existed)
+            gid = s.generation_id
+            pfile = paths.state_dir / "preregistration" / f"{gid}.json"
+            prereg = json.loads(pfile.read_text())
+            self.assertEqual(prereg["n_candidates"], 779)
+            self.assertIn("family_counts", prereg)
             before = prereg["preregistered_at"]
             r.register_all()
-            after = json.loads((paths.state_dir / "preregistration.json").read_text())
+            after = json.loads(pfile.read_text())
             self.assertEqual(after["preregistered_at"], before)
 
     def test_search_space_states(self):
@@ -914,20 +919,35 @@ class TestPromotion(unittest.TestCase):
         self.assertFalse(chk.eligible)
 
     def test_gate_happy_path(self):
-        chk = promotion_gate(state="PASS", preregistered=True,
-                             independent_validation_passed=True, lock_test_passed=True,
-                             lock_test_used=1, required_symbols=["BTCUSDT"])
+        # residual fix: the gate now also requires a FINAL generation FDR
+        # survival and a verified cost model (both absent → not eligible)
+        base = dict(state="PASS", preregistered=True,
+                    independent_validation_passed=True, lock_test_passed=True,
+                    lock_test_used=1, required_symbols=["BTCUSDT"])
+        self.assertFalse(promotion_gate(**base).eligible)
+        chk = promotion_gate(**base, fdr_survived=True, cost_verified=True)
         self.assertTrue(chk.eligible)
         self.assertEqual(chk.kind, "SURVIVOR")
 
     def test_combo_requires_portfolio(self):
         kw = dict(state="PASS", preregistered=True, independent_validation_passed=True,
-                  lock_test_passed=True, lock_test_used=1, required_symbols=["BTCUSDT"])
+                  lock_test_passed=True, lock_test_used=1, required_symbols=["BTCUSDT"],
+                  fdr_survived=True, cost_verified=True)
         chk = combo_promotion_gate(**kw, portfolio_passed=None)
         self.assertFalse(chk.eligible)
+        # residual fix P1-9: a bare boolean is no longer evidence
         chk2 = combo_promotion_gate(**kw, portfolio_passed=True)
-        self.assertTrue(chk2.eligible)
-        self.assertEqual(chk2.kind, "SURVIVOR_COMBO")
+        self.assertFalse(chk2.eligible)
+        bars = make_bars(n=200, drift=0.001, vol=0.0, seed=21, volume=1e9)
+        pf = simulate_portfolio({"A": bars}, [{"symbol": "A", "decision_index": 40,
+                                               "side": 1, "horizon": 20}],
+                                {"A": make_funding(bars[0].ts, bars[-1].ts, rate=0.0)},
+                                CostContext.futures_default(),
+                                PortfolioConfig(initial_capital=10_000, size_fraction=0.1),
+                                context_id="C2-x").to_json()
+        chk3 = combo_promotion_gate(**kw, portfolio_result=pf, context_id="C2-x")
+        self.assertTrue(chk3.eligible, chk3.failed_steps)
+        self.assertEqual(chk3.kind, "SURVIVOR_COMBO")
 
     def test_queue_duplicates_and_not_deployed(self):
         with tempfile.TemporaryDirectory() as td:
@@ -950,20 +970,27 @@ class TestPromotion(unittest.TestCase):
                                state_dir=Path(td) / "state",
                                results_dir=Path(td) / "results",
                                audit_dir=Path(td) / "audit")
+            from generation import decide_family, family_status
             r = Runner(paths)
-            ctx = experiment_context_id(dataset_id="d", data_sha256="s", cost_model="c")
-            r.ledger.append({"evaluation_id": "E0", "strategy_id": "S0",
-                             "context_id": ctx, "status": "PASS",
-                             "primary_dev_p": 1e-12})
-            # p=0.06 at rank 2 of 2: threshold 0.05 → step-up stops at rank 1 →
-            # the marginal candidate is NOT selected and never consumes the lock
-            rep = r._bh_fdr_survival("S1", ctx, 0.06)
-            self.assertFalse(rep["survived"])
-            self.assertEqual(rep["trials"], 2)
-            # different ctx → family of one, p=0.045 ≤ 0.05 → survives
-            rep2 = r._bh_fdr_survival("S1", "OTHER", 0.045)
-            self.assertTrue(rep2["survived"])
-            self.assertEqual(rep2["trials"], 1)
+            manifest = {"generation_id": "G-test", "strategy_ids": ["S0", "S1"]}
+            r.ledger.append({"evaluation_id": "E0", "strategy_id": "S0", "phase": "dev",
+                             "generation_id": "G-test", "context_id": "CTX",
+                             "status": "AWAITING_FDR", "primary_dev_p": 1e-12})
+            # S1 not yet evaluated: the family is incomplete → no decision at
+            # all (previously S0 "survived" as a family of one)
+            fam = family_status(r.ledger.records(), manifest, "CTX")
+            self.assertFalse(fam["complete"])
+            with self.assertRaises(ValueError):
+                decide_family(fam)
+            r.ledger.append({"evaluation_id": "E1", "strategy_id": "S1", "phase": "dev",
+                             "generation_id": "G-test", "context_id": "CTX",
+                             "status": "AWAITING_FDR", "primary_dev_p": 0.06})
+            # p=0.06 at rank 2 of 2: threshold 0.05 → the marginal candidate
+            # is NOT selected and never consumes the lock
+            dec = decide_family(family_status(r.ledger.records(), manifest, "CTX"))
+            self.assertEqual(dec["survivors"], ["S0"])
+            self.assertEqual(dec["m"], 2)
+            self.assertEqual(r.lock_registry.uses("S1", "BTCUSDT"), 0)
 
     def _write_btc_dataset(self, data: Path, *, lock_drift: float):
         import datetime as dt
@@ -1012,23 +1039,36 @@ class TestPromotion(unittest.TestCase):
         "primary_cell": {"symbol": "BTCUSDT", "horizon": 16},
     }
 
-    def test_full_pass_registers_promotion(self):
+    def _runner_one(self, td, data):
         from runner import PathConfig, Runner
+        from costs_bridge import FUTURES_COST_DEFAULTS
+        paths = PathConfig(root=Path(td) / "disc", data_dir=data,
+                           state_dir=Path(td) / "state",
+                           results_dir=Path(td) / "results",
+                           audit_dir=Path(td) / "audit")
+        cost = CostContext.from_params(FUTURES_COST_DEFAULTS, version="TEST_FAKE_VERIFIED",
+                                       verified=True, test_only=True)
+        sid = strategy_id(self.TOD_DEFN)
+        canon = normalize_strategy(self.TOD_DEFN)
+        return Runner(paths, cost=cost, allow_test_cost=True,
+                      candidates_fn=lambda: ([(sid, canon)], [])), sid
+
+    def test_full_pass_registers_promotion(self):
         with tempfile.TemporaryDirectory() as td:
             data = Path(td) / "data"
             self._write_btc_dataset(data, lock_drift=0.0005)
-            paths = PathConfig(root=Path(td) / "disc", data_dir=data,
-                               state_dir=Path(td) / "state",
-                               results_dir=Path(td) / "results",
-                               audit_dir=Path(td) / "audit")
-            r = Runner(paths)
+            r, sid = self._runner_one(td, data)
             r.register_all()
-            sid = strategy_id(self.TOD_DEFN)
-            out = r.run_one(sid, self.TOD_DEFN)
-            rec = out["record"]
-            self.assertEqual(out["status"], "PASS", json.dumps(rec, default=str)[:1500])
+            out = r.run_one(sid, r._defn_by_sid[sid])
+            self.assertEqual(out["status"], "AWAITING_FDR",
+                             json.dumps(out["record"], default=str)[:1500])
+            self.assertEqual(r.lock_registry.uses(sid, "BTCUSDT"), 0)
+            fin = r.finalize_fdr()
+            self.assertTrue(fin["complete"])
+            rec = r.ledger.latest_by_strategy()[sid]
+            self.assertEqual(rec["status"], "PASS", json.dumps(rec, default=str)[:1500])
             self.assertTrue(rec["multiple_testing"]["survived"])
-            self.assertGreaterEqual(rec["multiple_testing"]["trials"], 1)
+            self.assertEqual(rec["multiple_testing"]["m"], 1)
             self.assertEqual(rec["locked_test"]["pass"]["BTCUSDT"], True)
             self.assertTrue(rec["locked_test"]["independent"])
             self.assertEqual(r.lock_registry.uses(sid, "BTCUSDT"), 1)
@@ -1038,24 +1078,21 @@ class TestPromotion(unittest.TestCase):
             promo = r.promo.entries()
             self.assertEqual(len(promo), 1)
             self.assertEqual(promo[0]["strategy_id"], sid)
-            out2 = r.run_one(sid, self.TOD_DEFN)
+            self.assertTrue(promo[0]["test_only"])
+            out2 = r.run_one(sid, r._defn_by_sid[sid])
             self.assertTrue(out2.get("skipped"))
 
     def test_failing_locked_test_not_promoted(self):
-        from runner import PathConfig, Runner
         with tempfile.TemporaryDirectory() as td:
             data = Path(td) / "data"
             self._write_btc_dataset(data, lock_drift=-0.0005)
-            paths = PathConfig(root=Path(td) / "disc", data_dir=data,
-                               state_dir=Path(td) / "state",
-                               results_dir=Path(td) / "results",
-                               audit_dir=Path(td) / "audit")
-            r = Runner(paths)
+            r, sid = self._runner_one(td, data)
             r.register_all()
-            sid = strategy_id(self.TOD_DEFN)
-            out = r.run_one(sid, self.TOD_DEFN)
-            rec = out["record"]
-            self.assertEqual(out["status"], "FAIL_STAT")
+            out = r.run_one(sid, r._defn_by_sid[sid])
+            self.assertEqual(out["status"], "AWAITING_FDR")
+            r.finalize_fdr()
+            rec = r.ledger.latest_by_strategy()[sid]
+            self.assertEqual(rec["status"], "FAIL_STAT")
             self.assertEqual(rec["locked_test"]["pass"]["BTCUSDT"], False)
             self.assertEqual(r.promo.entries(), [])
 
