@@ -294,3 +294,15 @@ class TestMCSAndDSR(unittest.TestCase):
         expect = 0.5 * math.erfc(-z / math.sqrt(2))
         self.assertAlmostEqual(deflated_sharpe(sr, n, 0.0, 3.0, N, V), expect, places=9)
         self.assertLess(deflated_sharpe(sr, n, 0.0, 3.0, 500, V), deflated_sharpe(sr, n, 0.0, 3.0, 5, V))
+
+
+class TestCostBreakeven(unittest.TestCase):
+    def test_breakeven_hand_example(self):
+        from pipeline import cost_breakeven
+        ev = [{"gross_bp": 30.0, "cost_bp": 10.0, "funding_bp": 0.0},
+              {"gross_bp": 10.0, "cost_bp": 10.0, "funding_bp": 0.0}]
+        self.assertAlmostEqual(cost_breakeven(ev), 2.0)        # (20 gross)/(10 cost)
+        ev[0]["funding_bp"] = 10.0
+        self.assertAlmostEqual(cost_breakeven(ev), 1.5)        # funding eats margin
+        self.assertIsNone(cost_breakeven([]))
+        self.assertIsNone(cost_breakeven([{"gross_bp": 1.0, "cost_bp": 0.0, "funding_bp": 0.0}]))

@@ -870,7 +870,8 @@ class EvolutionPipeline:
             xs = [x["gross_bp"] - mult * x["cost_bp"] - x["funding_bp"] for x in all_ev]
             stress[str(mult)] = sum(xs) / len(xs) if xs else None
         need = stress.get(str(rc["require_positive_at_cost_multiplier"]))
-        checks["cost_stress"] = {"pass": need is not None and need > 0, "mean_bp": stress}
+        checks["cost_stress"] = {"pass": need is not None and need > 0, "mean_bp": stress,
+                                 "breakeven_multiplier": cost_breakeven(all_ev)}
         # regimes
         reg = {k: {"n": len(v), "mean_bp": sum(v) / len(v)} for k, v in regime_ev.items()}
         usable = [v for v in reg.values() if v["n"] >= rc["regime_min_events"]]
@@ -1181,6 +1182,20 @@ class EvolutionPipeline:
             self.statuses.set(sid, ctx, "BLOCKED_STATISTICS", stage="promotion", reasons=failures,
                               evidence=evidence, resume_to="VALIDATION_SURVIVOR")
         return review
+
+
+def cost_breakeven(events: Sequence[Mapping]) -> Optional[float]:
+    """Multiple of the modelled trading cost at which the mean net result is 0:
+    mean(gross - funding) / mean(cost).  Cost sensitivity as a sanity check (a
+    strategy that dies at 1.1x the assumed cost has no margin); informational,
+    never a gate.  None when it cannot be computed (no events / no cost)."""
+    if not events:
+        return None
+    n = len(events)
+    cost = sum(x["cost_bp"] for x in events) / n
+    if not cost > 0:
+        return None
+    return sum(x["gross_bp"] - x["funding_bp"] for x in events) / n / cost
 
 
 class _Ev:
