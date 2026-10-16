@@ -35,7 +35,8 @@ LOW_DISK_BYTES = 200 * 1024 * 1024
 CONFIGS = {"promotion_v2.json": "promotion_config_v1",
            "cost_verification_v1.json": "cost_verification_criteria_v1",
            "paper_forward_v1.json": "paper_forward_criteria_v1",
-           "cost_assumed_public_v1.json": "cost_assumed_profile_v1"}
+           "cost_assumed_public_v1.json": "cost_assumed_profile_v1",
+           "cost_public_estimate_v1.json": "cost_public_estimate_criteria_v1"}
 
 
 def _pid_alive(pid: int) -> bool:

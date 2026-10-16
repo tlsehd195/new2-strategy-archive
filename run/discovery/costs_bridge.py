@@ -95,6 +95,9 @@ UNVERIFIED_COST_MODEL = "UNVERIFIED_COST_MODEL"
 #: a documented assumption profile (public fee schedule + conservative
 #: slippage margin) — still unverified, never promotable (ADR 0007)
 ASSUMED_COST_MODEL = "ASSUMED_COST_MODEL"
+#: spread/impact estimated from public order books (fee still assumed) —
+#: evidence, not a verification; never promotable (ADR 0007)
+ESTIMATED_FROM_PUBLIC_DATA = "ESTIMATED_FROM_PUBLIC_DATA"
 ASSUMED_PROFILE_SCHEMA = "cost_assumed_profile_v1"
 ASSUMED_PROFILES = {"assumed_public_v1": "cost_assumed_public_v1.json"}
 
@@ -233,11 +236,30 @@ class CostContext:
                                "base_half_spread": prof["base_half_spread"],
                                "slippage_margin_per_side": prof["slippage_margin_per_side"]})
 
+    @classmethod
+    def from_public_estimate(cls, record: dict) -> "CostContext":
+        """Parameters from a sealed ``public_cost_estimate`` record
+        (ESTIMATED_FROM_PUBLIC_DATA — unverified, research only)."""
+        from public_cost_estimate import EstimateError, check_estimate
+        try:
+            check_estimate(record)
+        except EstimateError as e:
+            raise CostConfigError(f"public cost estimate rejected: {e}") from e
+        p = _validate_params(dict(record["params"]))
+        return cls(model=CandleCostModel(**p),
+                   version=f"{COST_MODEL_VERSION}#public_estimate:{record['record_id']}",
+                   verified=False, test_only=False,
+                   assumption={"kind": "public_estimate", "status": ESTIMATED_FROM_PUBLIC_DATA,
+                               "profile_id": record["record_id"], "sha256": record["record_id"],
+                               "fee_source": record["fee_basis"]["fee_source"]})
+
     @property
     def status(self) -> str:
         if self.verified:
             return "VERIFIED"
-        return ASSUMED_COST_MODEL if self.assumption is not None else UNVERIFIED_COST_MODEL
+        if self.assumption is None:
+            return UNVERIFIED_COST_MODEL
+        return self.assumption.get("status", ASSUMED_COST_MODEL)
 
     def verified_for(self, symbols, order_value: float) -> tuple[bool, list[str]]:
         """Does the verification cover this use (symbols, order size)?"""

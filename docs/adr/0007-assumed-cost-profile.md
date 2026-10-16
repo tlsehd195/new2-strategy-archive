@@ -1,8 +1,8 @@
-# ADR 0007 — 가정 비용(ASSUMED) 프로필: 실측 체결 없이 연구를 계속하되 승격은 막는다
+# ADR 0007 — 가정 비용(ASSUMED)과 공개 시세 추정(ESTIMATED_FROM_PUBLIC_DATA): 실측 체결 없이 연구를 계속하되 승격은 막는다
 
 - 상태: Proposed (PR #6, 머지 시 Accepted)
 - 날짜: 2026-10-16
-- 범위: `run/discovery/costs_bridge.py`, `config/cost_assumed_public_v1.json`(신규), `pipeline.py`, `runner.py`, `autoloop.py`, `ops.py`, `run_cycle.sh`(주석), `tests/test_assumed_cost.py`(신규), `.github/workflows/research-ci.yml`
+- 범위: `run/discovery/costs_bridge.py`, `config/cost_assumed_public_v1.json`(신규), `public_market_collect.py`·`public_cost_estimate.py`·`config/cost_public_estimate_v1.json`·`tests/test_public_estimate.py`·`docs/공개시세_비용추정_로컬실행_안내.md`(신규), `pipeline.py`, `runner.py`, `autoloop.py`, `ops.py`, `run_cycle.sh`(주석), `tests/test_assumed_cost.py`(신규), `.github/workflows/research-ci.yml`
 - 선행: [ADR 0006](0006-cost-verification-forward-paper-data-manifest-ops-ci.md)
 
 ## 맥락
@@ -32,11 +32,21 @@ ADR 0006에 따라 비용 모델은 계정 체결 보고서로만 검증할 수 
    - 환경 변수 `NEW2_COST_PROFILE`의 기본값은 `new2_default`이고 동작은 이전과 같다. `assumed_public_v1`을 주면 이 프로필을 쓴다.
    - 모르는 이름을 주면 잠금을 잡기 전에 `CONFIG_ERROR`를 내고 종료 코드 1로 끝난다.
 
+6. **공개 시세 추정** (사용자 결정 2026-10-16: "공개 시세 api로 할게").
+   - `public_market_collect.py`는 키가 필요 없는 공개 엔드포인트만 호출한다(`/fapi/v1/depth`, `klines`, `aggTrades`, `time`). 허용 목록 밖의 경로나 서명·타임스탬프·API 키 파라미터는 코드가 거부한다. 네트워크 사용은 `--allow-network`로 명시해야 하고, 수집 시간은 `--hours`로 반드시 제한된다. 요청 간격은 5초 이상이어야 한다.
+   - `public_cost_estimate.py`는 네트워크를 쓰지 않는다. 스냅샷마다 호가를 걸어 1천~100만 USDT 주문의 한쪽 비용을 잰다. 시장 충격 계수는 `초과비용 = k·√(주문/직전 15분 거래대금)`으로 적합한다.
+   - 보수적 선택은 모두 데이터를 보기 전에 `config/cost_public_estimate_v1.json`에 고정했다. 반스프레드는 90% 분위수에 한 수집 간격 동안의 중간가 변동 중앙값(지연 여유)을 더한다. 충격 계수는 최소제곱 추정과 90% 분위수 비율 중 큰 값을 쓴다. 종목 간에는 최댓값을 쓴다.
+   - 사용 조건은 종목별 72시간 이상, 스냅샷 2,000개 이상, 공백 2% 이하, 무효 1% 이하다. 조건을 못 채우면 `INSUFFICIENT_PUBLIC_DATA`이고 엔진이 거부한다.
+   - 수수료는 공개 데이터에 없으므로 ASSUMED 프로필의 공개 수수료표 값(taker 5bp)을 그대로 쓰고, `observed=false`로 기록한다.
+   - 엔진에서는 `NEW2_COST_PROFILE=public_estimate:<record.json>`으로 쓴다. 이때 상태는 `ESTIMATED_FROM_PUBLIC_DATA`이고 `verified=False`다. 승격 심사 라벨과 `BLOCKED_COST` 처리는 ASSUMED와 같다. 기록 해시가 맞지 않으면 거부한다.
+   - 이 컨테이너는 바이낸스 접속이 막혀 있으므로 실행은 사용자 PC에서 한다. 절차는 `docs/공개시세_비용추정_로컬실행_안내.md`에 있다. 사용자에게 우회 접속을 안내하지 않는다.
+
 ## 설정·기준 변경 기록
 | 항목 | 이전 | 새 값 | 컨텍스트 영향 |
 |---|---|---|---|
 | 비용 프로필 | 기본(UNVERIFIED)만 존재 | `assumed_public_v1` 추가 | 프로필 ID·파일 해시가 비용 identity에 들어가므로 별도 컨텍스트가 된다. 파일을 고쳐도 새 컨텍스트가 된다. |
 | 기본 프로필 비용 identity | — | 형태 변경 없음 | 다만 `costs_bridge.py`, `pipeline.py`, `runner.py` 코드 해시가 바뀌므로 기본 프로필로 돌려도 새 컨텍스트가 된다(이전 PASS는 재사용하지 않는다). |
+| 공개 시세 추정 기준 | 없음 | `cost_public_estimate_v1.json` 신규(데이터 수집 전에 고정) | 추정 기록 ID가 비용 identity에 들어가 별도 컨텍스트가 된다 |
 | 승격·검증 기준 (`promotion_v2.json`, `cost_verification_v1.json`) | — | 변경 없음 | 없음 |
 
 ## 결과

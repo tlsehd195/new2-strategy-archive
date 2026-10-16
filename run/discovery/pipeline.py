@@ -43,8 +43,7 @@ from pathlib import Path
 from typing import Mapping, Optional, Sequence
 
 from campaigns import CampaignLedger, WindowRetired, member_alpha
-from costs_bridge import (ASSUMED_COST_MODEL, COST_MODEL_SCOPE, CostComputationError, CostConfigError,
-                          UNVERIFIED_COST_MODEL)
+from costs_bridge import COST_MODEL_SCOPE, CostComputationError, CostConfigError, UNVERIFIED_COST_MODEL
 from engine_lib import (
     CODE_FILES, LockTestRegistry, append_jsonl, bh_fdr_family, canonical_json,
     code_identity, experiment_context, iso_now, iter_jsonl, locked_window_for, nw_tstat,
@@ -63,7 +62,7 @@ from strategy_spec import (
 )
 
 PIPELINE_VERSION = "evo-pipeline-v1"
-EVO_CODE_FILES = tuple(sorted(set(CODE_FILES) | {"strategy_spec.py", "evolution.py", "search.py",
+EVO_CODE_FILES = tuple(sorted(set(CODE_FILES) | {"public_cost_estimate.py", "strategy_spec.py", "evolution.py", "search.py",
                                                  "pipeline.py", "autoloop.py", "paper.py",
                                                  "paper_forward.py", "execution_sim.py",
                                                  "config/paper_forward_v1.json"}))
@@ -506,7 +505,7 @@ class EvolutionPipeline:
              "test_only": self.cost.test_only, "scope": COST_MODEL_SCOPE}
         if self.cost.assumption is not None:
             b["assumption"] = {k: self.cost.assumption[k] for k in ("profile_id", "sha256")}
-            b["claim"] = "비용 미검증(ASSUMED): research only, never promotable"
+            b["claim"] = f"비용 미검증({self.cost.status}): research only, never promotable"
         return b
 
     # -- stage 1: DEV ------------------------------------------------------------------
@@ -1264,8 +1263,8 @@ class EvolutionPipeline:
             canonicalize_spec(self.specs.get(sid))["symbols"], self.order_value)
         if not cost_ok:
             labels.append(pc.get("unverified_cost_label", UNVERIFIED_COST_MODEL))
-            if self.cost.status == ASSUMED_COST_MODEL:
-                labels.append(ASSUMED_COST_MODEL)
+            if self.cost.status != UNVERIFIED_COST_MODEL and not self.cost.verified:
+                labels.append(self.cost.status)       # ASSUMED_COST_MODEL / ESTIMATED_FROM_PUBLIC_DATA
         if self.cost.test_only:
             labels.append("TEST_ONLY_COST")
         review = {"strategy_id": sid, "context_id": ctx, "config_hash": self.cfg_hash,

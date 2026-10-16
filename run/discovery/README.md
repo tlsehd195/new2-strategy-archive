@@ -56,6 +56,11 @@ fixed 3bp slippage margin per side (`config/cost_assumed_public_v1.json`).
 Records carry `ASSUMED_COST_MODEL` ("비용 미검증"); like the default
 (`UNVERIFIED_COST_MODEL`) it can never reach `PAPER_TEST_READY` — only a
 sealed `cost_calibration` VERIFIED record can.  Unknown names exit 1.
+`NEW2_COST_PROFILE=public_estimate:<record.json>` uses spread/impact
+estimated from public order books (`public_market_collect.py` on a machine
+that reaches Binance, then `public_cost_estimate.py`; Korean guide:
+`docs/공개시세_비용추정_로컬실행_안내.md`) — status
+`ESTIMATED_FROM_PUBLIC_DATA`, equally never promotable.
 
 One automatic research cycle (`autoloop.py`): data check (no usable data →
 `CYCLE_BLOCKED_DATA`, nothing synthesised) → seed the search once with the
@@ -176,6 +181,7 @@ audit report.
 - `campaigns.py` — locked-window campaign ledger (group-level locked TEST control)
 - `paper.py` / `autoloop.py` / `data_fetch.py` — isolated paper replay (never PAPER_PASSED) / one evolution cycle / opt-in data acquisition (retry + failure classes)
 - `config/cost_assumed_public_v1.json` — the ASSUMED cost profile (ADR 0007)
+- `public_market_collect.py` / `public_cost_estimate.py` + `config/cost_public_estimate_v1.json` — key-less public book collector (opt-in network, bounded) / offline spread+impact estimator (ADR 0007)
 - `cost_calibration.py` + `config/cost_verification_v1.json` — the ONLY way to a verified cost model: fit on execution reports, verify out-of-sample, sealed `CV-…` record (ADR 0006)
 - `data_manifest.py` — dataset manifest (SHA-256 per file, provenance, cross-month/funding checks)
 - `execution_sim.py` — partial fill / reject / liquidation / late-observation layer

@@ -57,6 +57,8 @@ jobs:
           from costs_bridge import ASSUMED_PROFILES, load_assumed_profile
           load_promotion_config(); cost_criteria(); paper_criteria()
           for name in ASSUMED_PROFILES: load_assumed_profile(name)
+          from public_cost_estimate import load_criteria as estimate_criteria
+          estimate_criteria()
           json.load(open("data_exceptions.json"))
           print("configs ok")
           EOF

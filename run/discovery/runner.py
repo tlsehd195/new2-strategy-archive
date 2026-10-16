@@ -1643,15 +1643,24 @@ EXIT_BLOCKED_DATA = 4
 
 def cost_from_env() -> CostContext:
     """``NEW2_COST_PROFILE``: unset/``new2_default`` → NEW2 defaults (UNVERIFIED);
-    ``assumed_public_v1`` → public fee schedule + slippage margin (ASSUMED).
-    Neither is verified; only a sealed calibration record is (ADR 0006/0007)."""
+    ``assumed_public_v1`` → public fee schedule + slippage margin (ASSUMED);
+    ``public_estimate:<record.json>`` → spread/impact estimated from public
+    order books (ESTIMATED_FROM_PUBLIC_DATA).  None is verified; only a sealed
+    calibration record is (ADR 0006/0007)."""
     name = os.environ.get("NEW2_COST_PROFILE", "").strip()
     if name in ("", "new2_default"):
         return CostContext.futures_default()
     if name in ASSUMED_PROFILES:
         return CostContext.from_assumed_profile(name)
+    if name.startswith("public_estimate:"):
+        path = Path(name.split(":", 1)[1])
+        try:
+            rec = json.loads(path.read_text())
+        except (OSError, ValueError) as e:
+            raise CostConfigError(f"public estimate {path} unreadable: {e}") from e
+        return CostContext.from_public_estimate(rec)
     raise CostConfigError(f"NEW2_COST_PROFILE={name!r} unknown (new2_default | "
-                          + " | ".join(ASSUMED_PROFILES) + ")")
+                          + " | ".join(ASSUMED_PROFILES) + " | public_estimate:<record.json>)")
 
 
 def main(argv: Sequence[str]) -> int:
