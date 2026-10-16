@@ -54,7 +54,9 @@ jobs:
           from pipeline import load_promotion_config
           from cost_calibration import load_criteria as cost_criteria
           from paper_forward import load_criteria as paper_criteria
+          from costs_bridge import ASSUMED_PROFILES, load_assumed_profile
           load_promotion_config(); cost_criteria(); paper_criteria()
+          for name in ASSUMED_PROFILES: load_assumed_profile(name)
           json.load(open("data_exceptions.json"))
           print("configs ok")
           EOF

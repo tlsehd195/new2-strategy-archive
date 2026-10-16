@@ -43,7 +43,8 @@ from pathlib import Path
 from typing import Mapping, Optional, Sequence
 
 from campaigns import CampaignLedger, WindowRetired, member_alpha
-from costs_bridge import COST_MODEL_SCOPE, CostComputationError, CostConfigError, UNVERIFIED_COST_MODEL
+from costs_bridge import (ASSUMED_COST_MODEL, COST_MODEL_SCOPE, CostComputationError, CostConfigError,
+                          UNVERIFIED_COST_MODEL)
 from engine_lib import (
     CODE_FILES, LockTestRegistry, append_jsonl, bh_fdr_family, canonical_json,
     code_identity, experiment_context, iso_now, iter_jsonl, locked_window_for, nw_tstat,
@@ -501,9 +502,12 @@ class EvolutionPipeline:
         return data, fng, missing
 
     def _cost_block(self) -> dict:
-        return {"version": self.cost.version,
-                "status": "VERIFIED" if self.cost.verified else UNVERIFIED_COST_MODEL,
-                "test_only": self.cost.test_only, "scope": COST_MODEL_SCOPE}
+        b = {"version": self.cost.version, "status": self.cost.status,
+             "test_only": self.cost.test_only, "scope": COST_MODEL_SCOPE}
+        if self.cost.assumption is not None:
+            b["assumption"] = {k: self.cost.assumption[k] for k in ("profile_id", "sha256")}
+            b["claim"] = "비용 미검증(ASSUMED): research only, never promotable"
+        return b
 
     # -- stage 1: DEV ------------------------------------------------------------------
     def register(self, spec: Mapping, *, source: str, parents: Sequence[str] = (),
@@ -1260,6 +1264,8 @@ class EvolutionPipeline:
             canonicalize_spec(self.specs.get(sid))["symbols"], self.order_value)
         if not cost_ok:
             labels.append(pc.get("unverified_cost_label", UNVERIFIED_COST_MODEL))
+            if self.cost.status == ASSUMED_COST_MODEL:
+                labels.append(ASSUMED_COST_MODEL)
         if self.cost.test_only:
             labels.append("TEST_ONLY_COST")
         review = {"strategy_id": sid, "context_id": ctx, "config_hash": self.cfg_hash,
@@ -1276,7 +1282,7 @@ class EvolutionPipeline:
                               labels=labels)
         elif review["decision"] == "BLOCKED_COST":
             self.statuses.set(sid, ctx, "BLOCKED_COST", stage="promotion",
-                              reasons=["UNVERIFIED_COST_MODEL: research candidate only, not promotable to PAPER_TEST_READY"],
+                              reasons=[f"{self.cost.status}: research candidate only, not promotable to PAPER_TEST_READY"],
                               evidence=evidence, resume_to="VALIDATION_SURVIVOR")
         else:
             self.statuses.set(sid, ctx, "BLOCKED_STATISTICS", stage="promotion", reasons=failures,

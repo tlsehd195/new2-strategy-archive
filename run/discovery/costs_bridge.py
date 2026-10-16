@@ -92,6 +92,11 @@ FUTURES_COST_DEFAULTS: dict = {
 }
 
 UNVERIFIED_COST_MODEL = "UNVERIFIED_COST_MODEL"
+#: a documented assumption profile (public fee schedule + conservative
+#: slippage margin) — still unverified, never promotable (ADR 0007)
+ASSUMED_COST_MODEL = "ASSUMED_COST_MODEL"
+ASSUMED_PROFILE_SCHEMA = "cost_assumed_profile_v1"
+ASSUMED_PROFILES = {"assumed_public_v1": "cost_assumed_public_v1.json"}
 
 #: applicability range of the candle model, recorded with every evaluation
 COST_MODEL_SCOPE = {
@@ -171,12 +176,16 @@ class CostContext:
     test_only: bool = False
     params: dict = field(default_factory=dict, compare=False, hash=False)
     verification: Optional[dict] = field(default=None, compare=False, hash=False)
+    assumption: Optional[dict] = field(default=None, compare=False, hash=False)
 
     def __post_init__(self):
         # the params actually used are always the model's own fields — the
         # record can never claim a different configuration than was priced
         object.__setattr__(self, "params", _validate_params(
             {k: getattr(self.model, k) for k in REQUIRED_COST_PARAMS}))
+        if self.assumption is not None and self.verified:
+            raise CostConfigError("an assumed cost profile is not a verification — "
+                                  "it can never be verified=True")
         if self.verified and not self.test_only:
             from cost_calibration import CalibrationError, check_record
             if not self.verification:
@@ -207,10 +216,33 @@ class CostContext:
                    version=f"{COST_MODEL_VERSION}#verified:{record.get('record_id')}",
                    verified=True, test_only=False, verification=dict(record))
 
+    @classmethod
+    def from_assumed_profile(cls, name_or_path: str, *, config_dir=None) -> "CostContext":
+        """A documented ASSUMED cost profile (unverified, research only)."""
+        prof, sha = load_assumed_profile(name_or_path, config_dir=config_dir)
+        p = {"fee_rate": prof["fee_rate"],
+             "half_spread": prof["base_half_spread"] + prof["slippage_margin_per_side"],
+             "impact_coefficient": prof["impact_coefficient"],
+             "max_participation": prof["max_participation"]}
+        p = _validate_params(p)
+        return cls(model=CandleCostModel(**p),
+                   version=f"{COST_MODEL_VERSION}#assumed:{prof['profile_id']}:{sha[:12]}",
+                   verified=False, test_only=False,
+                   assumption={"profile_id": prof["profile_id"], "sha256": sha,
+                               "fee_source": prof["fee_source"],
+                               "base_half_spread": prof["base_half_spread"],
+                               "slippage_margin_per_side": prof["slippage_margin_per_side"]})
+
+    @property
+    def status(self) -> str:
+        if self.verified:
+            return "VERIFIED"
+        return ASSUMED_COST_MODEL if self.assumption is not None else UNVERIFIED_COST_MODEL
+
     def verified_for(self, symbols, order_value: float) -> tuple[bool, list[str]]:
         """Does the verification cover this use (symbols, order size)?"""
         if not self.verified:
-            return False, [UNVERIFIED_COST_MODEL]
+            return False, [self.status]
         if self.test_only:
             return True, []
         sc = (self.verification or {}).get("scope") or {}
@@ -236,6 +268,9 @@ class CostContext:
             "verified": bool(self.verified),
             "test_only": bool(self.test_only),
             "verification_record": (self.verification or {}).get("record_id"),
+            # assumed profiles only: the default cost identity keeps its shape
+            **({"status": self.status, "assumption_profile": self.assumption["profile_id"],
+                "assumption_sha256": self.assumption["sha256"]} if self.assumption else {}),
         }
 
     def quote(self, order_value: float, bar_traded_value) -> float:
@@ -280,6 +315,33 @@ class CostContext:
         c = (self.quote(order_value, entry_bar_value)
              + self.quote(order_value, exit_bar_value))
         return c * 1e4
+
+
+def load_assumed_profile(name_or_path: str, *, config_dir=None) -> tuple[dict, str]:
+    """Read and validate an assumed-cost profile; returns (profile, sha256 of the file)."""
+    from pathlib import Path
+    cdir = Path(config_dir) if config_dir else Path(__file__).resolve().parent / "config"
+    path = cdir / ASSUMED_PROFILES[name_or_path] if name_or_path in ASSUMED_PROFILES else Path(name_or_path)
+    try:
+        raw = path.read_bytes()
+        prof = __import__("json").loads(raw)
+    except (OSError, ValueError) as e:
+        raise CostConfigError(f"assumed cost profile {name_or_path!r} unreadable: {e}") from e
+    if not isinstance(prof, dict) or prof.get("schema") != ASSUMED_PROFILE_SCHEMA:
+        raise CostConfigError(f"{path}: schema must be {ASSUMED_PROFILE_SCHEMA!r}")
+    if prof.get("status") != ASSUMED_COST_MODEL:
+        raise CostConfigError(f"{path}: status must be {ASSUMED_COST_MODEL!r} — a profile is never verified")
+    for k in ("profile_id", "fee_source"):
+        if not isinstance(prof.get(k), str) or not prof[k].strip():
+            raise CostConfigError(f"{path}: {k} required")
+    for k in ("fee_rate", "base_half_spread", "slippage_margin_per_side",
+              "impact_coefficient", "max_participation"):
+        v = prof.get(k)
+        if isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or v < 0:
+            raise CostConfigError(f"{path}: {k} must be a finite number >= 0, got {v!r}")
+    if any(k in prof for k in ("verified", "verification")):
+        raise CostConfigError(f"{path}: a profile cannot carry verification fields")
+    return prof, hashlib.sha256(raw).hexdigest()
 
 
 #: named sensitivity scenarios for the cost sensitivity analysis (§10)

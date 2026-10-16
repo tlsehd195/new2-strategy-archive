@@ -50,6 +50,13 @@ If the log directory cannot be created the runner is not started (exit 1).
 
 ## Evolution mode (`--mode evolve`, ADR 0004)
 
+Cost profile (ADR 0007): `NEW2_COST_PROFILE=assumed_public_v1` prices every
+fill at the public base-tier taker fee (5bp) plus half spread 2bp and a
+fixed 3bp slippage margin per side (`config/cost_assumed_public_v1.json`).
+Records carry `ASSUMED_COST_MODEL` ("비용 미검증"); like the default
+(`UNVERIFIED_COST_MODEL`) it can never reach `PAPER_TEST_READY` — only a
+sealed `cost_calibration` VERIFIED record can.  Unknown names exit 1.
+
 One automatic research cycle (`autoloop.py`): data check (no usable data →
 `CYCLE_BLOCKED_DATA`, nothing synthesised) → seed the search once with the
 779 legacy candidates translated to declarative specs → pending DEV
@@ -168,6 +175,7 @@ audit report.
 - `pipeline.py` — staged evaluation, statuses, validation batches, robustness, locked campaigns, promotion review
 - `campaigns.py` — locked-window campaign ledger (group-level locked TEST control)
 - `paper.py` / `autoloop.py` / `data_fetch.py` — isolated paper replay (never PAPER_PASSED) / one evolution cycle / opt-in data acquisition (retry + failure classes)
+- `config/cost_assumed_public_v1.json` — the ASSUMED cost profile (ADR 0007)
 - `cost_calibration.py` + `config/cost_verification_v1.json` — the ONLY way to a verified cost model: fit on execution reports, verify out-of-sample, sealed `CV-…` record (ADR 0006)
 - `data_manifest.py` — dataset manifest (SHA-256 per file, provenance, cross-month/funding checks)
 - `execution_sim.py` — partial fill / reject / liquidation / late-observation layer
