@@ -114,7 +114,9 @@ matrix), `test_final_fdr_context.py` (FDR family notions, prior-context evidence
 decision immutability, context behaviour), `test_core_defects.py` (15m integrity, defaults,
 look-ahead, ledger recovery), `test_evolution_spec.py` (specs, operators, lineage,
 RC/SPA/StepM), `test_pipeline.py` (staged pipeline, campaigns, promotion, paper, search
-budget/resume, cycle), `test_legacy_campaigns.py` and `test_data_fetch.py`.  The exact counts of the last verification
+budget/resume, cycle), `test_legacy_campaigns.py`, `test_data_fetch.py` and `test_completion.py` (cost verification
+gate, fetch retry, data manifest, execution sim, forward paper, PR #4 diagnostics, scenario
+matrix, ops; ADR 0006).  CI: `.github/workflows/research-ci.yml`.  The exact counts of the last verification
 are in the final audit report.  Synthetic data +
 isolated temp dirs — the real ledger/state and the locked TEST windows are
 NEVER touched.  The run log of the last verification is in the residual-fix
@@ -165,7 +167,12 @@ audit report.
 - `stats_mc.py` — stationary bootstrap, Reality Check, SPA, StepM, BY, alpha spending
 - `pipeline.py` — staged evaluation, statuses, validation batches, robustness, locked campaigns, promotion review
 - `campaigns.py` — locked-window campaign ledger (group-level locked TEST control)
-- `paper.py` / `autoloop.py` / `data_fetch.py` — isolated paper replay / one evolution cycle / opt-in data acquisition
+- `paper.py` / `autoloop.py` / `data_fetch.py` — isolated paper replay (never PAPER_PASSED) / one evolution cycle / opt-in data acquisition (retry + failure classes)
+- `cost_calibration.py` + `config/cost_verification_v1.json` — the ONLY way to a verified cost model: fit on execution reports, verify out-of-sample, sealed `CV-…` record (ADR 0006)
+- `data_manifest.py` — dataset manifest (SHA-256 per file, provenance, cross-month/funding checks)
+- `execution_sim.py` — partial fill / reject / liquidation / late-observation layer
+- `paper_forward.py` + `config/paper_forward_v1.json` — forward paper observation on bars that close after registration; the only source of PAPER_PASSED
+- `ops.py` — `health` (read-only state check) and bounded `loop`
 - `portfolio_sim.py`, `funding_cost.py` — legacy v1 diagnostics (NOT used by
   the runner; `portfolio_sim.py` references the v1 `engine_lib.RUN` and does not run against v2)
 - `state/` — state.json, queue.json, discovery_ledger.jsonl (v2 schema),

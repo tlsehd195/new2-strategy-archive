@@ -1,0 +1,23 @@
+## ruff gating (E9,F63,F7,F82)
+All checks passed!
+exit=0
+## ruff F (report)
+17	F401	[*] unused-import
+ 5	F841	[ ] unused-variable
+Found 22 errors.
+[*] 17 fixable with the `--fix` option (5 hidden fixes can be enabled with the `--unsafe-fixes` option).
+exit=1
+## ruff F on origin/main for comparison
+## compileall
+exit=0
+## bash -n / shellcheck run_cycle.sh
+bash-n exit=0
+shellcheck exit=0
+ShellCheck - shell script analysis tool
+version: 0.11.0
+ruff 0.16.8
+2cb09dc Merge pull request #2 from tlsehd195/claude/final-residual-fixes
+22	F401	[*] unused-import
+ 5	F841	[ ] unused-variable
+Found 27 errors.
+[*] 22 fixable with the `--fix` option (5 hidden fixes can be enabled with the `--unsafe-fixes` option).

@@ -1,0 +1,99 @@
+{
+ "base_params": {
+  "fee_rate": 0.0005,
+  "half_spread": 0.0002,
+  "impact_coefficient": 0.1,
+  "max_participation": 0.05
+ },
+ "by_hour_utc": [],
+ "by_participation": [],
+ "by_volatility": [],
+ "calibration_version": "cost-calib-v1",
+ "code_hash": "2a77d71f555d12cf785a93ab996a1a0b1bfed15c1bf6439274bb8f32dfcba611",
+ "cost_source_sha256": "27ec57bbeb0fed22878ea427579223ff5eea495a288e7b39c9a96d0e49b3540b",
+ "criteria_hash": "d0bdb7586c4a6a2f",
+ "data_sha256": "6acc8133eb35ca6a2312c9196d3a9af6620b80ca7fe1f8d150d2e1501a8fb886",
+ "fill_rates": {
+  "EXPIRED": 1.0,
+  "FILLED": 0.0,
+  "PARTIAL": 0.0,
+  "REJECTED": 0.0
+ },
+ "fit": {
+  "fitted": {
+   "half_spread": {
+    "method": "median quoted (ask-bid)/2/mid",
+    "n": 8
+   }
+  },
+  "params": {
+   "fee_rate": 0.0005,
+   "half_spread": 1.2945208569124594e-06,
+   "impact_coefficient": 0.1,
+   "max_participation": 0.05
+  }
+ },
+ "model_refusals_in_verification": 0,
+ "n_observations": 16,
+ "params": {
+  "fee_rate": 0.0005,
+  "half_spread": 1.2945208569124594e-06,
+  "impact_coefficient": 0.1,
+  "max_participation": 0.05
+ },
+ "period": {
+  "calibration": [
+   1791967067014,
+   1791967067015
+  ],
+  "verification": [
+   1791984176165,
+   1791984176166
+  ]
+ },
+ "reasons": [
+  "components not verifiable from ['paper_fill_monitor']: ['fee', 'impact'] (account execution reports with fees are required)",
+  "BTCUSDT: 0 verification fills < 200",
+  "ETHUSDT: 0 verification fills < 200",
+  "order value 10000.0 outside the observed notional range [1.0, 1.0]"
+ ],
+ "record_id": "CV-7ea0bc0b48fcdf812226b1f0",
+ "schema": "cost_verification_v1",
+ "scope": {
+  "notional_range": [
+   1.0,
+   1.0
+  ],
+  "order_types": [
+   "maker"
+  ],
+  "symbols": [
+   "BTCUSDT",
+   "ETHUSDT"
+  ]
+ },
+ "sealed_at": "2026-10-16T12:56:02Z",
+ "source_kinds": [
+  "paper_fill_monitor"
+ ],
+ "source_ref": "../../data/fill_ledger.jsonl",
+ "spread_check": {
+  "base_half_spread_bp": 2.0,
+  "model_half_spread_bp": 0.012945208569124594,
+  "observed_half_spread_bp": {
+   "max_bp": 0.02032524456394887,
+   "mean_bp": 0.01319422798423743,
+   "median_bp": 0.01319422798423743,
+   "n": 8,
+   "p90_bp": 0.02032524456394887,
+   "p95_bp": 0.02032524456394887,
+   "p99_bp": 0.02032524456394887,
+   "underestimated_share": 1.0
+  }
+ },
+ "status": "BLOCKED_EXTERNAL_EVIDENCE",
+ "verification_errors": {
+  "n": 0
+ }
+}
+exit=4
