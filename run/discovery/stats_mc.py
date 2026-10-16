@@ -21,6 +21,25 @@ Implemented from the source texts (checked 2026-10-15; see docs/adr/0003):
   reject every remaining z_k above it, repeat until nothing new is rejected.
   Asymptotic STRONG FWER control under arbitrary dependence between the
   strategies (the joint bootstrap keeps the cross-sectional dependence).
+* Step-SPA — Hsu, Hsu & Kuan (2010), full text read: the Step-RC loop of
+  Romano-Wolf, but the critical value at every step is the SPA one — the
+  (1-alpha) quantile of max_k sqrt(n)(dbar*_k - dbar_k + mu_hat_k) with the
+  Hansen re-centering mu_hat_k = dbar_k * 1(sqrt(n) dbar_k <= -sigma_k
+  sqrt(2 log log n)), floored at 0 — recomputed on the not-yet-rejected
+  models.  The paper proves FWE <= alpha asymptotically and strictly more
+  power than Step-RC under Hansen's stationarity / alpha-mixing assumption.
+  Because it is LESS conservative than StepM it is only a DIAGNOSTIC here;
+  the validation gate stays StepM (criteria are not relaxed).  Studentized
+  form (the paper notes studentizing is more powerful) with the
+  bootstrap-population sigma used elsewhere in this module.
+* Diebold & Mariano (1995), full text read: for a loss differential d_t
+  (covariance stationary, short memory) sqrt(T)(dbar - mu) -> N(0, 2 pi f_d(0)),
+  S = dbar / sqrt(2 pi f_hat_d(0) / T) ~ N(0,1) under H0: E d_t = 0.  Used for
+  parent-vs-child strategy comparisons on DEV daily returns (d = child -
+  parent).  Difference from the paper: no forecast horizon exists here, so
+  f_hat is the Bartlett-weighted (Newey-West) long-run variance with the
+  usual n^(2/9) lag rule instead of the paper's rectangular h-1 truncation
+  (which can go negative).  DEV-only, diagnostic.
 * Model Confidence Set — Hansen, Lunde & Nason (2011), working-paper text
   (CREATES RP 2010-76): d_ij = L_i - L_j, t_i. = dbar_i. / sqrt(var(dbar_i.)),
   T_max,M = max_i t_i., elimination rule e = argmax t_i. (the object with the
@@ -56,7 +75,7 @@ import random
 from typing import Mapping, Optional, Sequence
 
 #: version tag recorded in every decision (changing any rule => new tag)
-MC_METHOD_VERSION = "mc-v2(stationary-bootstrap,RC,SPA,StepM-studentized,MCS-Tmax,BY,alpha-spending-1/k^2)"
+MC_METHOD_VERSION = "mc-v3(stationary-bootstrap,RC,SPA,StepM-studentized,StepSPA-diagnostic,MCS-Tmax,BY,alpha-spending-1/k^2)"
 
 
 # ---------------------------------------------------------------------------
@@ -215,6 +234,70 @@ def stepm(series: Mapping[str, Sequence[float]], *, alpha: float, B: int = 1000,
             "note": "sigma from Hansen-2005 bootstrap-population variance, held fixed "
                     "across resamples (Romano-Wolf allow sigma*; fixed sigma is the "
                     "simpler consistent choice under their Assumption 4.1)"}
+
+
+def step_spa(series: Mapping[str, Sequence[float]], *, alpha: float, B: int = 1000,
+             q: Optional[float] = None, seed: int = 0) -> dict:
+    """Hsu-Hsu-Kuan (2010) Step-SPA (studentized) for H0_k: E d_k <= 0.
+    Diagnostic only — see module docstring."""
+    keys, n = _check_matrix(series)
+    q = q or default_q(n)
+    if not 0.0 < alpha < 1.0:
+        raise ValueError("alpha must be in (0, 1)")
+    rng = random.Random(seed)
+    dbar = {k: _mean(series[k]) for k in keys}
+    w = {}
+    for k in keys:
+        var = bootstrap_variance(series[k], q)
+        if var <= 0:
+            raise ValueError(f"zero variance for {k}")
+        w[k] = math.sqrt(var)
+    z = {k: math.sqrt(n) * dbar[k] / w[k] for k in keys}
+    a_n = -math.sqrt(2.0 * math.log(math.log(n))) if n > 15 else 0.0
+    mu_hat = {k: (dbar[k] if z[k] <= a_n else 0.0) for k in keys}
+    draws: list[dict] = []
+    for _ in range(B):
+        ix = stationary_bootstrap_indices(n, q, rng)
+        draws.append({k: math.sqrt(n) * (_mean([series[k][i] for i in ix]) - dbar[k] + mu_hat[k]) / w[k]
+                      for k in keys})
+    rejected: list[str] = []
+    steps = []
+    remaining = sorted(keys, key=lambda k: -z[k])
+    while remaining:
+        maxes = sorted(max(d[k] for k in remaining) for d in draws)
+        crit = max(maxes[min(B - 1, int(math.ceil((1 - alpha) * B)) - 1)], 0.0)
+        newly = [k for k in remaining if z[k] > crit]
+        steps.append({"remaining": len(remaining), "critical": crit, "rejected": sorted(newly)})
+        if not newly:
+            break
+        rejected += newly
+        remaining = [k for k in remaining if k not in newly]
+    return {"method": "hsu_hsu_kuan2010_step_spa_studentized", "alpha": alpha,
+            "rejected": sorted(rejected), "z": z, "steps": steps, "B": B, "q": q,
+            "n": n, "m": len(keys), "seed": seed}
+
+
+def dm_test(d: Sequence[float], *, lag: Optional[int] = None) -> dict:
+    """Diebold-Mariano statistic for H0: E[d_t] = 0 (d = loss/return
+    differential).  Returns z and the one-sided p for 'mean(d) > 0'."""
+    n = len(d)
+    if n < 10:
+        raise ValueError(f"too few observations ({n}) for a DM test")
+    if any(not math.isfinite(x) for x in d):
+        raise ValueError("non-finite value in the differential")
+    if lag is None:
+        lag = int(math.floor(4 * (n / 100.0) ** (2.0 / 9.0)))
+    mu = _mean(d)
+    u = [x - mu for x in d]
+    lrv = sum(v * v for v in u) / n
+    for l in range(1, min(lag, n - 1) + 1):
+        lrv += 2.0 * (1.0 - l / (lag + 1.0)) * sum(u[i] * u[i - l] for i in range(l, n)) / n
+    if not lrv > 0:
+        raise ValueError("non-positive long-run variance: DM statistic undefined")
+    z = mu / math.sqrt(lrv / n)
+    return {"method": "diebold_mariano1995_bartlett_lrv", "z": z,
+            "p_one_sided_better": 0.5 * math.erfc(z / math.sqrt(2.0)), "n": n, "lag": lag,
+            "mean": mu}
 
 
 def mcs(series: Mapping[str, Sequence[float]], *, alpha: float = 0.10, B: int = 1000,

@@ -539,6 +539,20 @@ if __name__ == "__main__":
     unittest.main()
 
 
+class TestVariationReport(PipelineCase):
+    def test_parent_child_dm_rows(self):
+        p = self.pipe(SyntheticProvider())
+        parent, _ = p.register(NOISE[0], source="test")
+        p.dev_evaluate(parent)
+        child, _ = p.register(EDGE, source="test", parents=[parent], operator="param_change")
+        p.dev_evaluate(child)
+        lone, _ = p.register(NOISE[1], source="test", parents=["S-missing"], operator="x")
+        rows = {r["child"]: r for r in p.variation_report()}
+        self.assertEqual(rows[child]["status"], "OK")
+        self.assertIn("p_better", rows[child])
+        self.assertEqual(rows[lone]["status"], "UNTESTED")           # parent never evaluated: nothing invented
+
+
 class TestHandoff(PipelineCase):
     def test_handoff_is_sealed_and_never_live(self):
         from handoff import HandoffRefused, build_handoff, export_handoff

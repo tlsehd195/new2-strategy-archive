@@ -53,7 +53,7 @@ from evaluator import cell_stats, run_event_study
 from evolution import EVOLUTION_GENERATOR_VERSION, LineageStore, SpecStore, mutate
 from search import SearchConfig, dev_feedback
 from stats_mc import (
-    MC_METHOD_VERSION, by_fdr, daily_series, default_q, mcs, reality_check, spa_test,
+    MC_METHOD_VERSION, by_fdr, daily_series, default_q, dm_test, mcs, reality_check, spa_test, step_spa,
     spending_alpha, stationary_bootstrap_indices, stepm,
 )
 from strategy_spec import (
@@ -694,6 +694,8 @@ class EvolutionPipeline:
                         res["spa"] = {k: v for k, v in spa_test(series, B=vc["bootstrap_B"], q=q,
                                                                  seed=batch["seed"]).items()
                                       if k.startswith("p_") or k == "statistic"}
+                        res["step_spa_rejected"] = step_spa(series, alpha=w["alpha"], B=vc["bootstrap_B"],
+                                                            q=q, seed=batch["seed"])["rejected"]
                         res["reality_check_p"] = reality_check(series, B=vc["bootstrap_B"], q=q,
                                                                seed=batch["seed"])["p"]
                     except ValueError as err:
@@ -767,6 +769,41 @@ class EvolutionPipeline:
                         and self._pbo()["computable"]):
                     self.robustness(m)
                     out.append(m)
+        return out
+
+    def variation_report(self) -> list[dict]:
+        """Parent -> child DEV comparisons (Diebold-Mariano on the daily
+        return differential).  DEV data only; informs human review and the
+        failure memory, never the search ranking or any gate."""
+        ctx = self.context_id()
+        latest = {r["strategy_id"]: r for r in iter_jsonl(self.series_path) if r["context_id"] == ctx}
+
+        def pooled(sid):
+            r = latest.get(sid)
+            if r is None:
+                return None
+            acc: dict[int, float] = {}
+            for _sym, (d0, vals) in r["series"].items():
+                for i, v in enumerate(vals):
+                    acc[d0 + i] = acc.get(d0 + i, 0.0) + v
+            return acc
+        out = []
+        for rec in self.lineage.records():
+            c = pooled(rec["child_id"])
+            row = {"child": rec["child_id"], "parents": rec["parents"], "operator": rec["operator"]}
+            ps = [pooled(p_) for p_ in rec["parents"]]
+            if c is None or not ps or any(p_ is None for p_ in ps):
+                out.append({**row, "status": "UNTESTED"})
+                continue
+            best = max(ps, key=lambda a: (sum(a.values()) / len(a)) if a else -math.inf)
+            days = sorted(set(c) | set(best))
+            try:
+                res = dm_test([c.get(d, 0.0) - best.get(d, 0.0) for d in days])
+            except ValueError as err:
+                out.append({**row, "status": "NOT_COMPUTED", "reason": str(err)})
+                continue
+            out.append({**row, "status": "OK", "z": res["z"], "p_better": res["p_one_sided_better"],
+                        "n_days": res["n"]})
         return out
 
     # -- stage 3: robustness (filters only) ---------------------------------------------

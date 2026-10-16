@@ -306,3 +306,57 @@ class TestCostBreakeven(unittest.TestCase):
         self.assertAlmostEqual(cost_breakeven(ev), 1.5)        # funding eats margin
         self.assertIsNone(cost_breakeven([]))
         self.assertIsNone(cost_breakeven([{"gross_bp": 1.0, "cost_bp": 0.0, "funding_bp": 0.0}]))
+
+
+class TestStepSPA(unittest.TestCase):
+    @staticmethod
+    def _world(seed, n=250, drifts=(0.0,)):
+        r = random.Random(seed)
+        return {f"m{i}": [r.gauss(mu, 1.0) for _ in range(n)] for i, mu in enumerate(drifts)}
+
+    def test_finds_true_edge_and_no_more_than_stepm_misses(self):
+        ser = self._world(1, drifts=(0.45, 0.4, 0.0, -0.5, -0.5, -0.5, -0.5, -0.5))
+        sm = stats_mc.stepm(ser, alpha=0.05, B=400, seed=2)
+        sp = stats_mc.step_spa(ser, alpha=0.05, B=400, seed=2)
+        self.assertTrue({"m0", "m1"} <= set(sp["rejected"]))
+        self.assertNotIn("m2", sp["rejected"])
+        self.assertTrue(set(sm["rejected"]) <= set(sp["rejected"]))     # more (or equally) powerful
+        self.assertEqual(sp["method"], "hsu_hsu_kuan2010_step_spa_studentized")
+
+    def test_null_world_fwe_is_controlled(self):
+        hits = 0
+        for r in range(60):
+            ser = self._world(100 + r, n=200, drifts=(0.0,) * 6)
+            hits += bool(stats_mc.step_spa(ser, alpha=0.10, B=150, seed=r)["rejected"])
+        self.assertLessEqual(hits / 60, 0.10 + 0.12)      # alpha + Monte-Carlo slack (60 reps)
+
+    def test_bad_input(self):
+        with self.assertRaises(ValueError):
+            stats_mc.step_spa({"a": [1.0] * 30}, alpha=0.05)         # zero variance
+        with self.assertRaises(ValueError):
+            stats_mc.step_spa({"a": [0.1, -0.1] * 20}, alpha=1.5)
+
+
+class TestDM(unittest.TestCase):
+    def test_hand_example_iid(self):
+        # d = +1,-1 alternating plus a shift: mean 0.2, lag 0 variance by hand
+        d = [1.2, -0.8] * 10
+        r = stats_mc.dm_test(d, lag=0)
+        var = sum((x - 0.2) ** 2 for x in d) / 20            # = 1.0
+        self.assertAlmostEqual(r["z"], 0.2 / math.sqrt(var / 20), places=12)
+        self.assertAlmostEqual(r["p_one_sided_better"], 0.5 * math.erfc(r["z"] / math.sqrt(2)), places=12)
+
+    def test_detects_shift_not_noise(self):
+        rg = random.Random(5)
+        better = [rg.gauss(0.3, 1.0) for _ in range(400)]
+        same = [rg.gauss(0.0, 1.0) for _ in range(400)]
+        self.assertLess(stats_mc.dm_test(better)["p_one_sided_better"], 0.01)
+        self.assertGreater(stats_mc.dm_test(same)["p_one_sided_better"], 0.01)
+
+    def test_bad_input(self):
+        with self.assertRaises(ValueError):
+            stats_mc.dm_test([0.1] * 5)
+        with self.assertRaises(ValueError):
+            stats_mc.dm_test([0.5] * 40)          # zero variance
+        with self.assertRaises(ValueError):
+            stats_mc.dm_test([0.1, float("nan")] * 10)
