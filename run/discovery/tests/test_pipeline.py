@@ -410,7 +410,7 @@ class TestPaper(PipelineCase):
                          r"binance)\b", re.M)
         for name in ("paper.py", "pipeline.py", "autoloop.py", "search.py", "evolution.py",
                      "strategy_spec.py", "stats_mc.py", "campaigns.py", "paper_forward.py",
-                     "execution_sim.py", "cost_calibration.py"):
+                     "execution_sim.py", "cost_calibration.py", "public_cost_estimate.py"):
             self.assertIsNone(pat.search((DISC / name).read_text()), name)
 
 

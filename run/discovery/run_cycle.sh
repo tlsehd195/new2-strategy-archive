@@ -33,6 +33,7 @@
 #   NEW2_DISC_TEE        로그 기록 명령 (기본: tee; 테스트에서 가짜 기록기로 교체)
 #   PYTHON               파이썬 실행 파일 (기본: python3)
 #   NEW2_DISC_MODE       legacy(기본) | evolve | full — runner.py --mode 로 전달
+#   NEW2_COST_PROFILE    new2_default(기본) | assumed_public_v1 | public_estimate:<기록.json> — 모두 미검증, 승격 불가
 #   REFRESH=1            미지원 — runner가 경고하고 요약에 기록한다
 # ============================================================
 set -uo pipefail

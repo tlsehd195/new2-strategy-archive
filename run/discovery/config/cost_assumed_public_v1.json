@@ -1,0 +1,14 @@
+{
+ "schema": "cost_assumed_profile_v1",
+ "profile_id": "assumed_public_v1",
+ "status": "ASSUMED_COST_MODEL",
+ "note": "Fixed 2026-10-16 BEFORE any run with this profile. An assumption, not a measurement: the user has no exchange account (minor) and therefore no execution reports. Results under this profile are research-only and can never reach PAPER_TEST_READY; only a sealed cost_calibration VERIFIED record can. A change needs a new file (v2) with a reason.",
+ "fee_source": "Binance USDT-M futures public fee schedule for the base (regular, no BNB discount) tier: maker 0.0200%, taker 0.0500%. Not fetched in this environment (Binance hosts are blocked); re-check against the exchange's published page before relying on it.",
+ "fee_rate": 0.0005,
+ "fee_basis": "every fill assumed taker (the more expensive side), entry and exit",
+ "base_half_spread": 0.0002,
+ "slippage_margin_per_side": 0.0003,
+ "slippage_basis": "conservative extra per side on top of the half spread for latency, queue and adverse selection; not estimated from data",
+ "impact_coefficient": 0.1,
+ "max_participation": 0.05
+}

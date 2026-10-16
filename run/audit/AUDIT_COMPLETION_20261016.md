@@ -104,3 +104,13 @@
 2. **실시간 공개 시세 접근**: 전진 페이퍼에 필요하다. 이 컨테이너에서는 Binance가 막혀 있다. 허용된 환경에서 `BinancePublicFeed(allow_network=True)`로 최소 60일 관측해야 한다.
 3. **검증 생존자**: 현재 탐색 공간에서는 0개다. 탐색 공간을 넓히는 것은 연구 판단이며, 기준을 낮추는 것으로 해결하지 않는다.
 4. PR #5 리뷰와 머지(PR #4 포함).
+
+## 부록 A — 가정 비용(ASSUMED) 실데이터 사이클 (ADR 0007, PR #6)
+- 설정: `NEW2_COST_PROFILE=assumed_public_v1`(수수료 5bp, 반스프레드 2bp, 슬리피지 여유 3bp, 한쪽당). 같은 명령(`--rounds 3 --evals 2000`)을 서로 다른 빈 상태 폴더에서 동시에 두 번 실행했다(D1, D2).
+- 결과: 둘 다 `CYCLE_OK`, exit 0, 약 27분. 컨텍스트 `C2-d1649d032643094490b6`(비용 프로필과 코드가 바뀌어 5절의 컨텍스트와 다르다). 사이클 요약의 `cost_status`는 `ASSUMED_COST_MODEL`이다.
+- 재현성: 평가 기록 779개의 record_id가 순서까지 완전히 같다.
+- 후보: DEV 평가 777, REJECTED 709, INCONCLUSIVE 66, 검증 진출 2(둘 다 INCONCLUSIVE). 생존 0, 잠금 TEST 사용 0, 잠금 사용 기록 파일도 없다.
+- 해석: 기본 비용에서는 6개가 검증에 올라갔는데(6절), 비용이 더 보수적인 가정 프로필에서는 2개만 올라갔다. 비용을 올리면 DEV 우위가 더 줄어든다는 방향의 관측이다. 어느 쪽도 수익성 증거가 아니다.
+- 표시: 검증 단계 기록의 `cost_model.status`는 `ASSUMED_COST_MODEL`, 문구는 "비용 미검증(ASSUMED): research only, never promotable"이다. 이 상태의 전략은 승격 심사에서 `BLOCKED_COST`가 된다(단위 테스트).
+- 증거: `run_assumed_D1_summary.json`, `run_assumed_D2_summary.json`, 종료 코드 파일.
+- 공개 시세 추정(`ESTIMATED_FROM_PUBLIC_DATA`) 도구는 구현하고 합성 호가로 테스트했다. 이 환경에서는 바이낸스 접속이 막혀 있어 실제 공개 데이터는 모으지 못했다. 로컬 실행 방법은 `docs/공개시세_비용추정_로컬실행_안내.md`에 있다.

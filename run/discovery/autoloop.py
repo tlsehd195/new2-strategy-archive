@@ -34,6 +34,7 @@ class EvolutionCycleSummary:
     started_at: str = ""
     finished_at: str = ""
     context_id: str = ""
+    cost_status: str = ""
     symbols_used: list = field(default_factory=list)
     symbols_blocked: dict = field(default_factory=dict)
     seeded: int = 0
@@ -85,6 +86,7 @@ def run_evolution_cycle(state_dir: Path, provider, cost, *, symbols: Sequence[st
                              promotion_config=promotion_config)
     ctx = pipe.context_id()
     s.context_id = ctx
+    s.cost_status = getattr(cost, "status", "")
     avail = provider.available_data()
     state_path = pipe.dir / "search_state.json"
     st = SearchState.load(state_path, config_hash=cfg.config_hash(), context_id=ctx)

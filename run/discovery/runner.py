@@ -49,7 +49,7 @@ from engine_lib import (  # noqa: E402
     runtime_identity,
     symbols_without_locked_test,
 )
-from costs_bridge import COST_MODEL_SCOPE, CostContext, UNVERIFIED_COST_MODEL  # noqa: E402
+from costs_bridge import ASSUMED_PROFILES, COST_MODEL_SCOPE, CostConfigError, CostContext  # noqa: E402
 from evaluator import cell_stats, run_event_study  # noqa: E402
 from generation import (  # noqa: E402
     FDR_SPEC,
@@ -916,7 +916,8 @@ class Runner:
         common = {"primary_symbol": required[0], "primary_dev_p": None,
                   "dataset": {s: handles[s].identity() for s in handles},
                   "cost_model": {"version": self.cost.version,
-                                 "status": "VERIFIED" if self.cost.verified else UNVERIFIED_COST_MODEL,
+                                 "status": self.cost.status,
+                                 "assumption_profile": (self.cost.assumption or {}).get("profile_id"),
                                  "params": dict(self.cost.params),
                                  "test_only": self.cost.test_only,
                                  "scope": COST_MODEL_SCOPE}}
@@ -1224,7 +1225,7 @@ class Runner:
         if final == "PASS":
             promotion_check = self._promote(sid, defn, dev_rec, decision)
             rec["claim_scope"] = ("VERIFIED_COST" if self.cost.verified
-                                  else UNVERIFIED_COST_MODEL)
+                                  else self.cost.status)
         rec["promotion_check"] = promotion_check
         self.ledger.append(rec)
         self.store.set(sid, CandidateState(final), data_version=ctx)
@@ -1640,6 +1641,28 @@ EXIT_CODES = {"SUCCESS": 0, "SUCCESS_WITH_WARNINGS": 0, "PARTIAL_FAILURE": 2,
 EXIT_BLOCKED_DATA = 4
 
 
+def cost_from_env() -> CostContext:
+    """``NEW2_COST_PROFILE``: unset/``new2_default`` → NEW2 defaults (UNVERIFIED);
+    ``assumed_public_v1`` → public fee schedule + slippage margin (ASSUMED);
+    ``public_estimate:<record.json>`` → spread/impact estimated from public
+    order books (ESTIMATED_FROM_PUBLIC_DATA).  None is verified; only a sealed
+    calibration record is (ADR 0006/0007)."""
+    name = os.environ.get("NEW2_COST_PROFILE", "").strip()
+    if name in ("", "new2_default"):
+        return CostContext.futures_default()
+    if name in ASSUMED_PROFILES:
+        return CostContext.from_assumed_profile(name)
+    if name.startswith("public_estimate:"):
+        path = Path(name.split(":", 1)[1])
+        try:
+            rec = json.loads(path.read_text())
+        except (OSError, ValueError) as e:
+            raise CostConfigError(f"public estimate {path} unreadable: {e}") from e
+        return CostContext.from_public_estimate(rec)
+    raise CostConfigError(f"NEW2_COST_PROFILE={name!r} unknown (new2_default | "
+                          + " | ".join(ASSUMED_PROFILES) + " | public_estimate:<record.json>)")
+
+
 def main(argv: Sequence[str]) -> int:
     try:
         opts = parse_options(argv)
@@ -1657,6 +1680,11 @@ def main(argv: Sequence[str]) -> int:
         print("WARNING: REFRESH=1 is NOT supported by the v2 discovery engine. "
               "Data updates are performed by run/download_missing_data.py; "
               "every evaluation records data staleness honestly.", file=sys.stderr)
+    try:
+        cost = cost_from_env()
+    except CostConfigError as e:
+        print(f"CONFIG_ERROR: {e}", file=sys.stderr)
+        return 1
     lock = ProcessLock(paths.state_dir / "run.lock")
     if not lock.acquire():
         print(f"CYCLE_SKIPPED lock held ({paths.state_dir / 'run.lock'})")
@@ -1664,7 +1692,7 @@ def main(argv: Sequence[str]) -> int:
     rc = 0
     try:
         if opts["mode"] in ("legacy", "full"):
-            r = Runner(paths)
+            r = Runner(paths, cost=cost)
             s = r.cycle(max_candidates=opts["batch"])
             if os.environ.get("REFRESH") == "1":
                 s.notes.append("REFRESH=1 requested but NOT supported — no data was refreshed")
@@ -1675,7 +1703,7 @@ def main(argv: Sequence[str]) -> int:
             from paper_forward import FileFeed
             from pipeline import RunnerDataProvider
             es = run_evolution_cycle(paths.state_dir, RunnerDataProvider(paths.data_dir),
-                                     CostContext.futures_default(), rounds=opts["rounds"],
+                                     cost, rounds=opts["rounds"],
                                      max_dev_evals=opts["evals"], results_dir=paths.results_dir,
                                      forward_feed=FileFeed(paths.data_dir))
             print(json.dumps(es.to_json(), default=str))
