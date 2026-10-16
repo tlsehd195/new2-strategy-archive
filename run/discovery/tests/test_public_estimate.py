@@ -173,10 +173,44 @@ class TestEstimator(unittest.TestCase):
         rec = pce.estimate(d)
         self.assertEqual(rec["per_symbol"]["BTCUSDT"]["snapshots_invalid"], 200)
         self.assertEqual(rec["status"], pce.INSUFFICIENT)           # 200/4800 > 1 %
+        # a torn line (crash during a write) is counted, never skipped silently
         with open(d / "ETHUSDT" / "public_20261016.jsonl", "a") as f:
             f.write("{torn\n")
-        with self.assertRaises(pce.EstimateError):
-            pce.estimate(d)
+        rec2 = pce.estimate(d)
+        self.assertEqual(rec2["per_symbol"]["ETHUSDT"]["invalid_reasons"], {"not valid JSON": 1})
+
+    def test_append_after_torn_tail_keeps_lines_separate(self):
+        from portable_util import append_line
+        f = self.td / "x" / "public_1.jsonl"
+        append_line(f, {"a": 1})
+        with open(f, "a") as fh:
+            fh.write('{"half')
+        append_line(f, {"b": 2})
+        lines = f.read_text().splitlines()
+        self.assertEqual((json.loads(lines[0]), json.loads(lines[2])), ({"a": 1}, {"b": 2}))
+        self.assertEqual(lines[1], '{"half')
+
+    def test_scripts_run_without_fcntl_or_new2_checkout(self):
+        """Windows simulation: no fcntl, no NEW2 source — the two PC scripts must still import and run."""
+        import subprocess
+        code = (
+            "import sys; sys.modules['fcntl']=None; sys.modules['cointrader']=None\n"
+            "sys.path.insert(0, %r)\n"
+            "import public_market_collect, public_cost_estimate\n"
+            "bad=[m for m in ('engine_lib','costs_bridge','data_quality') if m in sys.modules]\n"
+            "assert not bad, bad\n"
+            "print('ok')\n" % str(DISC))
+        env = {k: v for k, v in os.environ.items() if k != "COINTRADER_SRC"}
+        r = subprocess.run([sys.executable, "-I", "-c", code], capture_output=True, text=True, env=env)
+        self.assertEqual((r.returncode, r.stdout.strip()), (0, "ok"), r.stderr)
+        d = write_dir(self.td, {s: synth_lines(s, hours=80) for s in ["BTCUSDT", "ETHUSDT"]})
+        out = self.td / "e.json"
+        code2 = ("import sys; sys.modules['fcntl']=None; sys.modules['cointrader']=None\n"
+                 "sys.path.insert(0, %r)\nimport public_cost_estimate as p\n"
+                 "sys.exit(p.main(['--in', %r, '--out', %r]))\n" % (str(DISC), str(d), str(out)))
+        r2 = subprocess.run([sys.executable, "-I", "-c", code2], capture_output=True, text=True, env=env)
+        self.assertEqual(r2.returncode, 0, r2.stderr)
+        pce.check_estimate(json.loads(out.read_text()))
 
     def test_tampered_record_refused(self):
         d = write_dir(self.td, {s: synth_lines(s, hours=80) for s in ["BTCUSDT", "ETHUSDT"]})
