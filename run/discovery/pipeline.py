@@ -62,7 +62,7 @@ from strategy_spec import (
 )
 
 PIPELINE_VERSION = "evo-pipeline-v1"
-EVO_CODE_FILES = tuple(sorted(set(CODE_FILES) | {"public_cost_estimate.py", "strategy_spec.py", "evolution.py", "search.py",
+EVO_CODE_FILES = tuple(sorted(set(CODE_FILES) | {"public_cost_estimate.py", "portable_util.py", "strategy_spec.py", "evolution.py", "search.py",
                                                  "pipeline.py", "autoloop.py", "paper.py",
                                                  "paper_forward.py", "execution_sim.py",
                                                  "config/paper_forward_v1.json"}))

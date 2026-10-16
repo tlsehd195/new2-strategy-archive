@@ -29,7 +29,7 @@ from pathlib import Path
 from typing import Callable, Optional, Sequence
 
 from data_fetch import FetchFailure, fetch_with_retry
-from engine_lib import append_jsonl, iso_now
+from portable_util import append_line, iso_now
 
 SCHEMA = "public_market_snapshot_v1"
 BASE = "https://fapi.binance.com"
@@ -92,7 +92,7 @@ def write_manifest(out: Path) -> dict:
                       "sha256": hashlib.sha256(p.read_bytes()).hexdigest()})
     man = {"schema": "public_market_manifest_v1", "generated_at": iso_now(), "source": BASE,
            "endpoints": sorted(ALLOWED), "files": files}
-    (out / "collect_manifest.json").write_text(json.dumps(man, indent=1, sort_keys=True))
+    (out / "collect_manifest.json").write_text(json.dumps(man, indent=1, sort_keys=True), encoding="utf-8")
     return man
 
 
@@ -114,7 +114,7 @@ def collect(out: Path, symbols: Sequence[str], *, hours: float, interval: float 
             t0 = clock()
             for s in symbols:
                 rec = snapshot(s, opener=opener, sleep=sleep, now_ms=int(t0 * 1000))
-                append_jsonl(_day_file(out, s, rec["fetched_at_ms"]), rec)
+                append_line(_day_file(out, s, rec["fetched_at_ms"]), rec)
                 ok = rec["status"] == "OK"
                 counts[s]["OK" if ok else "FAILED"] += 1
                 fails_in_row = 0 if ok else fails_in_row + 1

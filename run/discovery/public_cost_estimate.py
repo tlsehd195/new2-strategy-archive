@@ -35,7 +35,7 @@ import sys
 from pathlib import Path
 from typing import Iterable, Mapping, Optional, Sequence
 
-from engine_lib import canonical_json, iso_now
+from portable_util import canonical_json, iso_now
 
 RECORD_SCHEMA = "cost_public_estimate_v1"
 CRITERIA_SCHEMA = "cost_public_estimate_criteria_v1"
@@ -54,10 +54,24 @@ class EstimateError(ValueError):
     pass
 
 
+def _fee_profile(name: str) -> tuple[dict, str]:
+    """The public-schedule fee assumption (fees are not observable in public data).
+    Read directly so this script needs no NEW2 checkout; the engine re-validates
+    every parameter when it loads the record."""
+    raw = (DEFAULT_CRITERIA.parent / f"cost_{name}.json").read_bytes()
+    prof = json.loads(raw)
+    if prof.get("schema") != "cost_assumed_profile_v1" or prof.get("status") != "ASSUMED_COST_MODEL":
+        raise EstimateError(f"fee profile {name!r} is not an ASSUMED cost profile")
+    fee = prof.get("fee_rate")
+    if isinstance(fee, bool) or not isinstance(fee, (int, float)) or not math.isfinite(fee) or fee < 0:
+        raise EstimateError(f"fee profile {name!r}: bad fee_rate {fee!r}")
+    return prof, hashlib.sha256(raw).hexdigest()
+
+
 def load_criteria(path: Optional[Path] = None) -> tuple[dict, str]:
     p = Path(path or DEFAULT_CRITERIA)
     raw = p.read_bytes()
-    c = json.loads(raw)
+    c = json.loads(raw.decode("utf-8"))
     if c.get("schema") != CRITERIA_SCHEMA:
         raise EstimateError(f"{p}: not a {CRITERIA_SCHEMA} file")
     return c, hashlib.sha256(raw).hexdigest()
@@ -113,6 +127,10 @@ def walk(levels: Sequence[tuple[float, float]], notional: float) -> Optional[flo
 def per_symbol(lines: Iterable[Mapping], crit: Mapping) -> dict:
     ok, invalid, failed, reasons = [], 0, 0, {}
     for r in lines:
+        if r.get("status") == "BAD_LINE":
+            invalid += 1
+            reasons["not valid JSON"] = reasons.get("not valid JSON", 0) + 1
+            continue
         if r.get("status") != "OK":
             failed += 1
             continue
@@ -196,29 +214,34 @@ def record_hash(rec: Mapping) -> str:
 
 
 def read_lines(paths: Iterable[Path]) -> dict[str, list[dict]]:
+    """Group snapshot lines by symbol.  A line that is not valid JSON (for
+    example the torn last line after a crash) is never skipped silently: it
+    becomes a ``BAD_LINE`` entry for the symbol named by its folder and is
+    counted as an invalid snapshot."""
     out: dict[str, list[dict]] = {}
     for p in paths:
-        for i, line in enumerate(Path(p).read_text().splitlines()):
+        p = Path(p)
+        for line in p.read_text(encoding="utf-8", errors="replace").splitlines():
             if not line.strip():
                 continue
             try:
                 r = json.loads(line)
-            except ValueError as e:
-                raise EstimateError(f"{p}:{i + 1}: not JSON ({e}) — fix or remove the file, "
-                                    "nothing is skipped silently") from e
-            out.setdefault(r.get("symbol", "?"), []).append(r)
+                if not isinstance(r, dict):
+                    raise ValueError("not an object")
+            except ValueError:
+                r = {"status": "BAD_LINE", "symbol": p.parent.name}
+            out.setdefault(r.get("symbol", p.parent.name), []).append(r)
     return out
 
 
 def estimate(in_dir: Path, *, criteria_path: Optional[Path] = None) -> dict:
-    from costs_bridge import load_assumed_profile
     crit, crit_sha = load_criteria(criteria_path)
     in_dir = Path(in_dir)
     files = sorted(in_dir.rglob("public_*.jsonl"))
     lines = read_lines(files)
     per = {s: per_symbol(lines.get(s, []), crit) for s in crit["required_symbols"]}
     reasons = [f"{s}: {w}" for s, d in per.items() for w in d.get("not_usable_because", ["no data"])]
-    prof, prof_sha = load_assumed_profile(crit["fee_profile"])
+    prof, prof_sha = _fee_profile(crit["fee_profile"])
     ok = all(d.get("usable") for d in per.values())
     params = None
     if ok:
@@ -270,7 +293,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:  # pragma: no cover - CLI
     except (EstimateError, OSError) as e:
         print(f"ERROR: {e}", file=sys.stderr)
         return 1
-    out.write_text(json.dumps(rec, indent=1, sort_keys=True, default=str))
+    out.write_text(json.dumps(rec, indent=1, sort_keys=True, default=str), encoding="utf-8")
     print(json.dumps({"status": rec["status"], "record_id": rec["record_id"], "params": rec["params"],
                       "reasons": rec["reasons"]}, indent=1))
     return 0 if rec["status"] == ESTIMATED else 4
