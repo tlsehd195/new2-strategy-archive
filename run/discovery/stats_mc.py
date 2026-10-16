@@ -15,7 +15,7 @@ Implemented from the source texts (checked 2026-10-15; see docs/adr/0003):
   p = share of T* > T.  w_k^2 is the bootstrap-population variance
   gamma_0 + 2 sum kappa(n,i) gamma_i with
   kappa(n,i) = (n-i)/n (1-q)^i + i/n (1-q)^(n-i)   (Hansen 2005, §3).
-* StepM — Romano & Wolf (2005), Algorithm 4.1 (studentized): relabel by the
+* StepM — Romano & Wolf (2005) / Romano-Shaikh-Wolf (2008) Alg. 4.3 with k=1 (studentized): relabel by the
   studentized statistic, critical value = (1-alpha) bootstrap quantile of
   max over the NOT-yet-rejected hypotheses of (w*_k - w_k) / sigma*_k,
   reject every remaining z_k above it, repeat until nothing new is rejected.

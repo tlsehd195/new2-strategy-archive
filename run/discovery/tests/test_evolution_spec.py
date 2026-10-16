@@ -255,6 +255,19 @@ class TestMultipleComparison(unittest.TestCase):
             stats_mc.spa_test({"a": [1.0, math.nan] * 10})
 
 
+class TestMinBTL(unittest.TestCase):
+    def test_paper_numbers(self):
+        # Bailey et al. 2014: N=45 trials at E[max]=1 needs ~5 years; N=7 ~2 years.
+        from engine_lib import min_backtest_years
+        self.assertAlmostEqual(min_backtest_years(45, 1.0), 5.0, delta=0.05)
+        self.assertAlmostEqual(min_backtest_years(7, 1.0), 2.0, delta=0.1)
+
+    def test_nonpositive_sr_never_enough(self):
+        from engine_lib import min_backtest_years
+        self.assertEqual(min_backtest_years(100, 0.0), float("inf"))
+        self.assertEqual(min_backtest_years(100, -1.0), float("inf"))
+
+
 if __name__ == "__main__":
     unittest.main()
 

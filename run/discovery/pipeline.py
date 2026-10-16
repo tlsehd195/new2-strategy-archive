@@ -865,7 +865,14 @@ class EvolutionPipeline:
         m_ = sum(all_sr) / len(all_sr)
         var_sr = sum((v - m_) ** 2 for v in all_sr) / (len(all_sr) - 1)
         d = deflated_sharpe(sr, n, skew, kurt, len(srs), var_sr)
-        return {"computable": math.isfinite(d), "dsr": d if math.isfinite(d) else None,
+        # MinBTL (Bailey et al. 2014): raw trial count, 365 d/yr (24/7 market).
+        from engine_lib import expected_max_sr, min_backtest_years
+        sr_ann = sr * math.sqrt(365.0)
+        floor_ann = expected_max_sr(len(srs)) / math.sqrt(n / 365.0)
+        return {"minbtl_years": min_backtest_years(len(srs), sr_ann),
+                "sr_annual": sr_ann, "sr_floor_annual": floor_ann,
+                "exceeds_sr_floor": sr_ann > floor_ann,
+                "computable": math.isfinite(d), "dsr": d if math.isfinite(d) else None,
                 "sr_daily": sr, "n_days": n, "trials": len(srs), "var_sr": var_sr,
                 "skew": skew, "kurtosis": kurt}
 
