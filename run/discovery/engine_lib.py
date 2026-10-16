@@ -833,6 +833,23 @@ def block_bootstrap_pvalue(xs: Sequence[float], block: int = 8,
 import random  # noqa: E402  (used by bootstrap; kept next to its only users)
 
 
+def expected_max_sr(n_trials: int) -> float:
+    """E[max of N iid standard normals] (Bailey et al. 2014, Notices AMS, eq. 4).
+    Scale by y**-0.5 (y = years) for the null SR of N unskilled trials."""
+    g = 0.5772156649015329
+    n_trials = max(2, n_trials)
+    return (1.0 - g) * norm_ppf(1.0 - 1.0 / n_trials) + g * norm_ppf(1.0 - 1.0 / (n_trials * math.e))
+
+
+def min_backtest_years(n_trials: int, sr_annual: float) -> float:
+    """MinBTL (Bailey et al. 2014, Theorem 2, eq. 6): years of data needed so
+    that the best of N unskilled trials is unlikely to reach ``sr_annual``.
+    A necessary condition only; assumes iid normal, independent trials."""
+    if not (sr_annual > 0) or not math.isfinite(sr_annual):
+        return float("inf")
+    return (expected_max_sr(n_trials) / sr_annual) ** 2
+
+
 def deflated_sharpe(sr: float, n: int, skew: float, kurtosis: float,
                     n_trials: int, var_sr: float) -> float:
     """Bailey & López de Prado Deflated Sharpe Ratio.

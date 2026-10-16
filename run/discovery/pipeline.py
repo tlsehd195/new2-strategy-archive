@@ -53,7 +53,7 @@ from evaluator import cell_stats, run_event_study
 from evolution import EVOLUTION_GENERATOR_VERSION, LineageStore, SpecStore, mutate
 from search import SearchConfig, dev_feedback
 from stats_mc import (
-    MC_METHOD_VERSION, by_fdr, daily_series, default_q, mcs, reality_check, spa_test,
+    MC_METHOD_VERSION, by_fdr, daily_series, default_q, dm_test, mcs, reality_check, spa_test, step_spa,
     spending_alpha, stationary_bootstrap_indices, stepm,
 )
 from strategy_spec import (
@@ -694,6 +694,8 @@ class EvolutionPipeline:
                         res["spa"] = {k: v for k, v in spa_test(series, B=vc["bootstrap_B"], q=q,
                                                                  seed=batch["seed"]).items()
                                       if k.startswith("p_") or k == "statistic"}
+                        res["step_spa_rejected"] = step_spa(series, alpha=w["alpha"], B=vc["bootstrap_B"],
+                                                            q=q, seed=batch["seed"])["rejected"]
                         res["reality_check_p"] = reality_check(series, B=vc["bootstrap_B"], q=q,
                                                                seed=batch["seed"])["p"]
                     except ValueError as err:
@@ -769,6 +771,41 @@ class EvolutionPipeline:
                     out.append(m)
         return out
 
+    def variation_report(self) -> list[dict]:
+        """Parent -> child DEV comparisons (Diebold-Mariano on the daily
+        return differential).  DEV data only; informs human review and the
+        failure memory, never the search ranking or any gate."""
+        ctx = self.context_id()
+        latest = {r["strategy_id"]: r for r in iter_jsonl(self.series_path) if r["context_id"] == ctx}
+
+        def pooled(sid):
+            r = latest.get(sid)
+            if r is None:
+                return None
+            acc: dict[int, float] = {}
+            for _sym, (d0, vals) in r["series"].items():
+                for i, v in enumerate(vals):
+                    acc[d0 + i] = acc.get(d0 + i, 0.0) + v
+            return acc
+        out = []
+        for rec in self.lineage.records():
+            c = pooled(rec["child_id"])
+            row = {"child": rec["child_id"], "parents": rec["parents"], "operator": rec["operator"]}
+            ps = [pooled(p_) for p_ in rec["parents"]]
+            if c is None or not ps or any(p_ is None for p_ in ps):
+                out.append({**row, "status": "UNTESTED"})
+                continue
+            best = max(ps, key=lambda a: (sum(a.values()) / len(a)) if a else -math.inf)
+            days = sorted(set(c) | set(best))
+            try:
+                res = dm_test([c.get(d, 0.0) - best.get(d, 0.0) for d in days])
+            except ValueError as err:
+                out.append({**row, "status": "NOT_COMPUTED", "reason": str(err)})
+                continue
+            out.append({**row, "status": "OK", "z": res["z"], "p_better": res["p_one_sided_better"],
+                        "n_days": res["n"]})
+        return out
+
     # -- stage 3: robustness (filters only) ---------------------------------------------
     def _pbo(self) -> dict:
         ctx = self.context_id()
@@ -828,7 +865,14 @@ class EvolutionPipeline:
         m_ = sum(all_sr) / len(all_sr)
         var_sr = sum((v - m_) ** 2 for v in all_sr) / (len(all_sr) - 1)
         d = deflated_sharpe(sr, n, skew, kurt, len(srs), var_sr)
-        return {"computable": math.isfinite(d), "dsr": d if math.isfinite(d) else None,
+        # MinBTL (Bailey et al. 2014): raw trial count, 365 d/yr (24/7 market).
+        from engine_lib import expected_max_sr, min_backtest_years
+        sr_ann = sr * math.sqrt(365.0)
+        floor_ann = expected_max_sr(len(srs)) / math.sqrt(n / 365.0)
+        return {"minbtl_years": min_backtest_years(len(srs), sr_ann),
+                "sr_annual": sr_ann, "sr_floor_annual": floor_ann,
+                "exceeds_sr_floor": sr_ann > floor_ann,
+                "computable": math.isfinite(d), "dsr": d if math.isfinite(d) else None,
                 "sr_daily": sr, "n_days": n, "trials": len(srs), "var_sr": var_sr,
                 "skew": skew, "kurtosis": kurt}
 
@@ -870,7 +914,8 @@ class EvolutionPipeline:
             xs = [x["gross_bp"] - mult * x["cost_bp"] - x["funding_bp"] for x in all_ev]
             stress[str(mult)] = sum(xs) / len(xs) if xs else None
         need = stress.get(str(rc["require_positive_at_cost_multiplier"]))
-        checks["cost_stress"] = {"pass": need is not None and need > 0, "mean_bp": stress}
+        checks["cost_stress"] = {"pass": need is not None and need > 0, "mean_bp": stress,
+                                 "breakeven_multiplier": cost_breakeven(all_ev)}
         # regimes
         reg = {k: {"n": len(v), "mean_bp": sum(v) / len(v)} for k, v in regime_ev.items()}
         usable = [v for v in reg.values() if v["n"] >= rc["regime_min_events"]]
@@ -1181,6 +1226,20 @@ class EvolutionPipeline:
             self.statuses.set(sid, ctx, "BLOCKED_STATISTICS", stage="promotion", reasons=failures,
                               evidence=evidence, resume_to="VALIDATION_SURVIVOR")
         return review
+
+
+def cost_breakeven(events: Sequence[Mapping]) -> Optional[float]:
+    """Multiple of the modelled trading cost at which the mean net result is 0:
+    mean(gross - funding) / mean(cost).  Cost sensitivity as a sanity check (a
+    strategy that dies at 1.1x the assumed cost has no margin); informational,
+    never a gate.  None when it cannot be computed (no events / no cost)."""
+    if not events:
+        return None
+    n = len(events)
+    cost = sum(x["cost_bp"] for x in events) / n
+    if not cost > 0:
+        return None
+    return sum(x["gross_bp"] - x["funding_bp"] for x in events) / n / cost
 
 
 class _Ev:
