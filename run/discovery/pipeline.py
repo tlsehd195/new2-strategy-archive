@@ -42,15 +42,15 @@ import random
 from pathlib import Path
 from typing import Mapping, Optional, Sequence
 
-from campaigns import CampaignLedger, WindowRetired, member_alpha, window_key
+from campaigns import CampaignLedger, WindowRetired, member_alpha
 from costs_bridge import COST_MODEL_SCOPE, CostComputationError, CostConfigError, UNVERIFIED_COST_MODEL
 from engine_lib import (
-    CODE_FILES, LockTestRegistry, MIN_VALID_N, append_jsonl, bh_fdr_family, canonical_json,
+    CODE_FILES, LockTestRegistry, append_jsonl, bh_fdr_family, canonical_json,
     code_identity, experiment_context, iso_now, iter_jsonl, locked_window_for, nw_tstat,
     pbo_cscv, runtime_identity, t_sf,
 )
 from evaluator import cell_stats, run_event_study
-from evolution import EVOLUTION_GENERATOR_VERSION, LineageStore, SpecStore, mutate
+from evolution import EVOLUTION_GENERATOR_VERSION, LineageStore, SpecStore
 from search import SearchConfig, dev_feedback
 from stats_mc import (
     MC_METHOD_VERSION, by_fdr, daily_series, default_q, dm_test, mcs, reality_check, spa_test, step_spa,
@@ -63,7 +63,9 @@ from strategy_spec import (
 
 PIPELINE_VERSION = "evo-pipeline-v1"
 EVO_CODE_FILES = tuple(sorted(set(CODE_FILES) | {"strategy_spec.py", "evolution.py", "search.py",
-                                                 "pipeline.py", "autoloop.py", "paper.py"}))
+                                                 "pipeline.py", "autoloop.py", "paper.py",
+                                                 "paper_forward.py", "execution_sim.py",
+                                                 "config/paper_forward_v1.json"}))
 DEFAULT_PROMOTION_CONFIG = Path(__file__).resolve().parent / "config" / "promotion_v2.json"
 DAY_MS = 86_400_000
 
@@ -85,7 +87,9 @@ TRANSITIONS = {
     # isolated paper replay only (no live trading): PAPER_PASSED / PAPER_FAILED never
     # authorise real orders; a human approval outside this repository would be required
     "PAPER_TEST_READY": {"PAPER_TESTING"},
-    "PAPER_TESTING": {"PAPER_PASSED", "PAPER_FAILED"},
+    # PAPER_PASSED only from the preregistered forward observation (paper_forward.py);
+    # INCONCLUSIVE when its maximum observation period ends without enough trades
+    "PAPER_TESTING": {"PAPER_PASSED", "PAPER_FAILED", "INCONCLUSIVE"},
     "PAPER_PASSED": set(),
     "PAPER_FAILED": set(),
 }
@@ -407,6 +411,30 @@ class EvolutionPipeline:
                 append_jsonl(p, {"context_id": ctx, "components": norm, "at": iso_now()})
             self._ctx = ctx
         return self._ctx
+
+    def reverification_pending(self) -> list[dict]:
+        """Strategies that reached a confirmatory status under ANOTHER
+        experiment context and have no status under the current one.  Their
+        old evidence is never reused (statuses are per context); they wait for
+        a fresh evaluation.  ``changed`` names the context components that
+        differ (e.g. ``cost`` after a cost-model change)."""
+        ctx = self.context_id()
+        comps = {r["context_id"]: r.get("components", {}) for r in iter_jsonl(self.dir / "contexts.jsonl")}
+        cur = comps.get(ctx, {})
+        advanced = {"VALIDATION_SURVIVOR", "PAPER_TEST_READY", "PAPER_TESTING", "PAPER_PASSED",
+                    "BLOCKED_COST", "BLOCKED_STATISTICS"}
+        now = self.statuses.all(ctx)
+        out: dict[str, dict] = {}
+        for (sid, c), r in sorted(self.statuses._load().items()):
+            if c == ctx or sid in now or r["status"] not in advanced:
+                continue
+            if r["status"] in _BLOCKED and r.get("resume_to") != "VALIDATION_SURVIVOR":
+                continue
+            old = comps.get(c, {})
+            changed = sorted(k for k in set(cur) | set(old) if canonical_json(cur.get(k)) != canonical_json(old.get(k)))
+            out[sid] = {"strategy_id": sid, "previous_context": c, "previous_status": r["status"],
+                        "changed": changed, "status": "REVERIFY_PENDING"}
+        return list(out.values())
 
     # -- evaluation records -------------------------------------------------------
     def _index(self) -> dict:
@@ -774,36 +802,56 @@ class EvolutionPipeline:
     def variation_report(self) -> list[dict]:
         """Parent -> child DEV comparisons (Diebold-Mariano on the daily
         return differential).  DEV data only; informs human review and the
-        failure memory, never the search ranking or any gate."""
+        failure memory, never the search ranking or any gate.
+
+        Alignment (review of PR #4): the differential is formed only on the
+        symbols BOTH strategies trade and only on the days BOTH series cover
+        — a day outside one series' DEV window is not observed, it is not a
+        zero return.  The comparison parent is the best parent by its DEV
+        mean on that same common grid (chosen before the test is computed;
+        the choice is recorded).  Too little overlap -> NOT_COMPUTED."""
         ctx = self.context_id()
         latest = {r["strategy_id"]: r for r in iter_jsonl(self.series_path) if r["context_id"] == ctx}
 
-        def pooled(sid):
+        def per_symbol(sid):
             r = latest.get(sid)
             if r is None:
                 return None
-            acc: dict[int, float] = {}
-            for _sym, (d0, vals) in r["series"].items():
-                for i, v in enumerate(vals):
-                    acc[d0 + i] = acc.get(d0 + i, 0.0) + v
-            return acc
+            return {sym: {d0 + i: v for i, v in enumerate(vals)}
+                    for sym, (d0, vals) in r["series"].items()}
+
+        def aligned(a, b):
+            syms = sorted(set(a) & set(b))
+            days = sorted(set().union(*(set(a[s]) & set(b[s]) for s in syms))) if syms else []
+            xa = [sum(a[s].get(d, 0.0) for s in syms if d in a[s] and d in b[s]) for d in days]
+            xb = [sum(b[s].get(d, 0.0) for s in syms if d in a[s] and d in b[s]) for d in days]
+            return syms, days, xa, xb
         out = []
         for rec in self.lineage.records():
-            c = pooled(rec["child_id"])
-            row = {"child": rec["child_id"], "parents": rec["parents"], "operator": rec["operator"]}
-            ps = [pooled(p_) for p_ in rec["parents"]]
-            if c is None or not ps or any(p_ is None for p_ in ps):
+            c = per_symbol(rec["child_id"])
+            row = {"child": rec["child_id"], "parents": rec["parents"], "operator": rec["operator"],
+                   "data": "dev", "use": "diagnostic only (never ranking or gating)"}
+            ps = {p_: per_symbol(p_) for p_ in rec["parents"]}
+            if c is None or not ps or any(v is None for v in ps.values()):
                 out.append({**row, "status": "UNTESTED"})
                 continue
-            best = max(ps, key=lambda a: (sum(a.values()) / len(a)) if a else -math.inf)
-            days = sorted(set(c) | set(best))
+            grids = {p_: aligned(c, v) for p_, v in ps.items()}
+            usable = {p_: g for p_, g in grids.items() if g[1]}
+            if not usable:
+                out.append({**row, "status": "NOT_COMPUTED",
+                            "reason": "no common symbol/day between child and parents"})
+                continue
+            best = max(sorted(usable), key=lambda p_: sum(usable[p_][3]) / len(usable[p_][3]))
+            syms, days, xc, xp = usable[best]
             try:
-                res = dm_test([c.get(d, 0.0) - best.get(d, 0.0) for d in days])
+                res = dm_test([a - b for a, b in zip(xc, xp)])
             except ValueError as err:
-                out.append({**row, "status": "NOT_COMPUTED", "reason": str(err)})
+                out.append({**row, "status": "NOT_COMPUTED", "reason": str(err),
+                            "compared_parent": best, "n_days": len(days)})
                 continue
             out.append({**row, "status": "OK", "z": res["z"], "p_better": res["p_one_sided_better"],
-                        "n_days": res["n"]})
+                        "n_days": res["n"], "compared_parent": best, "symbols": syms,
+                        "first_day": days[0], "last_day": days[-1]})
         return out
 
     # -- stage 3: robustness (filters only) ---------------------------------------------
@@ -915,7 +963,11 @@ class EvolutionPipeline:
             stress[str(mult)] = sum(xs) / len(xs) if xs else None
         need = stress.get(str(rc["require_positive_at_cost_multiplier"]))
         checks["cost_stress"] = {"pass": need is not None and need > 0, "mean_bp": stress,
-                                 "breakeven_multiplier": cost_breakeven(all_ev)}
+                                 "breakeven_multiplier": cost_breakeven(all_ev),
+                                 # a multiple of the MODELLED cost: says nothing about real
+                                 # execution cost while the model is unverified
+                                 "breakeven_basis": ("TEST_ONLY_COST" if self.cost.verified and self.cost.test_only
+                                                     else self._cost_block()["status"])}
         # regimes
         reg = {k: {"n": len(v), "mean_bp": sum(v) / len(v)} for k, v in regime_ev.items()}
         usable = [v for v in reg.values() if v["n"] >= rc["regime_min_events"]]
@@ -1202,14 +1254,18 @@ class EvolutionPipeline:
         # PAPER_TEST_READY needs a VERIFIED cost model (calibrated against recorded
         # fills/books). The old config switch ``allow_unverified_cost_for_paper`` is
         # no longer honoured: an unverified model leaves the candidate research-only.
-        cost_ok = bool(self.cost.verified)
+        # ``verified`` itself can only be True with a sealed calibration record
+        # (costs_bridge.CostContext); the record must also cover this use.
+        cost_ok, cost_why = self.cost.verified_for(
+            canonicalize_spec(self.specs.get(sid))["symbols"], self.order_value)
         if not cost_ok:
             labels.append(pc.get("unverified_cost_label", UNVERIFIED_COST_MODEL))
         if self.cost.test_only:
             labels.append("TEST_ONLY_COST")
         review = {"strategy_id": sid, "context_id": ctx, "config_hash": self.cfg_hash,
                   "evidence": evidence, "failures": failures, "labels": labels,
-                  "cost_verified": cost_ok,
+                  "cost_verified": cost_ok, "cost_scope_issues": cost_why,
+                  "cost_verification_record": (self.cost.verification or {}).get("record_id"),
                   "decision": ("PAPER_TEST_READY" if not failures and cost_ok
                                else "BLOCKED_COST" if not failures else "NOT_ELIGIBLE"),
                   "scope": "paper trading / isolated simulation only — never live orders",
@@ -1253,7 +1309,6 @@ class _Ev:
 def seed_specs_from_legacy(symbols: Sequence[str], available_data: Sequence[str]) -> list[tuple[str, dict]]:
     """(legacy strategy id, translated spec) for every legacy candidate whose
     data is available; symbols restricted to ``symbols``."""
-    from engine_lib import strategy_id
     from generator import enumerate_candidates
     from strategy_spec import SpecError, legacy_to_spec
     out = []

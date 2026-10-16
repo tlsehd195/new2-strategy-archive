@@ -47,7 +47,9 @@ class EvolutionCycleSummary:
     robustness_resumed: list = field(default_factory=list)
     campaign: Optional[dict] = None
     paper: list = field(default_factory=list)
+    forward: list = field(default_factory=list)
     status_counts: dict = field(default_factory=dict)
+    reverify_pending: list = field(default_factory=list)
     notes: list = field(default_factory=list)
     runtime_seconds: float = 0.0
 
@@ -59,7 +61,8 @@ def run_evolution_cycle(state_dir: Path, provider, cost, *, symbols: Sequence[st
                         search_cfg: Optional[SearchConfig] = None, rounds: int = 2,
                         max_dev_evals: int = 60, seed_legacy: bool = True,
                         promotion_config: Optional[Path] = None,
-                        results_dir: Optional[Path] = None) -> EvolutionCycleSummary:
+                        results_dir: Optional[Path] = None,
+                        forward_feed=None) -> EvolutionCycleSummary:
     from paper import PaperRefused, run_paper
     from pipeline import EvolutionPipeline, seed_specs_from_legacy
     t0 = time.time()
@@ -191,10 +194,27 @@ def run_evolution_cycle(state_dir: Path, provider, cost, *, symbols: Sequence[st
                 s.paper.append({"strategy_id": sid, "status": r["status"], "verdict": r.get("verdict")})
             except PaperRefused:
                 pass
+    # 7) forward paper observation (bars that did not exist at promotion; no orders)
+    if forward_feed is not None:
+        from paper_forward import ForwardPaper, ForwardRefused
+        fp = ForwardPaper(pipe, forward_feed)
+        planned = {r["strategy_id"] for r in fp.plans() if r["context_id"] == ctx}
+        for sid, stt in sorted(pipe.statuses.all(ctx).items()):
+            if stt == "PAPER_TESTING" and sid not in planned:
+                try:
+                    fp.register_plan(sid)
+                except ForwardRefused as e:
+                    s.notes.append(f"forward plan refused for {sid}: {e}")
+        for plan in fp.plans():
+            if plan["context_id"] == ctx:
+                r = fp.step(plan["plan_id"])
+                s.forward.append({"plan_id": plan["plan_id"], "strategy_id": plan["strategy_id"],
+                                  "verdict": r.get("verdict"), "status": r.get("status")})
     counts: dict = {}
     for v in pipe.statuses.all(ctx).values():
         counts[v] = counts.get(v, 0) + 1
     s.status_counts = counts
+    s.reverify_pending = pipe.reverification_pending()
     if st.status == "BUDGET_EXHAUSTED":
         s.status = "CYCLE_BUDGET_EXHAUSTED"
     elif evaluated == 0 and vb is None and not s.campaign:

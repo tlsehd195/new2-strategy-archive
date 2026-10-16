@@ -387,7 +387,7 @@ class TestPaper(PipelineCase):
         r = run_paper(p, edge)
         ctx = p.context_id()
         self.assertEqual(p.statuses.status(edge, ctx),
-                         {"PAPER_CONSISTENT": "PAPER_PASSED", "PAPER_DEGRADED": "PAPER_FAILED",
+                         {"PAPER_CONSISTENT": "PAPER_TESTING", "PAPER_DEGRADED": "PAPER_FAILED",
                           "PAPER_INCONCLUSIVE": "PAPER_TESTING"}[r["verdict"]])
         self.assertEqual(r["orders_sent"], 0)
         with self.assertRaises(PaperRefused):
@@ -409,7 +409,8 @@ class TestPaper(PipelineCase):
         pat = re.compile(r"^\s*(import|from)\s+(socket|urllib|http|requests|aiohttp|websocket|ccxt|"
                          r"binance)\b", re.M)
         for name in ("paper.py", "pipeline.py", "autoloop.py", "search.py", "evolution.py",
-                     "strategy_spec.py", "stats_mc.py", "campaigns.py"):
+                     "strategy_spec.py", "stats_mc.py", "campaigns.py", "paper_forward.py",
+                     "execution_sim.py", "cost_calibration.py"):
             self.assertIsNone(pat.search((DISC / name).read_text()), name)
 
 

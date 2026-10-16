@@ -553,6 +553,7 @@ def experiment_context(components: Mapping) -> tuple[str, dict]:
 CODE_FILES = ("engine_lib.py", "runner.py", "evaluator.py", "portfolio.py",
               "generator.py", "generation.py", "data_quality.py",
               "costs_bridge.py", "store.py", "promotion.py", "campaigns.py", "stats_mc.py",
+              "cost_calibration.py", "config/cost_verification_v1.json",
               "config/promotion_v1.json", "config/promotion_v2.json")
 
 

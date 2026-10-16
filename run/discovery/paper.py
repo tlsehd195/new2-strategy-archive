@@ -8,7 +8,10 @@ exchange client, no order API is imported or called — the module refuses
 to run if it is asked for anything but replay.
 
 Each strategy gets ONE paper run per context (the paper window is then
-consumed, like a locked window).  Results are written as ``paper`` stage
+consumed, like a locked window).  The replay can FAIL a strategy (mean <= 0
+after costs) but never pass it: ``PAPER_PASSED`` is reserved for the
+preregistered forward observation on bars that did not exist at promotion
+(``paper_forward.py``).  Results are written as ``paper`` stage
 evidence and as a research-feedback record.  The search never reads them
 (search.dev_feedback only accepts DEV records): paper outcomes inform the
 human review and the failure memory, not the generator's ranking.
@@ -17,7 +20,6 @@ human review and the failure memory, not the generator's ranking.
 from __future__ import annotations
 
 import math
-from typing import Mapping
 
 from engine_lib import append_jsonl, iso_now, iter_jsonl
 from strategy_spec import canonicalize_spec
@@ -88,10 +90,11 @@ def run_paper(pipeline, sid: str, *, mode: str = PAPER_MODE) -> dict:
                            "verdict": verdict, "n": n,
                            "mean_bp": mean if mean is None or math.isfinite(mean) else None,
                            "is_simulation": True})
-    if verdict == "PAPER_CONSISTENT":
-        pipeline.statuses.set(sid, ctx, "PAPER_PASSED", stage="paper", reasons=[
-            "replay mean > 0 with enough events; this is NOT approval for live trading"])
-    elif verdict == "PAPER_DEGRADED":
+    # A replay on stored history is never enough for PAPER_PASSED (a positive mean is
+    # not a preregistered paper criterion): PAPER_CONSISTENT keeps PAPER_TESTING and
+    # the strategy waits for the forward observation (paper_forward.py).  A degraded
+    # replay fails closed.
+    if verdict == "PAPER_DEGRADED":
         pipeline.statuses.set(sid, ctx, "PAPER_FAILED", stage="paper",
                               reasons=["replay mean <= 0 after costs"])
     # PAPER_INCONCLUSIVE (too few events): stays PAPER_TESTING, the window is consumed
