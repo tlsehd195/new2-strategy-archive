@@ -376,6 +376,11 @@ class TestForwardPaper(ForwardCase):
         rec = p.evaluation("paper_forward", edge)
         self.assertIn("OBSERVED_FROM_ARCHIVE_NOT_REALTIME", rec["labels"])
         self.assertEqual(fp.step(plan["plan_id"])["status"], "CONCLUDED")
+        from handoff import HANDOFF_SCHEMA, build_handoff
+        doc = build_handoff(p, edge)
+        self.assertEqual((doc["schema"], doc["paper_forward_verdict"], doc["live_registration"]),
+                         (HANDOFF_SCHEMA, "PAPER_PASSED", False))
+        self.assertEqual(doc["paper_forward_record_id"], rec["record_id"])
         # the search never sees it
         from search import FeedbackLeak, dev_feedback
         with self.assertRaises(FeedbackLeak):
