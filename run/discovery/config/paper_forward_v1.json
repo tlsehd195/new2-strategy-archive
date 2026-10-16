@@ -1,0 +1,21 @@
+{
+ "schema": "paper_forward_criteria_v1",
+ "note": "Preregistered 2026-10-16 before any forward observation. Thresholds are fixed per plan (the plan stores this file's hash); a change needs a new file and applies only to NEW plans.",
+ "min_days": 60,
+ "max_days": 180,
+ "min_trades": 30,
+ "alpha": 0.05,
+ "require_positive_at_cost_multiplier": 1.5,
+ "max_mdd_bp": 2500.0,
+ "max_missing_bar_share": 0.01,
+ "max_late_trade_share": 0.1,
+ "allow_liquidations": 0,
+ "execution": {
+  "leverage": 1.0,
+  "maintenance_margin": 0.004,
+  "liquidation_fee": 0.0125,
+  "partial_fill_policy": "refuse",
+  "max_observation_delay_ms": 120000
+ },
+ "warmup_bars": 4096
+}

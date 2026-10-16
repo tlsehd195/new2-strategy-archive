@@ -23,6 +23,7 @@ import json
 import os
 import sys
 import tempfile
+import time
 import zipfile
 from pathlib import Path
 from typing import Callable, Optional, Sequence
@@ -34,14 +35,78 @@ KINDS = {
 }
 
 
+PROVENANCE_SCHEMA = "provenance_v2"
+
+
 class FetchError(RuntimeError):
     pass
+
+
+class FetchFailure(RuntimeError):
+    """A download that failed after the retry policy, with its class:
+
+    NOT_PUBLISHED   HTTP 404 — the archive does not exist (yet): a data
+                    shortage, not a transport problem; never retried
+    PROXY_ERROR     the egress proxy refused the tunnel (HTTP 403/407 on
+                    CONNECT, "Tunnel connection failed"): an access policy
+    EXCHANGE_ERROR  any other HTTP 4xx from the server; never retried
+    TRANSIENT       HTTP 429/5xx, timeouts, resets, DNS — retried with
+                    exponential backoff, at most ``attempts`` times
+    """
+
+    def __init__(self, kind: str, detail: str, attempts: int):
+        super().__init__(f"{kind} after {attempts} attempt(s): {detail}")
+        self.kind, self.detail, self.attempts = kind, detail, attempts
+
+
+def classify_error(exc: BaseException) -> str:
+    code = getattr(exc, "code", None)
+    text = f"{type(exc).__name__}: {exc}".lower()
+    if "tunnel connection failed" in text or "proxy" in text or code == 407:
+        return "PROXY_ERROR"
+    if isinstance(code, int):
+        if code == 404:
+            return "NOT_PUBLISHED"
+        if code == 403:
+            return "PROXY_ERROR" if "tunnel" in text else "EXCHANGE_ERROR"
+        if code == 429 or code >= 500:
+            return "TRANSIENT"
+        if 400 <= code < 500:
+            return "EXCHANGE_ERROR"
+    return "TRANSIENT"
+
+
+def fetch_with_retry(url: str, *, opener: Optional[Callable[[str], bytes]] = None, attempts: int = 4,
+                     base_delay: float = 2.0, sleep: Callable[[float], None] = time.sleep) -> bytes:
+    """Bounded retries (``attempts`` total, delays base, 2*base, 4*base ...).
+    Only TRANSIENT failures are retried; never an infinite loop."""
+    opener = opener or _default_opener
+    if attempts < 1:
+        raise ValueError("attempts must be >= 1")
+    last = None
+    for k in range(attempts):
+        try:
+            return opener(url)
+        except Exception as e:  # noqa: BLE001 — classified below
+            last = e
+            kind = classify_error(e)
+            if kind != "TRANSIENT" or k == attempts - 1:
+                raise FetchFailure(kind, f"{type(e).__name__}: {e}", k + 1) from e
+            sleep(base_delay * (2 ** k))
+    raise FetchFailure("TRANSIENT", str(last), attempts)  # pragma: no cover
 
 
 def _default_opener(url: str) -> bytes:  # pragma: no cover - network
     import urllib.request
     with urllib.request.urlopen(url, timeout=60) as r:
         return r.read()
+
+
+def code_version() -> str:
+    h = hashlib.sha256()
+    for name in ("data_fetch.py", "data_quality.py"):
+        h.update((Path(__file__).resolve().parent / name).read_bytes())
+    return h.hexdigest()[:16]
 
 
 def months(start: str, end: str) -> list[str]:
@@ -54,31 +119,40 @@ def months(start: str, end: str) -> list[str]:
     return out
 
 
-def _quality_ok(kind: str, sym: str, path: Path) -> tuple[bool, str]:
+def _quality_ok(kind: str, sym: str, path: Path) -> tuple[bool, str, dict]:
     if kind == "klines":
         from data_quality import dataset_for
         h = dataset_for(sym, path)
         if h is None or not h.quality.ok:
-            return False, f"kline quality {getattr(h, 'missing', None) or 'BLOCK'}"
-        return True, h.sha256
+            return False, f"kline quality {getattr(h, 'missing', None) or 'BLOCK'}", {}
+        q = h.quality
+        return True, h.sha256, {"verdict": q.verdict, "rows": q.n_rows, "first_ts": q.first_ts,
+                                "last_ts": q.last_ts, "missing_bars": q.missing_candles,
+                                "known_gap_bars": q.known_gap_bars, "zero_volume": q.zero_volume,
+                                "warnings": sorted({i["code"] for i in q.issues if i["severity"] == "WARN"})}
     from data_quality import funding_quality, load_funding_csv_checked
     pairs, rep = load_funding_csv_checked(path)
     fq = funding_quality(pairs, parse_errors=rep["parse_errors"], torn_tail=rep["torn_tail"],
                          intervals=rep["intervals"])
-    return (True, rep["sha256"]) if fq["ok"] else (False, f"funding quality {fq['issues']}")
+    summ = {"verdict": "OK" if fq["ok"] else "BLOCK", "rows": fq.get("n"), "first_ts": fq.get("first"),
+            "last_ts": fq.get("last"), "gaps": len(fq.get("gaps", [])), "warnings": fq.get("warnings", [])}
+    return (True, rep["sha256"], summ) if fq["ok"] else (False, f"funding quality {fq['issues']}", summ)
 
 
 def fetch_month(data_dir: Path, kind: str, sym: str, ym: str, *,
-                opener: Callable[[str], bytes]) -> dict:
+                opener: Callable[[str], bytes], attempts: int = 4,
+                sleep: Callable[[float], None] = time.sleep) -> dict:
     rel, sub, name = KINDS[kind]
     url = f"{BASE}/{rel.format(sym=sym, ym=ym)}"
     target = Path(data_dir) / sub / name.format(sym=sym, ym=ym)
     out = {"kind": kind, "symbol": sym, "month": ym, "url": url, "path": str(target)}
     try:
-        blob = opener(url)
-        chk = opener(url + ".CHECKSUM").decode("ascii", "replace").split()
-    except Exception as e:  # noqa: BLE001 — any transport failure is BLOCKED_DATA
-        return {**out, "status": "BLOCKED_DATA", "reason": f"download failed: {type(e).__name__}: {e}"}
+        blob = fetch_with_retry(url, opener=opener, attempts=attempts, sleep=sleep)
+        chk = fetch_with_retry(url + ".CHECKSUM", opener=opener, attempts=attempts,
+                               sleep=sleep).decode("ascii", "replace").split()
+    except FetchFailure as e:  # any transport failure is BLOCKED_DATA, with its class
+        return {**out, "status": "BLOCKED_DATA", "failure_kind": e.kind, "attempts": e.attempts,
+                "reason": f"download failed: {e.detail}"}
     sha = hashlib.sha256(blob).hexdigest()
     if not chk or chk[0].lower() != sha:
         return {**out, "status": "BLOCKED_DATA", "reason": "checksum mismatch", "sha256": sha}
@@ -103,9 +177,10 @@ def fetch_month(data_dir: Path, kind: str, sym: str, ym: str, *,
             f.write(csv)
             f.flush()
             os.fsync(f.fileno())
-        ok, info = _quality_ok(kind, sym, Path(tmp))
+        ok, info, quality = _quality_ok(kind, sym, Path(tmp))
         if not ok:
-            return {**out, "status": "BLOCKED_DATA", "reason": info}
+            return {**out, "status": "BLOCKED_DATA", "failure_kind": "QUALITY", "reason": info,
+                    "quality": quality}
         if target.exists():                       # raced with another writer: keep theirs
             return {**out, "status": "CONFLICT", "reason": "appeared during fetch — kept"}
         os.replace(tmp, target)
@@ -115,6 +190,8 @@ def fetch_month(data_dir: Path, kind: str, sym: str, ym: str, *,
             os.unlink(tmp)
     rec = {**out, "status": "FETCHED", "zip_sha256": sha,
            "csv_sha256": hashlib.sha256(csv).hexdigest(),
+           "schema": PROVENANCE_SCHEMA, "source": "data.binance.vision (public USD-M monthly archive)",
+           "code_version": code_version(), "quality": quality,
            "at": dt.datetime.now(dt.timezone.utc).isoformat()}
     with open(Path(data_dir) / "_provenance.jsonl", "a", encoding="utf-8") as f:
         f.write(json.dumps(rec, sort_keys=True) + "\n")
@@ -124,7 +201,8 @@ def fetch_month(data_dir: Path, kind: str, sym: str, ym: str, *,
 def fetch_missing(data_dir: Path, symbols: Sequence[str], start: str, end: str, *,
                   allow: bool = False, kinds: Sequence[str] = ("klines", "funding"),
                   opener: Optional[Callable[[str], bytes]] = None,
-                  today: Optional[dt.date] = None) -> dict:
+                  today: Optional[dt.date] = None, attempts: int = 4,
+                  sleep: Callable[[float], None] = time.sleep) -> dict:
     """Fetch every missing COMPLETE month in [start, end] (the running month is
     never fetched: monthly archives exist only for finished months)."""
     if not allow:
@@ -139,10 +217,16 @@ def fetch_missing(data_dir: Path, symbols: Sequence[str], start: str, end: str, 
             for ym in months(start, end):
                 if (Path(data_dir) / sub / name.format(sym=sym, ym=ym)).exists():
                     continue
-                results.append(fetch_month(data_dir, kind, sym, ym, opener=opener or _default_opener))
+                results.append(fetch_month(data_dir, kind, sym, ym, opener=opener or _default_opener,
+                                           attempts=attempts, sleep=sleep))
     blocked = [r for r in results if r["status"] in ("BLOCKED_DATA", "CONFLICT")]
+    kinds_count: dict = {}
+    for r in blocked:
+        k = r.get("failure_kind") or r["status"]
+        kinds_count[k] = kinds_count.get(k, 0) + 1
     return {"status": "BLOCKED_DATA" if blocked else "OK", "results": results,
-            "fetched": sum(r["status"] == "FETCHED" for r in results), "blocked": len(blocked)}
+            "fetched": sum(r["status"] == "FETCHED" for r in results), "blocked": len(blocked),
+            "blocked_by_kind": kinds_count}
 
 
 def main(argv: Sequence[str]) -> int:  # pragma: no cover - CLI

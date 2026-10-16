@@ -72,7 +72,7 @@ class TestFetch(unittest.TestCase):
     def run_fetch(self, files, **kw):
         op = FakeOpener(files)
         return fetch_missing(self.dd, ["BTCUSDT"], "2024-01", "2024-12", allow=True,
-                             kinds=("klines",), opener=op, today=TODAY, **kw), op
+                             kinds=("klines",), opener=op, today=TODAY, sleep=lambda _s: None, **kw), op
 
     def test_disabled_by_default(self):
         r = fetch_missing(self.dd, ["BTCUSDT"], "2024-01", "2024-02")

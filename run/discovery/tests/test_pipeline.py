@@ -387,7 +387,7 @@ class TestPaper(PipelineCase):
         r = run_paper(p, edge)
         ctx = p.context_id()
         self.assertEqual(p.statuses.status(edge, ctx),
-                         {"PAPER_CONSISTENT": "PAPER_PASSED", "PAPER_DEGRADED": "PAPER_FAILED",
+                         {"PAPER_CONSISTENT": "PAPER_TESTING", "PAPER_DEGRADED": "PAPER_FAILED",
                           "PAPER_INCONCLUSIVE": "PAPER_TESTING"}[r["verdict"]])
         self.assertEqual(r["orders_sent"], 0)
         with self.assertRaises(PaperRefused):
@@ -409,7 +409,8 @@ class TestPaper(PipelineCase):
         pat = re.compile(r"^\s*(import|from)\s+(socket|urllib|http|requests|aiohttp|websocket|ccxt|"
                          r"binance)\b", re.M)
         for name in ("paper.py", "pipeline.py", "autoloop.py", "search.py", "evolution.py",
-                     "strategy_spec.py", "stats_mc.py", "campaigns.py"):
+                     "strategy_spec.py", "stats_mc.py", "campaigns.py", "paper_forward.py",
+                     "execution_sim.py", "cost_calibration.py"):
             self.assertIsNone(pat.search((DISC / name).read_text()), name)
 
 
@@ -537,6 +538,20 @@ class TestSpecCausality(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestVariationReport(PipelineCase):
+    def test_parent_child_dm_rows(self):
+        p = self.pipe(SyntheticProvider())
+        parent, _ = p.register(NOISE[0], source="test")
+        p.dev_evaluate(parent)
+        child, _ = p.register(EDGE, source="test", parents=[parent], operator="param_change")
+        p.dev_evaluate(child)
+        lone, _ = p.register(NOISE[1], source="test", parents=["S-missing"], operator="x")
+        rows = {r["child"]: r for r in p.variation_report()}
+        self.assertEqual(rows[child]["status"], "OK")
+        self.assertIn("p_better", rows[child])
+        self.assertEqual(rows[lone]["status"], "UNTESTED")           # parent never evaluated: nothing invented
 
 
 class TestHandoff(PipelineCase):

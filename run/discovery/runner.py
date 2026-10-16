@@ -1672,10 +1672,12 @@ def main(argv: Sequence[str]) -> int:
             rc = EXIT_CODES[s.status]
         if opts["mode"] in ("evolve", "full"):
             from autoloop import CYCLE_EXIT, run_evolution_cycle
+            from paper_forward import FileFeed
             from pipeline import RunnerDataProvider
             es = run_evolution_cycle(paths.state_dir, RunnerDataProvider(paths.data_dir),
                                      CostContext.futures_default(), rounds=opts["rounds"],
-                                     max_dev_evals=opts["evals"], results_dir=paths.results_dir)
+                                     max_dev_evals=opts["evals"], results_dir=paths.results_dir,
+                                     forward_feed=FileFeed(paths.data_dir))
             print(json.dumps(es.to_json(), default=str))
             erc = CYCLE_EXIT[es.status]
             rc = erc if rc == 0 else (rc if erc == 0 else max(rc, erc))

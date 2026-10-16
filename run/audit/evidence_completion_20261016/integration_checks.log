@@ -1,0 +1,134 @@
+{
+ "1_no_data": {
+  "expected_exit": 4,
+  "exit": 4,
+  "summary": "CYCLE_BLOCKED_DATA"
+ },
+ "1_missing_data_dir": {
+  "expected_exit": 1,
+  "exit": 1
+ },
+ "2_corrupt_manifest": {
+  "ok": false,
+  "blocking": [
+   [
+    "MISSING_BARS",
+    "klines/BTCUSDT-15m-2022-05.csv"
+   ],
+   [
+    "PARSE_ERROR",
+    "klines/BTCUSDT-15m-2022-05.csv"
+   ],
+   [
+    "PROVENANCE_MISMATCH",
+    "klines/BTCUSDT-15m-2022-05.csv"
+   ]
+  ]
+ },
+ "2_corrupt_provider": {
+  "BTCUSDT_missing": [
+   "file BTCUSDT-15m-2022-05.csv failed the quality gate"
+  ],
+  "ETHUSDT_usable": true
+ },
+ "2_corrupt_cycle": {
+  "status": "CYCLE_OK",
+  "symbols_used": [
+   "ETHUSDT"
+  ],
+  "symbols_blocked": [
+   "BTCUSDT"
+  ],
+  "dev_evaluated": 3
+ },
+ "3_real_manifest": {
+  "ok": true,
+  "dataset_sha256": "5f0101f7c707f2036a19796e77d04b26f9edbd4d788cacf1ad0cf790baad1789",
+  "n_files": 276,
+  "counts": {
+   "blocking": 0,
+   "warnings": 7
+  },
+  "symbols": {
+   "BTCUSDT": {
+    "klines_first_ts": 1609459200000,
+    "klines_last_ts": 1790811900000,
+    "kline_files": 69,
+    "funding_first_ts": 1609459200002,
+    "funding_last_ts": 1790784000002,
+    "funding_files": 69
+   },
+   "ETHUSDT": {
+    "klines_first_ts": 1609459200000,
+    "klines_last_ts": 1790811900000,
+    "kline_files": 69,
+    "funding_first_ts": 1609459200002,
+    "funding_last_ts": 1790784000002,
+    "funding_files": 69
+   }
+  }
+ },
+ "13_reproducible": {
+  "same_context": true,
+  "same_evaluation_records": true,
+  "n_records_a": 783,
+  "n_records_b": 783,
+  "status_counts_a": {
+   "REJECTED": 707,
+   "INCONCLUSIVE": 70
+  },
+  "status_counts_b": {
+   "REJECTED": 707,
+   "INCONCLUSIVE": 70
+  },
+  "validation_outcomes_a": [
+   {
+    "S-084802771f95f122": "INCONCLUSIVE",
+    "S-332c96b180322def": "INCONCLUSIVE",
+    "S-391396a9487de780": "REJECTED",
+    "S-5f8884793cae1ba1": "INCONCLUSIVE",
+    "S-6d1f375a260fc295": "INCONCLUSIVE",
+    "S-83e6031e8cde7217": "INCONCLUSIVE"
+   }
+  ],
+  "locked_campaign_records_a": 0,
+  "lock_usage_file_a": false
+ },
+ "12_health_a": {
+  "status": "OK",
+  "checks": {
+   "lock": {
+    "status": "FREE"
+   },
+   "ledgers": {
+    "status": "OK",
+    "files": 8,
+    "corrupt": [],
+    "quarantined": []
+   },
+   "evidence": {
+    "status": "OK",
+    "tampered": []
+   },
+   "config": {
+    "status": "OK",
+    "errors": []
+   },
+   "disk": {
+    "status": "OK",
+    "free_bytes": 31821938688
+   },
+   "data_dir": {
+    "status": "OK",
+    "path": "/tmp/claude-0/-home-claude-new2-strategy-archive/f9dd1cea-48c6-5978-86fa-b1504ecd3599/scratchpad/realdata"
+   },
+   "last_cycle": {
+    "status": "CYCLE_OK",
+    "finished_at": "2026-10-16T13:22:30Z",
+    "context_id": "C2-0f3bfb900528ba8c8ee2"
+   }
+  },
+  "at": "2026-10-16T13:23:30Z"
+ }
+}
+exit=0

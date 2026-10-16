@@ -1,0 +1,11 @@
+{
+ "schema": "cost_verification_criteria_v1",
+ "note": "Preregistered 2026-10-16 before any execution data was seen. Mean underestimate tolerance 0.5bp absorbs sampling noise of the mean; p90 tolerance 2bp bounds the tail. Changing a value requires a new file (v2) and a recorded reason; old records keep their criteria_hash.",
+ "calibration_fraction": 0.5,
+ "min_verification_fills_per_symbol": 200,
+ "max_mean_underestimate_bp": 0.5,
+ "max_p90_underestimate_bp": 2.0,
+ "max_reject_rate": 0.05,
+ "participation_edges": [1e-05, 0.0001, 0.001, 0.01],
+ "volatility_edges": [0.001, 0.003, 0.01]
+}

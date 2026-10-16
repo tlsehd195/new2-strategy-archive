@@ -34,6 +34,7 @@ import math
 import os
 import sys
 from dataclasses import dataclass, field
+from typing import Optional
 
 _COINTRADER_SRC = os.environ.get(
     "COINTRADER_SRC", "/home/z/my-project/NEW2_public_clone/src"
@@ -155,6 +156,13 @@ class CostContext:
     ``verified`` stays False (→ UNVERIFIED_COST_MODEL) until the parameters
     are calibrated against real fee schedules / recorded books.  ``test_only``
     marks fake contexts used by tests; the production runner refuses them.
+
+    A caller can NOT make a context verified by passing ``verified=True``
+    (or a config boolean): outside ``test_only`` a verified context must
+    carry a sealed ``cost_calibration`` VERIFIED record whose parameters are
+    exactly the ones priced here and whose cost-model source hash is the
+    imported one (:meth:`from_verification`).  Anything else raises
+    :class:`CostConfigError` at construction time.
     """
 
     model: CandleCostModel
@@ -162,12 +170,26 @@ class CostContext:
     verified: bool = False  # False → UNVERIFIED_COST_MODEL in records
     test_only: bool = False
     params: dict = field(default_factory=dict, compare=False, hash=False)
+    verification: Optional[dict] = field(default=None, compare=False, hash=False)
 
     def __post_init__(self):
         # the params actually used are always the model's own fields — the
         # record can never claim a different configuration than was priced
         object.__setattr__(self, "params", _validate_params(
             {k: getattr(self.model, k) for k in REQUIRED_COST_PARAMS}))
+        if self.verified and not self.test_only:
+            from cost_calibration import CalibrationError, check_record
+            if not self.verification:
+                raise CostConfigError("verified=True without a sealed cost verification record "
+                                      "— a flag is not evidence")
+            try:
+                check_record(self.verification)
+            except CalibrationError as e:
+                raise CostConfigError(f"cost verification record rejected: {e}") from e
+            rp = {k: float(v) for k, v in (self.verification.get("params") or {}).items()}
+            if rp != self.params:
+                raise CostConfigError("cost verification record was made for different "
+                                      f"parameters {rp} than {self.params}")
 
     @classmethod
     def from_params(cls, params: dict, *, version: str, verified: bool = False,
@@ -175,6 +197,29 @@ class CostContext:
         p = _validate_params(dict(params))
         return cls(model=CandleCostModel(**p), version=version,
                    verified=verified, test_only=test_only)
+
+    @classmethod
+    def from_verification(cls, record: dict) -> "CostContext":
+        """The only production path to a verified context: a sealed VERIFIED
+        record from ``cost_calibration`` (checked again here)."""
+        p = _validate_params(dict(record.get("params") or {}))
+        return cls(model=CandleCostModel(**p),
+                   version=f"{COST_MODEL_VERSION}#verified:{record.get('record_id')}",
+                   verified=True, test_only=False, verification=dict(record))
+
+    def verified_for(self, symbols, order_value: float) -> tuple[bool, list[str]]:
+        """Does the verification cover this use (symbols, order size)?"""
+        if not self.verified:
+            return False, [UNVERIFIED_COST_MODEL]
+        if self.test_only:
+            return True, []
+        sc = (self.verification or {}).get("scope") or {}
+        why = [f"{s} not in verified symbols {sc.get('symbols')}"
+               for s in symbols if s not in (sc.get("symbols") or [])]
+        lo, hi = (sc.get("notional_range") or [math.inf, -math.inf])
+        if not (lo <= order_value <= hi):
+            why.append(f"order value {order_value} outside verified range [{lo}, {hi}]")
+        return not why, why
 
     @classmethod
     def futures_default(cls) -> "CostContext":
@@ -190,6 +235,7 @@ class CostContext:
             "params": dict(self.params),
             "verified": bool(self.verified),
             "test_only": bool(self.test_only),
+            "verification_record": (self.verification or {}).get("record_id"),
         }
 
     def quote(self, order_value: float, bar_traded_value) -> float:

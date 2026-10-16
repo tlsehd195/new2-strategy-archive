@@ -22,7 +22,8 @@ from typing import Mapping
 from engine_lib import canonical_json, iso_now, iter_jsonl
 from strategy_spec import canonicalize_spec
 
-HANDOFF_SCHEMA = "new2_research_handoff_v1"
+#: v2 (2026-10-16): adds the forward-paper evidence and the cost verification record id
+HANDOFF_SCHEMA = "new2_research_handoff_v2"
 EXPORTABLE = ("PAPER_TEST_READY", "PAPER_TESTING", "PAPER_PASSED")
 
 
@@ -47,6 +48,7 @@ def build_handoff(pipeline, sid: str) -> dict:
             raise HandoffRefused(f"{sid}: {stage} evidence missing or differs from the review")
         evidence[stage] = rec["record_id"]
     paper = pipeline.evaluation("paper", sid)
+    forward = pipeline.evaluation("paper_forward", sid)
     comps = next((r["components"] for r in iter_jsonl(pipeline.dir / "contexts.jsonl")
                   if r["context_id"] == ctx), {})
     spec = canonicalize_spec(pipeline.specs.get(sid))
@@ -61,7 +63,11 @@ def build_handoff(pipeline, sid: str) -> dict:
         "status": st["status"],
         "evidence_record_ids": evidence,
         "paper_record_id": paper["record_id"] if paper else None,
+        "paper_kind": "isolated replay of stored post-locked data (can fail, never passes)",
+        "paper_forward_record_id": forward["record_id"] if forward else None,
+        "paper_forward_verdict": forward["verdict"] if forward else "NOT_RUN",
         "cost_model": cost,
+        "cost_verification_record": pipeline.cost.identity().get("verification_record"),
         "labels": review[-1].get("labels", []),
         "failure_conditions": [
             "any later cost-model recalibration that turns the net edge <= 0",
