@@ -57,7 +57,7 @@ PR #4~#7이 모두 main에 병합된 상태(`c39578f`)에서 잔여 감사를 �
 - 통계 기준(`promotion_v2.json`, StepM·α 소비, PBO 0.5, DSR 비게이트), 비용 검증 기준(`cost_verification_v1.json`), 페이퍼 기준(`paper_forward_v1.json`), 가정 비용 프로필 값은 바꾸지 않았다.
 - StepM·SPA·Reality Check·Step-SPA·MCS·BH/BY·PBO(CSCV)·DSR·MinBTL의 식과 호출 경로를 다시 읽었다. 결함은 찾지 못했다. 근거는 감사 보고서 §4에 있다.
 - 검증 생존자가 없으면 잠금 TEST는 열리지 않는다(기존 동작, 확인함).
-- **결정 대기**: 지금은 비용이 미검증(ASSUMED/ESTIMATED/UNVERIFIED)이어도 검증 생존자가 생기면 잠금 TEST를 연다. 결과는 승격 심사에서 `BLOCKED_COST`가 된다. 잠금 창은 전략·종목당 한 번만 쓸 수 있으므로, 나중에 비용이 VERIFIED가 되어도 그 전략은 잠금 TEST를 다시 받을 수 없다. "비용 미검증이면 잠금 TEST를 열지 않고 창을 보존한다"로 바꿀지는 사용자 결정으로 남겼다. 실데이터에서 생존자는 지금까지 0명이라 아직 쓰인 창은 없다.
+- **결정 완료(2026-10-17, [ADR 0009](0009-locked-test-requires-verified-cost.md))**: 사용자가 "닫아 두기"를 골랐다. 아래는 결정 전 상황이다. 결정 전에는 비용이 미검증(ASSUMED/ESTIMATED/UNVERIFIED)이어도 검증 생존자가 생기면 잠금 TEST를 연다. 결과는 승격 심사에서 `BLOCKED_COST`가 된다. 잠금 창은 전략·종목당 한 번만 쓸 수 있으므로, 나중에 비용이 VERIFIED가 되어도 그 전략은 잠금 TEST를 다시 받을 수 없다. "비용 미검증이면 잠금 TEST를 열지 않고 창을 보존한다"로 바꿀지는 사용자 결정으로 남겼다. 실데이터에서 생존자는 지금까지 0명이라 아직 쓰인 창은 없다.
 
 ## 결과
 - 실데이터 사이클(새 코드, 기본 비용 프로필)과 테스트 결과는 `run/audit/AUDIT_RESIDUAL_20261017.md`에 있다.

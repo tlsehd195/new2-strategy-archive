@@ -151,6 +151,8 @@ audit report.
    strategy+symbol (`LockTestRegistry` v2: RESERVED → EVALUATION_STARTED →
    CONSUMED / BLOCKED_DATA_MISSING / FAILED, flock-protected, immutable results);
    missing locked data blocks the attempt WITHOUT consuming the window
+   and so does a cost model that is not VERIFIED for the strategy's symbols
+   and order size (`BLOCKED_COST`, stage `locked`; ADR 0009)
 7. Promotion gate: preregistration + final FDR survival + independent
    validation + lock test exactly once + VERIFIED cost model (+ a real
    portfolio result under the same context for combos) → append-only queue;

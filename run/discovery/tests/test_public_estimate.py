@@ -245,9 +245,13 @@ class TestEngineUse(PipelineCase):
         edge, *_ = self.register_all(p, [EDGE] + NOISE[:7])
         self.assertEqual(p.evaluation("dev", edge)["cost_model"]["status"], ESTIMATED_FROM_PUBLIC_DATA)
         p.run_validation()
-        p.run_locked_campaign()
+        self.assertIsNone(p.run_locked_campaign())
+        # ADR 0009: a public estimate never spends the single-use locked window
         self.assertEqual(p.statuses.status(edge, ctx), "BLOCKED_COST")
-        rv = [r for r in iter_jsonl(p.review_path) if r["strategy_id"] == edge][-1]
+        self.assertEqual(p.statuses.get(edge, ctx)["stage"], "locked")
+        self.assertEqual(p.lock_registry.uses(edge, "BTCUSDT"), 0)
+        rv = p.promotion_review(edge)
+        self.assertNotEqual(rv["decision"], "PAPER_TEST_READY")
         self.assertIn(ESTIMATED_FROM_PUBLIC_DATA, rv["labels"])
         self.assertIn(UNVERIFIED_COST_MODEL, rv["labels"])
 

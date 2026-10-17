@@ -69,6 +69,7 @@
 
 ## 5. 잠금 TEST·전진 페이퍼
 - 잠금 TEST는 `VALIDATION_SURVIVOR`가 있을 때만 열린다. 실데이터에서는 생존자 0명이라 열지 않았다(§7).
+- 사용자 결정(ADR 0009): 비용 모델이 그 전략의 종목과 주문 금액에 대해 VERIFIED가 아니면 잠금 TEST를 열지 않는다. 상태는 `BLOCKED_COST`(stage `locked`)로 남고, 창은 예약하지도 읽지도 않는다.
 - 과거 리플레이(`paper.py`)는 저장된 봉을 다시 재생하므로 `PAPER_PASSED`가 될 수 없다(기존 테스트). 전진 관측(`paper_forward.py`)은 계획 등록 뒤 새로 마감된 봉만 평가한다.
 - 수익성 기준은 계획 등록 시점에 해시로 고정되고, 평가는 계획의 기준과 체결 규칙만 쓴다(이번 수정).
 - 실제 미래 관측은 아직 없다. 이 컨테이너는 바이낸스 접속이 막혀 있고, 비용이 미검증이라 계획 등록 자체가 거부된다. 따라서 어떤 전략도 `PAPER_PASSED`가 아니며, `PAPER_VALIDATED`라는 상태는 존재하지 않는다.
@@ -78,6 +79,7 @@
 |---|---|---|
 | 전체 단위 테스트 | `cd run && COINTRADER_SRC=<NEW2@8ec6371>/src python3 -m unittest discover -s discovery/tests` | 388개 OK, 실패 0, exit 0, 301초 (`full_suite_run1.log`) |
 | 전체 단위 테스트 2회차 | 같음(실데이터 사이클 뒤) | 388개 OK, 실패 0, exit 0, 302초 (`full_suite_run2.log`) |
+| 전체 단위 테스트 3회차 | 같음(ADR 0009 잠금 TEST 비용 게이트 추가 뒤, 테스트 2개 추가) | 390개 OK, 실패 0, 295초 (`full_suite_run3_locked_gate.log`) |
 | 컴파일 | `python3 -m compileall -q discovery` | exit 0 |
 | Ruff 게이트(E9,F63,F7,F82) | `ruff check --isolated --select E9,F63,F7,F82 discovery` | 통과 |
 | Ruff F 전체(v1 진단 2개 제외) | `ruff check --isolated --select F --exclude portfolio_sim.py,funding_cost.py discovery` | 통과(이전에는 22건, 보고만 했음) |
@@ -114,5 +116,5 @@
 | 비용 VERIFIED | 차단 | 계정 체결 보고서 없음(사용자 계정 없음). 공개 호가와 가상 주문은 증거로 인정하지 않음 |
 | 잠금 TEST | 미실행 | 검증 생존자 0명 |
 | 전진 페이퍼(실제 미래 관측) | 미실행 | 비용 미검증으로 계획 등록 거부. 이 컨테이너는 바이낸스 접속 차단 |
-| 미검증 비용에서 잠금 TEST 사용 여부 | 사용자 결정 대기 | ADR 0008 "결정 대기" 참조 |
+| 미검증 비용에서 잠금 TEST 사용 여부 | 결정·구현 완료 | 닫아 두기(ADR 0009). 비용 VERIFIED 전에는 잠금 창을 쓰지 않음 |
 | NEW2 본 저장소 통합·배포, 실거래 | 하지 않음 | 지시 범위 밖 |

@@ -94,15 +94,18 @@ class TestAssumedProfile(PipelineCase):
         self.assertEqual(dev["cost_model"]["status"], ASSUMED_COST_MODEL)
         self.assertIn("ASSUMED", dev["cost_model"]["claim"])
         p.run_validation()
-        p.run_locked_campaign()
+        self.assertIsNone(p.run_locked_campaign())
+        # ADR 0009: the locked window is preserved, not spent on an assumed cost
         self.assertEqual(p.statuses.status(edge, ctx), "BLOCKED_COST")
-        rv = [r for r in iter_jsonl(p.review_path) if r["strategy_id"] == edge][-1]
-        self.assertEqual(rv["decision"], "BLOCKED_COST")
+        st = [r for r in iter_jsonl(p.statuses.path) if r["strategy_id"] == edge][-1]
+        self.assertEqual(st["stage"], "locked")
+        self.assertIn(ASSUMED_COST_MODEL, st["reasons"][0])
+        self.assertEqual(p.lock_registry.uses(edge, "BTCUSDT"), 0)
+        rv = p.promotion_review(edge)
+        self.assertNotEqual(rv["decision"], "PAPER_TEST_READY")
         self.assertFalse(rv["cost_verified"])
         self.assertIn(ASSUMED_COST_MODEL, rv["labels"])
         self.assertIn(UNVERIFIED_COST_MODEL, rv["labels"])
-        st = [r for r in iter_jsonl(p.statuses.path) if r["strategy_id"] == edge][-1]
-        self.assertTrue(st["reasons"][0].startswith(ASSUMED_COST_MODEL))
 
 
 class TestRunnerCostProfile(unittest.TestCase):
