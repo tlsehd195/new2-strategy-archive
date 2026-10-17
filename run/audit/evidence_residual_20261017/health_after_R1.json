@@ -1,0 +1,36 @@
+{
+ "status": "OK",
+ "checks": {
+  "lock": {
+   "status": "FREE"
+  },
+  "ledgers": {
+   "status": "OK",
+   "files": 8,
+   "corrupt": [],
+   "quarantined": []
+  },
+  "evidence": {
+   "status": "OK",
+   "tampered": []
+  },
+  "config": {
+   "status": "OK",
+   "errors": []
+  },
+  "disk": {
+   "status": "OK",
+   "free_bytes": 31956869120
+  },
+  "data_dir": {
+   "status": "OK",
+   "path": "/tmp/claude-0/-home-claude-new2-strategy-archive/02ff0e7a-e14c-56b4-b210-2db16f242002/scratchpad/realdata"
+  },
+  "last_cycle": {
+   "status": "CYCLE_OK",
+   "finished_at": "2026-10-17T03:54:42Z",
+   "context_id": "C2-eb8b580f8c24306b61e0"
+  }
+ },
+ "at": "2026-10-17T03:54:57Z"
+}

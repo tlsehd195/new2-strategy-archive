@@ -1,0 +1,1 @@
+NEW2_DATA_DIR=<unzipped upload f6379f02, dataset sha 5f0101f7...> NEW2_DISCOVERY_ROOT=<fresh empty dir> COINTRADER_SRC=<NEW2@8ec6371>/src python3 runner.py --mode evolve --rounds 3 --evals 2000

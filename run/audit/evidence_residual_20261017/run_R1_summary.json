@@ -1,0 +1,42 @@
+{
+    "status": "CYCLE_OK",
+    "started_at": "2026-10-17T03:27:36Z",
+    "finished_at": "2026-10-17T03:54:42Z",
+    "context_id": "C2-eb8b580f8c24306b61e0",
+    "cost_status": "UNVERIFIED_COST_MODEL",
+    "symbols_used": [
+        "BTCUSDT",
+        "ETHUSDT"
+    ],
+    "symbols_blocked": {},
+    "seeded": 705,
+    "dev_evaluated": 777,
+    "rounds": 3,
+    "proposed": 72,
+    "invalid": 20,
+    "duplicates": 1,
+    "search_status": "ACTIVE",
+    "validation_batch": {
+        "batch_id": "VB-4d074b078f1d3fc8",
+        "outcome": {
+            "S-0837f4d7b3261938": "INCONCLUSIVE",
+            "S-202b2284faa1e9ac": "REJECTED",
+            "S-391396a9487de780": "REJECTED",
+            "S-5f8884793cae1ba1": "INCONCLUSIVE",
+            "S-6d1f375a260fc295": "INCONCLUSIVE",
+            "S-cf0ab2f27d97f1ac": "INCONCLUSIVE"
+        },
+        "blocked": null
+    },
+    "robustness_resumed": [],
+    "campaign": null,
+    "paper": [],
+    "forward": [],
+    "status_counts": {
+        "REJECTED": 708,
+        "INCONCLUSIVE": 69
+    },
+    "reverify_pending": [],
+    "notes": [],
+    "runtime_seconds": 1626.1804733276367
+}
