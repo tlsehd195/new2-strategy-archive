@@ -1083,6 +1083,15 @@ class EvolutionPipeline:
                     blocked = ("BLOCKED_COST",
                                f"cost not verified for this use ({'; '.join(cost_why)}) — "
                                "locked window preserved, not touched")
+                if blocked is None:
+                    # ADR 0010: another symbol's selection data inside this symbol's
+                    # locked window means the window is not an independent test
+                    from runner import locked_independence_issues
+                    overlap = locked_independence_issues(syms)
+                    if overlap:
+                        blocked = ("BLOCKED_STATISTICS",
+                                   "LOCKED_WINDOW_NOT_INDEPENDENT: " + "; ".join(overlap)
+                                   + " — locked window not touched")
                 for sym in syms if blocked is None else ():
                     ws = self.campaigns.window_status(sym, max_campaigns=lc["max_campaigns_per_window"])
                     es = self.lock_registry.entry_status(sid, sym)

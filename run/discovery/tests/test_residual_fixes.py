@@ -90,6 +90,12 @@ def long_sig(decision, horizon, sym="A", side=1):
     return {"symbol": sym, "decision_index": decision, "side": side, "horizon": horizon}
 
 
+def test_verified_cost():
+    from costs_bridge import CostContext, FUTURES_COST_DEFAULTS
+    return CostContext.from_params(FUTURES_COST_DEFAULTS, version="TEST_VERIFIED",
+                                   verified=True, test_only=True)
+
+
 def make_paths(td):
     from runner import PathConfig
     data = Path(td) / "data"
@@ -122,13 +128,28 @@ PVALS = dict(zip(SIDS, [0.001, 0.008, 0.02, 0.035, 0.2, None]))
 EXPECTED_SURVIVORS = sorted(SIDS[:3])
 
 
-def _fake_runner_cls():
+def _fake_runner_cls(open_lock_gates: bool = False):
+    """``open_lock_gates``: for the locked-window BOOKKEEPING tests on the BTC+ETH
+    space only — a test-only verified cost and no cross-symbol overlap check, so
+    the window registry is reached.  The gates themselves (ADR 0009/0010) are
+    tested closed in test_reaudit_20261017."""
     from runner import Runner
 
     class FakeEvalRunner(Runner):
         """Dev phase replaced by fixed p-values; everything downstream (ledger,
         state machine, FDR family, decision store, locked TEST registry,
         promotion) is the real implementation."""
+
+        def __init__(self, *a, **kw):
+            if open_lock_gates:
+                kw.setdefault("cost", test_verified_cost())
+                kw.setdefault("allow_test_cost", True)
+            super().__init__(*a, **kw)
+
+        if open_lock_gates:
+            @staticmethod
+            def _lock_independence(symbols):
+                return []
 
         def _evaluate(self, sid, defn):
             p = PVALS[sid]
@@ -552,7 +573,8 @@ class TestLockLifecycle(unittest.TestCase):
         from runner import Runner
         paths = make_paths(td)
         _write_lock_window(paths.data_dir, **kw) if kw.get("write", True) else None
-        r = Runner(paths, candidates_fn=lambda: ([(LOCK_SID, LOCK_DEFN)], []))
+        r = Runner(paths, candidates_fn=lambda: ([(LOCK_SID, LOCK_DEFN)], []),
+                   cost=test_verified_cost(), allow_test_cost=True)   # ADR 0009/0010 gate open
         r._ctx = "CTX-test"
         return r
 
@@ -562,7 +584,8 @@ class TestLockLifecycle(unittest.TestCase):
             paths = make_paths(td)
             if kw.pop("klines", True):
                 _write_lock_window(paths.data_dir, **kw)
-            r = Runner(paths, candidates_fn=lambda: ([(LOCK_SID, LOCK_DEFN)], []))
+            r = Runner(paths, candidates_fn=lambda: ([(LOCK_SID, LOCK_DEFN)], []),
+                       cost=test_verified_cost(), allow_test_cost=True)
             r._ctx = "CTX-test"
             status, info = r._locked_test(LOCK_SID, LOCK_DEFN, "CTX-test")
             atts = r.lock_registry.attempts(LOCK_SID, "BTCUSDT")

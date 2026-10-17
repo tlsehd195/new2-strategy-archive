@@ -1,6 +1,6 @@
 # ADR 0008 — 잔여 감사(2026-10-17): 공개 시세 추정 강화, 비용 계산 시점 누출 제거, 체결 증거 규칙, 전진 페이퍼 무결성
 
-- 상태: Proposed (이 PR, 머지 시 Accepted)
+- 상태: Accepted (PR #8 병합, `a2f63c0`)
 - 날짜: 2026-10-17
 - 범위: `run/discovery/public_cost_estimate.py`, `public_market_collect.py`, `config/cost_public_estimate_v2.json`(신규), `cost_calibration.py`, `evaluator.py`, `execution_sim.py`, `portfolio.py`, `paper_forward.py`, `ops.py`, `store.py`, 사용하지 않는 import 정리(`engine_lib.py`, `evolution.py`, `generator.py`, `handoff.py`, `runner.py`, 테스트 4개), `tests/test_residual_20261017.py`(신규), `tests/test_public_estimate.py`, `tests/test_residual_fixes.py`, `.github/workflows/research-ci.yml`, `docs/공개시세_비용추정_로컬실행_안내.md`, `run/discovery/README.md`
 - 선행: [ADR 0006](0006-cost-verification-forward-paper-data-manifest-ops-ci.md), [ADR 0007](0007-assumed-cost-profile.md)

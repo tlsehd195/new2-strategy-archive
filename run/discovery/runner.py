@@ -621,6 +621,38 @@ class CycleSummary:
         return dict(self.__dict__)
 
 
+def selection_read_end(sym: str) -> str:
+    """Last day dev/validation selection may read for ``sym``: the day before
+    its locked window, or :data:`READ_END_NO_LOCK`."""
+    import datetime as dt
+    lock_s = locked_window_for(sym)
+    return (dt.date.fromisoformat(lock_s[0]) - dt.timedelta(days=1)).isoformat() \
+        if lock_s else READ_END_NO_LOCK
+
+
+def locked_independence_issues(symbols: Sequence[str]) -> list[str]:
+    """ADR 0010: a multi-symbol candidate's locked TEST is independent only if
+    no OTHER symbol's selection read window covers a symbol's locked window
+    (BTC and ETH share market-wide shocks, so ETH selection data from inside
+    the BTC locked window carries information about it).  Pure, reads no data;
+    an empty list means independent."""
+    out: list[str] = []
+    syms = list(dict.fromkeys(symbols))
+    for x in syms:
+        w = locked_window_for(x)
+        if not w:
+            continue
+        lo, hi = w
+        for y in syms:
+            if y == x:
+                continue
+            y_end = selection_read_end(y)
+            if READ_START <= hi and lo <= y_end:
+                out.append(f"{y} selection data [{READ_START},{y_end}] covers "
+                           f"{x} locked window [{lo},{hi}]")
+    return out
+
+
 class Runner:
     def __init__(self, paths: PathConfig, *, order_value: float = ORDER_VALUE_DEFAULT,
                  cost: Optional[CostContext] = None,
@@ -711,10 +743,11 @@ class Runner:
 
     @staticmethod
     def _read_end(sym: str) -> str:
-        import datetime as dt
-        lock_s = locked_window_for(sym)
-        return (dt.date.fromisoformat(lock_s[0]) - dt.timedelta(days=1)).isoformat() \
-            if lock_s else READ_END_NO_LOCK
+        return selection_read_end(sym)
+
+    @staticmethod
+    def _lock_independence(symbols: Sequence[str]) -> list[str]:
+        return locked_independence_issues(symbols)
 
     def _sym_data(self, sym: str) -> dict:
         """Per-symbol dev/validation data, loaded once per runner.  The read
@@ -1142,8 +1175,22 @@ class Runner:
     def lock_entry_status(self, sid: str, defn: Mapping) -> dict:
         """May a NEW locked-TEST attempt start for this candidate?  Independent of the
         statistics: a window consumed earlier (any context, any symbol of the
-        candidate) can never be entered again.  Read-only."""
+        candidate) can never be entered again.  Read-only.
+
+        Checked first, before any window is looked up (ADR 0009/0010):
+        ``COST_NOT_VERIFIED`` — the cost model does not cover these symbols and
+        this order size, so the window is preserved and the candidate waits;
+        ``NOT_INDEPENDENT`` — another symbol's selection data covers this
+        symbol's locked window, so no independent locked TEST exists."""
         required = list(defn["symbols"])
+        cost_ok, cost_why = self.cost.verified_for(required, self.order_value)
+        if not cost_ok:
+            return {"eligible": False, "reason": "COST_NOT_VERIFIED", "per_symbol": {},
+                    "no_locked_test": [], "cost": cost_why}
+        overlap = self._lock_independence(required)
+        if overlap:
+            return {"eligible": False, "reason": "NOT_INDEPENDENT", "per_symbol": {},
+                    "no_locked_test": [], "overlap": overlap}
         per = {sym: self.lock_registry.entry_status(sid, sym) for sym in required}
         no_lock = symbols_without_locked_test(required)
         if no_lock:
@@ -1193,9 +1240,16 @@ class Runner:
         else:
             entry = self.lock_entry_status(sid, defn)
             lock_info["entry"] = entry
-            if entry["reason"] == "IN_PROGRESS":
-                return None          # another live process holds the window
-            if entry["reason"] == "ALREADY_CONSUMED":
+            if entry["reason"] in ("IN_PROGRESS", "COST_NOT_VERIFIED"):
+                # another live process holds the window, or the cost model does
+                # not cover this use yet (ADR 0010): wait, window untouched
+                return None
+            if entry["reason"] == "NOT_INDEPENDENT":
+                final = "DATA_MISSING"
+                lock_info["note"] = ("LOCKED_WINDOW_NOT_INDEPENDENT: "
+                                     + "; ".join(entry["overlap"])
+                                     + " — cannot claim final; nothing reserved or read")
+            elif entry["reason"] == "ALREADY_CONSUMED":
                 final = "FAIL_STAT"
                 lock_info["reused"] = True
                 lock_info["note"] = ("locked window already consumed earlier "
@@ -1228,7 +1282,9 @@ class Runner:
         rec["promotion_check"] = promotion_check
         self.ledger.append(rec)
         self.store.set(sid, CandidateState(final), data_version=ctx)
-        if final in ("DATA_MISSING",):
+        if final in ("DATA_MISSING",) and not str(lock_info.get("note", "")).startswith(
+                "LOCKED_WINDOW_NOT_INDEPENDENT"):
+            # no data refresh can make an overlapping window independent
             self._maybe_enqueue_reverify(sid, final)
         return final
 
@@ -1241,6 +1297,13 @@ class Runner:
         no_lock = symbols_without_locked_test(required)
         if no_lock:
             info["note"] = f"NO_LOCKED_TEST for {no_lock} — cannot claim final; nothing consumed"
+            return "DATA_MISSING", info
+        # ADR 0010: never reserve or read a locked window on a cost model that does
+        # not cover this use, or when the window is not independent of selection
+        if not self.cost.verified_for(required, self.order_value)[0]:
+            return None
+        if self._lock_independence(required):
+            info["note"] = "LOCKED_WINDOW_NOT_INDEPENDENT — nothing reserved or read"
             return "DATA_MISSING", info
         tokens: dict = {}
         for sym in required:
@@ -1662,7 +1725,20 @@ def cost_from_env() -> CostContext:
                           + " | ".join(ASSUMED_PROFILES) + " | public_estimate:<record.json>)")
 
 
+USAGE = """usage: runner.py [--batch N] [--mode legacy|evolve|full] [--rounds R] [--evals E]
+  --mode legacy  (default) v2 candidate engine: generation BH-FDR, state/state.json,
+                 state/discovery_ledger.jsonl, results/cycle_summary.json
+  --mode evolve  evolution engine: StepM validation batches + locked campaigns,
+                 state/evolution/*, results/evolution_cycle_summary.json
+  --mode full    legacy then evolve in one cycle
+Both share the single-use locked-window records (state/lock_test_usage.json,
+state/locked_window_campaigns.jsonl).  A cycle status is not a strategy verdict."""
+
+
 def main(argv: Sequence[str]) -> int:
+    if list(argv[:1]) in (["-h"], ["--help"]):
+        print(USAGE)
+        return 0
     try:
         opts = parse_options(argv)
     except UsageError as e:
@@ -1690,6 +1766,7 @@ def main(argv: Sequence[str]) -> int:
         return 3
     rc = 0
     try:
+        print(f"RUN_MODE {opts['mode']} state_dir={paths.state_dir}", file=sys.stderr)
         if opts["mode"] in ("legacy", "full"):
             r = Runner(paths, cost=cost)
             s = r.cycle(max_candidates=opts["batch"])
