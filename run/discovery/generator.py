@@ -13,7 +13,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterator, Mapping, Sequence
+from typing import Iterator, Mapping
 
 from engine_lib import canonical_json, normalize_strategy, strategy_id
 

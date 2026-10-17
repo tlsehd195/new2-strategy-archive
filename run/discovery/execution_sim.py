@@ -9,7 +9,8 @@ reports (see ``cost_calibration.py``).  Nothing here sends an order.
 Rules (all conservative — a rule never makes a trade better):
 
 * participation: the cost model refuses an order above
-  ``max_participation`` of the bar's traded value.  Policy ``refuse``
+  ``max_participation`` of the traded value of the last bar CLOSED before
+  the fill (the fill bar's own volume is not known when the order is sent).  Policy ``refuse``
   (default, same as research) drops the order and counts it REJECTED;
   policy ``cap`` fills only ``max_participation * bar_value`` and scales the
   P&L by the fill fraction (PARTIAL).
@@ -22,7 +23,10 @@ Rules (all conservative — a rule never makes a trade better):
   move from entry reaches ``1/L - mm``.  The bar path is scanned with the
   WORST intrabar price (low for longs, high for shorts); the loss is the
   whole initial margin (``1e4 / L`` bp of notional) plus the entry cost and
-  a liquidation fee; it replaces the strategy's own exit.
+  a liquidation fee; it replaces the strategy's own exit.  When the strategy
+  exits INSIDE the exit bar (stop / take-profit) the order of the stop and
+  the liquidation within that bar is unknown, so the exit bar's worst price
+  is checked too (conservative).
 """
 
 from __future__ import annotations
@@ -31,7 +35,7 @@ import math
 from dataclasses import dataclass
 from typing import Mapping, Optional, Sequence
 
-EXECUTION_SIM_VERSION = "exec-sim-v1"
+EXECUTION_SIM_VERSION = "exec-sim-v2"
 
 
 @dataclass(frozen=True)
@@ -75,14 +79,15 @@ def liquidation_price(entry_px: float, side: int, cfg: ExecutionConfig) -> float
 
 
 def scan_liquidation(bars: Sequence, entry_i: int, exit_i: int, side: int,
-                     cfg: ExecutionConfig) -> Optional[int]:
+                     cfg: ExecutionConfig, *, intrabar_exit: bool = False) -> Optional[int]:
     """Index of the first bar in [entry_i, exit_i] whose worst price crosses
     the liquidation price, or None.  (An exit at the open of exit_i happens
-    before that bar trades, so exit_i itself is only checked at its open.)"""
+    before that bar trades, so exit_i itself is only checked at its open —
+    unless the exit is ``intrabar_exit``, then its worst price is checked.)"""
     lp = liquidation_price(bars[entry_i].open, side, cfg)
     for j in range(entry_i, exit_i + 1):
         b = bars[j]
-        if j == exit_i:
+        if j == exit_i and not intrabar_exit:
             worst = b.open
         else:
             worst = b.low if side == 1 else b.high
@@ -100,8 +105,8 @@ def apply_execution(event: Mapping, bars: Sequence, cfg: ExecutionConfig, *,
     cfg.validate()
     out = dict(event)
     entry_i, exit_i, side = event["entry_index"], event["exit_index"], event["side"]
-    frac, st = fill_fraction(order_value, bars[entry_i].quote_volume, max_participation,
-                             cfg.partial_fill_policy)
+    prev_qv = bars[entry_i - 1].quote_volume if entry_i > 0 else None
+    frac, st = fill_fraction(order_value, prev_qv, max_participation, cfg.partial_fill_policy)
     out.update({"fill_fraction": frac, "exec_status": st, "liquidated": False,
                 "late": False, "exec_version": EXECUTION_SIM_VERSION})
     if frac == 0.0:
@@ -110,7 +115,13 @@ def apply_execution(event: Mapping, bars: Sequence, cfg: ExecutionConfig, *,
     if observed_delay_ms is not None and observed_delay_ms > cfg.max_observation_delay_ms:
         out["late"] = True
     net = event["net_bp"]
-    j = scan_liquidation(bars, entry_i, exit_i, side, cfg)
+    # exit price implied by the event's gross return; an exit away from the
+    # exit bar's open happened inside that bar (stop / take-profit)
+    intrabar = False
+    if event.get("gross_bp") is not None:
+        px_out = bars[entry_i].open * (1.0 + side * event["gross_bp"] / 1e4)
+        intrabar = abs(px_out - bars[exit_i].open) > 1e-9 * max(1.0, abs(bars[exit_i].open))
+    j = scan_liquidation(bars, entry_i, exit_i, side, cfg, intrabar_exit=intrabar)
     if j is not None:
         entry_cost = event["cost_bp"] / 2.0
         net = -(1e4 / cfg.leverage) - entry_cost - cfg.liquidation_fee * 1e4

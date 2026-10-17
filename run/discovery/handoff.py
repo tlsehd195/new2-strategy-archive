@@ -17,7 +17,6 @@ import hashlib
 import json
 import os
 from pathlib import Path
-from typing import Mapping
 
 from engine_lib import canonical_json, iso_now, iter_jsonl
 from strategy_spec import canonicalize_spec

@@ -24,7 +24,6 @@ from data_quality import (  # noqa: E402
     Bar,
     DatasetHandle,
     dataset_for,
-    load_funding_csv,
     funding_quality,
     staleness,
 )
@@ -62,7 +61,7 @@ from generation import (  # noqa: E402
     decide_family,
     family_status,
 )
-from generator import FAMILY_DATA_REQUIREMENTS, SYMBOLS, enumerate_candidates  # noqa: E402
+from generator import FAMILY_DATA_REQUIREMENTS, enumerate_candidates  # noqa: E402
 from portfolio import PortfolioConfig, portfolio_passes, simulate_portfolio  # noqa: E402
 from store import CandidateStore, Ledger, ReverifyQueue, reconcile  # noqa: E402
 from promotion import PromotionQueue, combo_promotion_gate, is_combo, promotion_gate  # noqa: E402

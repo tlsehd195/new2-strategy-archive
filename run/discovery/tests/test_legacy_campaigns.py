@@ -3,7 +3,6 @@ through preregistered campaigns shared with the evolution pipeline
 (synthetic data, temp dirs)."""
 from __future__ import annotations
 
-import json
 import sys
 import tempfile
 import unittest

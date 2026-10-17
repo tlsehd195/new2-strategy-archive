@@ -59,7 +59,7 @@ from typing import Mapping, Optional, Sequence
 from costs_bridge import CostComputationError, CostContext, CostDataMissing, CostError, CostRefused
 from data_quality import Bar
 
-PORTFOLIO_MODEL_VERSION = "portfolio-mtm-v2"
+PORTFOLIO_MODEL_VERSION = "portfolio-mtm-v3"
 END_POLICY = "force_close_at_last_open"
 
 
@@ -203,7 +203,9 @@ def simulate_portfolio(bars_by_symbol: Mapping[str, Sequence[Bar]],
         realized = pos.side * (price - pos.entry_price) * qty
         exit_notional = qty * price
         try:
-            cf = cost.quote(exit_notional, bar.quote_volume)
+            # traded value of the last CLOSED bar before the fill at open[i]
+            prev_qv = bars_by_symbol[sym][i - 1].quote_volume if i > 0 else None
+            cf = cost.quote(exit_notional, prev_qv)
             fee = cf * exit_notional
             res.total_cost_bp += cf * 1e4
         except CostError as e:
@@ -275,11 +277,12 @@ def simulate_portfolio(bars_by_symbol: Mapping[str, Sequence[Bar]],
                     frac = cfg.size_fraction
                 else:
                     # vol-inverse sizing: risk fixed, size shrinks with vol
-                    if i < cfg.vol_window:
+                    if i <= cfg.vol_window:
                         res.skipped_capacity += 1
                         continue
+                    # closes up to bar i-1 only: close[i] is not known at open[i]
                     rets = [bars_by_symbol[sym][j].close / bars_by_symbol[sym][j - 1].close - 1.0
-                            for j in range(i - cfg.vol_window + 1, i + 1)]
+                            for j in range(i - cfg.vol_window, i)]
                     mu = sum(rets) / len(rets)
                     var = sum((r - mu) ** 2 for r in rets) / max(1, len(rets) - 1)
                     vol = math.sqrt(var)
@@ -296,7 +299,7 @@ def simulate_portfolio(bars_by_symbol: Mapping[str, Sequence[Bar]],
                     res.skipped_margin += 1
                     continue
                 try:
-                    cf = cost.quote(notional, bar.quote_volume)
+                    cf = cost.quote(notional, bars_by_symbol[sym][i - 1].quote_volume)
                 except CostRefused:
                     res.participation_refusals += 1
                     continue

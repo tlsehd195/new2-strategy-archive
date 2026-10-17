@@ -5,7 +5,11 @@ Construction (identical in spirit to the public repo's futures engine):
   peeking raises IndexError);
 - entry fills at bar t+1 open, exit at bar t+1+H open;
 - per-side costs from the shared CandleCostModel with sqrt-participation
-  impact, fail-closed when participation is exceeded;
+  impact, fail-closed when participation is exceeded.  Participation is
+  measured against the traded value of the last bar CLOSED before each fill
+  (bar t for the entry at open t+1, bar exit-1 for the exit): the fill bar's
+  own volume is not known when the order is sent (no look-ahead in pricing
+  or in the refusal decision);
 - funding is charged for the actual holding window from the caller-supplied
   funding series — never estimated (missing funding for a held period is
   recorded, and the event is dropped, NOT filled with a guess).
@@ -180,9 +184,10 @@ def run_event_study(bars: Sequence[Bar], symbol: str, signal_fn: SignalFn,
             exit_i, exit_px, _reason = ex
         entry_bar, exit_bar = bars[entry_i], bars[exit_i]
         try:
+            # last CLOSED bar before each fill (entry_i - 1 = the decision bar t)
             cost_bp = cost.round_trip_bp(order_value,
-                                         entry_bar.quote_volume,
-                                         exit_bar.quote_volume)
+                                         bars[entry_i - 1].quote_volume,
+                                         bars[exit_i - 1].quote_volume)
         except CostRefused:
             # participation cap exceeded → the trade is refused, counted
             res.participation_refusals += 1

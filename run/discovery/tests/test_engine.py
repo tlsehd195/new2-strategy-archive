@@ -27,8 +27,8 @@ if str(DISC) not in sys.path:
 
 from data_quality import Bar, check_bars, funding_quality, staleness, dataset_for
 from engine_lib import (
-    ALLOWED_TRANSITIONS, CandidateState, InvalidTransition, LockTestRegistry,
-    ProcessLock, RetryRecord, assert_no_locked_overlap, assert_transition,
+    CandidateState, InvalidTransition, LockTestRegistry,
+    ProcessLock, assert_no_locked_overlap, assert_transition,
     atomic_write_json, backoff_seconds, bh_fdr, block_bootstrap_pvalue,
     deflated_sharpe, evaluation_id, experiment_context_id, holm_test,
     norm_ppf, normalize_strategy, nw_tstat, pbo_cscv, reverify_eligible,
@@ -38,12 +38,12 @@ from engine_lib import (
 from store import CandidateStore, Ledger, ReverifyQueue, StoreCorruption, reconcile
 from generator import FAMILY_GENERATORS, _mk, enumerate_candidates, search_space_status
 from evaluator import (
-    EventStudyResult, FundingIndex, PrefixView, cell_stats, funding_paid_bp,
+    FundingIndex, PrefixView, cell_stats, funding_paid_bp,
     run_event_study,
 )
-from costs_bridge import CostContext, SENSITIVITY_SCENARIOS, scenario_model
+from costs_bridge import CostContext, scenario_model
 from portfolio import PortfolioConfig, simulate_portfolio
-from promotion import PromotionCheck, PromotionQueue, combo_promotion_gate, promotion_gate
+from promotion import PromotionQueue, combo_promotion_gate, promotion_gate
 
 MS15 = 900_000
 DAY_MS = 86_400_000

@@ -49,16 +49,18 @@ def synth_lines(symbol, *, hours, interval_s=60, seed=1, start_ms=1_790_000_000_
         bids, asks = synth_book(mid, **kw)
         t = start_ms + i * interval_s * 1000
         out.append({"schema": pmc.SCHEMA, "symbol": symbol, "fetched_at_ms": t, "status": "OK",
-                    "depth": {"bids": bids, "asks": asks},
+                    "depth": {"E": t - 40, "T": t - 45, "bids": bids, "asks": asks},
                     "kline_closed": {"quote_volume": str(QV), "close_time": t - 1}})
     return out
 
 
-def write_dir(td: Path, per_symbol: dict) -> Path:
+def write_dir(td: Path, per_symbol: dict, *, manifest: bool = True) -> Path:
     for sym, lines in per_symbol.items():
         d = td / sym
         d.mkdir(parents=True, exist_ok=True)
         (d / "public_20261016.jsonl").write_text("".join(json.dumps(x) + "\n" for x in lines))
+    if manifest:
+        pmc.write_manifest(td)
     return td
 
 

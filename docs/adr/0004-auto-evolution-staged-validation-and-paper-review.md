@@ -1,6 +1,6 @@
 # ADR 0004 — 자동 전략 진화, 단계별 검증, 잠금 창 캠페인, 논문 적용·보류
 
-- 상태: Proposed (PR #3, 머지 시 Accepted)
+- 상태: Accepted (PR #3 병합)
 - 날짜: 2026-10-15
 - 범위: `run/discovery/{strategy_spec,evolution,search,stats_mc,pipeline,campaigns,paper,autoloop,data_fetch}.py`, `config/promotion_v1.json`, `runner.py --mode`, `run_cycle.sh`
 - 선행: [ADR 0003](0003-core-defects-data-defaults-lookahead-ledger.md)

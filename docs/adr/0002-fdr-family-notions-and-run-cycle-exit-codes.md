@@ -1,6 +1,6 @@
 # ADR 0002 — FDR 가족 개념 분리, 과거 컨텍스트 PASS 처리, run_cycle 종료 코드 정책
 
-- 상태: Proposed (PR #2, 머지 시 Accepted)
+- 상태: Accepted (PR #2 병합)
 - 날짜: 2026-10-15
 - 범위: `run/discovery/{generation.py,runner.py,engine_lib.py,run_cycle.sh}`
 - 선행: [ADR 0001](0001-discovery-engine-residual-defect-fixes.md)

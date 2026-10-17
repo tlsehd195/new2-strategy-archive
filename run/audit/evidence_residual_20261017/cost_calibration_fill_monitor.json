@@ -1,0 +1,92 @@
+{
+ "base_params": {
+  "fee_rate": 0.0005,
+  "half_spread": 0.0002,
+  "impact_coefficient": 0.1,
+  "max_participation": 0.05
+ },
+ "by_hour_utc": [],
+ "by_participation": [],
+ "by_volatility": [],
+ "calibration_version": "cost-calib-v2",
+ "code_hash": "03cea0e44cfa4da0561fb55a57f34f35239fa761dcbbf193c9b505bd5b89f515",
+ "cost_source_sha256": "27ec57bbeb0fed22878ea427579223ff5eea495a288e7b39c9a96d0e49b3540b",
+ "criteria_hash": "d0bdb7586c4a6a2f",
+ "data_sha256": "6acc8133eb35ca6a2312c9196d3a9af6620b80ca7fe1f8d150d2e1501a8fb886",
+ "fill_rates": {
+  "EXPIRED": null,
+  "FILLED": null,
+  "PARTIAL": null,
+  "REJECTED": null
+ },
+ "fit": {
+  "fitted": {
+   "half_spread": {
+    "method": "median quoted (ask-bid)/2/mid",
+    "n": 8
+   }
+  },
+  "params": {
+   "fee_rate": 0.0005,
+   "half_spread": 1.2945208569124594e-06,
+   "impact_coefficient": 0.1,
+   "max_participation": 0.05
+  }
+ },
+ "model_refusals_in_verification": 0,
+ "n_observations": 16,
+ "n_orders": 0,
+ "params": {
+  "fee_rate": 0.0005,
+  "half_spread": 1.2945208569124594e-06,
+  "impact_coefficient": 0.1,
+  "max_participation": 0.05
+ },
+ "period": {
+  "calibration": [
+   1791967067014,
+   1791967067015
+  ],
+  "verification": [
+   1791984176165,
+   1791984176166
+  ]
+ },
+ "reasons": [
+  "components not verifiable from ['paper_fill_monitor']: ['fee', 'impact'] (account execution reports with fees are required)",
+  "BTCUSDT: 0 verification fills < 200",
+  "ETHUSDT: 0 verification fills < 200",
+  "order value 10000.0 outside the verified notional range none"
+ ],
+ "record_id": "CV-93e4521d30c8cdb6f6cdbb5c",
+ "schema": "cost_verification_v1",
+ "scope": {
+  "notional_range": null,
+  "order_types": [],
+  "symbols": [],
+  "verification_fills_per_symbol": {}
+ },
+ "sealed_at": "2026-10-17T03:29:19Z",
+ "source_kinds": [
+  "paper_fill_monitor"
+ ],
+ "source_ref": "../../data/fill_ledger.jsonl",
+ "spread_check": {
+  "base_half_spread_bp": 2.0,
+  "model_half_spread_bp": 0.012945208569124594,
+  "observed_half_spread_bp": {
+   "max_bp": 0.02032524456394887,
+   "mean_bp": 0.01319422798423743,
+   "median_bp": 0.01319422798423743,
+   "n": 8,
+   "p90_bp": 0.02032524456394887,
+   "p95_bp": 0.02032524456394887,
+   "p99_bp": 0.02032524456394887,
+   "underestimated_share": 1.0
+  }
+ },
+ "status": "BLOCKED_EXTERNAL_EVIDENCE",
+ "verification_errors": {
+  "n": 0
+ }
+}

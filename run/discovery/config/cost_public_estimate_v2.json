@@ -1,0 +1,23 @@
+{
+ "schema": "cost_public_estimate_criteria_v2",
+ "note": "Fixed 2026-10-17 BEFORE any estimate was computed from collected data (collection was running on the user's PC; no estimate had been run or looked at). Supersedes v1 for a stricter estimator, never a looser one: (1) the WORSE of the buy and sell side is used per snapshot instead of their average; (2) a notional whose book walk ran out of visible depth in more than max_thin_share of snapshots is excluded from the impact fit as a whole (dropping only the thin snapshots would keep the cheap ones — selection bias), and the estimate is unusable when no fit notional is left; (3) snapshots with a stale book or stale closed kline, a duplicate timestamp, a symbol that does not match its folder or non-finite numbers are invalid; (4) collect_manifest.json is required and every input file must match its SHA-256 there. All v1 thresholds are unchanged. A change needs a new file (v3) with a reason.",
+ "supersedes": "cost_public_estimate_v1.json",
+ "required_symbols": ["BTCUSDT", "ETHUSDT"],
+ "min_hours_per_symbol": 72,
+ "min_snapshots_per_symbol": 2000,
+ "max_gap_minutes": 10,
+ "max_gap_share": 0.02,
+ "max_invalid_share": 0.01,
+ "notionals": [1000, 10000, 100000, 1000000],
+ "impact_fit_min_notional": 100000,
+ "half_spread_quantile": 0.9,
+ "impact_ratio_quantile": 0.9,
+ "latency_move_quantile": 0.5,
+ "fee_profile": "assumed_public_v1",
+ "max_participation": 0.05,
+ "side_aggregation": "max",
+ "max_thin_share": 0.01,
+ "max_book_age_ms": 5000,
+ "max_kline_age_ms": 1020000,
+ "require_manifest": true
+}

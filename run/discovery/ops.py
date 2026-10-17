@@ -9,7 +9,9 @@ quarantines only torn tails, see ``engine_lib.repair_jsonl_tail``).
 runs ``runner.main`` up to N times (N is required: there is no endless
 mode), sleeping S seconds in between, and stops early on the first
 FAILED cycle (exit 1), on BLOCKED_DATA (exit 4), or after
-``--max-no-progress`` cycles without progress.  Every cycle's exit code
+``--max-no-progress`` cycles without progress.  A loop that ran to its
+limit exits 0 only if no cycle was PARTIAL_FAILURE (runner exit 2);
+otherwise it exits 2.  Every cycle's exit code
 and summary line is appended to ``state/ops_loop.jsonl``.  Single process
 only: concurrency is excluded by ``state/run.lock`` (a second loop gets
 CYCLE_SKIPPED, exit 3, and stops).  No alerting is configured here; the
@@ -36,7 +38,8 @@ CONFIGS = {"promotion_v2.json": "promotion_config_v1",
            "cost_verification_v1.json": "cost_verification_criteria_v1",
            "paper_forward_v1.json": "paper_forward_criteria_v1",
            "cost_assumed_public_v1.json": "cost_assumed_profile_v1",
-           "cost_public_estimate_v1.json": "cost_public_estimate_criteria_v1"}
+           "cost_public_estimate_v1.json": "cost_public_estimate_criteria_v1",
+           "cost_public_estimate_v2.json": "cost_public_estimate_criteria_v2"}
 
 
 def _pid_alive(pid: int) -> bool:
@@ -176,8 +179,13 @@ def run_loop(main: Callable[[Sequence[str]], int], runner_args: Sequence[str], *
             break
         if k + 1 < max_cycles and interval > 0:
             sleep(interval)
+    partial = sum(1 for c in cycles if c["exit"] == 2)
+    # a loop that ran to its limit is still not a success if a cycle only partly
+    # succeeded (runner exit 2): the loop exit says so instead of 0
+    exit_code = (0 if partial == 0 else 2) if stop in ("MAX_CYCLES", "NO_PROGRESS") \
+        else (cycles[-1]["exit"] if cycles else 1) or 1
     res = {"stopped": stop, "cycles": len(cycles), "last_exit": cycles[-1]["exit"] if cycles else None,
-           "at": iso_now()}
+           "partial_cycles": partial, "exit": exit_code, "at": iso_now()}
     append_jsonl(log, {"loop_end": res})
     return res
 
@@ -214,7 +222,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:  # pragma: no cover - CLI
     r = run_loop(runner.main, args, state_dir=pc.state_dir, max_cycles=a.max_cycles,
                  interval=a.interval, max_no_progress=a.max_no_progress)
     print(json.dumps(r))
-    return 0 if r["stopped"] in ("MAX_CYCLES", "NO_PROGRESS") else (r["last_exit"] or 1)
+    return r["exit"]
 
 
 if __name__ == "__main__":  # pragma: no cover

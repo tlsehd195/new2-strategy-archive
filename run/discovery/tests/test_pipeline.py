@@ -25,7 +25,7 @@ for p in (str(DISC), str(HERE)):
         sys.path.insert(0, p)
 
 from data_quality import Bar  # noqa: E402
-from engine_lib import iter_jsonl, strategy_id  # noqa: E402
+from engine_lib import iter_jsonl  # noqa: E402
 from strategy_spec import SPEC_SCHEMA, canonicalize_spec  # noqa: E402
 from test_residual_fixes import fee_cost  # noqa: E402
 from costs_bridge import CostContext  # noqa: E402
@@ -346,7 +346,7 @@ class TestPromotionAndStatus(PipelineCase):
         self.assertIn("UNVERIFIED_COST_MODEL", rv["labels"])
 
     def test_tampered_evidence_record_blocks_promotion(self):
-        from pipeline import EvidenceTampered, EvolutionPipeline
+        from pipeline import EvidenceTampered
         p = self.pipe(SyntheticProvider())
         edge, *_ = self.register_all(p, [EDGE] + NOISE[:7])
         lines = p.eval_path.read_text().splitlines()

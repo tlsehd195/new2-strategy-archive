@@ -1,0 +1,12 @@
+All checks passed!
+gating exit=0
+F exit=0
+4	F841	unused-variable
+Found 4 errors.
+No fixes available (4 hidden fixes can be enabled with the `--unsafe-fixes` option).
+F(all incl. legacy) exit=1
+bash -n exit=0
+ShellCheck - shell script analysis tool
+version: 0.11.0
+shellcheck exit=0
+compileall exit=0
