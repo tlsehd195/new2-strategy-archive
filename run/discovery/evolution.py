@@ -37,7 +37,6 @@ from __future__ import annotations
 
 import copy
 import hashlib
-import json
 import math
 import random
 from pathlib import Path
@@ -45,7 +44,7 @@ from typing import Mapping, Optional, Sequence
 
 from engine_lib import append_jsonl, canonical_json, iso_now, iter_jsonl, strategy_id
 from strategy_spec import (
-    FEATURES, HORIZON_RANGE, RISK_RANGES, SPEC_SCHEMA, STOP_RANGE_BP, SUPPORTED_SYMBOLS,
+    FEATURES, RISK_RANGES, SPEC_SCHEMA, STOP_RANGE_BP, SUPPORTED_SYMBOLS,
     SpecError, canonicalize_spec,
 )
 

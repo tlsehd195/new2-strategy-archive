@@ -400,9 +400,10 @@ class TestCostFailures(unittest.TestCase):
             run_event_study(bars, "X", lambda v: 1, 4, nan, 10_000.0, None)
 
     def test_exit_cost_failure_is_not_priced_cheaply(self):
-        # exit bar has traded value 1000: participation 500% → refused
+        # the bar before the exit open (bar 9; exit at open 10) traded 1000:
+        # participation 500% → refused (ADR 0008: priced on the last CLOSED bar)
         bars = [Bar(ts=i * MS15, open=100, high=100, low=100, close=100, volume=1e6,
-                    quote_volume=(1e8 if i != 10 else 1000.0)) for i in range(20)]
+                    quote_volume=(1e8 if i != 9 else 1000.0)) for i in range(20)]
         pf = sim(bars, [long_sig(2, 7)], cost=CostContext.futures_default(), size_fraction=0.5)
         self.assertEqual(pf.cost_status, "FAIL_COST")
         self.assertEqual(len(pf.cost_failures), 1)

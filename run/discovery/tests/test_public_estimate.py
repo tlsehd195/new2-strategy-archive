@@ -49,16 +49,18 @@ def synth_lines(symbol, *, hours, interval_s=60, seed=1, start_ms=1_790_000_000_
         bids, asks = synth_book(mid, **kw)
         t = start_ms + i * interval_s * 1000
         out.append({"schema": pmc.SCHEMA, "symbol": symbol, "fetched_at_ms": t, "status": "OK",
-                    "depth": {"bids": bids, "asks": asks},
+                    "depth": {"E": t - 40, "T": t - 45, "bids": bids, "asks": asks},
                     "kline_closed": {"quote_volume": str(QV), "close_time": t - 1}})
     return out
 
 
-def write_dir(td: Path, per_symbol: dict) -> Path:
+def write_dir(td: Path, per_symbol: dict, *, manifest: bool = True) -> Path:
     for sym, lines in per_symbol.items():
         d = td / sym
         d.mkdir(parents=True, exist_ok=True)
         (d / "public_20261016.jsonl").write_text("".join(json.dumps(x) + "\n" for x in lines))
+    if manifest:
+        pmc.write_manifest(td)
     return td
 
 
@@ -243,9 +245,13 @@ class TestEngineUse(PipelineCase):
         edge, *_ = self.register_all(p, [EDGE] + NOISE[:7])
         self.assertEqual(p.evaluation("dev", edge)["cost_model"]["status"], ESTIMATED_FROM_PUBLIC_DATA)
         p.run_validation()
-        p.run_locked_campaign()
+        self.assertIsNone(p.run_locked_campaign())
+        # ADR 0009: a public estimate never spends the single-use locked window
         self.assertEqual(p.statuses.status(edge, ctx), "BLOCKED_COST")
-        rv = [r for r in iter_jsonl(p.review_path) if r["strategy_id"] == edge][-1]
+        self.assertEqual(p.statuses.get(edge, ctx)["stage"], "locked")
+        self.assertEqual(p.lock_registry.uses(edge, "BTCUSDT"), 0)
+        rv = p.promotion_review(edge)
+        self.assertNotEqual(rv["decision"], "PAPER_TEST_READY")
         self.assertIn(ESTIMATED_FROM_PUBLIC_DATA, rv["labels"])
         self.assertIn(UNVERIFIED_COST_MODEL, rv["labels"])
 

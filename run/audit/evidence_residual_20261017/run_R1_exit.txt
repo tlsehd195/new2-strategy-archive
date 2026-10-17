@@ -1,0 +1,5 @@
+exit=0
+
+real	27m6.618s
+user	26m41.588s
+sys	0m7.507s

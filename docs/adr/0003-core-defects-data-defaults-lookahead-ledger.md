@@ -1,6 +1,6 @@
 # ADR 0003 — 핵심 결함 수정: 15분봉 무결성, 기본값 단일 해석, 시점 누출, 원장 복구
 
-- 상태: Proposed (PR #3, 머지 시 Accepted)
+- 상태: Accepted (PR #3 병합)
 - 날짜: 2026-10-15
 - 범위: `run/discovery/{data_quality.py,data_exceptions.json,evaluator.py,engine_lib.py,generator.py,runner.py,store.py,generation.py}`
 - 선행: [ADR 0002](0002-fdr-family-notions-and-run-cycle-exit-codes.md)

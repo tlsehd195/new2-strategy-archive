@@ -25,7 +25,7 @@ for p in (str(DISC), str(HERE)):
         sys.path.insert(0, p)
 
 from data_quality import Bar  # noqa: E402
-from engine_lib import iter_jsonl, strategy_id  # noqa: E402
+from engine_lib import iter_jsonl  # noqa: E402
 from strategy_spec import SPEC_SCHEMA, canonicalize_spec  # noqa: E402
 from test_residual_fixes import fee_cost  # noqa: E402
 from costs_bridge import CostContext  # noqa: E402
@@ -339,14 +339,19 @@ class TestPromotionAndStatus(PipelineCase):
         ctx = p.context_id()
         edge, *_ = self.register_all(p, [EDGE] + NOISE[:7])
         p.run_validation()
-        p.run_locked_campaign()
+        self.assertIsNone(p.run_locked_campaign())
+        # ADR 0009: an unverified cost model never spends the single-use locked window
         self.assertEqual(p.statuses.status(edge, ctx), "BLOCKED_COST")
-        rv = [r for r in iter_jsonl(p.review_path) if r["strategy_id"] == edge][-1]
+        self.assertEqual(p.statuses.get(edge, ctx)["stage"], "locked")
+        self.assertEqual(p.lock_registry.uses(edge, "BTCUSDT"), 0)
+        self.assertEqual(p.campaigns.counted_campaigns("BTCUSDT:LOCK:2024-03-25:2024-06-18"), 0)
+        rv = p.promotion_review(edge)
         self.assertFalse(rv["cost_verified"])
         self.assertIn("UNVERIFIED_COST_MODEL", rv["labels"])
+        self.assertNotEqual(rv["decision"], "PAPER_TEST_READY")
 
     def test_tampered_evidence_record_blocks_promotion(self):
-        from pipeline import EvidenceTampered, EvolutionPipeline
+        from pipeline import EvidenceTampered
         p = self.pipe(SyntheticProvider())
         edge, *_ = self.register_all(p, [EDGE] + NOISE[:7])
         lines = p.eval_path.read_text().splitlines()

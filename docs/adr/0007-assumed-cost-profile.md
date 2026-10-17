@@ -1,6 +1,6 @@
 # ADR 0007 — 가정 비용(ASSUMED)과 공개 시세 추정(ESTIMATED_FROM_PUBLIC_DATA): 실측 체결 없이 연구를 계속하되 승격은 막는다
 
-- 상태: Proposed (PR #6, 머지 시 Accepted)
+- 상태: Accepted (PR #6·#7 병합, main `c39578f`). 추정기 기준은 [ADR 0008](0008-residual-audit-cost-estimate-lookahead-forward-integrity.md)의 v2로 대체됨
 - 날짜: 2026-10-16
 - 범위: `run/discovery/costs_bridge.py`, `config/cost_assumed_public_v1.json`(신규), `public_market_collect.py`·`public_cost_estimate.py`·`config/cost_public_estimate_v1.json`·`tests/test_public_estimate.py`·`docs/공개시세_비용추정_로컬실행_안내.md`(신규), `pipeline.py`, `runner.py`, `autoloop.py`, `ops.py`, `run_cycle.sh`(주석), `tests/test_assumed_cost.py`(신규), `.github/workflows/research-ci.yml`
 - 선행: [ADR 0006](0006-cost-verification-forward-paper-data-manifest-ops-ci.md)

@@ -1066,7 +1066,7 @@ class EvolutionPipeline:
             survivors = []
             for s, st in sorted(self.statuses.all(ctx).items()):
                 rec = self.statuses.get(s, ctx)
-                waiting = (st == "BLOCKED_DATA" and rec.get("stage") == "locked"
+                waiting = (st in ("BLOCKED_DATA", "BLOCKED_COST") and rec.get("stage") == "locked"
                            and rec.get("resume_to") == "VALIDATION_SURVIVOR")
                 if (st == "VALIDATION_SURVIVOR" or waiting) and s not in in_camp:
                     survivors.append((s, st))
@@ -1074,7 +1074,16 @@ class EvolutionPipeline:
             for sid, st in survivors:
                 syms = self.specs.get(sid)["symbols"]
                 blocked = None
-                for sym in syms:
+                # The locked window is single-use per strategy+symbol. A result on an
+                # unverified cost model can only end in BLOCKED_COST at promotion, so
+                # the window is not spent until the cost model covers this use
+                # (ADR 0009). Checked before any window lookup: nothing is reserved.
+                cost_ok, cost_why = self.cost.verified_for(syms, self.order_value)
+                if not cost_ok:
+                    blocked = ("BLOCKED_COST",
+                               f"cost not verified for this use ({'; '.join(cost_why)}) — "
+                               "locked window preserved, not touched")
+                for sym in syms if blocked is None else ():
                     ws = self.campaigns.window_status(sym, max_campaigns=lc["max_campaigns_per_window"])
                     es = self.lock_registry.entry_status(sid, sym)
                     if ws["retired"]:

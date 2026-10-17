@@ -50,7 +50,7 @@ from typing import Iterable, Mapping, Optional, Sequence
 
 from engine_lib import append_jsonl, canonical_json, code_identity, iso_now, iter_jsonl
 
-COST_CALIBRATION_VERSION = "cost-calib-v1"
+COST_CALIBRATION_VERSION = "cost-calib-v2"
 RECORD_SCHEMA = "cost_verification_v1"
 DEFAULT_CRITERIA = Path(__file__).resolve().parent / "config" / "cost_verification_v1.json"
 
@@ -62,6 +62,7 @@ SOURCE_COMPONENTS = {
 }
 MODEL_COMPONENTS = ("fee", "spread", "impact")
 FILL_STATUSES = ("FILLED", "PARTIAL", "REJECTED", "EXPIRED")
+ORDER_TYPES = ("taker", "maker")
 
 
 class CalibrationError(ValueError):
@@ -89,6 +90,26 @@ class Observation:
     def validate(self) -> None:
         if self.source_kind not in SOURCE_COMPONENTS:
             raise CalibrationError(f"unknown source kind {self.source_kind!r}")
+        if isinstance(self.ts_ms, bool) or not isinstance(self.ts_ms, int) or self.ts_ms <= 0:
+            raise CalibrationError(f"ts_ms={self.ts_ms!r} must be a positive integer (epoch ms)")
+        if not isinstance(self.symbol, str) or not self.symbol.strip():
+            raise CalibrationError(f"symbol={self.symbol!r} required")
+        if self.order_type not in ORDER_TYPES:
+            raise CalibrationError(f"order_type must be one of {ORDER_TYPES}, got {self.order_type!r}")
+        for k in ("bid", "ask", "fill_price", "filled_notional", "fee", "bar_traded_value",
+                  "bar_volatility"):
+            v = getattr(self, k)
+            if v is not None and (isinstance(v, bool) or not isinstance(v, (int, float))
+                                  or not math.isfinite(v)):
+                raise CalibrationError(f"{k}={v!r} must be a finite number when given")
+        if self.bar_traded_value is not None and self.bar_traded_value <= 0:
+            raise CalibrationError(f"bar_traded_value={self.bar_traded_value!r} must be > 0 when given")
+        if self.source_kind != "exchange_fills" and any(
+                getattr(self, k) is not None for k in ("fill_price", "filled_notional", "fee")):
+            # a public quote or a virtual (paper / monitor) order is not an execution:
+            # it must never carry a fill price or a fee that could be read as one
+            raise CalibrationError(f"{self.source_kind} rows cannot carry fill_price / filled_notional / "
+                                   "fee — only account execution reports are execution evidence")
         if self.side not in (1, -1):
             raise CalibrationError(f"side must be +1/-1, got {self.side!r}")
         if self.status not in FILL_STATUSES:
@@ -135,12 +156,21 @@ def load_observations(path: Path) -> list[Observation]:
     rows raise — a calibration never silently drops evidence."""
     out = []
     fields = set(Observation.__dataclass_fields__)
+    seen: dict[str, int] = {}
     for i, r in enumerate(iter_jsonl(Path(path))):
         extra = set(r) - fields
         if extra:
             raise CalibrationError(f"{path}:{i + 1}: unknown fields {sorted(extra)}")
-        o = Observation(**r)
+        try:
+            o = Observation(**r)
+        except TypeError as e:
+            raise CalibrationError(f"{path}:{i + 1}: {e}") from e
         o.validate()
+        key = canonical_json(asdict(o))
+        if key in seen:
+            # the same report twice would count one execution as two pieces of evidence
+            raise CalibrationError(f"{path}:{i + 1}: duplicate of line {seen[key]}")
+        seen[key] = i + 1
         out.append(o)
     return out
 
@@ -313,26 +343,37 @@ def calibrate_and_verify(obs: Sequence[Observation], base_ctx, *, required_symbo
     rec["by_volatility"] = _buckets(used, errs, lambda o: o.bar_volatility, crit["volatility_edges"])
     rec["by_hour_utc"] = _buckets(used, errs, lambda o: (o.ts_ms // 3_600_000) % 24, [6, 12, 18])
     rec["model_refusals_in_verification"] = failures
-    n_all = len(obs)
-    rec["fill_rates"] = {s: sum(1 for o in obs if o.status == s) / n_all for s in FILL_STATUSES}
-    # coverage
-    syms = sorted({o.symbol for o in obs})
-    lo, hi = min(o.notional for o in obs), max(o.notional for o in obs)
-    rec["scope"] = {"symbols": syms, "notional_range": [lo, hi],
-                    "order_types": sorted({o.order_type for o in obs})}
+    # fill / reject rates are properties of real orders: quote snapshots and
+    # virtual monitor orders are not orders and must not dilute them
+    orders = [o for o in obs if o.source_kind == "exchange_fills"]
+    n_ord = len(orders)
+    rec["fill_rates"] = {s: (sum(1 for o in orders if o.status == s) / n_ord if n_ord else None)
+                         for s in FILL_STATUSES}
+    rec["n_orders"] = n_ord
+    # coverage = what the OUT-OF-SAMPLE execution evidence covers (not quotes,
+    # not a symbol seen once): a symbol is in scope only with enough fills
+    min_fills = crit["min_verification_fills_per_symbol"]
+    per_sym = {s: sum(1 for o in used if o.symbol == s) for s in sorted({o.symbol for o in used})}
+    syms = sorted(s for s, k in per_sym.items() if k >= min_fills)
+    lo, hi = ((min(o.notional for o in used), max(o.notional for o in used)) if used
+              else (math.inf, -math.inf))
+    rec["scope"] = {"symbols": syms, "notional_range": [lo, hi] if used else None,
+                    "order_types": sorted({o.order_type for o in used}),
+                    "verification_fills_per_symbol": per_sym}
     for s in required_symbols:
-        n_s = sum(1 for o in used if o.symbol == s)
-        if n_s < crit["min_verification_fills_per_symbol"]:
-            reasons.append(f"{s}: {n_s} verification fills < {crit['min_verification_fills_per_symbol']}")
+        n_s = per_sym.get(s, 0)
+        if n_s < min_fills:
+            reasons.append(f"{s}: {n_s} verification fills < {min_fills}")
     if not (lo <= order_value <= hi):
-        reasons.append(f"order value {order_value} outside the observed notional range [{lo}, {hi}]")
+        reasons.append(f"order value {order_value} outside the verified notional range "
+                       f"{[lo, hi] if used else 'none'}")
     ve = rec["verification_errors"]
     if ve.get("n"):
         if ve["p90_bp"] > crit["max_p90_underestimate_bp"]:
             reasons.append(f"p90 underestimate {ve['p90_bp']:.3f}bp > {crit['max_p90_underestimate_bp']}bp")
         if ve["mean_bp"] > crit["max_mean_underestimate_bp"]:
             reasons.append(f"mean underestimate {ve['mean_bp']:.3f}bp > {crit['max_mean_underestimate_bp']}bp")
-    if rec["fill_rates"]["REJECTED"] > crit["max_reject_rate"]:
+    if n_ord and rec["fill_rates"]["REJECTED"] > crit["max_reject_rate"]:
         reasons.append(f"reject rate {rec['fill_rates']['REJECTED']:.3f} > {crit['max_reject_rate']}")
     if missing:
         status = "BLOCKED_EXTERNAL_EVIDENCE"
@@ -372,6 +413,10 @@ def check_record(rec: Mapping) -> None:
         raise CalibrationError("cost verification record was altered (hash mismatch)")
     if rec.get("status") != "VERIFIED":
         raise CalibrationError(f"cost verification status is {rec.get('status')}, not VERIFIED")
+    if rec.get("reasons"):
+        raise CalibrationError(f"VERIFIED record carries failure reasons {rec['reasons']}")
+    if not (rec.get("scope") or {}).get("symbols") or not (rec.get("scope") or {}).get("notional_range"):
+        raise CalibrationError("VERIFIED record without a verified scope (symbols, notional range)")
     if rec.get("cost_source_sha256") != COST_MODEL_SOURCE_SHA256:
         raise CalibrationError("verification was made against a different cost-model source")
     if "exchange_fills" not in rec.get("source_kinds", []):

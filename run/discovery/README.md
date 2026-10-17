@@ -151,6 +151,8 @@ audit report.
    strategy+symbol (`LockTestRegistry` v2: RESERVED → EVALUATION_STARTED →
    CONSUMED / BLOCKED_DATA_MISSING / FAILED, flock-protected, immutable results);
    missing locked data blocks the attempt WITHOUT consuming the window
+   and so does a cost model that is not VERIFIED for the strategy's symbols
+   and order size (`BLOCKED_COST`, stage `locked`; ADR 0009)
 7. Promotion gate: preregistration + final FDR survival + independent
    validation + lock test exactly once + VERIFIED cost model (+ a real
    portfolio result under the same context for combos) → append-only queue;
@@ -181,7 +183,7 @@ audit report.
 - `campaigns.py` — locked-window campaign ledger (group-level locked TEST control)
 - `paper.py` / `autoloop.py` / `data_fetch.py` — isolated paper replay (never PAPER_PASSED) / one evolution cycle / opt-in data acquisition (retry + failure classes)
 - `config/cost_assumed_public_v1.json` — the ASSUMED cost profile (ADR 0007)
-- `public_market_collect.py` / `public_cost_estimate.py` + `config/cost_public_estimate_v1.json` — key-less public book collector (opt-in network, bounded) / offline spread+impact estimator (ADR 0007)
+- `public_market_collect.py` / `public_cost_estimate.py` + `config/cost_public_estimate_v2.json` (v1 superseded) — key-less public book collector (opt-in network, bounded; `--manifest-only` re-seals files offline) / offline spread+impact estimator with manifest-hash check, worse-side pricing, thin-book exclusion and `--verify` re-check (ADR 0007, ADR 0008)
 - `cost_calibration.py` + `config/cost_verification_v1.json` — the ONLY way to a verified cost model: fit on execution reports, verify out-of-sample, sealed `CV-…` record (ADR 0006)
 - `data_manifest.py` — dataset manifest (SHA-256 per file, provenance, cross-month/funding checks)
 - `execution_sim.py` — partial fill / reject / liquidation / late-observation layer

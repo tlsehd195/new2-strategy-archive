@@ -13,7 +13,10 @@ One JSON line per symbol per tick is appended to
 (``--hours`` is required), can be stopped with Ctrl+C at any time and
 resumed by running the same command again (lines are only appended).
 ``<out>/collect_manifest.json`` lists every file with its SHA-256 at the end
-of a run.  The output feeds ``public_cost_estimate.py``; it is market data,
+of a run (also after Ctrl+C).  If the process was killed without that step
+(window closed, power loss), ``--manifest-only`` re-seals the files as they
+are now, without any network access; the estimator refuses files that are
+missing from the manifest or do not match it.  The output feeds ``public_cost_estimate.py``; it is market data,
 not a record of anyone's fills, and can never verify a cost model.
 """
 
@@ -88,7 +91,7 @@ def _day_file(out: Path, symbol: str, t_ms: int) -> Path:
 def write_manifest(out: Path) -> dict:
     files = []
     for p in sorted(out.rglob("public_*.jsonl")):
-        files.append({"path": str(p.relative_to(out)), "bytes": p.stat().st_size,
+        files.append({"path": p.relative_to(out).as_posix(), "bytes": p.stat().st_size,
                       "sha256": hashlib.sha256(p.read_bytes()).hexdigest()})
     man = {"schema": "public_market_manifest_v1", "generated_at": iso_now(), "source": BASE,
            "endpoints": sorted(ALLOWED), "files": files}
@@ -131,11 +134,22 @@ def collect(out: Path, symbols: Sequence[str], *, hours: float, interval: float 
 def main(argv: Optional[Sequence[str]] = None) -> int:  # pragma: no cover - CLI
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--allow-network", action="store_true", help="required: opt in to public HTTP requests")
-    ap.add_argument("--hours", type=float, required=True, help="how long to collect (bounded)")
+    ap.add_argument("--hours", type=float, help="how long to collect (bounded; required unless --manifest-only)")
+    ap.add_argument("--manifest-only", action="store_true",
+                    help="no network: only (re)write collect_manifest.json for the files in --out")
     ap.add_argument("--interval", type=float, default=30.0, help="seconds between ticks (>= 5)")
     ap.add_argument("--symbols", nargs="+", default=["BTCUSDT", "ETHUSDT"])
     ap.add_argument("--out", required=True)
     a = ap.parse_args(argv)
+    if a.manifest_only:
+        if not Path(a.out).is_dir():
+            print(f"REFUSED: {a.out} is not a directory", file=sys.stderr)
+            return 1
+        man = write_manifest(Path(a.out))
+        print(json.dumps({"manifest": str(Path(a.out) / "collect_manifest.json"), "files": len(man["files"])}))
+        return 0
+    if a.hours is None:
+        ap.error("--hours is required (the run is always bounded)")
     try:
         r = collect(Path(a.out), a.symbols, hours=a.hours, interval=a.interval,
                     allow_network=a.allow_network)

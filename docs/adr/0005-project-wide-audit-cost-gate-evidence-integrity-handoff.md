@@ -1,6 +1,6 @@
 # ADR 0005 — 전체 감사: 비용 검증 게이트 강화, 증거 무결성, 페이퍼 상태, NEW2 인계 아티팩트
 
-- 상태: Proposed (PR #3, 머지 시 Accepted)
+- 상태: Accepted (PR #3 병합)
 - 날짜: 2026-10-15
 - 범위: `run/discovery/{pipeline,paper,autoloop,handoff}.py`, `config/promotion_v2.json`, `tests/test_pipeline.py`, `tests/test_ops_failures.py`
 - 선행: [ADR 0003](0003-core-defects-data-defaults-lookahead-ledger.md), [ADR 0004](0004-auto-evolution-staged-validation-and-paper-review.md)

@@ -1,6 +1,6 @@
 # ADR 0006 — 잔여 작업 완료: 비용 검증 절차, 전진 페이퍼, 데이터 매니페스트, 체결 시뮬, 운영·CI
 
-- 상태: Proposed (PR #5, 머지 시 Accepted)
+- 상태: Accepted (PR #5 병합, `733e4e7`)
 - 날짜: 2026-10-16
 - 범위: `run/discovery/{cost_calibration,data_manifest,execution_sim,paper_forward,ops}.py`(신규), `{costs_bridge,data_fetch,pipeline,paper,autoloop,runner,handoff,engine_lib}.py`, `config/{cost_verification_v1,paper_forward_v1}.json`(신규), `tests/test_completion.py`(신규), `.github/workflows/research-ci.yml`(신규)
 - 선행: [ADR 0005](0005-project-wide-audit-cost-gate-evidence-integrity-handoff.md), PR #4(Step-SPA·DM·MinBTL·비용 손익분기)

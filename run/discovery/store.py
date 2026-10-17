@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterable, Mapping, Optional
 
 from engine_lib import (
     CandidateState,
-    InvalidTransition,
     LEDGER_SCHEMA,
     RetryRecord,
     STATE_SCHEMA,
@@ -251,7 +249,6 @@ def reconcile(store: CandidateStore, queue: ReverifyQueue, ledger: Ledger,
     - queue items whose candidate is final (PASS) or already in flight
       (RUNNING) are dropped — the queue must never resurrect them
     """
-    now = now_ts or __import__("time").time()
     report = {"requeued_interrupted": [], "dropped_queue_items": [],
               "state_repaired": [], "corrupt_ledger_lines": 0,
               "queue_realigned": []}

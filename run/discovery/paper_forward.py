@@ -316,6 +316,13 @@ class ForwardPaper:
         d = self.root / plan_id
         now = self.clock()
         new_counts = {}
+        if st["status"] == "OBSERVING":
+            drift = self._plan_drift(plan)
+            if drift:
+                # the plan's preregistered spec / cost / execution rules are what is
+                # being observed: anything else would be a different experiment
+                st["status"] = "ERROR"
+                st["errors"].append({"at": now, "kind": "PLAN_CONTEXT_CHANGED", "detail": "; ".join(drift)})
         for sym in plan["symbols"]:
             if st["status"] != "OBSERVING":
                 break
@@ -326,6 +333,7 @@ class ForwardPaper:
                 st["status"] = "ERROR"
                 st["errors"].append({"at": now, "symbol": sym, "kind": "BAR_LOG_TAMPERED", "detail": str(e)})
                 break
+            self._recover_from_logs(plan, st, sym, rows)
             prev_hash = rows[-1]["hash"] if rows else ""
             bars, info = self.feed.closed_bars(sym, st["last_ts"][sym])
             bars = sorted(bars, key=lambda b: b.ts)          # out-of-order delivery is normalised
@@ -388,6 +396,44 @@ class ForwardPaper:
                                          **{k: v for k, v in result.items() if k != "trades"}})
         return result
 
+    def _plan_drift(self, plan: Mapping) -> list[str]:
+        """What differs between the registered plan and what a step would run."""
+        why = []
+        body = {k: v for k, v in plan.items() if k not in ("plan_id", "at")}
+        if "FP-" + hashlib.sha256(canonical_json(body).encode()).hexdigest()[:16] != plan["plan_id"]:
+            why.append("plan record does not match its id")
+        spec = self.p.specs.get(plan["strategy_id"])
+        if spec is None or hashlib.sha256(canonical_json(canonicalize_spec(spec)).encode()).hexdigest() \
+                != plan["spec_sha256"]:
+            why.append("strategy specification differs from the registered one")
+        if canonical_json(self.p.cost.identity()) != canonical_json(plan["cost"]):
+            why.append("cost model differs from the registered one")
+        if plan.get("execution_version") != EXECUTION_SIM_VERSION:
+            why.append(f"execution rules {EXECUTION_SIM_VERSION} != registered {plan.get('execution_version')}")
+        if self.p.context_id() != plan["context_id"]:
+            why.append("experiment context differs from the registered one")
+        return why
+
+    def _recover_from_logs(self, plan: Mapping, st: dict, sym: str, rows: Sequence[Mapping]) -> None:
+        """A step killed after appending bars but before saving the state left
+        the state behind the (hash-chained) bar log.  The log is the record:
+        re-derive the counters from it so no bar is appended twice."""
+        if not rows or rows[-1]["ts"] <= st["last_ts"][sym]:
+            return
+        prev, gaps, missing = plan["start_ts"] - MS15, [], 0
+        for r in rows:
+            g = r["ts"] - prev
+            if g > MS15:
+                gaps.append([prev, r["ts"], g // MS15 - 1])
+                missing += g // MS15 - 1
+            prev = r["ts"]
+        st["last_ts"][sym], st["bars"][sym] = rows[-1]["ts"], len(rows)
+        st["gaps"][sym], st["missing_bars"][sym] = gaps, missing
+        fl = list(iter_jsonl(self.root / plan["plan_id"] / f"funding_{sym}.jsonl"))
+        if fl:
+            st["last_funding_ts"][sym] = max(st["last_funding_ts"][sym], max(r["ts"] for r in fl))
+        st.setdefault("recovered", []).append({"symbol": sym, "last_ts": rows[-1]["ts"], "at": iso_now()})
+
     # -- evaluation ------------------------------------------------------------------
     def _series(self, plan: Mapping, sym: str) -> tuple[list[Bar], int, list[dict], list]:
         d = self.root / plan["plan_id"]
@@ -400,7 +446,9 @@ class ForwardPaper:
 
     def _evaluate(self, plan: Mapping, st: Mapping) -> dict:
         spec = canonicalize_spec(self.p.specs.get(plan["strategy_id"]))
-        mp = self.p.cost.params["max_participation"]
+        # the plan's own (registered) rules, never the current config files
+        exec_cfg = ExecutionConfig(**plan["execution"])
+        mp = float(plan["cost"]["params"]["max_participation"])
         trades, open_pos, excluded = [], [], {"gap": 0, "no_funding_coverage": 0}
         for sym in plan["symbols"]:
             bars, w, obs, fund = self._series(plan, sym)
@@ -424,7 +472,7 @@ class ForwardPaper:
                     excluded["gap"] += 1
                     continue
                 decision_ts = bars[x["entry_index"] - 1].ts
-                y = apply_execution(x, bars, self.exec_cfg, order_value=plan["order_value"],
+                y = apply_execution(x, bars, exec_cfg, order_value=plan["order_value"],
                                     max_participation=mp, observed_delay_ms=delay.get(decision_ts))
                 y["event_id"] = f"{sym}:{x['entry_ts']}"
                 y["holding_minutes"] = (x["exit_ts"] - x["entry_ts"]) / 60_000
@@ -538,6 +586,14 @@ class ForwardPaper:
         to = {"PAPER_PASSED": "PAPER_PASSED", "PAPER_FAILED": "PAPER_FAILED",
               "PAPER_INCONCLUSIVE": "INCONCLUSIVE"}[verdict["verdict"]]
         labels = [] if plan["feed_realtime"] else ["OBSERVED_FROM_ARCHIVE_NOT_REALTIME"]
+        prior = self.p.evaluation("paper_forward", sid, ctx)
+        if prior is not None and prior.get("plan_id") == plan["plan_id"]:
+            # concluded before an interruption (state not yet saved): never twice
+            if self.p.statuses.status(sid, ctx) != to:
+                self.p.statuses.set(sid, ctx, to, stage="paper_forward", labels=labels,
+                                    reasons=list(prior.get("reasons") or []),
+                                    evidence={"paper_forward": prior["record_id"]})
+            return
         rec = self.p._append_eval({"stage": "paper_forward", "strategy_id": sid, "context_id": ctx,
                                    "status": "OK", "plan_id": plan["plan_id"], "verdict": verdict["verdict"],
                                    "reasons": list(verdict["reasons"]), "metrics": result.get("metrics"),
