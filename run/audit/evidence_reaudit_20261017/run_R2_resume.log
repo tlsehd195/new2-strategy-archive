@@ -1,0 +1,5 @@
+2026-10-17T12:57:14Z
+RUN_MODE evolve state_dir=/tmp/claude-0/-home-claude-new2-strategy-archive/45d5e234-b9c0-53ed-8134-afc4f9ea3ccb/scratchpad/r2root/state
+{"status": "CYCLE_OK", "started_at": "2026-10-17T12:57:14Z", "finished_at": "2026-10-17T13:07:51Z", "context_id": "C2-d02d2b0b6b60075dd192", "cost_status": "UNVERIFIED_COST_MODEL", "symbols_used": ["BTCUSDT", "ETHUSDT"], "symbols_blocked": {}, "seeded": 0, "dev_evaluated": 73, "rounds": 3, "proposed": 72, "invalid": 30, "duplicates": 13, "search_status": "ACTIVE", "validation_batch": {"batch_id": "VB-f2ff19c6457c14d3", "outcome": {"S-0837f4d7b3261938": "INCONCLUSIVE", "S-202b2284faa1e9ac": "REJECTED", "S-391396a9487de780": "REJECTED", "S-5f8884793cae1ba1": "INCONCLUSIVE", "S-6d1f375a260fc295": "INCONCLUSIVE", "S-cf0ab2f27d97f1ac": "INCONCLUSIVE", "S-eb241b35711e67a3": "INCONCLUSIVE"}, "blocked": null}, "robustness_resumed": [], "campaign": null, "paper": [], "forward": [], "status_counts": {"REJECTED": 747, "INCONCLUSIVE": 102}, "reverify_pending": [], "notes": [], "runtime_seconds": 636.6831405162811}
+exit=0
+2026-10-17T13:07:51Z

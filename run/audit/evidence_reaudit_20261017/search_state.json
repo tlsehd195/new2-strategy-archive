@@ -1,0 +1,49 @@
+{
+ "config_hash": "a860f63620fe5d99",
+ "context_id": "C2-d02d2b0b6b60075dd192",
+ "duplicates": 13,
+ "front_hash": "39ca36ecd508c26e",
+ "history": [
+  {
+   "at": "2026-10-17T12:27:01Z",
+   "event": "seeded",
+   "n": 705
+  },
+  {
+   "invalid": 5,
+   "proposed": 24,
+   "round_index": 1,
+   "status": "ACTIVE"
+  },
+  {
+   "invalid": 7,
+   "proposed": 24,
+   "round_index": 2,
+   "status": "ACTIVE"
+  },
+  {
+   "invalid": 9,
+   "proposed": 24,
+   "round_index": 3,
+   "status": "ACTIVE"
+  },
+  {
+   "invalid": 4,
+   "proposed": 24,
+   "round_index": 4,
+   "status": "ACTIVE"
+  },
+  {
+   "invalid": 17,
+   "proposed": 24,
+   "round_index": 5,
+   "status": "ACTIVE"
+  }
+ ],
+ "invalid": 42,
+ "proposed": 120,
+ "registered": 849,
+ "round_index": 5,
+ "rounds_without_front_change": 0,
+ "status": "ACTIVE"
+}

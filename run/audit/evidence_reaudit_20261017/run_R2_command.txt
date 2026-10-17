@@ -1,0 +1,7 @@
+Real-data evolution cycle R2 (ADR 0010 code; runner/pipeline identical to commit d399c25 — the run started
+moments before that commit was made, from the same working tree; code_base.txt therefore read a2f63c0).
+Data: upload f6379f02 unzipped into a fresh directory, dataset_sha256 5f0101f7c707f2036a19796e77d04b26f9edbd4d788cacf1ad0cf790baad1789
+Fresh, empty state directory (NEW2_DISCOVERY_ROOT); default cost profile (UNVERIFIED_COST_MODEL).
+Command: NEW2_DATA_DIR=<data> NEW2_DISCOVERY_ROOT=<fresh> COINTRADER_SRC=<NEW2@8ec6371>/src python3 runner.py --mode evolve --rounds 3 --evals 2000
+Part 1: started 2026-10-17T12:26:57Z, killed by the session's 30-minute background limit after seeding (705) and rounds 1-2 (no summary written).
+Part 2: same command, same state directory, 12:57:14Z-13:07:51Z, exit 0 CYCLE_OK; resumed from the checkpoint and ran rounds 3-5 plus the validation batch.
