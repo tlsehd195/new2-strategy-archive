@@ -248,7 +248,7 @@ class TestFamilyNotions(unittest.TestCase):
 
 class TestRunnerFinalization(unittest.TestCase):
     def _runner(self, td, space=None):
-        cls = _fake_runner_cls()
+        cls = _fake_runner_cls(open_lock_gates=True)
         sp = space or SPACE
         return cls(make_paths(td), candidates_fn=lambda: (sp, []))
 
@@ -334,7 +334,7 @@ class TestLockEntryPolicy(unittest.TestCase):
     """Statistical survivors vs. candidates that may actually enter the locked TEST."""
 
     def _runner(self, td):
-        r = _fake_runner_cls()(make_paths(td), candidates_fn=lambda: (SPACE, []))
+        r = _fake_runner_cls(open_lock_gates=True)(make_paths(td), candidates_fn=lambda: (SPACE, []))
         r.register_all()
         r._current_context()
         return r

@@ -2,7 +2,8 @@
 
 This document states what the engine's numbers mean and, just as
 importantly, what they do NOT guarantee.  It reflects the code as of the
-2026-10-15 residual-defect fixes.
+2026-10-15 residual-defect fixes; section 9 was added on 2026-10-17
+(ADR 0010) and covers both engines as of that date.
 
 ## 1. Test units
 
@@ -233,3 +234,65 @@ promotable.
 - Assumptions stated, not proven: stationarity / weak dependence of daily
   strategy returns (bootstrap validity), daily aggregation of 15m events,
   `q = n^(-1/3)` mean block length.
+
+## 9. Two engines, two procedures (ADR 0010)
+
+`run_cycle.sh` / `runner.py` run **legacy** by default (`NEW2_DISC_MODE` /
+`--mode`; unset prints `CYCLE_WARNING` and every result line carries
+`mode=`).  The engines share only the single-use locked-window records.
+A `CYCLE_OK` line means the cycle ran; it is never a strategy verdict.
+
+| | legacy (`--mode legacy`, default) | evolution (`--mode evolve`) |
+|---|---|---|
+| candidates | fixed 779-candidate space, one generation | declarative specs, seeded from the 779, then mutated |
+| cross-candidate test | generation BH-FDR, q = 0.05, m = whole manifest (§2) | Romano–Wolf StepM per preregistered validation batch, alpha spending `alpha_total·6/π²/k²` per window (§8) |
+| BY / SPA / RC | not used | diagnostics only |
+| locked TEST entry | BH survivor + validation PASS → one campaign per BH decision | VALIDATION_SURVIVOR after robustness → one campaign |
+| locked PASS | cell test AND `p ≤` campaign member alpha | one-sided HAC t per symbol, Bonferroni in the campaign |
+| verdict labels | §3 (PASS, FAIL_STAT, …, AWAITING_FDR) | §8 statuses (VALIDATION_SURVIVOR, BLOCKED_*, PAPER_TEST_READY, …) |
+| state | `state/state.json`, `state/discovery_ledger.jsonl`, `state/queue.json`, `results/cycle_summary.json` | `state/evolution/*`, `results/evolution_cycle_summary.json` |
+| shared | `state/lock_test_usage.json`, `state/locked_window_campaigns.jsonl` | same files |
+
+The two procedures are not one common procedure and their numbers are not
+comparable.  BH-FDR assumes PRDS between candidates; that is **not**
+verified (§2.5).
+
+### 9.1 Locked TEST gates, both engines
+
+Checked in this order, before any window status lookup, reservation or
+locked-data read.  A blocked candidate spends nothing.
+
+1. **Cost covers the use** (ADR 0009, legacy since ADR 0010):
+   `cost.verified_for(symbols, order_value)`.  Not covered → legacy:
+   `lock_blocked = COST_NOT_VERIFIED`, the candidate stays `AWAITING_FDR`
+   with no final record; evolution: `BLOCKED_COST`, stage `locked`,
+   `resume_to = VALIDATION_SURVIVOR`.
+2. **Independence** (ADR 0010): no other symbol of the candidate may have
+   selection (DEV/validation) data inside a symbol's locked window.  ETH
+   selection reads 2021-01-01..2026-04-27, which covers the BTC window
+   2024-03-25..2024-06-18, so **every BTC+ETH candidate is blocked**.
+   Legacy: final `DATA_MISSING` with note `LOCKED_WINDOW_NOT_INDEPENDENT`
+   (not re-queued: no data refresh can change it); evolution:
+   `BLOCKED_STATISTICS`, stage `locked`.  Single-symbol candidates are
+   unaffected.  Not covered: information that reaches a single-symbol
+   candidate through the search itself (evolution mutates using DEV results
+   of both symbols) — a stated residual risk.
+3. Window history (consumed / in progress / retired) and data presence (§4).
+
+### 9.2 Cost status labels
+
+| label | source | promotable |
+|---|---|---|
+| `UNVERIFIED_COST_MODEL` | NEW2 candle-model defaults (production default) | no |
+| `ASSUMED_COST_MODEL` | `assumed_public_v1`: public fee schedule + fixed margins | no |
+| `ESTIMATED_FROM_PUBLIC_DATA` | `public_estimate:<record>`: spread/impact from public order books; fee still assumed | no |
+| `VERIFIED` | sealed `cost_calibration` record from account execution reports, ≥ 200 verification fills per symbol, inside its symbol and notional scope | yes, inside the scope only |
+| `BLOCKED_EXTERNAL_EVIDENCE` | `cost_calibration` result when the evidence does not exist (no account fills) | — |
+
+### 9.3 Paper labels
+
+`PAPER_TEST_READY` = eligible for an isolated replay; `paper.py` replays
+stored bars and can never produce `PAPER_PASSED`.  `PAPER_PASSED` comes only
+from `paper_forward.py` on bars that closed after the plan was registered,
+and plan registration requires a VERIFIED cost.  No strategy is
+`PAPER_PASSED`.

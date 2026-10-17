@@ -32,7 +32,12 @@
 #   NEW2_DISC_AUDIT      감사 로그 경로 (기본: $NEW2_DISCOVERY_ROOT/cycle_audit.log, append)
 #   NEW2_DISC_TEE        로그 기록 명령 (기본: tee; 테스트에서 가짜 기록기로 교체)
 #   PYTHON               파이썬 실행 파일 (기본: python3)
-#   NEW2_DISC_MODE       legacy(기본) | evolve | full — runner.py --mode 로 전달
+#   NEW2_DISC_MODE       legacy(기본) | evolve | full — runner.py --mode 로 전달.
+#                        legacy = v2 후보 엔진(state/state.json, state/discovery_ledger.jsonl),
+#                        evolve = 자동 진화 엔진(state/evolution/*), full = 둘 다 순서대로.
+#                        미지정이면 legacy로 실행하고 stderr에 경고한다(ADR 0010).
+#                        모든 결과 줄(CYCLE_OK 등)에 mode=가 붙는다. 이 줄은 실행 결과일 뿐,
+#                        전략 검증 통과를 뜻하지 않는다.
 #   NEW2_COST_PROFILE    new2_default(기본) | assumed_public_v1 | public_estimate:<기록.json> — 모두 미검증, 승격 불가
 #   REFRESH=1            미지원 — runner가 경고하고 요약에 기록한다
 # ============================================================
@@ -42,6 +47,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || { echo "CYCLE_FAIL
 
 usage() {
   echo "usage: run_cycle.sh [BATCH]   (BATCH: positive integer, default \${NEW2_DISC_BATCH:-10})" >&2
+  echo "       NEW2_DISC_MODE=legacy|evolve|full (default legacy: the v2 candidate engine, not evolution)" >&2
 }
 
 if [ "$#" -gt 1 ]; then
@@ -65,6 +71,9 @@ case "$MODE" in
   legacy|evolve|full) ;;
   *) usage; echo "CYCLE_FAILED usage: invalid NEW2_DISC_MODE '$MODE'"; exit 1 ;;
 esac
+if [ -z "${NEW2_DISC_MODE:-}" ]; then
+  echo "CYCLE_WARNING NEW2_DISC_MODE not set: running mode=legacy (v2 candidate engine). Set NEW2_DISC_MODE=evolve for the evolution engine." >&2
+fi
 
 ROOT="${NEW2_DISCOVERY_ROOT:-$SCRIPT_DIR}"
 LOG="${NEW2_DISC_LOG:-$ROOT/cycle_log.txt}"
@@ -97,7 +106,7 @@ if [ "$tee_rc" -ne 0 ] || [ "$tail_rc" -ne 0 ]; then
   log_failed=1
   echo "CYCLE_LOG_ERROR log pipeline failed (writer rc=$tee_rc, tail rc=$tail_rc, log=$LOG, runner rc=$rc)" >&2
 fi
-audit "event=RUN runner_rc=$rc log_writer_rc=$tee_rc tail_rc=$tail_rc log=$LOG"
+audit "event=RUN mode=$MODE runner_rc=$rc log_writer_rc=$tee_rc tail_rc=$tail_rc log=$LOG"
 
 case "$rc" in
   0)
@@ -106,7 +115,7 @@ case "$rc" in
       echo "CYCLE_FAILED log pipeline failed (runner rc=0, writer rc=$tee_rc, log=$LOG)"
       exit 1
     fi
-    echo "CYCLE_OK batch=$BATCH"
+    echo "CYCLE_OK batch=$BATCH mode=$MODE"
     exit 0 ;;
   2)
     if [ "$log_failed" -ne 0 ]; then
@@ -114,10 +123,10 @@ case "$rc" in
       echo "CYCLE_FAILED partial cycle but log pipeline failed (writer rc=$tee_rc, log=$LOG)"
       exit 1
     fi
-    echo "CYCLE_PARTIAL batch=$BATCH"; exit 2 ;;
+    echo "CYCLE_PARTIAL batch=$BATCH mode=$MODE"; exit 2 ;;
   3)
     [ "$log_failed" -ne 0 ] && audit "event=LOG_ERROR_ON_SKIP runner_rc=3"
-    echo "CYCLE_SKIPPED"; exit 3 ;;
+    echo "CYCLE_SKIPPED mode=$MODE"; exit 3 ;;
   4)
     if [ "$log_failed" -ne 0 ]; then
       audit "event=CYCLE_FAILED reason=log_failure_after_blocked_data runner_rc=4"
@@ -127,5 +136,5 @@ case "$rc" in
     echo "CYCLE_BLOCKED_DATA batch=$BATCH mode=$MODE"; exit 4 ;;
   *)
     [ "$log_failed" -ne 0 ] && audit "event=LOG_ERROR_ON_FAILURE runner_rc=$rc"
-    echo "CYCLE_FAILED rc=$rc"; exit 1 ;;
+    echo "CYCLE_FAILED rc=$rc mode=$MODE"; exit 1 ;;
 esac

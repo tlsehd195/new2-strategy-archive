@@ -45,8 +45,31 @@ If the log directory cannot be created the runner is not started (exit 1).
 `NEW2_DISC_TEE` replaces the log writer command (used by the tests).
 
 `runner.py` can be called directly: `python3 run/discovery/runner.py --batch N
-[--mode legacy|evolve|full] [--rounds R] [--evals E]`.  `run_cycle.sh` passes
-`NEW2_DISC_MODE` (default `legacy`) as `--mode`.
+[--mode legacy|evolve|full] [--rounds R] [--evals E]` (`--help` lists them).
+`run_cycle.sh` passes `NEW2_DISC_MODE` as `--mode`.
+
+**The default mode is `legacy`** (the fixed 779-candidate engine with
+generation BH-FDR), not the evolution engine.  With `NEW2_DISC_MODE` unset,
+`run_cycle.sh` prints `CYCLE_WARNING NEW2_DISC_MODE not set …` on stderr and
+every result line names the mode (`CYCLE_OK batch=10 mode=legacy`); the
+runner prints `RUN_MODE <mode> state_dir=…`.  The latest real-data runs used
+`--mode evolve`.  A `CYCLE_OK` means the cycle ran, never that a strategy
+passed.  The two engines' procedures differ: `STATISTICS_AND_STATES.md` §9.
+
+### State files: current vs historical (ADR 0010)
+
+| file | engine | status |
+|---|---|---|
+| `state/state.json`, `state/discovery_ledger.jsonl`, `state/queue.json`, `state/preregistration.json` | legacy v2 | written by `--mode legacy`; the committed copies are the 2026-10-15 runs |
+| `results/cycle_summary.json` | legacy v2 | last committed legacy cycle (2026-10-15, 3 evaluated, all DATA_MISSING) — not the latest research run |
+| `state/evolution/*`, `results/evolution_cycle_summary.json` | evolution | written by `--mode evolve`; not committed (real-data runs used fresh directories, see `run/audit/`) |
+| `state/lock_test_usage.json`, `state/locked_window_campaigns.jsonl` | both | single-use locked-window records; not present in the repository (no window was ever used) |
+| `state.json`, `discovery_ledger.jsonl`, `promotion_queue.md`, `cycles.md` (this directory) | v1 (`NEW2-discovery-v1`) | **historical evidence only**; no current code reads them; kept unchanged |
+| `cycle_log.txt` (this directory) | v1 lines, then any engine | default log of `run_cycle.sh`; the committed lines are v1 (2026-10-14), new cycles are appended below them |
+| `state/cycles.md`, `state/last_stderr.log` | legacy v2 | notes of the 2026-10-15 runs; no code writes them |
+
+The current state of the research (all engines, all measurements) is
+summarised in `run/audit/STATUS_CURRENT_20261017.md`.
 
 ## Evolution mode (`--mode evolve`, ADR 0004)
 
@@ -72,7 +95,8 @@ window) → robustness filters → one locked-window campaign → promotion revi
 → isolated paper replay.  State lives in `state/evolution/` (specs, lineage,
 evaluations, statuses, batches, rounds, search state, reviews, paper runs) and
 `state/locked_window_campaigns.jsonl` (shared with the legacy path).  Gates
-are in `config/promotion_v1.json` (its hash is part of the context).
+are in `config/promotion_v2.json` (its hash is part of the context; v1 is kept for
+the record).
 `PAPER_TEST_READY` means "eligible for an isolated paper replay" — never
 "profitable", never live trading (no order code exists).
 

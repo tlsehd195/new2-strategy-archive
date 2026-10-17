@@ -1,6 +1,6 @@
 # ADR 0009 — 비용 모델이 검증되기 전에는 잠금 TEST를 열지 않는다
 
-- 상태: Proposed (PR #8, 머지 시 Accepted)
+- 상태: Accepted (PR #8 병합, `a2f63c0`)
 - 날짜: 2026-10-17
 - 범위: `run/discovery/pipeline.py`(`run_locked_campaign`), `tests/test_locked_cost_gate.py`(신규), `tests/test_pipeline.py`, `tests/test_assumed_cost.py`, `tests/test_public_estimate.py`
 - 선행: [ADR 0007](0007-assumed-cost-profile.md), [ADR 0008](0008-residual-audit-cost-estimate-lookahead-forward-integrity.md) "결정 대기"
