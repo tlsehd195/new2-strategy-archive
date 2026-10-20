@@ -15,3 +15,4 @@
 | [0009](0009-locked-test-requires-verified-cost.md) | 비용 모델이 검증되기 전에는 잠금 TEST를 열지 않는다 | Accepted (PR #8 병합, `a2f63c0`) |
 | [0010](0010-legacy-lock-gates-cross-symbol-independence-mode.md) | legacy 잠금 TEST 비용 게이트, 다종목 잠금 창 독립성, 실행 모드 표시 | Accepted (PR #9 병합, `3685355`) |
 | [0011](0011-public-market-estimate-first-run.md) | 공개 호가 80시간 수집분으로 첫 비용 추정 (ESTIMATED_FROM_PUBLIC_DATA) | Accepted |
+| [0012](0012-evolve-real-data-run-public-estimate-cost.md) | 공개 호가 추정 비용으로 실데이터 evolve R3 (검증 진입 20, 생존 0) | Accepted |
