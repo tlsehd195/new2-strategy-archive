@@ -100,11 +100,11 @@ mkdir -p "$(dirname "$LOG")" 2>/dev/null || { audit "event=FAILED reason=log_dir
 # 성공으로 보고되지 않는다. 임시 파일은 종료 시 지운다(2026-10-20 지시 §7).
 TMP_RC="$(mktemp "${TMPDIR:-/tmp}/run_cycle_rc.XXXXXX")" || { audit "event=FAILED reason=mktemp_failed"; echo "CYCLE_FAILED cannot create temp file"; exit 1; }
 TMP_PID="$(mktemp "${TMPDIR:-/tmp}/run_cycle_pid.XXXXXX")" || { rm -f "$TMP_RC"; audit "event=FAILED reason=mktemp_failed"; echo "CYCLE_FAILED cannot create temp file"; exit 1; }
-# shellcheck disable=SC2329  # invoked by the EXIT trap
+# shellcheck disable=SC2317,SC2329  # invoked by the EXIT trap
 cleanup() { rm -f "$TMP_RC" "$TMP_PID"; }
 trap cleanup EXIT
 interrupted=""
-# shellcheck disable=SC2329  # invoked by the signal traps
+# shellcheck disable=SC2317,SC2329  # invoked by the signal traps
 on_signal() {
   interrupted="$1"
   local rpid
