@@ -347,9 +347,13 @@ def behaviour_key(spec: Mapping) -> str:
     same rule (``add_filter`` / ``crossover`` can create exactly that).  The
     key pools entry and filter conditions for "all" logic; the stored id is
     unchanged (ids stay stable), the key is only used to stop the search from
-    spending budget and multiplicity on a behavioural duplicate."""
+    spending budget and multiplicity on a behavioural duplicate.  Risk
+    settings are not part of the key (see below)."""
     c = canonicalize_spec(spec)
-    body = {"direction": c["direction"], "symbols": c["symbols"], "exit": c["exit"], "risk": c["risk"]}
+    # ``risk`` is left out: no evaluation stage of the evolution pipeline reads it
+    # (fixed order value per event), so a ``change_risk`` child trades exactly like
+    # its parent — real run R4 put such a pair into one validation batch (ADR 0013)
+    body = {"direction": c["direction"], "symbols": c["symbols"], "exit": c["exit"]}
     if c["entry"]["logic"] == "all":
         conds = sorted({canonical_json(x) for x in c["entry"]["conditions"] + c["filters"]})
         body["all"] = conds

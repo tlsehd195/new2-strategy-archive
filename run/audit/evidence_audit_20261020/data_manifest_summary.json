@@ -1,0 +1,63 @@
+{
+ "dataset_sha256": "5f0101f7c707f2036a19796e77d04b26f9edbd4d788cacf1ad0cf790baad1789",
+ "ok": true,
+ "n_files": 276,
+ "issues": [
+  {
+   "code": "ZERO_VOLUME",
+   "detail": "3 bars without volume",
+   "path": "klines/BTCUSDT-15m-2021-03.csv",
+   "severity": "WARN",
+   "symbol": "BTCUSDT"
+  },
+  {
+   "code": "ZERO_VOLUME",
+   "detail": "3 bars without volume",
+   "path": "klines/BTCUSDT-15m-2022-05.csv",
+   "severity": "WARN",
+   "symbol": "BTCUSDT"
+  },
+  {
+   "code": "ZERO_VOLUME",
+   "detail": "5 bars without volume",
+   "path": "klines/BTCUSDT-15m-2023-11.csv",
+   "severity": "WARN",
+   "symbol": "BTCUSDT"
+  },
+  {
+   "code": "ZERO_VOLUME",
+   "detail": "4 bars without volume",
+   "path": "klines/BTCUSDT-15m-2024-10.csv",
+   "severity": "WARN",
+   "symbol": "BTCUSDT"
+  },
+  {
+   "code": "ZERO_VOLUME",
+   "detail": "3 bars without volume",
+   "path": "klines/ETHUSDT-15m-2021-03.csv",
+   "severity": "WARN",
+   "symbol": "ETHUSDT"
+  },
+  {
+   "code": "ZERO_VOLUME",
+   "detail": "3 bars without volume",
+   "path": "klines/ETHUSDT-15m-2022-05.csv",
+   "severity": "WARN",
+   "symbol": "ETHUSDT"
+  },
+  {
+   "code": "ZERO_VOLUME",
+   "detail": "4 bars without volume",
+   "path": "klines/ETHUSDT-15m-2024-10.csv",
+   "severity": "WARN",
+   "symbol": "ETHUSDT"
+  }
+ ],
+ "exceptions": {
+  "file": "data_exceptions.json",
+  "n": 0,
+  "sha256": "b839aec30e3a4fe809540f3ed9364122a3f4f131e6938843612600bb68fa1bdf"
+ },
+ "quality_policy": "dq-v2",
+ "generated_at": "2026-10-20T06:30:21.183655+00:00"
+}

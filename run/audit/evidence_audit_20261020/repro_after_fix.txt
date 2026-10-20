@@ -1,0 +1,7 @@
+D1 pooled hides BTC underestimate: status = NOT_VERIFIED pooled mean/p90 = -0.999 1.164
+D2 refused: seconds ts ts_ms=1700000000 outside [2017-01-01, now+1d] — seconds instead of milliseconds, or a clock error?
+D2 refused: fee in bp fee 55558.45463762994 is 400.0000% of the filled notional (> 1%) — fee in bp/percent instead of quote currency?
+D2 refused: price x100 fill_price 10019.069752544172 is 9919.07% away from ref_price 100.0 — wrong price unit or stale reference?
+D3 in-memory duplicates (5 repeated fills): status = NOT_VERIFIED
+D4 too few fills: status = INSUFFICIENT_DATA (sample shortfall reported as a failure)
+D5 entry[A,B] vs entry[A]+filter[B]: ids S-b603800652209416 S-1664ee1cd37882e8 (same behaviour, both accepted as new)

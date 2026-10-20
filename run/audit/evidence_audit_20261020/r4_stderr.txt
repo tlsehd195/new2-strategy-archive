@@ -1,0 +1,2 @@
+RUN_MODE evolve state_dir=/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/r4/state
+VALIDATION_HISTORY /home/claude/new2-strategy-archive/run/discovery/validation_window_history.jsonl

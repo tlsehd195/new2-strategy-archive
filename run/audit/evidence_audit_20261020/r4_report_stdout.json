@@ -1,0 +1,54 @@
+{
+ "context_id": "C2-4a5b6fb6c5a3202b6fc8",
+ "candidates": {
+  "registered_specs": 777,
+  "by_source": {
+   "seed": 705,
+   "evolution": 72
+  },
+  "search_pool": 777,
+  "lineage_edges": 777,
+  "by_operator": {
+   "legacy_translation": 705,
+   "split_symbol": 4,
+   "resample_param": 3,
+   "tweak_param": 5,
+   "add_entry_condition": 3,
+   "tweak_threshold": 5,
+   "change_horizon": 5,
+   "swap_feature": 8,
+   "add_filter": 4,
+   "flip_direction": 2,
+   "crossover": 12,
+   "random_spec": 18,
+   "change_exit": 2,
+   "change_risk": 1
+  }
+ },
+ "dev": {
+  "evaluated": 777,
+  "ok": 777,
+  "screen_pass": 42,
+  "not_ok": {}
+ },
+ "statuses": {
+  "REJECTED": 679,
+  "INCONCLUSIVE": 76,
+  "RESEARCH_ONLY": 22
+ },
+ "survivors": [],
+ "validation": {
+  "batches": 1,
+  "members": 20,
+  "outcomes": {
+   "INCONCLUSIVE": 13,
+   "REJECTED": 7
+  },
+  "failure_classes": {
+   "INSUFFICIENT_DATA": 13,
+   "FAIL_COST": 3,
+   "NO_EDGE_OUT_OF_SAMPLE": 2,
+   "FAIL_STAT": 2
+  }
+ }
+}

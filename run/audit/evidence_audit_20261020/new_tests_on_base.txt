@@ -1,0 +1,170 @@
+EEEEEEEFEEEEEFFEF
+======================================================================
+ERROR: test_entry_and_filter_conjunction_is_one_behaviour (discovery.tests.test_audit_20261020.TestBehaviourKey.test_entry_and_filter_conjunction_is_one_behaviour)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/tests/test_audit_20261020.py", line 81, in test_entry_and_filter_conjunction_is_one_behaviour
+    from evolution import behaviour_key
+ImportError: cannot import name 'behaviour_key' from 'evolution' (/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/evolution.py)
+
+======================================================================
+ERROR: test_propose_round_skips_known_behaviour (discovery.tests.test_audit_20261020.TestBehaviourKey.test_propose_round_skips_known_behaviour)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/tests/test_audit_20261020.py", line 104, in test_propose_round_skips_known_behaviour
+    from evolution import behaviour_key
+ImportError: cannot import name 'behaviour_key' from 'evolution' (/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/evolution.py)
+
+======================================================================
+ERROR: test_really_different_strategies_keep_different_keys (discovery.tests.test_audit_20261020.TestBehaviourKey.test_really_different_strategies_keep_different_keys)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/tests/test_audit_20261020.py", line 91, in test_really_different_strategies_keep_different_keys
+    from evolution import behaviour_key
+ImportError: cannot import name 'behaviour_key' from 'evolution' (/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/evolution.py)
+
+======================================================================
+ERROR: test_in_memory_duplicates_are_not_evidence (discovery.tests.test_audit_20261020.TestCalibrationAudit.test_in_memory_duplicates_are_not_evidence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/tests/test_audit_20261020.py", line 248, in test_in_memory_duplicates_are_not_evidence
+    self.assertEqual((rec["status"], rec["n_duplicates"]), ("NOT_VERIFIED", 5))
+                                     ~~~^^^^^^^^^^^^^^^^
+KeyError: 'n_duplicates'
+
+======================================================================
+ERROR: test_pooled_error_cannot_hide_one_symbol (discovery.tests.test_audit_20261020.TestCalibrationAudit.test_pooled_error_cannot_hide_one_symbol)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/tests/test_audit_20261020.py", line 267, in test_pooled_error_cannot_hide_one_symbol
+    self.assertGreater(rec["verification_errors_by_symbol"]["BTCUSDT"]["mean_bp"], 0.5)
+                       ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'verification_errors_by_symbol'
+
+======================================================================
+ERROR: test_quarantine_isolates_bad_rows_and_blocks_verified (discovery.tests.test_audit_20261020.TestCalibrationAudit.test_quarantine_isolates_bad_rows_and_blocks_verified)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/tests/test_audit_20261020.py", line 236, in test_quarantine_isolates_bad_rows_and_blocks_verified
+    good, bad = cc.load_observations_checked(p)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'cost_calibration' has no attribute 'load_observations_checked'
+
+======================================================================
+ERROR: test_same_order_id_twice_is_a_duplicate (discovery.tests.test_audit_20261020.TestCalibrationAudit.test_same_order_id_twice_is_a_duplicate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/tests/test_audit_20261020.py", line 220, in test_same_order_id_twice_is_a_duplicate
+    a = replace(synth_fills(n=1)[0], order_id="1001")
+  File "/usr/lib/python3.13/dataclasses.py", line 1645, in replace
+    return _replace(obj, **changes)
+  File "/usr/lib/python3.13/dataclasses.py", line 1679, in _replace
+    return self.__class__(**changes)
+           ~~~~~~~~~~~~~~^^^^^^^^^^^
+TypeError: Observation.__init__() got an unexpected keyword argument 'order_id'
+
+======================================================================
+ERROR: test_uncertainty_and_period_are_recorded (discovery.tests.test_audit_20261020.TestCalibrationAudit.test_uncertainty_and_period_are_recorded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/tests/test_audit_20261020.py", line 273, in test_uncertainty_and_period_are_recorded
+    lo, hi = rec["verification_errors"]["mean_ci95_bp"]
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+KeyError: 'mean_ci95_bp'
+
+======================================================================
+ERROR: test_unit_errors_are_refused (discovery.tests.test_audit_20261020.TestCalibrationAudit.test_unit_errors_are_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/tests/test_audit_20261020.py", line 212, in test_unit_errors_are_refused
+    "blank_order_id": replace(good, order_id=" "),
+                      ~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/dataclasses.py", line 1645, in replace
+    return _replace(obj, **changes)
+  File "/usr/lib/python3.13/dataclasses.py", line 1679, in _replace
+    return self.__class__(**changes)
+           ~~~~~~~~~~~~~~^^^^^^^^^^^
+TypeError: Observation.__init__() got an unexpected keyword argument 'order_id'
+
+======================================================================
+ERROR: test_failure_class_rules (discovery.tests.test_audit_20261020.TestCostAttribution.test_failure_class_rules)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/tests/test_audit_20261020.py", line 155, in test_failure_class_rules
+    from pipeline import validation_failure_class as f
+ImportError: cannot import name 'validation_failure_class' from 'pipeline' (/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/pipeline.py)
+
+======================================================================
+ERROR: test_same_events_before_and_after_cost (discovery.tests.test_audit_20261020.TestCostAttribution.test_same_events_before_and_after_cost)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/tests/test_audit_20261020.py", line 124, in test_same_events_before_and_after_cost
+    from pipeline import cost_attribution
+ImportError: cannot import name 'cost_attribution' from 'pipeline' (/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/pipeline.py)
+
+======================================================================
+ERROR: test_validation_record_carries_failure_class (discovery.tests.test_audit_20261020.TestCostAttribution.test_validation_record_carries_failure_class)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/tests/test_audit_20261020.py", line 146, in test_validation_record_carries_failure_class
+    self.assertIn(rec["failure_class"], ("NO_EDGE_OUT_OF_SAMPLE", "FAIL_COST", "FAIL_STAT",
+                  ~~~^^^^^^^^^^^^^^^^^
+KeyError: 'failure_class'
+
+======================================================================
+ERROR: test_counts_match_ledgers (discovery.tests.test_audit_20261020.TestEvolutionReport.test_counts_match_ledgers)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/tests/test_audit_20261020.py", line 328, in test_counts_match_ledgers
+    from evolution_report import build_report, to_markdown
+ModuleNotFoundError: No module named 'evolution_report'
+
+======================================================================
+FAIL: test_too_little_data_is_insufficient_not_failed (discovery.tests.test_audit_20261020.TestCalibrationAudit.test_too_little_data_is_insufficient_not_failed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/tests/test_audit_20261020.py", line 252, in test_too_little_data_is_insufficient_not_failed
+    self.assertEqual(rec["status"], "INSUFFICIENT_DATA")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'NOT_VERIFIED' != 'INSUFFICIENT_DATA'
+- NOT_VERIFIED
++ INSUFFICIENT_DATA
+
+
+======================================================================
+FAIL: test_crash_overwrites_previous_ok_with_failed (discovery.tests.test_audit_20261020.TestCycleSummaryIntegrity.test_crash_overwrites_previous_ok_with_failed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/tests/test_audit_20261020.py", line 305, in test_crash_overwrites_previous_ok_with_failed
+    self.assertEqual(s["status"], "CYCLE_FAILED")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'CYCLE_OK' != 'CYCLE_FAILED'
+- CYCLE_OK
++ CYCLE_FAILED
+
+
+======================================================================
+FAIL: test_health_reports_a_killed_cycle (discovery.tests.test_audit_20261020.TestCycleSummaryIntegrity.test_health_reports_a_killed_cycle)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/tests/test_audit_20261020.py", line 318, in test_health_reports_a_killed_cycle
+    self.assertEqual(h["checks"]["last_cycle"]["status"], "CYCLE_INTERRUPTED")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'CYCLE_RUNNING' != 'CYCLE_INTERRUPTED'
+- CYCLE_RUNNING
++ CYCLE_INTERRUPTED
+
+
+======================================================================
+FAIL: test_neighbours_are_dev_evaluated_but_not_search_feedback (discovery.tests.test_audit_20261020.TestNeighboursStayOutOfSearch.test_neighbours_are_dev_evaluated_but_not_search_feedback)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-claude-new2-strategy-archive/3fff7595-edb4-5675-8136-452b7063ec46/scratchpad/base/run/discovery/tests/test_audit_20261020.py", line 69, in test_neighbours_are_dev_evaluated_but_not_search_feedback
+    self.assertFalse(neigh & set(fb), "a neighbour leaked into the search feedback")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'S-2a7ec97765e43fc2', 'S-a80c3e06ee5c7dd1', 'S-7f2e8378a9f70a7a'} is not false : a neighbour leaked into the search feedback
+
+----------------------------------------------------------------------
+Ran 17 tests in 13.240s
+
+FAILED (failures=4, errors=13)

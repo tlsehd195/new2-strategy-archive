@@ -1,0 +1,641 @@
+{
+ "context_id": "C2-4a5b6fb6c5a3202b6fc8",
+ "candidates": {
+  "registered_specs": 777,
+  "by_source": {
+   "seed": 705,
+   "evolution": 72
+  },
+  "search_pool": 777,
+  "lineage_edges": 777,
+  "by_operator": {
+   "legacy_translation": 705,
+   "split_symbol": 4,
+   "resample_param": 3,
+   "tweak_param": 5,
+   "add_entry_condition": 3,
+   "tweak_threshold": 5,
+   "change_horizon": 5,
+   "swap_feature": 8,
+   "add_filter": 4,
+   "flip_direction": 2,
+   "crossover": 12,
+   "random_spec": 18,
+   "change_exit": 2,
+   "change_risk": 1
+  }
+ },
+ "dev": {
+  "evaluated": 777,
+  "ok": 777,
+  "screen_pass": 42,
+  "not_ok": {}
+ },
+ "validation": {
+  "batches": 1,
+  "members": 20,
+  "outcomes": {
+   "INCONCLUSIVE": 13,
+   "REJECTED": 7
+  },
+  "failure_classes": {
+   "INSUFFICIENT_DATA": 13,
+   "FAIL_COST": 3,
+   "NO_EDGE_OUT_OF_SAMPLE": 2,
+   "FAIL_STAT": 2
+  },
+  "members_detail": [
+   {
+    "strategy_id": "S-043c5506668fb8f1",
+    "batch_id": "VB-1e6cf93e5972d725",
+    "outcome": "INCONCLUSIVE",
+    "failure_class": "INSUFFICIENT_DATA",
+    "status": "INCONCLUSIVE",
+    "reasons": [
+     "validation underpowered",
+     "failure_class=INSUFFICIENT_DATA"
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 20,
+      "mean_bp": 211.7014078197828,
+      "gross_mean_bp": 231.07238624754004,
+      "cost_mean_bp": 13.997798427757264,
+      "funding_mean_bp": 5.37318,
+      "hac_p": 0.04713574370358477
+     },
+     "ETHUSDT": {
+      "n": 18,
+      "mean_bp": -55.83814946339165,
+      "gross_mean_bp": -41.22647791779176,
+      "cost_mean_bp": 13.997804878933227,
+      "funding_mean_bp": 0.6138666666666666,
+      "hac_p": 0.6987989748784817
+     }
+    }
+   },
+   {
+    "strategy_id": "S-0d7f17648693c1b9",
+    "batch_id": "VB-1e6cf93e5972d725",
+    "outcome": "REJECTED",
+    "failure_class": "FAIL_COST",
+    "status": "REJECTED",
+    "reasons": [
+     "validation StepM did not reject H0 (mean <= 0)",
+     "failure_class=FAIL_COST"
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 31,
+      "mean_bp": 109.45825054039653,
+      "gross_mean_bp": 127.75119271456643,
+      "cost_mean_bp": 13.96802281933117,
+      "funding_mean_bp": 4.324919354838709,
+      "hac_p": 0.01962223658471942
+     },
+     "ETHUSDT": {
+      "n": 30,
+      "mean_bp": -10.907834552811096,
+      "gross_mean_bp": 4.177278515542173,
+      "cost_mean_bp": 14.005353068353267,
+      "funding_mean_bp": 1.07976,
+      "hac_p": 0.5668743324267141
+     }
+    }
+   },
+   {
+    "strategy_id": "S-202b2284faa1e9ac",
+    "batch_id": "VB-1e6cf93e5972d725",
+    "outcome": "REJECTED",
+    "failure_class": "FAIL_COST",
+    "status": "REJECTED",
+    "reasons": [
+     "validation StepM did not reject H0 (mean <= 0)",
+     "failure_class=FAIL_COST"
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 31,
+      "mean_bp": 109.45825054039653,
+      "gross_mean_bp": 127.75119271456643,
+      "cost_mean_bp": 13.96802281933117,
+      "funding_mean_bp": 4.324919354838709,
+      "hac_p": 0.01962223658471942
+     },
+     "ETHUSDT": {
+      "n": 30,
+      "mean_bp": -10.907834552811096,
+      "gross_mean_bp": 4.177278515542173,
+      "cost_mean_bp": 14.005353068353267,
+      "funding_mean_bp": 1.07976,
+      "hac_p": 0.5668743324267141
+     }
+    }
+   },
+   {
+    "strategy_id": "S-2d59854060280dc5",
+    "batch_id": "VB-1e6cf93e5972d725",
+    "outcome": "INCONCLUSIVE",
+    "failure_class": "INSUFFICIENT_DATA",
+    "status": "INCONCLUSIVE",
+    "reasons": [
+     "validation underpowered",
+     "failure_class=INSUFFICIENT_DATA"
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 19,
+      "mean_bp": 85.86256524141733,
+      "gross_mean_bp": 102.18000228142408,
+      "cost_mean_bp": 13.983489671585705,
+      "funding_mean_bp": 2.3339473684210525,
+      "hac_p": 0.05300142174090353
+     },
+     "ETHUSDT": {
+      "n": 16,
+      "mean_bp": -83.42664954943713,
+      "gross_mean_bp": -68.76011787174903,
+      "cost_mean_bp": 13.991150427688098,
+      "funding_mean_bp": 0.67538125,
+      "hac_p": 0.8895148763671956
+     }
+    }
+   },
+   {
+    "strategy_id": "S-391396a9487de780",
+    "batch_id": "VB-1e6cf93e5972d725",
+    "outcome": "REJECTED",
+    "failure_class": "NO_EDGE_OUT_OF_SAMPLE",
+    "status": "REJECTED",
+    "reasons": [
+     "validation StepM did not reject H0 (mean <= 0)",
+     "failure_class=NO_EDGE_OUT_OF_SAMPLE"
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 33,
+      "mean_bp": 93.3861467524607,
+      "gross_mean_bp": 109.61161484513626,
+      "cost_mean_bp": 13.996543850251307,
+      "funding_mean_bp": 2.2289242424242426,
+      "hac_p": 0.002403944554877817
+     },
+     "ETHUSDT": {
+      "n": 31,
+      "mean_bp": -26.086717225015818,
+      "gross_mean_bp": -11.501145639301836,
+      "cost_mean_bp": 13.99706190829463,
+      "funding_mean_bp": 0.5885096774193549,
+      "hac_p": 0.7027009014646822
+     }
+    }
+   },
+   {
+    "strategy_id": "S-4d4ec0ad8481a2a2",
+    "batch_id": "VB-1e6cf93e5972d725",
+    "outcome": "INCONCLUSIVE",
+    "failure_class": "INSUFFICIENT_DATA",
+    "status": "INCONCLUSIVE",
+    "reasons": [
+     "validation underpowered",
+     "failure_class=INSUFFICIENT_DATA"
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 13,
+      "mean_bp": -42.4703165170542,
+      "gross_mean_bp": -34.91263622816769,
+      "cost_mean_bp": 14.113841827348052,
+      "funding_mean_bp": -6.556161538461539,
+      "hac_p": 0.6910076272569972
+     },
+     "ETHUSDT": {
+      "n": 22,
+      "mean_bp": -21.568975314583238,
+      "gross_mean_bp": -8.392968921986277,
+      "cost_mean_bp": 14.106888210778777,
+      "funding_mean_bp": -0.9308818181818181,
+      "hac_p": 0.6023755927596004
+     }
+    }
+   },
+   {
+    "strategy_id": "S-536416d892f93e61",
+    "batch_id": "VB-1e6cf93e5972d725",
+    "outcome": "REJECTED",
+    "failure_class": "FAIL_COST",
+    "status": "REJECTED",
+    "reasons": [
+     "validation StepM did not reject H0 (mean <= 0)",
+     "failure_class=FAIL_COST"
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 36,
+      "mean_bp": 2.3413218815835446,
+      "gross_mean_bp": 17.121898190876923,
+      "cost_mean_bp": 13.971040198182273,
+      "funding_mean_bp": 0.8095361111111111,
+      "hac_p": 0.4582927245845857
+     },
+     "ETHUSDT": {
+      "n": 31,
+      "mean_bp": -3.3632238960188476,
+      "gross_mean_bp": 10.834117671777584,
+      "cost_mean_bp": 14.00265769682869,
+      "funding_mean_bp": 0.19468387096774192,
+      "hac_p": 0.54353115358137
+     }
+    }
+   },
+   {
+    "strategy_id": "S-5a47c0baf0100e04",
+    "batch_id": "VB-1e6cf93e5972d725",
+    "outcome": "INCONCLUSIVE",
+    "failure_class": "INSUFFICIENT_DATA",
+    "status": "INCONCLUSIVE",
+    "reasons": [
+     "validation underpowered",
+     "failure_class=INSUFFICIENT_DATA"
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 27,
+      "mean_bp": 158.49746846658797,
+      "gross_mean_bp": 178.57959787579185,
+      "cost_mean_bp": 14.007410890685357,
+      "funding_mean_bp": 6.074718518518519,
+      "hac_p": 0.014912069275819177
+     },
+     "ETHUSDT": {
+      "n": 26,
+      "mean_bp": 12.746165938620587,
+      "gross_mean_bp": 28.03744210526742,
+      "cost_mean_bp": 14.01839155126222,
+      "funding_mean_bp": 1.2728846153846154,
+      "hac_p": 0.4255906520952967
+     }
+    }
+   },
+   {
+    "strategy_id": "S-5f8884793cae1ba1",
+    "batch_id": "VB-1e6cf93e5972d725",
+    "outcome": "INCONCLUSIVE",
+    "failure_class": "INSUFFICIENT_DATA",
+    "status": "INCONCLUSIVE",
+    "reasons": [
+     "validation underpowered",
+     "failure_class=INSUFFICIENT_DATA"
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 15,
+      "mean_bp": 278.0031710302257,
+      "gross_mean_bp": 298.2072791126868,
+      "cost_mean_bp": 13.97764141579447,
+      "funding_mean_bp": 6.226466666666667,
+      "hac_p": 0.0028093052583569914
+     },
+     "ETHUSDT": {
+      "n": 21,
+      "mean_bp": 84.99509389687907,
+      "gross_mean_bp": 100.4676124697011,
+      "cost_mean_bp": 13.992247144250602,
+      "funding_mean_bp": 1.4802714285714287,
+      "hac_p": 0.08241716698453272
+     }
+    }
+   },
+   {
+    "strategy_id": "S-6d1f375a260fc295",
+    "batch_id": "VB-1e6cf93e5972d725",
+    "outcome": "INCONCLUSIVE",
+    "failure_class": "INSUFFICIENT_DATA",
+    "status": "INCONCLUSIVE",
+    "reasons": [
+     "validation underpowered",
+     "failure_class=INSUFFICIENT_DATA"
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 24,
+      "mean_bp": 211.5637644573881,
+      "gross_mean_bp": 233.1273372390027,
+      "cost_mean_bp": 13.971168614947947,
+      "funding_mean_bp": 7.592404166666667,
+      "hac_p": 0.0027999591643829034
+     },
+     "ETHUSDT": {
+      "n": 27,
+      "mean_bp": -45.8301705036652,
+      "gross_mean_bp": -30.2470464192692,
+      "cost_mean_bp": 13.987057417729334,
+      "funding_mean_bp": 1.5960666666666667,
+      "hac_p": 0.7143688375414665
+     }
+    }
+   },
+   {
+    "strategy_id": "S-706cd371788987ea",
+    "batch_id": "VB-1e6cf93e5972d725",
+    "outcome": "REJECTED",
+    "failure_class": "NO_EDGE_OUT_OF_SAMPLE",
+    "status": "REJECTED",
+    "reasons": [
+     "validation StepM did not reject H0 (mean <= 0)",
+     "failure_class=NO_EDGE_OUT_OF_SAMPLE"
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 39,
+      "mean_bp": -30.659928752440027,
+      "gross_mean_bp": -16.272216331951775,
+      "cost_mean_bp": 13.959753446129275,
+      "funding_mean_bp": 0.42795897435897434,
+      "hac_p": 0.9379246841732343
+     },
+     "ETHUSDT": {
+      "n": 31,
+      "mean_bp": -7.785601142193416,
+      "gross_mean_bp": 6.359923698210583,
+      "cost_mean_bp": 13.984905485565289,
+      "funding_mean_bp": 0.16061935483870968,
+      "hac_p": 0.6149996659191429
+     }
+    }
+   },
+   {
+    "strategy_id": "S-87fae56347890651",
+    "batch_id": "VB-1e6cf93e5972d725",
+    "outcome": "INCONCLUSIVE",
+    "failure_class": "INSUFFICIENT_DATA",
+    "status": "INCONCLUSIVE",
+    "reasons": [
+     "validation underpowered",
+     "failure_class=INSUFFICIENT_DATA"
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 13,
+      "mean_bp": 184.44031817662565,
+      "gross_mean_bp": 203.80083530124668,
+      "cost_mean_bp": 13.973686355390253,
+      "funding_mean_bp": 5.3868307692307695,
+      "hac_p": 0.03566815899694459
+     },
+     "ETHUSDT": {
+      "n": 11,
+      "mean_bp": -152.75641499051565,
+      "gross_mean_bp": -136.7803535035676,
+      "cost_mean_bp": 14.000734214220772,
+      "funding_mean_bp": 1.975327272727273,
+      "hac_p": 0.9421140135840973
+     }
+    }
+   },
+   {
+    "strategy_id": "S-91ab3cffaa7bab47",
+    "batch_id": "VB-1e6cf93e5972d725",
+    "outcome": "INCONCLUSIVE",
+    "failure_class": "INSUFFICIENT_DATA",
+    "status": "INCONCLUSIVE",
+    "reasons": [
+     "validation underpowered",
+     "failure_class=INSUFFICIENT_DATA"
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 13,
+      "mean_bp": -52.42819790252926,
+      "gross_mean_bp": -41.29960698355814,
+      "cost_mean_bp": 14.16117553435574,
+      "funding_mean_bp": -3.032584615384615,
+      "hac_p": 0.9678644558985255
+     },
+     "ETHUSDT": {
+      "n": 26,
+      "mean_bp": 29.33793517716517,
+      "gross_mean_bp": 42.98225962626702,
+      "cost_mean_bp": 14.116489833717235,
+      "funding_mean_bp": -0.4721653846153846,
+      "hac_p": 0.19167435802706384
+     }
+    }
+   },
+   {
+    "strategy_id": "S-ace182d55342733b",
+    "batch_id": "VB-1e6cf93e5972d725",
+    "outcome": "REJECTED",
+    "failure_class": "FAIL_STAT",
+    "status": "REJECTED",
+    "reasons": [
+     "validation StepM did not reject H0 (mean <= 0)",
+     "failure_class=FAIL_STAT"
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 63,
+      "mean_bp": 32.915021695527265,
+      "gross_mean_bp": 49.17651520776541,
+      "cost_mean_bp": 14.011518909063534,
+      "funding_mean_bp": 2.249974603174603,
+      "hac_p": 0.13959075858266412
+     },
+     "ETHUSDT": {
+      "n": 49,
+      "mean_bp": 10.881742148950865,
+      "gross_mean_bp": 25.529440115932736,
+      "cost_mean_bp": 14.004736742492069,
+      "funding_mean_bp": 0.6429612244897959,
+      "hac_p": 0.37913217199956545
+     }
+    }
+   },
+   {
+    "strategy_id": "S-b5e5df1c18d5a57d",
+    "batch_id": "VB-1e6cf93e5972d725",
+    "outcome": "INCONCLUSIVE",
+    "failure_class": "INSUFFICIENT_DATA",
+    "status": "INCONCLUSIVE",
+    "reasons": [
+     "validation underpowered",
+     "failure_class=INSUFFICIENT_DATA"
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 21,
+      "mean_bp": 98.4961887151305,
+      "gross_mean_bp": 117.01196415010915,
+      "cost_mean_bp": 13.965213530216758,
+      "funding_mean_bp": 4.550561904761905,
+      "hac_p": 0.07164963064452867
+     },
+     "ETHUSDT": {
+      "n": 26,
+      "mean_bp": -28.592295826685827,
+      "gross_mean_bp": -13.455793045946596,
+      "cost_mean_bp": 14.01162201150846,
+      "funding_mean_bp": 1.1248807692307692,
+      "hac_p": 0.6667181373167698
+     }
+    }
+   },
+   {
+    "strategy_id": "S-c515b31a298bdaf1",
+    "batch_id": "VB-1e6cf93e5972d725",
+    "outcome": "INCONCLUSIVE",
+    "failure_class": "INSUFFICIENT_DATA",
+    "status": "INCONCLUSIVE",
+    "reasons": [
+     "validation underpowered",
+     "failure_class=INSUFFICIENT_DATA"
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 29,
+      "mean_bp": 97.17474122455002,
+      "gross_mean_bp": 115.64698162390893,
+      "cost_mean_bp": 13.965492123496821,
+      "funding_mean_bp": 4.506748275862069,
+      "hac_p": 0.04051519379085873
+     },
+     "ETHUSDT": {
+      "n": 28,
+      "mean_bp": -13.306553125038162,
+      "gross_mean_bp": 1.7961831630768705,
+      "cost_mean_bp": 14.009511288115034,
+      "funding_mean_bp": 1.0932250000000001,
+      "hac_p": 0.5790457271214902
+     }
+    }
+   },
+   {
+    "strategy_id": "S-e1ae057f18c40b6e",
+    "batch_id": "VB-1e6cf93e5972d725",
+    "outcome": "INCONCLUSIVE",
+    "failure_class": "INSUFFICIENT_DATA",
+    "status": "INCONCLUSIVE",
+    "reasons": [
+     "validation underpowered",
+     "failure_class=INSUFFICIENT_DATA"
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 16,
+      "mean_bp": 193.68715717485517,
+      "gross_mean_bp": 215.57749834597837,
+      "cost_mean_bp": 13.974659921123187,
+      "funding_mean_bp": 7.9156812500000004,
+      "hac_p": 0.011369993139520203
+     },
+     "ETHUSDT": {
+      "n": 16,
+      "mean_bp": -89.68163622862366,
+      "gross_mean_bp": -74.01990100131046,
+      "cost_mean_bp": 13.985828977313195,
+      "funding_mean_bp": 1.6759062500000002,
+      "hac_p": 0.8291206511207674
+     }
+    }
+   },
+   {
+    "strategy_id": "S-ed2d1c8ed9cf1879",
+    "batch_id": "VB-1e6cf93e5972d725",
+    "outcome": "REJECTED",
+    "failure_class": "FAIL_STAT",
+    "status": "REJECTED",
+    "reasons": [
+     "validation StepM did not reject H0 (mean <= 0)",
+     "failure_class=FAIL_STAT"
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 30,
+      "mean_bp": 0.757947485214329,
+      "gross_mean_bp": 15.346998121039757,
+      "cost_mean_bp": 14.027890635825447,
+      "funding_mean_bp": 0.5611599999999999,
+      "hac_p": 0.4975072235072066
+     },
+     "ETHUSDT": {
+      "n": 32,
+      "mean_bp": 11.348529227984967,
+      "gross_mean_bp": 26.03359452823391,
+      "cost_mean_bp": 13.996462175248942,
+      "funding_mean_bp": 0.6886031249999999,
+      "hac_p": 0.4559220103478426
+     }
+    }
+   },
+   {
+    "strategy_id": "S-f8b1648d499419f6",
+    "batch_id": "VB-1e6cf93e5972d725",
+    "outcome": "INCONCLUSIVE",
+    "failure_class": "INSUFFICIENT_DATA",
+    "status": "INCONCLUSIVE",
+    "reasons": [
+     "validation underpowered",
+     "failure_class=INSUFFICIENT_DATA"
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 14,
+      "mean_bp": -61.49121941528475,
+      "gross_mean_bp": -50.06261461682593,
+      "cost_mean_bp": 14.170990512744538,
+      "funding_mean_bp": -2.742385714285714,
+      "hac_p": 0.991549923988174
+     },
+     "ETHUSDT": {
+      "n": 25,
+      "mean_bp": -47.06094499589044,
+      "gross_mean_bp": -33.42359306413694,
+      "cost_mean_bp": 14.125451931753505,
+      "funding_mean_bp": -0.48810000000000003,
+      "hac_p": 0.7974988759853199
+     }
+    }
+   },
+   {
+    "strategy_id": "S-fd45e2af64d20e15",
+    "batch_id": "VB-1e6cf93e5972d725",
+    "outcome": "INCONCLUSIVE",
+    "failure_class": "INSUFFICIENT_DATA",
+    "status": "INCONCLUSIVE",
+    "reasons": [
+     "validation underpowered",
+     "failure_class=INSUFFICIENT_DATA"
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 8,
+      "mean_bp": 12.652288645304882,
+      "gross_mean_bp": 30.472046933759927,
+      "cost_mean_bp": 13.962070788455062,
+      "funding_mean_bp": 3.8576875,
+      "hac_p": 0.46747439666126595
+     },
+     "ETHUSDT": {
+      "n": 15,
+      "mean_bp": 49.333037619216796,
+      "gross_mean_bp": 64.40667146434795,
+      "cost_mean_bp": 14.016320511797819,
+      "funding_mean_bp": 1.0573133333333333,
+      "hac_p": 0.3009873269207429
+     }
+    }
+   }
+  ]
+ },
+ "statuses": {
+  "REJECTED": 679,
+  "INCONCLUSIVE": 76,
+  "RESEARCH_ONLY": 22
+ },
+ "survivors": [],
+ "locked": {
+  "registry_present": false,
+  "attempts": 0,
+  "exposed_uses": 0
+ }
+}

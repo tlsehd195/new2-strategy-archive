@@ -1,0 +1,7 @@
+D1 pooled hides BTC underestimate: status = VERIFIED pooled mean/p90 = -0.999 1.164
+D2 accepted: seconds ts
+D2 accepted: fee in bp
+D2 accepted: price x100
+D3 in-memory duplicates (5 repeated fills): status = VERIFIED
+D4 too few fills: status = NOT_VERIFIED (sample shortfall reported as a failure)
+D5 entry[A,B] vs entry[A]+filter[B]: ids S-b603800652209416 S-1664ee1cd37882e8 (same behaviour, both accepted as new)

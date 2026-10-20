@@ -85,6 +85,9 @@ class TestBehaviourKey(unittest.TestCase):
         self.assertEqual(behaviour_key(x), behaviour_key(y))
         # a filter that repeats an entry condition adds nothing
         self.assertEqual(behaviour_key(spec([A])), behaviour_key(spec([A], [A])))
+        # risk settings are not read by any evaluation stage: same events, same key
+        # (real run R4: a change_risk child and its parent were both in one batch)
+        self.assertEqual(behaviour_key(spec([A])), behaviour_key({**spec([A]), "risk": {"risk_per_trade": 0.007}}))
 
     def test_really_different_strategies_keep_different_keys(self):
         from evolution import behaviour_key
