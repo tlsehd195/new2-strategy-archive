@@ -37,6 +37,7 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import json
 import math
 import random
 from pathlib import Path
@@ -337,30 +338,174 @@ OPS = {
 }
 
 
-def behaviour_key(spec: Mapping) -> str:
-    """Hash of what a strategy DOES, finer than ``strategy_id`` equality.
+#: version of the strategy fingerprints below; recorded with every lineage edge
+FINGERPRINT_VERSION = "fp-v2"
+#: features whose value is an integer by construction (UTC hour of the bar), so
+#: thresholds between two integers select the same bars
+INTEGER_FEATURES = frozenset({"hour_utc"})
+_INF = float("inf")
 
-    ``strategy_id`` hashes the canonical definition, so two definitions that
-    trade identically can still get different ids.  The case the operators
-    produce: under ``entry.logic == "all"`` the signal is entry AND filters,
-    so a condition in ``entry`` and the same condition in ``filters`` are the
-    same rule (``add_filter`` / ``crossover`` can create exactly that).  The
-    key pools entry and filter conditions for "all" logic; the stored id is
-    unchanged (ids stay stable), the key is only used to stop the search from
-    spending budget and multiplicity on a behavioural duplicate.  Risk
-    settings are not part of the key (see below)."""
+
+def definition_fingerprint(spec: Mapping) -> str:
+    """Hash of the COMPLETE canonical definition — entry/exit, direction,
+    features with their computation windows, thresholds and operators, risk
+    and sizing, symbols, timeframe, schema and feature-registry version.  Two
+    specs that differ only in key order, explicit defaults or the order of
+    commutative conditions get the same fingerprint (``canonicalize_spec``)."""
+    from strategy_spec import SPEC_REGISTRY_VERSION
+    c = canonicalize_spec(spec)
+    body = {"fingerprint": FINGERPRINT_VERSION, "registry": SPEC_REGISTRY_VERSION,
+            **{k: c[k] for k in ("schema", "direction", "symbols", "timeframe", "entry", "filters",
+                                 "exit", "risk")}}
+    return "DF-" + hashlib.sha256(canonical_json(body).encode()).hexdigest()[:20]
+
+
+def _bounds(c: Mapping) -> list:
+    """[lo, lo_closed, hi, hi_closed] of the values a condition accepts."""
+    v, op = c["value"], c["op"]
+    if op == "gt":
+        return [v, False, _INF, False]
+    if op == "ge":
+        return [v, True, _INF, False]
+    if op == "lt":
+        return [-_INF, False, v, False]
+    if op == "le":
+        return [-_INF, False, v, True]
+    return [v[0], True, v[1], False]                         # between: [lo, hi)
+
+
+def _intersect(a: list, b: list) -> list:
+    lo = (a[0], a[1]) if a[0] > b[0] else (b[0], b[1]) if b[0] > a[0] else (a[0], a[1] and b[1])
+    hi = (a[2], a[3]) if a[2] < b[2] else (b[2], b[3]) if b[2] < a[2] else (a[2], a[3] and b[3])
+    return [lo[0], lo[1], hi[0], hi[1]]
+
+
+def _integer_bounds(b: list) -> list:
+    """The same set of INTEGER values as closed bounds: ``> 9.5``, ``>= 10``
+    and ``> 9`` all become ``[10, +inf)``."""
+    lo, lc, hi, hc = b
+    if math.isfinite(lo):
+        lo = float(math.ceil(lo)) if lc else float(math.floor(lo) + 1)
+    if math.isfinite(hi):
+        hi = float(math.floor(hi)) if hc else float(math.ceil(hi) - 1)
+    return [lo, True, hi, True]
+
+
+def _normal_conditions(conds: Sequence[Mapping], *, conjunction: bool) -> list[str]:
+    """Normal form of a set of conditions.  Under a conjunction, every group
+    of conditions on the same feature WITH the same computation parameters is
+    one interval (``x > 1 AND x > 2`` is ``x > 2``); an integer feature is
+    written with closed integer bounds.  Operators that accept the same set
+    therefore give the same text; operators that differ on some value
+    (``>`` vs ``>=`` on a continuous feature) stay different."""
+    groups: dict = {}
+    for c in conds:
+        key = canonical_json({"feature": c["feature"], "params": c["params"]})
+        b = _bounds(c)
+        if conjunction and key in groups:
+            groups[key] = [_intersect(groups[key][0], b)]
+        else:
+            groups.setdefault(key, []).append(b)
+    out = []
+    for key, bs in groups.items():
+        feat = json.loads(key)["feature"]
+        for b in bs:
+            if feat in INTEGER_FEATURES:
+                b = _integer_bounds(b)
+            out.append(canonical_json({"cond": json.loads(key),
+                                       "bounds": [None if not math.isfinite(b[0]) else b[0], b[1],
+                                                  None if not math.isfinite(b[2]) else b[2], b[3]]}))
+    return sorted(set(out))
+
+
+def _behaviour_body(spec: Mapping) -> dict:
     c = canonicalize_spec(spec)
     # ``risk`` is left out: no evaluation stage of the evolution pipeline reads it
     # (fixed order value per event), so a ``change_risk`` child trades exactly like
-    # its parent — real run R4 put such a pair into one validation batch (ADR 0013)
-    body = {"direction": c["direction"], "symbols": c["symbols"], "exit": c["exit"]}
+    # its parent — real run R4 put such a pair into one validation batch (ADR 0013).
+    # It is part of ``definition_fingerprint``; the dedup report shows such pairs.
+    body = {"fingerprint": FINGERPRINT_VERSION, "direction": c["direction"],
+            "symbols": c["symbols"], "timeframe": c["timeframe"], "exit": c["exit"]}
     if c["entry"]["logic"] == "all":
-        conds = sorted({canonical_json(x) for x in c["entry"]["conditions"] + c["filters"]})
-        body["all"] = conds
+        body["all"] = _normal_conditions(c["entry"]["conditions"] + c["filters"], conjunction=True)
     else:
-        body["any"] = sorted(canonical_json(x) for x in c["entry"]["conditions"])
-        body["filters"] = sorted(canonical_json(x) for x in c["filters"])
-    return "BK-" + hashlib.sha256(canonical_json(body).encode()).hexdigest()[:20]
+        body["any"] = _normal_conditions(c["entry"]["conditions"], conjunction=False)
+        body["filters"] = _normal_conditions(c["filters"], conjunction=True)
+    return body
+
+
+def behaviour_key(spec: Mapping) -> str:
+    """Hash of what a strategy DOES (exact behavioural equivalence).
+
+    ``strategy_id`` hashes the canonical definition, so two definitions that
+    trade identically can still get different ids.  Equivalences folded here
+    (each one exact — the two definitions produce the same signal on every
+    possible input):
+
+    * under ``entry.logic == "all"`` the signal is entry AND filters, so a
+      condition in ``entry`` and the same condition in ``filters`` are the
+      same rule (``add_filter`` / ``crossover`` create exactly that);
+    * conditions on the same feature and parameters inside one conjunction
+      are one interval (``x > 1 AND x > 2`` == ``x > 2``);
+    * thresholds of an integer-valued feature (``hour_utc``) between the same
+      two integers (``[9.5, 14)`` == ``[10, 14)``);
+    * risk settings (not read by any evaluation stage, see above).
+
+    The stored id is unchanged (ids stay stable); the key stops the search
+    from spending budget and multiplicity on a behavioural duplicate.
+    Thresholds that are merely CLOSE are not folded here — see
+    :func:`near_duplicate`."""
+    return "BK-" + hashlib.sha256(canonical_json(_behaviour_body(spec)).encode()).hexdigest()[:20]
+
+
+def _near_tolerance(feature: str) -> float:
+    """Half of the smallest deliberate threshold step of ``op_tweak_threshold``
+    (0.25 on z-like scales, 5 on 0-100 scales): one mutation step is always a
+    real difference; less than half a step is "effectively the same"."""
+    if feature in INTEGER_FEATURES:
+        return 0.0                                   # integers: only exact equality
+    hi = FEATURES[feature].value_range[1]
+    return (5.0 if hi >= 100 else 0.25) / 2.0
+
+
+def near_signature(spec: Mapping) -> tuple[str, list[tuple[str, float]]]:
+    """(structure key, [(feature, finite bound), ...]): two specs are near
+    duplicates when the structure keys are equal and every bound differs by
+    less than the feature's tolerance.  Structure = everything except the
+    numeric thresholds (direction, symbols, exit, features + parameters, the
+    open / closed side of every bound)."""
+    body = _behaviour_body(spec)
+    struct, vec = dict(body), []
+    for part in ("all", "any", "filters"):
+        if part not in body:
+            continue
+        items = []
+        for txt in body[part]:
+            d = json.loads(txt)
+            lo, lc, hi, hc = d["bounds"]
+            shape = canonical_json({"cond": d["cond"], "shape": [lo is None, lc, hi is None, hc]})
+            items.append((shape, [x for x in (lo, hi) if x is not None], d["cond"]["feature"]))
+        items.sort(key=lambda t: (t[0], t[1]))          # align by structure, not by value
+        struct[part] = [t[0] for t in items]
+        vec += [(f, x) for _, xs, f in items for x in xs]
+    return "NS-" + hashlib.sha256(canonical_json(struct).encode()).hexdigest()[:20], vec
+
+
+def near_duplicate(a: Mapping, b: Mapping) -> Optional[str]:
+    """None, or the reason two specs are near duplicates (behaviourally
+    similar, NOT identical: they are both kept, see ``search.propose_round``)."""
+    ka, va = near_signature(a)
+    kb, vb = near_signature(b)
+    if ka != kb or len(va) != len(vb):
+        return None
+    diffs = []
+    for (f, x), (_, y) in zip(va, vb):
+        tol = _near_tolerance(f)
+        if abs(x - y) > 0 and not abs(x - y) < tol:
+            return None
+        if x != y:
+            diffs.append(f"{f} {x} vs {y} (|d|={abs(x - y):.4g} < {tol})")
+    return "thresholds within half a mutation step: " + "; ".join(diffs) if diffs else "identical thresholds"
 
 
 def _strip_derived(s: Mapping) -> dict:
@@ -463,7 +608,11 @@ class LineageStore:
 
     def record(self, *, child_id: str, parents: Sequence[str], operator: str, detail: Mapping,
                generator_version: str, seed: int, round_index: int, context_id: Optional[str],
-               policy: Mapping, budget: Mapping, parent_dev: Mapping, created: bool) -> dict:
+               policy: Mapping, budget: Mapping, parent_dev: Mapping, created: bool,
+               identity: Optional[Mapping] = None) -> dict:
+        """``identity``: fingerprints and generation of the child (see
+        :meth:`identity_for`) — kept with the edge so lineage stays readable
+        when the fingerprint definition changes later."""
         rec = {"child_id": child_id, "parents": list(parents), "operator": operator,
                "detail": detail, "generator_version": generator_version, "seed": seed,
                "round_index": round_index, "context_id": context_id,
@@ -471,9 +620,37 @@ class LineageStore:
                "parent_dev_snapshot": dict(parent_dev),
                "parent_dev_snapshot_hash": hashlib.sha256(
                    canonical_json(dict(parent_dev)).encode()).hexdigest()[:16],
-               "child_was_new": created, "created_at": iso_now()}
+               "child_was_new": created, **dict(identity or {}), "created_at": iso_now()}
         append_jsonl(self.path, rec)
         return rec
+
+    def generation_of(self, sid: str) -> int:
+        """0 for a seed / exploration spec, else 1 + the deepest parent's
+        generation (the smallest over the creation paths of ``sid``)."""
+        memo: dict = {}
+        recs = self.records()
+        paths: dict = {}
+        for r in recs:
+            paths.setdefault(r["child_id"], []).append(r)
+
+        def gen(x: str, depth: int = 0) -> int:
+            if x in memo:
+                return memo[x]
+            ps = [r for r in paths.get(x, []) if r["parents"] and r["operator"] != "legacy_translation"]
+            if not ps or depth > 500:
+                memo[x] = 0
+                return 0
+            memo[x] = min(1 + max(gen(q, depth + 1) for q in r["parents"]) for r in ps)
+            return memo[x]
+        return gen(sid)
+
+    def identity_for(self, spec: Mapping, parents: Sequence[str], operator: str) -> dict:
+        parent_gen = [self.generation_of(q) for q in parents] if operator != "legacy_translation" else []
+        return {"fingerprint_version": FINGERPRINT_VERSION,
+                "definition_fingerprint": definition_fingerprint(spec),
+                "behaviour_key": behaviour_key(spec),
+                "near_signature": near_signature(spec)[0],
+                "generation": (1 + max(parent_gen)) if parent_gen else 0}
 
     def records(self) -> list[dict]:
         return list(iter_jsonl(self.path))

@@ -66,7 +66,7 @@ EVO_CODE_FILES = tuple(sorted(set(CODE_FILES) | {"public_cost_estimate.py", "por
                                                  "pipeline.py", "autoloop.py", "paper.py",
                                                  "paper_forward.py", "execution_sim.py",
                                                  "config/paper_forward_v1.json"}))
-DEFAULT_PROMOTION_CONFIG = Path(__file__).resolve().parent / "config" / "promotion_v2.json"
+DEFAULT_PROMOTION_CONFIG = Path(__file__).resolve().parent / "config" / "promotion_v3.json"
 #: append-only record of validation batches run on the real validation windows
 #: in state directories that no longer exist (ADR 0013).  Alpha spending is per
 #: window, not per state directory: a fresh directory must not restart at k = 1.
@@ -97,6 +97,29 @@ TRANSITIONS = {
     "PAPER_PASSED": set(),
     "PAPER_FAILED": set(),
 }
+
+
+def window_alpha_total(section: Mapping) -> float:
+    """FWER budget of ONE validation / locked window.
+
+    promo-v3: one family for the whole search — ``alpha_total_per_search`` is
+    split equally over the windows of every SUPPORTED symbol (a fixed list, so
+    a run on fewer symbols cannot claim a larger share), and the union bound
+    over windows x batches keeps the probability of ANY false survivor in the
+    whole search at or below ``alpha_total_per_search``.  promo-v1/v2 configs
+    (``alpha_total_per_window``) keep their recorded meaning."""
+    from strategy_spec import SUPPORTED_SYMBOLS
+    if "alpha_total_per_search" in section:
+        return float(section["alpha_total_per_search"]) / len(SUPPORTED_SYMBOLS)
+    return float(section["alpha_total_per_window"])
+
+
+def alpha_family(section: Mapping) -> dict:
+    from strategy_spec import SUPPORTED_SYMBOLS
+    if "alpha_total_per_search" in section:
+        return {"scope": "search", "alpha_total": section["alpha_total_per_search"],
+                "windows": len(SUPPORTED_SYMBOLS), "per_window": window_alpha_total(section)}
+    return {"scope": "window", "alpha_total": section["alpha_total_per_window"]}
 
 
 class InvalidStatusTransition(RuntimeError):
@@ -536,7 +559,8 @@ class EvolutionPipeline:
                             budget=dict(budget or {}),
                             parent_dev={p: (self.evaluation("dev", p) or {}).get("metrics")
                                         for p in parents},
-                            created=created)
+                            created=created,
+                            identity=self.lineage.identity_for(spec, parents, operator))
         return sid, created
 
     def dev_evaluate(self, sid: str, *, record_status: bool = True) -> dict:
@@ -645,7 +669,36 @@ class EvolutionPipeline:
                if st == "RESEARCH_ONLY" and s not in in_batch and fb.get(s, {}).get("screen_pass")]
         # dev-only priority: capped dev t, then id (deterministic)
         cap = self.search_cfg.max_t_objective
-        return sorted(out, key=lambda s: (-min(fb[s]["dev_t"] or 0, cap), s))
+        ranked = sorted(out, key=lambda s: (-min(fb[s]["dev_t"] or 0, cap), s))
+        # at most one member per near-duplicate group (thresholds within half a
+        # mutation step, evolution.near_duplicate), counting strategies already
+        # submitted to validation in this context: a twin is a second look at
+        # the same hypothesis, not a new one.  The skipped ones stay RESEARCH_ONLY
+        # and are listed by :meth:`near_duplicate_skips` (dedup report).
+        from evolution import near_duplicate, near_signature
+        groups: dict = {}
+        for m in sorted(in_batch):
+            d = self.specs.get(m)
+            if d is not None:
+                groups.setdefault(near_signature(d)[0], []).append(m)
+        picked, self._near_skips = [], {}
+        for sid in ranked:
+            d = self.specs.get(sid)
+            ns = near_signature(d)[0]
+            twin = next((o for o in groups.get(ns, []) if near_duplicate(d, self.specs.get(o)) is not None), None)
+            if twin is not None:
+                self._near_skips[sid] = {"twin": twin, "reason": near_duplicate(d, self.specs.get(twin))}
+                continue
+            groups.setdefault(ns, []).append(sid)
+            picked.append(sid)
+        return picked
+
+    def near_duplicate_skips(self) -> dict:
+        """{strategy id: {twin, reason}} left out of validation by the last
+        :meth:`validation_candidates` call."""
+        if not hasattr(self, "_near_skips"):
+            self.validation_candidates()
+        return dict(self._near_skips)
 
     def preregister_batch(self, members: Sequence[str]) -> dict:
         ctx = self.context_id()
@@ -658,7 +711,8 @@ class EvolutionPipeline:
             ext = self.external_prior_batches(key)
             k = 1 + sum(1 for b in prior if key in b["windows"]) + ext
             windows[key] = {"symbol": sym, "batch_index": k, "external_prior_batches": ext,
-                            "alpha": spending_alpha(k, vc["alpha_total_per_window"]),
+                            "alpha": spending_alpha(k, window_alpha_total(vc)),
+                            "alpha_family": alpha_family(vc),
                             "members": sorted(m for m in members if sym in self.specs.get(m)["symbols"])}
         body = {"kind": "PREREGISTERED", "context_id": ctx, "members": sorted(members),
                 "windows": windows, "method": vc["method"], "mc_method": MC_METHOD_VERSION,
@@ -1154,7 +1208,7 @@ class EvolutionPipeline:
             try:
                 camp = self.campaigns.preregister(
                     source="evolution", source_ref=f"{ctx}:{ref}", context_id=ctx, members=members,
-                    alpha_total=lc["alpha_total_per_window"],
+                    alpha_total=window_alpha_total(lc),
                     max_campaigns=lc["max_campaigns_per_window"],
                     method="one-sided HAC t per symbol, Bonferroni alpha_c/m_c, c-th campaign alpha "
                            "spending", config_hash=self.cfg_hash)
@@ -1389,6 +1443,54 @@ def validation_failure_class(per_symbol: Mapping, symbols: Sequence[str], *, rej
     if any((i.get("gross_mean_bp") or 0.0) <= 0 for i in infos):
         return "NO_EDGE_OUT_OF_SAMPLE"
     if any((i.get("net_mean_bp") or 0.0) <= 0 for i in infos):
+        return "FAIL_COST"
+    return "FAIL_STAT"
+
+
+#: the outcome vocabulary of the 2026-10-20 directive.  A VIEW of the stored
+#: status + evidence (STATISTICS_AND_STATES.md has the table); nothing stores it.
+#: RUNNING exists only for a cycle (``CYCLE_RUNNING`` in the summary file): a
+#: single evaluation is one append and is never left half-written.
+OUTCOME_LABELS = ("PENDING", "RUNNING", "PASS", "FAIL_COST", "FAIL_STAT", "UNDETERMINED_POWER",
+                  "DATA_MISSING", "ERROR", "REVERIFY_PENDING")
+
+
+def outcome_label(status: Optional[Mapping], *, dev: Optional[Mapping] = None,
+                  validation: Optional[Mapping] = None, reverify: bool = False) -> str:
+    """Map one strategy's latest status record (and its DEV / validation
+    evaluation records) to :data:`OUTCOME_LABELS`."""
+    if reverify:
+        return "REVERIFY_PENDING"
+    st = (status or {}).get("status")
+    if st is None:
+        if dev is not None and dev.get("status") not in (None, "OK"):
+            return {"BLOCKED_DATA": "DATA_MISSING", "BLOCKED_COST": "ERROR"}.get(dev["status"], "ERROR")
+        return "PENDING"
+    if st in ("VALIDATION_SURVIVOR", "PAPER_TEST_READY", "PAPER_TESTING", "PAPER_PASSED"):
+        return "PASS"
+    if st == "RESEARCH_ONLY":
+        return "PENDING"                      # passed the DEV screen, waits for validation
+    if st == "BLOCKED_DATA":
+        return "DATA_MISSING"
+    if st == "BLOCKED_COST":
+        # a cost the model refused or could not compute; a priced-but-too-expensive
+        # trade is FAIL_COST below
+        return "ERROR"
+    if st == "BLOCKED_STATISTICS":
+        return "UNDETERMINED_POWER"
+    if st == "PAPER_FAILED":
+        return "FAIL_STAT"
+    fc = (validation or {}).get("failure_class") if (status or {}).get("stage") == "validation" else None
+    if fc is not None:
+        return {"DATA_MISSING": "DATA_MISSING", "INSUFFICIENT_DATA": "UNDETERMINED_POWER",
+                "NO_EDGE_OUT_OF_SAMPLE": "FAIL_STAT", "FAIL_COST": "FAIL_COST",
+                "FAIL_STAT": "FAIL_STAT", "PASSED_STEPM": "FAIL_STAT"}.get(fc, "FAIL_STAT")
+    if st == "INCONCLUSIVE":
+        return "UNDETERMINED_POWER"
+    # DEV screen rejection: positive before cost, not after -> the cost removed it
+    m = (dev or {}).get("metrics") or {}
+    g, n = m.get("dev_gross_mean_bp"), m.get("dev_mean_bp")
+    if g is not None and n is not None and g > 0 >= n:
         return "FAIL_COST"
     return "FAIL_STAT"
 

@@ -324,3 +324,65 @@ stored bars and can never produce `PAPER_PASSED`.  `PAPER_PASSED` comes only
 from `paper_forward.py` on bars that closed after the plan was registered,
 and plan registration requires a VERIFIED cost.  No strategy is
 `PAPER_PASSED`.
+
+## 10. Directive 2026-10-20: one search family, evidence vocabulary, duplicates
+
+### 10.1 One FWER family for the whole search (`promotion_v3.json`)
+
+Under v2 each validation window (BTC, ETH) had its own α = 0.05, so a claim
+"this search found something" over both windows had FWER up to 0.10.  v3 splits
+`alpha_total_per_search = 0.05` equally over the windows of every supported
+symbol (0.025 each, also when a batch only touches one symbol), and alpha
+spending (6/π²/k²) runs per window on that share.  Every batch window records
+its `alpha_family` (scope `search`, total, share, windows).  The locked
+campaign uses the same split.  The 7 batches already spent per window under v2
+(`validation_window_history.jsonl`) cannot be re-spent: the bound for the
+whole history is 2 × (0.05·S₇ + 0.025·(1 − S₇)) ≈ 0.096 with
+S₇ = (6/π²)·Σ_{k≤7} 1/k² ≈ 0.919; it is ≤ 0.05 only for searches started
+under v3.  v3 is stricter than v2 and nothing else changed; a new config hash
+is a new experiment context.
+
+### 10.2 Evidence vocabulary (directive §4, §7)
+
+Cost evidence — `cost_calibration.evidence_status(record, cost_status=...)`
+maps stored labels to the directive's words without adding new stored states:
+
+| directive word | stored source |
+|---|---|
+| `VERIFIED_FROM_ACTUAL_FILLS` | sealed calibration record `VERIFIED` (account execution reports, `data_origin=user_export`, ≥ 200 verification fills per symbol) |
+| `ESTIMATED_FROM_PUBLIC_QUOTES` | cost status `ESTIMATED_FROM_PUBLIC_DATA` |
+| `INSUFFICIENT_DATA` | calibration `INSUFFICIENT_DATA` or `BLOCKED_EXTERNAL_EVIDENCE` (no fills) |
+| `DATA_INVALID` | calibration `DATA_INVALID` (duplicates, quarantined rows, failed import) or a record whose seal does not match |
+| `NOT_CALIBRATED` | `UNVERIFIED_COST_MODEL` / `ASSUMED_COST_MODEL` / no record / a record made from synthetic test data |
+| `REVERIFY_REQUIRED` | a sealed `VERIFIED` record for another cost-model source or other criteria than the ones in use |
+| `NOT_VERIFIED` (kept) | enough genuine evidence, but a preregistered check failed — a result, not a data problem |
+
+Missing fees are never 0: a fill without a fee, or with a fee in a non-quote
+asset and no price at or before its time, makes the import `DATA_INVALID` for
+cost purposes.  When order outcomes (rejections, partial fills) cannot be seen
+in the data, fill rates are `None` and the result is `INSUFFICIENT_DATA`.
+
+Candidate outcomes — `pipeline.outcome_label` maps evolution statuses to
+`PENDING / RUNNING / PASS / FAIL_COST / FAIL_STAT / UNDETERMINED_POWER /
+DATA_MISSING / ERROR / REVERIFY_PENDING` (the legacy engine stores these
+directly).  `RESEARCH_ONLY` (passed the DEV screen only) is `PENDING`, not
+`PASS`; a validation rejection with failure class `INSUFFICIENT_DATA` is
+`UNDETERMINED_POWER`, and `DATA_MISSING` stays `DATA_MISSING` — data shortage
+is never reported as a statistical failure.  Results made under code or
+configuration older than the current context are `REVERIFY_PENDING`.
+
+### 10.3 Duplicates (fingerprint `fp-v2`, `evolution.py`)
+
+Each registered strategy carries `definition_fingerprint` (exact definition),
+`behaviour_key` (same signals on any data: conditions in normal form — ANDed
+bounds on one feature intersected, integer features such as `hour_utc` turned
+into integer ranges, operators normalised, condition order ignored; risk and
+sizing excluded because they do not change the entry signal), and
+`near_signature` (thresholds rounded to half the mutation step: 0.125 on
+z-scales, 2.5 on 0–100 scales).  The search keeps one representative per
+behaviour key (later equals are dropped with a logged reason) and keeps near
+duplicates but flags them; a validation batch takes at most one member of a
+near group, counting batches already preregistered in the context.  Lineage
+records candidate id, parents, generation, operator, changed parameters, seed
+and fingerprint version.  The evolution report shows representative,
+duplicate and reason per decision.

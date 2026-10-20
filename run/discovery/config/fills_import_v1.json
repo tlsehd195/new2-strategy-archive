@@ -1,0 +1,15 @@
+{
+ "schema": "fills_import_policy_v1",
+ "note": "Written 2026-10-20 before any account fill was seen. Integrity tolerances of the fill importer (fills_import.py). They catch unit, export and join errors; they do not judge execution quality. Changing a value needs a new file (v2) and a recorded reason.",
+ "min_fill_ts": "2019-09-01T00:00:00Z",
+ "max_future_ms": 86400000,
+ "quote_qty_rel_tol": 0.001,
+ "neighbour_window": 25,
+ "neighbour_min_count": 5,
+ "max_neighbour_price_dev": 0.05,
+ "kline_price_tol": 0.0005,
+ "max_fee_rate": 0.01,
+ "reference_quote_max_staleness_ms": 2000,
+ "fee_conversion_bar_ms": 900000,
+ "quote_assets": ["USDT", "USDC", "BUSD", "FDUSD"]
+}

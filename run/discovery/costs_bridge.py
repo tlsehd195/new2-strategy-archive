@@ -1,9 +1,10 @@
 """Cost model bridge — the SINGLE cost implementation.
 
-Directive §10 requires one shared cost model.  The public repo
-``tlsehd195/NEW2`` already ships a tested ``CandleCostModel`` (stdlib-only
-package), so instead of reimplementing cost math we import it directly and
-pin its identity.  If the source is unavailable the engine fails closed.
+Directive §10 requires one shared cost model.  It lives in this repository
+(``cost_model.CandleCostModel``); the archive no longer imports, checks out
+or assumes a path of the main trading repository (2026-10-20 directive §3;
+the provenance of the formula is recorded in ``cost_model.py``).  Its identity is
+the sha256 of that file.
 
 Cost model version changes are one of the explicit re-verification
 triggers (FAIL_COST → REVERIFY_PENDING).
@@ -29,29 +30,13 @@ callers still refuse the trade instead of crashing; none of them prices it.
 from __future__ import annotations
 
 import hashlib
-import importlib
 import math
-import os
-import sys
 from dataclasses import dataclass, field
 from typing import Optional
 
-_COINTRADER_SRC = os.environ.get(
-    "COINTRADER_SRC", "/home/z/my-project/NEW2_public_clone/src"
-)
+import cost_model as _costs
+from cost_model import CandleCostModel
 
-try:  # pragma: no cover - import guard
-    if _COINTRADER_SRC not in sys.path:
-        sys.path.insert(0, _COINTRADER_SRC)
-    _costs = importlib.import_module("cointrader.backtest.costs")
-except ImportError as e:  # pragma: no cover
-    raise ImportError(
-        "cointrader cost model not available — set COINTRADER_SRC to the "
-        "public NEW2 checkout (fail-closed, no local cost re-implementation "
-        "is permitted)"
-    ) from e
-
-CandleCostModel = _costs.CandleCostModel
 CostModel = CandleCostModel
 
 
@@ -71,12 +56,13 @@ COST_MODEL_SOURCE_SHA256 = _source_sha256(_costs)
 COST_MODEL_SOURCE_PATH = getattr(_costs, "__file__", "")
 
 #: pinned identity of the cost implementation for experiment_context_id
-COST_MODEL_VERSION = ("cointrader.backtest.costs.CandleCostModel@sha256:"
+COST_MODEL_VERSION = ("archive.cost_model.CandleCostModel@sha256:"
                       + COST_MODEL_SOURCE_SHA256[:16])
 
 #: every parameter the candle model needs.  A context MUST state all of
-#: them explicitly — CandleCostModel's own defaults are Upbit-KRW spot
-#: assumptions and must never leak silently into a futures evaluation.
+#: them explicitly (the archive's CandleCostModel has no defaults at all: the
+#: former import carried Upbit-KRW spot defaults that must never leak into a
+#: futures evaluation).
 REQUIRED_COST_PARAMS = ("fee_rate", "half_spread", "impact_coefficient",
                         "max_participation")
 

@@ -103,8 +103,9 @@ window) → robustness filters → one locked-window campaign → promotion revi
 → isolated paper replay.  State lives in `state/evolution/` (specs, lineage,
 evaluations, statuses, batches, rounds, search state, reviews, paper runs) and
 `state/locked_window_campaigns.jsonl` (shared with the legacy path).  Gates
-are in `config/promotion_v2.json` (its hash is part of the context; v1 is kept for
-the record).
+are in `config/promotion_v3.json` (its hash is part of the context; v1 and v2 are
+kept for the record — v3 makes the whole search one FWER family per window, see
+`STATISTICS_AND_STATES.md` §10).
 `PAPER_TEST_READY` means "eligible for an isolated paper replay" — never
 "profitable", never live trading (no order code exists).
 
@@ -116,11 +117,43 @@ Environment (all optional, fail-closed when wrong):
 
 - `NEW2_DISCOVERY_ROOT` (default: this directory) — state/, results/, cycle_log.txt live here
 - `NEW2_DATA_DIR` (default `/home/z/my-project/NEW2_run/data`) — must exist
-- `COINTRADER_SRC` (default `/home/z/my-project/NEW2_public_clone/src`) — the SINGLE
-  cost-model source (`cointrader.backtest.costs.CandleCostModel`)
+- the cost model is this repository's `cost_model.py` (no other repository, checkout,
+  token or path is needed; `COINTRADER_SRC` is no longer read — directive 2026-10-20)
 - `NEW2_DISC_LOG` — log file (default `$NEW2_DISCOVERY_ROOT/cycle_log.txt`)
 - `REFRESH=1` is explicitly NOT supported: data updates belong to
   `run/download_missing_data.py`; every evaluation records data staleness honestly.
+
+### DEV-only cycles, fills import, consistency check, recovery (directive 2026-10-20)
+
+- `runner.py --mode evolve --dev-only` runs the data check, DEV evaluations and
+  search rounds only.  No validation batch is preregistered, no validation or
+  locked window is loaded, no alpha is spent.  Use it to re-screen with new code
+  when no new independent window exists.
+- `fills_import.py --fills <export.csv|json> --klines <dir> [--fee-prices f.json]
+  [--verify --decisions d.jsonl --quotes q.jsonl]` imports a Binance trade-history
+  export into `private_fills/` (git-ignored; only counts and hashes are printed),
+  checks columns, types, duplicates, time order, time zone, missing fees (never
+  read as 0), fee-asset conversion (method and price time recorded per fill) and
+  per-symbol counts, and can run `cost_calibration` on the result.  Policy:
+  `config/fills_import_v1.json`.  `--data-origin synthetic_test` data can never be
+  VERIFIED.
+- `ledger_check.py <state_dir>` is a read-only consistency check of the source
+  ledgers and derived summaries (exit 0 consistent, 2 findings, 1 unreadable); the
+  file roles are listed in its docstring.
+
+Recovery after a crash, `kill` or reboot:
+
+1. `python3 ops.py health` — shows a stale lock, `CYCLE_RUNNING` without a live
+   process, or `CYCLE_FAILED`.
+2. `python3 ledger_check.py state` — if `CONSISTENT` (an `INTERRUPTED_CYCLE`
+   finding alone is expected here), rerun the same command: evaluations are keyed
+   by (stage, strategy, context) and are never repeated, the lock is re-taken, and
+   legacy `RUNNING` candidates are re-queued by `store.reconcile()`.
+3. Any other finding (tampered record, impossible transition, duplicate
+   submission or promotion) means the source ledgers were edited: stop, keep the
+   state directory as evidence, and restore it from git / backup.  Derived files
+   (summaries, `state.json`, `queue.json`, reports) are rebuilt from the sources;
+   the ledgers are never hand-edited.
 
 ## What one cycle does
 
@@ -149,7 +182,7 @@ whole generation has been evaluated (779 candidates ≈ 78 cycles at batch 10).
 ## Tests
 
 ```bash
-cd run && COINTRADER_SRC=/path/to/NEW2/src python3 -m unittest discover -s discovery/tests -v
+cd run && python3 -m unittest discover -s discovery/tests -v
 ```
 
 unittest, stdlib only: `test_engine.py` (original suite), `test_residual_fixes.py`

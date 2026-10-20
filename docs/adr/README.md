@@ -17,3 +17,4 @@
 | [0011](0011-public-market-estimate-first-run.md) | 공개 호가 80시간 수집분으로 첫 비용 추정 (ESTIMATED_FROM_PUBLIC_DATA) | Accepted |
 | [0012](0012-evolve-real-data-run-public-estimate-cost.md) | 공개 호가 추정 비용으로 실데이터 evolve R3 (검증 진입 20, 생존 0) | Accepted |
 | [0013](0013-audit-search-pool-cost-evidence-alpha-history.md) | 전체 감사: 검색 풀 분리, 행동 중복, 비용 전후 비교, 비용 검증 상태 세분, 창 단위 알파 소비 | Proposed |
+| [0014](0014-archive-independence-fills-import-dedup-v2-search-family.md) | 아카이브 독립, 체결 가져오기, 행동 중복 fp-v2, 탐색 단위 다중검정(promo-v3), 상태·원장 검사 | Proposed |

@@ -31,8 +31,8 @@ from typing import Mapping, Optional, Sequence
 
 from engine_lib import atomic_write_json, canonical_json, load_json, strategy_id
 from evolution import (
-    EVOLUTION_GENERATOR_VERSION, OPERATOR_WEIGHTS, OPERATORS, behaviour_key, crossover, mutate,
-    random_spec,
+    EVOLUTION_GENERATOR_VERSION, FINGERPRINT_VERSION, OPERATOR_WEIGHTS, OPERATORS, behaviour_key,
+    crossover, definition_fingerprint, mutate, near_duplicate, near_signature, random_spec,
 )
 
 SEARCH_VERSION = "search-v1(pareto+niche,dev-only)"
@@ -196,12 +196,20 @@ def round_rng(cfg: SearchConfig, round_index: int) -> random.Random:
 def propose_round(*, cfg: SearchConfig, round_index: int, elite: Sequence[str],
                   specs: Mapping[str, Mapping], feedback: Mapping[str, Mapping],
                   available_data: Sequence[str], known_ids: set,
-                  symbols: Sequence[str], known_keys: Optional[set] = None) -> tuple[list[dict], dict]:
+                  symbols: Sequence[str], known_keys: Optional[set] = None,
+                  known_specs: Optional[Mapping[str, Mapping]] = None) -> tuple[list[dict], dict]:
     """Proposals for one round: [{spec, sid, parents, operator, detail}] plus
     counters.  Known ids (any earlier evaluation, any status — including
-    rejected ones) are never proposed again, and neither is a definition that
-    behaves like a known one (:func:`evolution.behaviour_key`;
-    ``semantic_duplicates`` counts those)."""
+    rejected ones, any earlier generation) are never proposed again, and
+    neither is a definition that behaves like a known one
+    (:func:`evolution.behaviour_key`; ``semantic_duplicates`` counts those).
+
+    A proposal whose thresholds are within half a mutation step of a known or
+    already proposed spec of the same structure (:func:`evolution.near_duplicate`)
+    is KEPT — it may differ on real data — but carries ``near_duplicate_of``;
+    ``near_duplicates`` counts them and the validation batch takes at most one
+    member per near group.  ``counters["dedup_log"]`` lists every decision with
+    the representative and the reason (the audit trail of the dedup)."""
     rng = round_rng(cfg, round_index)
     n = cfg.children_per_round
     n_explore = int(round(n * cfg.exploration_share)) if elite else n
@@ -212,21 +220,59 @@ def propose_round(*, cfg: SearchConfig, round_index: int, elite: Sequence[str],
     out: list[dict] = []
     seen = set(known_ids)
     seen_keys = set(known_keys or ())
-    counters = {"attempts": 0, "invalid": 0, "duplicates": 0, "semantic_duplicates": 0}
+    rep_of: dict = {}                     # behaviour key -> representative id
+    near: dict = {}                       # near structure -> [(id, spec)]
+    for ksid, ksp in sorted((known_specs or {}).items()):
+        try:
+            k = behaviour_key(ksp)
+        except Exception:  # noqa: BLE001 — a legacy definition, not a spec
+            continue
+        seen_keys.add(k)
+        rep_of.setdefault(k, ksid)
+        near.setdefault(near_signature(ksp)[0], []).append((ksid, ksp))
+    counters = {"attempts": 0, "invalid": 0, "duplicates": 0, "semantic_duplicates": 0,
+                "near_duplicates": 0, "dedup_log": []}
+
+    def _log(kind, spec, sid, rep_sid, op, parents, reason):
+        counters["dedup_log"].append({"kind": kind, "proposed_id": sid,
+                                      "proposed_fingerprint": definition_fingerprint(spec),
+                                      "representative": rep_sid, "operator": op,
+                                      "parents": list(parents), "reason": reason,
+                                      "fingerprint_version": FINGERPRINT_VERSION})
 
     def _add(spec, parents, op, detail):
         sid = strategy_id(spec)
         if sid in seen:
             counters["duplicates"] += 1
+            _log("exact_definition", spec, sid, sid, op, parents,
+                 "same canonical definition (strategy id) as a known strategy")
             return
         bk = behaviour_key(spec)
         if bk in seen_keys:
             counters["semantic_duplicates"] += 1
+            rsid = rep_of.get(bk)
+            rspec = (known_specs or {}).get(rsid) or next(
+                (o["spec"] for o in out if o["sid"] == rsid), None)
+            why = "behaviourally identical (normal form of the conditions)"
+            if rspec is not None and {k: v for k, v in rspec.items() if k != "risk"} == \
+                    {k: v for k, v in spec.items() if k != "risk"}:
+                why = "differs only in risk settings, which no evaluation stage reads"
+            _log("behaviour_equal", spec, sid, rsid, op, parents, why)
             return
         seen.add(sid)
         seen_keys.add(bk)
-        out.append({"spec": spec, "sid": sid, "parents": list(parents), "operator": op,
-                    "detail": detail})
+        rep_of[bk] = sid
+        prop = {"spec": spec, "sid": sid, "parents": list(parents), "operator": op, "detail": detail}
+        ns = near_signature(spec)[0]
+        for osid, ospec in near.get(ns, []):
+            why = near_duplicate(spec, ospec)
+            if why is not None:
+                counters["near_duplicates"] += 1
+                prop["detail"] = {**dict(detail), "near_duplicate_of": osid, "near_reason": why}
+                _log("near_duplicate_kept", spec, sid, osid, op, parents, why)
+                break
+        near.setdefault(ns, []).append((sid, spec))
+        out.append(prop)
 
     for kind, target in (("mutate", n_mut), ("crossover", n_cross), ("explore", n_explore)):
         made, tries = 0, 0

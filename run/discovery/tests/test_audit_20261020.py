@@ -241,13 +241,14 @@ class TestCalibrationAudit(unittest.TestCase):
         clean = self.calib(good)
         self.assertEqual(clean["status"], "VERIFIED", clean["reasons"])
         dirty = self.calib(good, quarantined=len(bad))
-        self.assertEqual(dirty["status"], "NOT_VERIFIED")
+        self.assertEqual(dirty["status"], "DATA_INVALID")   # v4: was NOT_VERIFIED, still never VERIFIED
         self.assertTrue(any("quarantined" in r for r in dirty["reasons"]))
 
     def test_in_memory_duplicates_are_not_evidence(self):
         obs = synth_fills(n=1000, symbols=("BTCUSDT", "ETHUSDT"))
         rec = self.calib(obs + obs[:5])
-        self.assertEqual((rec["status"], rec["n_duplicates"]), ("NOT_VERIFIED", 5))
+        # v4 (2026-10-20): integrity problems are DATA_INVALID (was NOT_VERIFIED) — still never VERIFIED
+        self.assertEqual((rec["status"], rec["n_duplicates"]), ("DATA_INVALID", 5))
 
     def test_too_little_data_is_insufficient_not_failed(self):
         rec = self.calib(synth_fills(n=100))                        # 50 BTC, 0 ETH verification fills
@@ -340,7 +341,7 @@ class TestValidationWindowHistory(PipelineCase):
         b = p.preregister_batch([edge])
         w = b["windows"][key]
         self.assertEqual((w["batch_index"], w["external_prior_batches"]), (4, 3))
-        self.assertAlmostEqual(w["alpha"], spending_alpha(4, 0.05))
+        self.assertAlmostEqual(w["alpha"], spending_alpha(4, 0.05 / 2))   # promo-v3: search family split over 2 windows
         # the same directory written to the history is not counted twice
         with hist.open("a") as f:
             f.write(json.dumps({"run": "this", "batches": 1, "window_keys": [key],

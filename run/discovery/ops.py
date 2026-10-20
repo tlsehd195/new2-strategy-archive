@@ -34,7 +34,8 @@ from typing import Callable, Optional, Sequence
 from engine_lib import JsonlCorruption, append_jsonl, iso_now, iter_jsonl
 
 LOW_DISK_BYTES = 200 * 1024 * 1024
-CONFIGS = {"promotion_v2.json": "promotion_config_v1",
+CONFIGS = {"promotion_v2.json": "promotion_config_v1", "promotion_v3.json": "promotion_config_v1",
+           "fills_import_v1.json": "fills_import_policy_v1",
            "cost_verification_v1.json": "cost_verification_criteria_v1",
            "paper_forward_v1.json": "paper_forward_criteria_v1",
            "cost_assumed_public_v1.json": "cost_assumed_profile_v1",

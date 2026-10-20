@@ -1,0 +1,4 @@
+reference: tlsehd195/NEW2@8ec637153b4375143cbb9b34c00eb32053feca5e src/cointrader/backtest/costs.py
+reference git blob: ca95b9c598e2f0e806510ccbbcc79397b3f7e234 (matches GitHub API sha)
+reference sha256: 27ec57bbeb0fed22878ea427579223ff5eea495a288e7b39c9a96d0e49b3540b
+random cases 200000, mismatches 0 (exact equality incl. error messages), identical refusals 73984
