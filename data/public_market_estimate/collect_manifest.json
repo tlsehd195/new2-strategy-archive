@@ -1,0 +1,53 @@
+{
+ "endpoints": [
+  "/fapi/v1/aggTrades",
+  "/fapi/v1/depth",
+  "/fapi/v1/klines",
+  "/fapi/v1/time"
+ ],
+ "files": [
+  {
+   "bytes": 10195535,
+   "path": "BTCUSDT\\public_20261016.jsonl",
+   "sha256": "922311b851264d8038cd7764eb62d3ed98d41bad5c6996ce90fef374b8a4455f"
+  },
+  {
+   "bytes": 26312771,
+   "path": "BTCUSDT\\public_20261017.jsonl",
+   "sha256": "37834fad4eea29a734f60dbcab7e6e9f1be6b7b2dbd01064f4b4958c1330ddff"
+  },
+  {
+   "bytes": 26338914,
+   "path": "BTCUSDT\\public_20261018.jsonl",
+   "sha256": "6249413a74cd829e9ad59a93c2ea1cf02e5a947f4cf4eafd89106491f6b4865b"
+  },
+  {
+   "bytes": 24932128,
+   "path": "BTCUSDT\\public_20261019.jsonl",
+   "sha256": "4a9152e55ab104c7b84bc164d23a11285c9e15c19d3b613d92035a3c1481c8ae"
+  },
+  {
+   "bytes": 10015150,
+   "path": "ETHUSDT\\public_20261016.jsonl",
+   "sha256": "7cc72d46e472a3efaa9455c0cf34ab0df39a0992fdd4b97373d168045b303375"
+  },
+  {
+   "bytes": 25864600,
+   "path": "ETHUSDT\\public_20261017.jsonl",
+   "sha256": "bc78fda38552588df4df31f616f45da98de30c0ebc842b480c62e0084f3b152d"
+  },
+  {
+   "bytes": 25864698,
+   "path": "ETHUSDT\\public_20261018.jsonl",
+   "sha256": "8e8a10c934ccb022cac6f69881f35b6d0b6744ee1efab2d66dc2cffa6ed371ff"
+  },
+  {
+   "bytes": 24484502,
+   "path": "ETHUSDT\\public_20261019.jsonl",
+   "sha256": "ebf8d10d2715011fd261a2c5104debf22a3cd318354e9152f0d14cb6f46101aa"
+  }
+ ],
+ "generated_at": "2026-10-19T22:43:16Z",
+ "schema": "public_market_manifest_v1",
+ "source": "https://fapi.binance.com"
+}

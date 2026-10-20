@@ -1,6 +1,6 @@
 # ADR 0010 — legacy 잠금 TEST 비용 게이트, 다종목 잠금 창 독립성, 실행 모드 표시
 
-- 상태: Proposed (이 PR, 병합 시 Accepted)
+- 상태: Accepted (PR #9 병합, 2026-10-17)
 - 날짜: 2026-10-17
 - 범위: `run/discovery/runner.py`, `run/discovery/pipeline.py`, `run/discovery/run_cycle.sh`, `run/discovery/tests/test_reaudit_20261017.py`(신규), `tests/test_residual_fixes.py`, `tests/test_final_fdr_context.py`, `run/discovery/README.md`, `run/discovery/STATISTICS_AND_STATES.md` §9, `run/audit/STATUS_CURRENT_20261017.md`(신규)
 - 선행: [ADR 0009](0009-locked-test-requires-verified-cost.md)
