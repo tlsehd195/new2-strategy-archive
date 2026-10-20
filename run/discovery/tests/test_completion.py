@@ -115,7 +115,8 @@ class TestCostVerificationGate(unittest.TestCase):
     def test_insufficient_or_quote_only_data_blocks(self):
         rec = cc.calibrate_and_verify(synth_fills(n=100), CostContext.futures_default(),
                                       required_symbols=["BTCUSDT", "ETHUSDT"], order_value=10_000.0)
-        self.assertEqual(rec["status"], "NOT_VERIFIED")
+        # too few fills is a sample shortfall, not a failed model (ADR 0013)
+        self.assertEqual(rec["status"], "INSUFFICIENT_DATA")
         self.assertTrue(any("ETHUSDT" in r for r in rec["reasons"]))
         empty = cc.calibrate_and_verify([], CostContext.futures_default(), required_symbols=["BTCUSDT"],
                                         order_value=1.0)

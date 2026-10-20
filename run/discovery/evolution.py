@@ -337,6 +337,28 @@ OPS = {
 }
 
 
+def behaviour_key(spec: Mapping) -> str:
+    """Hash of what a strategy DOES, finer than ``strategy_id`` equality.
+
+    ``strategy_id`` hashes the canonical definition, so two definitions that
+    trade identically can still get different ids.  The case the operators
+    produce: under ``entry.logic == "all"`` the signal is entry AND filters,
+    so a condition in ``entry`` and the same condition in ``filters`` are the
+    same rule (``add_filter`` / ``crossover`` can create exactly that).  The
+    key pools entry and filter conditions for "all" logic; the stored id is
+    unchanged (ids stay stable), the key is only used to stop the search from
+    spending budget and multiplicity on a behavioural duplicate."""
+    c = canonicalize_spec(spec)
+    body = {"direction": c["direction"], "symbols": c["symbols"], "exit": c["exit"], "risk": c["risk"]}
+    if c["entry"]["logic"] == "all":
+        conds = sorted({canonical_json(x) for x in c["entry"]["conditions"] + c["filters"]})
+        body["all"] = conds
+    else:
+        body["any"] = sorted(canonical_json(x) for x in c["entry"]["conditions"])
+        body["filters"] = sorted(canonical_json(x) for x in c["filters"])
+    return "BK-" + hashlib.sha256(canonical_json(body).encode()).hexdigest()[:20]
+
+
 def _strip_derived(s: Mapping) -> dict:
     d = copy.deepcopy(dict(s))
     for k in ("family", "data", "primary_cell"):

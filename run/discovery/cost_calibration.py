@@ -9,7 +9,9 @@ context can become ``verified``:
 2. the sample is split chronologically — the first part calibrates the
    parameters, the second part (never seen by the fit) verifies them;
 3. a preregistered criteria file (``config/cost_verification_v1.json``)
-   decides VERIFIED / NOT_VERIFIED / BLOCKED_EXTERNAL_EVIDENCE;
+   decides VERIFIED / NOT_VERIFIED / INSUFFICIENT_DATA /
+   BLOCKED_EXTERNAL_EVIDENCE (too little genuine evidence is INSUFFICIENT_DATA,
+   a failed check on enough evidence is NOT_VERIFIED);
 4. the decision is sealed in an append-only record whose content hash is
    checked again whenever a cost context claims to be verified
    (``CostContext.from_verification``).
@@ -50,7 +52,7 @@ from typing import Iterable, Mapping, Optional, Sequence
 
 from engine_lib import append_jsonl, canonical_json, code_identity, iso_now, iter_jsonl
 
-COST_CALIBRATION_VERSION = "cost-calib-v2"
+COST_CALIBRATION_VERSION = "cost-calib-v3"
 RECORD_SCHEMA = "cost_verification_v1"
 DEFAULT_CRITERIA = Path(__file__).resolve().parent / "config" / "cost_verification_v1.json"
 
@@ -63,6 +65,21 @@ SOURCE_COMPONENTS = {
 MODEL_COMPONENTS = ("fee", "spread", "impact")
 FILL_STATUSES = ("FILLED", "PARTIAL", "REJECTED", "EXPIRED")
 ORDER_TYPES = ("taker", "maker")
+
+#: plausibility bounds (v3, ADR 0013).  They catch unit errors, not market
+#: behaviour: a timestamp in seconds instead of ms, a fee given in bp or in
+#: percent instead of quote currency, a price in another unit, a fill larger
+#: than the order.  A row outside them is invalid evidence, never "a costly fill".
+MIN_TS_MS = 1_483_228_800_000            # 2017-01-01 UTC (before any USDT-M contract)
+MAX_FUTURE_MS = 86_400_000               # at most one day ahead of the clock
+MAX_FEE_RATE = 0.01                      # 100 bp of filled notional per side
+MAX_FILL_DEVIATION = 0.05                # |fill / ref - 1|
+MAX_OVERFILL = 1.05                      # filled_notional / notional (price moves on a fixed qty)
+
+#: statuses of a calibration record.  INSUFFICIENT_DATA = the evidence is genuine
+#: but too small for the preregistered sample rules (collect more, nothing failed);
+#: NOT_VERIFIED = the model failed a check on enough data.
+RECORD_STATUSES = ("VERIFIED", "NOT_VERIFIED", "INSUFFICIENT_DATA", "BLOCKED_EXTERNAL_EVIDENCE")
 
 
 class CalibrationError(ValueError):
@@ -86,6 +103,7 @@ class Observation:
     fee: Optional[float] = None              # quote currency, as charged
     bar_traded_value: Optional[float] = None  # quote volume of the decision bar
     bar_volatility: Optional[float] = None
+    order_id: Optional[str] = None            # exchange order / trade id (duplicate key)
 
     def validate(self) -> None:
         if self.source_kind not in SOURCE_COMPONENTS:
@@ -126,6 +144,27 @@ class Observation:
                     v = getattr(self, k)
                     if v is None or not math.isfinite(v) or v < 0 or (k != "fee" and v == 0):
                         raise CalibrationError(f"filled exchange record needs {k} (got {v!r})")
+                self._check_units()
+        if self.order_id is not None and (not isinstance(self.order_id, str) or not self.order_id.strip()):
+            raise CalibrationError(f"order_id={self.order_id!r} must be a non-empty string when given")
+        now_ms = int(__import__("time").time() * 1000)
+        if not MIN_TS_MS <= self.ts_ms <= now_ms + MAX_FUTURE_MS:
+            raise CalibrationError(f"ts_ms={self.ts_ms} outside [2017-01-01, now+1d] — "
+                                   "seconds instead of milliseconds, or a clock error?")
+
+    def _check_units(self) -> None:
+        fee_rate = self.fee / self.filled_notional
+        if fee_rate > MAX_FEE_RATE:
+            raise CalibrationError(f"fee {self.fee!r} is {fee_rate:.4%} of the filled notional "
+                                   f"(> {MAX_FEE_RATE:.0%}) — fee in bp/percent instead of quote currency?")
+        dev = abs(self.fill_price / self.ref_price - 1.0)
+        if dev > MAX_FILL_DEVIATION:
+            raise CalibrationError(f"fill_price {self.fill_price} is {dev:.2%} away from ref_price "
+                                   f"{self.ref_price} — wrong price unit or stale reference?")
+        if self.filled_notional > self.notional * MAX_OVERFILL:
+            raise CalibrationError(f"filled_notional {self.filled_notional} > order notional {self.notional}")
+        if self.status == "PARTIAL" and self.filled_notional >= self.notional:
+            raise CalibrationError("PARTIAL fill with filled_notional >= notional")
 
     # -- derived quantities -----------------------------------------------------
     def half_spread_frac(self) -> Optional[float]:
@@ -151,27 +190,59 @@ def data_sha256(obs: Sequence[Observation]) -> str:
     return hashlib.sha256(canonical_json(rows).encode()).hexdigest()
 
 
-def load_observations(path: Path) -> list[Observation]:
-    """JSONL, one :class:`Observation` per line.  Unknown keys or invalid
-    rows raise — a calibration never silently drops evidence."""
-    out = []
+def _dup_keys(o: Observation) -> list[str]:
+    """Identity keys of one report: the full row, and (when the source gives
+    one) the exchange order id — the same execution exported twice with a
+    re-computed bar field is still one execution."""
+    keys = ["row:" + canonical_json(asdict(o))]
+    if o.order_id is not None:
+        keys.append(f"id:{o.source_kind}:{o.symbol}:{o.order_id}")
+    return keys
+
+
+def load_observations_checked(path: Path) -> tuple[list[Observation], list[dict]]:
+    """Like :func:`load_observations` but invalid or duplicate rows are
+    ISOLATED instead of aborting the load: returns (valid rows, quarantined
+    rows with line number and reason).  A calibration fed from a file with
+    quarantined rows can never be VERIFIED (:func:`calibrate_and_verify`
+    ``quarantined=``); the quarantine is evidence for the operator, not a
+    silent drop."""
+    out: list[Observation] = []
+    bad: list[dict] = []
     fields = set(Observation.__dataclass_fields__)
     seen: dict[str, int] = {}
     for i, r in enumerate(iter_jsonl(Path(path))):
-        extra = set(r) - fields
-        if extra:
-            raise CalibrationError(f"{path}:{i + 1}: unknown fields {sorted(extra)}")
+        line = i + 1
         try:
-            o = Observation(**r)
-        except TypeError as e:
-            raise CalibrationError(f"{path}:{i + 1}: {e}") from e
-        o.validate()
-        key = canonical_json(asdict(o))
-        if key in seen:
-            # the same report twice would count one execution as two pieces of evidence
-            raise CalibrationError(f"{path}:{i + 1}: duplicate of line {seen[key]}")
-        seen[key] = i + 1
+            extra = set(r) - fields
+            if extra:
+                raise CalibrationError(f"unknown fields {sorted(extra)}")
+            try:
+                o = Observation(**r)
+            except TypeError as e:
+                raise CalibrationError(str(e)) from e
+            o.validate()
+            keys = _dup_keys(o)
+            hit = next((seen[k] for k in keys if k in seen), None)
+            if hit is not None:
+                # the same report twice would count one execution as two pieces of evidence
+                raise CalibrationError(f"duplicate of line {hit}")
+        except CalibrationError as e:
+            bad.append({"line": line, "reason": str(e), "row": r})
+            continue
+        for k in keys:
+            seen[k] = line
         out.append(o)
+    return out, bad
+
+
+def load_observations(path: Path) -> list[Observation]:
+    """JSONL, one :class:`Observation` per line.  Unknown keys, invalid or
+    duplicate rows raise — a calibration never silently drops evidence."""
+    out, bad = load_observations_checked(path)
+    if bad:
+        raise CalibrationError(f"{path}:{bad[0]['line']}: {bad[0]['reason']}"
+                               + (f" (+{len(bad) - 1} more bad rows)" if len(bad) > 1 else ""))
     return out
 
 
@@ -213,10 +284,17 @@ def error_summary(errors: Sequence[float]) -> dict:
     n = len(errors)
     if not n:
         return {"n": 0}
-    return {"n": n, "mean_bp": sum(errors) / n, "median_bp": _quantile(errors, 0.5),
+    mean = sum(errors) / n
+    sd = math.sqrt(sum((e - mean) ** 2 for e in errors) / (n - 1)) if n > 1 else math.nan
+    se = sd / math.sqrt(n) if n > 1 else math.nan
+    return {"n": n, "mean_bp": mean, "median_bp": _quantile(errors, 0.5),
             "p90_bp": _quantile(errors, 0.90), "p95_bp": _quantile(errors, 0.95),
             "p99_bp": _quantile(errors, 0.99), "max_bp": max(errors),
-            "underestimated_share": sum(1 for e in errors if e > 0) / n}
+            "underestimated_share": sum(1 for e in errors if e > 0) / n,
+            # uncertainty of the mean (normal approximation, independent fills
+            # assumed — clustered fills make the true interval WIDER); informational
+            "sd_bp": sd if math.isfinite(sd) else None,
+            "mean_ci95_bp": [mean - 1.96 * se, mean + 1.96 * se] if math.isfinite(se) else None}
 
 
 def _buckets(obs: Sequence[Observation], errs: Sequence[float], key, edges: Sequence[float]) -> list[dict]:
@@ -280,7 +358,7 @@ def load_criteria(path: Optional[Path] = None) -> tuple[dict, str]:
 
 def calibrate_and_verify(obs: Sequence[Observation], base_ctx, *, required_symbols: Sequence[str],
                          order_value: float, criteria_path: Optional[Path] = None,
-                         source_ref: str = "") -> dict:
+                         source_ref: str = "", quarantined: int = 0) -> dict:
     """Fit on the first ``calibration_fraction`` (by time), verify the fitted
     context on the rest.  Returns an UNSEALED decision record (see :func:`seal`)."""
     from costs_bridge import COST_MODEL_SOURCE_SHA256, CostContext, CostError, REQUIRED_COST_PARAMS
@@ -296,10 +374,26 @@ def calibrate_and_verify(obs: Sequence[Observation], base_ctx, *, required_symbo
                  "data_sha256": data_sha256(obs), "n_observations": len(obs),
                  "cost_source_sha256": COST_MODEL_SOURCE_SHA256,
                  "code_hash": code_identity(files=("cost_calibration.py", "costs_bridge.py"))["code_hash"],
-                 "base_params": dict(base_ctx.params)}
+                 "base_params": dict(base_ctx.params), "n_quarantined": int(quarantined)}
+    if obs:
+        rec["collection_period"] = {"first_ts_ms": obs[0].ts_ms, "last_ts_ms": obs[-1].ts_ms,
+                                    "days": (obs[-1].ts_ms - obs[0].ts_ms) / 86_400_000}
+    seen_keys: set = set()
+    dups = 0
+    for o in obs:
+        ks = _dup_keys(o)
+        dups += any(k in seen_keys for k in ks)
+        seen_keys.update(ks)
+    if dups:
+        # in-memory inputs (several files, adapters) get the same duplicate rule as a file load
+        reasons.append(f"{dups} duplicate observations — one execution counted twice is not evidence")
+    rec["n_duplicates"] = dups
+    if quarantined:
+        reasons.append(f"{quarantined} source rows quarantined (invalid or duplicate) — "
+                       "a source with bad rows is not verification evidence")
     if not obs:
         rec.update({"status": "BLOCKED_EXTERNAL_EVIDENCE",
-                    "reasons": ["no execution observations supplied"]})
+                    "reasons": ["no execution observations supplied"] + reasons})
         return rec
     missing = [c for c in MODEL_COMPONENTS if c not in components]
     if missing:
@@ -360,26 +454,49 @@ def calibrate_and_verify(obs: Sequence[Observation], base_ctx, *, required_symbo
     rec["scope"] = {"symbols": syms, "notional_range": [lo, hi] if used else None,
                     "order_types": sorted({o.order_type for o in used}),
                     "verification_fills_per_symbol": per_sym}
+    # sample-size shortfalls are kept apart from failures: too little evidence is
+    # INSUFFICIENT_DATA (collect more), never "the model failed"
+    shortfall: list[str] = []
     for s in required_symbols:
         n_s = per_sym.get(s, 0)
         if n_s < min_fills:
-            reasons.append(f"{s}: {n_s} verification fills < {min_fills}")
+            shortfall.append(f"{s}: {n_s} verification fills < {min_fills}")
     if not (lo <= order_value <= hi):
-        reasons.append(f"order value {order_value} outside the verified notional range "
-                       f"{[lo, hi] if used else 'none'}")
-    ve = rec["verification_errors"]
-    if ve.get("n"):
+        shortfall.append(f"order value {order_value} outside the verified notional range "
+                         f"{[lo, hi] if used else 'none'}")
+
+    def _limits(ve: Mapping, label: str) -> None:
+        if not ve.get("n"):
+            return
         if ve["p90_bp"] > crit["max_p90_underestimate_bp"]:
-            reasons.append(f"p90 underestimate {ve['p90_bp']:.3f}bp > {crit['max_p90_underestimate_bp']}bp")
+            reasons.append(f"{label}p90 underestimate {ve['p90_bp']:.3f}bp > {crit['max_p90_underestimate_bp']}bp")
         if ve["mean_bp"] > crit["max_mean_underestimate_bp"]:
-            reasons.append(f"mean underestimate {ve['mean_bp']:.3f}bp > {crit['max_mean_underestimate_bp']}bp")
+            reasons.append(f"{label}mean underestimate {ve['mean_bp']:.3f}bp > {crit['max_mean_underestimate_bp']}bp")
+    _limits(rec["verification_errors"], "")
+    # the same preregistered limits per symbol (v3): a pooled error can hide one
+    # symbol the model underprices behind another it overprices, while the scope
+    # would still claim both symbols
+    rec["verification_errors_by_symbol"] = {
+        s: error_summary([e for o, e in zip(used, errs) if o.symbol == s]) for s in per_sym}
+    for s in syms:
+        _limits(rec["verification_errors_by_symbol"][s], f"{s}: ")
     if n_ord and rec["fill_rates"]["REJECTED"] > crit["max_reject_rate"]:
         reasons.append(f"reject rate {rec['fill_rates']['REJECTED']:.3f} > {crit['max_reject_rate']}")
+    # representativeness (informational): which market states the evidence covers
+    rec["coverage_notes"] = [f"verification evidence covers {len(rec['by_volatility'])} of "
+                             f"{len(crit['volatility_edges']) + 1} volatility buckets and "
+                             f"{len(rec['by_participation'])} of {len(crit['participation_edges']) + 1} "
+                             "participation buckets; other regimes are not verified"]
     if missing:
         status = "BLOCKED_EXTERNAL_EVIDENCE"
+    elif reasons:
+        status = "NOT_VERIFIED"
+    elif shortfall:
+        status = "INSUFFICIENT_DATA"
     else:
-        status = "VERIFIED" if not reasons else "NOT_VERIFIED"
-    rec.update({"status": status, "reasons": reasons})
+        status = "VERIFIED"
+    rec.update({"status": status, "reasons": reasons + shortfall,
+                "sample_shortfall": shortfall})
     return rec
 
 
@@ -436,22 +553,33 @@ def main(argv: Optional[Iterable[str]] = None) -> int:  # pragma: no cover - CLI
     ap.add_argument("--symbols", nargs="+", default=["BTCUSDT", "ETHUSDT"])
     ap.add_argument("--order-value", type=float, default=10_000.0)
     ap.add_argument("--ledger", help="append the sealed decision record here")
+    ap.add_argument("--quarantine", help="isolate invalid/duplicate observation rows into this JSONL "
+                                         "instead of aborting (the record then cannot be VERIFIED)")
     a = ap.parse_args(list(argv) if argv is not None else None)
     obs: list[Observation] = []
     ref = []
+    n_bad = 0
     if a.observations:
-        obs += load_observations(Path(a.observations))
+        if a.quarantine:
+            good, bad = load_observations_checked(Path(a.observations))
+            for b in bad:
+                append_jsonl(Path(a.quarantine), {"source": a.observations, **b})
+            obs += good
+            n_bad = len(bad)
+        else:
+            obs += load_observations(Path(a.observations))
         ref.append(a.observations)
     if a.fill_monitor:
         obs += observations_from_fill_monitor(Path(a.fill_monitor))
         ref.append(a.fill_monitor)
     rec = calibrate_and_verify(obs, CostContext.futures_default(), required_symbols=a.symbols,
-                               order_value=a.order_value, source_ref=";".join(ref))
+                               order_value=a.order_value, source_ref=";".join(ref), quarantined=n_bad)
     rec = seal(rec)
     if a.ledger:
         append_record(Path(a.ledger), rec)
     print(json.dumps(rec, indent=1, sort_keys=True, default=str))
-    return 0 if rec["status"] == "VERIFIED" else (4 if rec["status"] == "BLOCKED_EXTERNAL_EVIDENCE" else 2)
+    return 0 if rec["status"] == "VERIFIED" else (
+        4 if rec["status"] in ("BLOCKED_EXTERNAL_EVIDENCE", "INSUFFICIENT_DATA") else 2)
 
 
 if __name__ == "__main__":  # pragma: no cover

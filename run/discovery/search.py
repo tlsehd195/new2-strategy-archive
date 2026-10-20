@@ -31,7 +31,8 @@ from typing import Mapping, Optional, Sequence
 
 from engine_lib import atomic_write_json, canonical_json, load_json, strategy_id
 from evolution import (
-    EVOLUTION_GENERATOR_VERSION, OPERATOR_WEIGHTS, OPERATORS, crossover, mutate, random_spec,
+    EVOLUTION_GENERATOR_VERSION, OPERATOR_WEIGHTS, OPERATORS, behaviour_key, crossover, mutate,
+    random_spec,
 )
 
 SEARCH_VERSION = "search-v1(pareto+niche,dev-only)"
@@ -162,6 +163,7 @@ class SearchState:
     proposed: int = 0
     invalid: int = 0
     duplicates: int = 0
+    semantic_duplicates: int = 0
     registered: int = 0
     rounds_without_front_change: int = 0
     front_hash: str = ""
@@ -194,10 +196,12 @@ def round_rng(cfg: SearchConfig, round_index: int) -> random.Random:
 def propose_round(*, cfg: SearchConfig, round_index: int, elite: Sequence[str],
                   specs: Mapping[str, Mapping], feedback: Mapping[str, Mapping],
                   available_data: Sequence[str], known_ids: set,
-                  symbols: Sequence[str]) -> tuple[list[dict], dict]:
+                  symbols: Sequence[str], known_keys: Optional[set] = None) -> tuple[list[dict], dict]:
     """Proposals for one round: [{spec, sid, parents, operator, detail}] plus
     counters.  Known ids (any earlier evaluation, any status — including
-    rejected ones) are never proposed again."""
+    rejected ones) are never proposed again, and neither is a definition that
+    behaves like a known one (:func:`evolution.behaviour_key`;
+    ``semantic_duplicates`` counts those)."""
     rng = round_rng(cfg, round_index)
     n = cfg.children_per_round
     n_explore = int(round(n * cfg.exploration_share)) if elite else n
@@ -207,14 +211,20 @@ def propose_round(*, cfg: SearchConfig, round_index: int, elite: Sequence[str],
     weights = [cfg.operator_weights[o] for o in ops]
     out: list[dict] = []
     seen = set(known_ids)
-    counters = {"attempts": 0, "invalid": 0, "duplicates": 0}
+    seen_keys = set(known_keys or ())
+    counters = {"attempts": 0, "invalid": 0, "duplicates": 0, "semantic_duplicates": 0}
 
     def _add(spec, parents, op, detail):
         sid = strategy_id(spec)
         if sid in seen:
             counters["duplicates"] += 1
             return
+        bk = behaviour_key(spec)
+        if bk in seen_keys:
+            counters["semantic_duplicates"] += 1
+            return
         seen.add(sid)
+        seen_keys.add(bk)
         out.append({"spec": spec, "sid": sid, "parents": list(parents), "operator": op,
                     "detail": detail})
 
