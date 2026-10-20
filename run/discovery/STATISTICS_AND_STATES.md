@@ -231,6 +231,22 @@ promotable.
   to the status recorded in `resume_to`.  Promotion links the record ids of
   the dev, validation, robustness and locked evidence; any missing evidence
   blocks it.
+- **Search pool** (ADR 0013): the search sees only strategies registered
+  through the search itself (seeds and proposals, i.e. with a lineage
+  record).  Robustness neighbours are DEV-evaluated because their centre
+  passed VALIDATION, so they are kept out of the search feedback and out of
+  the known-id set; otherwise a validation outcome would steer the search.
+- **Behavioural duplicates** (ADR 0013): `evolution.behaviour_key` pools
+  entry and filter conditions under `all` logic (entry A + filter B trades
+  exactly like entry A AND B).  A proposal with a known key is counted as
+  `semantic_duplicates` and not registered.  `strategy_id` is unchanged.
+- **Failure class** of every validation member (reporting only, never a
+  gate; the worst symbol decides): `DATA_MISSING` (no event on a symbol),
+  `INSUFFICIENT_DATA` (fewer than the preregistered minimum),
+  `NO_EDGE_OUT_OF_SAMPLE` (mean gross move ≤ 0: the DEV edge did not carry
+  over), `FAIL_COST` (gross > 0, net ≤ 0), `FAIL_STAT` (net > 0 but StepM did
+  not reject).  DEV and validation records carry gross / cost / funding /
+  net means of the same events (before vs after cost, same rule and window).
 - Assumptions stated, not proven: stationarity / weak dependence of daily
   strategy returns (bootstrap validity), daily aggregation of 15m events,
   `q = n^(-1/3)` mean block length.
@@ -286,8 +302,20 @@ locked-data read.  A blocked candidate spends nothing.
 | `UNVERIFIED_COST_MODEL` | NEW2 candle-model defaults (production default) | no |
 | `ASSUMED_COST_MODEL` | `assumed_public_v1`: public fee schedule + fixed margins | no |
 | `ESTIMATED_FROM_PUBLIC_DATA` | `public_estimate:<record>`: spread/impact from public order books; fee still assumed | no |
-| `VERIFIED` | sealed `cost_calibration` record from account execution reports, ≥ 200 verification fills per symbol, inside its symbol and notional scope | yes, inside the scope only |
+| `VERIFIED` | sealed `cost_calibration` record from account execution reports, ≥ 200 verification fills per symbol, mean / p90 underestimate limits met pooled AND per symbol (ADR 0013), no quarantined or duplicate rows, inside its symbol and notional scope | yes, inside the scope only |
+| `NOT_VERIFIED` | `cost_calibration` result: enough evidence, but a check failed (underestimate, reject rate, quarantined / duplicate rows) | no |
+| `INSUFFICIENT_DATA` | `cost_calibration` result: genuine execution evidence, but fewer verification fills than required or the order size outside the observed range — collect more, nothing failed (ADR 0013) | no |
 | `BLOCKED_EXTERNAL_EVIDENCE` | `cost_calibration` result when the evidence does not exist (no account fills) | — |
+
+A calibration record also carries the 95 % interval of the mean prediction
+error (normal approximation, independent fills assumed — clustered fills
+make the true interval wider), the collection period, and which volatility /
+participation buckets the verification evidence covers.  Those are
+informational: the preregistered criteria file (`cost_verification_v1.json`)
+was not changed.  Plausibility checks on every fill (ts in ms between
+2017-01-01 and now + 1 day, fee ≤ 1 % of filled notional, fill price within
+5 % of the reference, no overfill) catch unit errors; `order_id`, when
+present, is a duplicate key.
 
 ### 9.3 Paper labels
 

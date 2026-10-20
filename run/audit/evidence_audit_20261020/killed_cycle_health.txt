@@ -1,0 +1,1 @@
+DEGRADED {'status': 'CYCLE_INTERRUPTED', 'finished_at': '', 'context_id': ''} {'status': 'STALE', 'pid': 1432}

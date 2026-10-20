@@ -7,7 +7,8 @@ promotion review -> isolated paper replay -> summary.
 
 Cycle statuses: CYCLE_OK, CYCLE_NO_PROGRESS, CYCLE_BUDGET_EXHAUSTED,
 CYCLE_BLOCKED_DATA (no usable market data — nothing was evaluated; exit 4),
-CYCLE_FAILED.  The search state, every specification, lineage edge,
+CYCLE_FAILED; CYCLE_RUNNING only in the summary file while a cycle runs (or
+after it was killed).  A cycle status is never a strategy verdict.  The search state, every specification, lineage edge,
 evaluation and status are persisted as they happen, so an interrupted cycle
 resumes where it stopped.
 """
@@ -43,6 +44,7 @@ class EvolutionCycleSummary:
     proposed: int = 0
     invalid: int = 0
     duplicates: int = 0
+    semantic_duplicates: int = 0
     search_status: str = ""
     validation_batch: Optional[dict] = None
     robustness_resumed: list = field(default_factory=list)
@@ -58,12 +60,35 @@ class EvolutionCycleSummary:
         return asdict(self)
 
 
-def run_evolution_cycle(state_dir: Path, provider, cost, *, symbols: Sequence[str] = ("BTCUSDT", "ETHUSDT"),
-                        search_cfg: Optional[SearchConfig] = None, rounds: int = 2,
-                        max_dev_evals: int = 60, seed_legacy: bool = True,
-                        promotion_config: Optional[Path] = None,
-                        results_dir: Optional[Path] = None,
-                        forward_feed=None) -> EvolutionCycleSummary:
+def run_evolution_cycle(state_dir: Path, provider, cost, *, results_dir: Optional[Path] = None,
+                        **kw) -> EvolutionCycleSummary:
+    """One cycle.  Before any work the summary file is overwritten with
+    ``CYCLE_RUNNING``; a crash rewrites it as ``CYCLE_FAILED`` (and re-raises).
+    A killed process therefore leaves ``CYCLE_RUNNING`` behind — never the
+    previous cycle's ``CYCLE_OK`` reading as the latest result (ADR 0013)."""
+    out = Path(results_dir) if results_dir is not None else Path(state_dir) / "evolution"
+    started = iso_now()
+    out.mkdir(parents=True, exist_ok=True)
+    atomic_write_json(out / "evolution_cycle_summary.json",
+                      EvolutionCycleSummary(status="CYCLE_RUNNING", started_at=started,
+                                            notes=["cycle in progress — if no process holds "
+                                                   "state/run.lock, it was interrupted"]).to_json())
+    try:
+        return _run_evolution_cycle(state_dir, provider, cost, results_dir=results_dir, **kw)
+    except BaseException as err:
+        atomic_write_json(out / "evolution_cycle_summary.json",
+                          EvolutionCycleSummary(status="CYCLE_FAILED", started_at=started,
+                                                finished_at=iso_now(),
+                                                notes=[f"{type(err).__name__}: {err}"]).to_json())
+        raise
+
+
+def _run_evolution_cycle(state_dir: Path, provider, cost, *, symbols: Sequence[str] = ("BTCUSDT", "ETHUSDT"),
+                         search_cfg: Optional[SearchConfig] = None, rounds: int = 2,
+                         max_dev_evals: int = 60, seed_legacy: bool = True,
+                         promotion_config: Optional[Path] = None,
+                         results_dir: Optional[Path] = None,
+                         forward_feed=None, validation_history: Optional[Path] = None) -> EvolutionCycleSummary:
     from paper import PaperRefused, run_paper
     from pipeline import EvolutionPipeline, seed_specs_from_legacy
     t0 = time.time()
@@ -81,9 +106,9 @@ def run_evolution_cycle(state_dir: Path, provider, cost, *, symbols: Sequence[st
     if not usable:
         s.status = "CYCLE_BLOCKED_DATA"
         s.notes.append("no usable market data for any symbol — nothing evaluated (BLOCKED_DATA)")
-        return _finish(s, t0, results_dir)
+        return _finish(s, t0, results_dir or (Path(state_dir) / "evolution"))
     pipe = EvolutionPipeline(state_dir, provider, cost, symbols=usable, search_cfg=cfg,
-                             promotion_config=promotion_config)
+                             promotion_config=promotion_config, validation_history=validation_history)
     ctx = pipe.context_id()
     s.context_id = ctx
     s.cost_status = getattr(cost, "status", "")
@@ -143,9 +168,14 @@ def run_evolution_cycle(state_dir: Path, provider, cost, *, symbols: Sequence[st
         elite = select_elite(fb, cfg)
         specs = {sid: pipe.specs.get(sid) for sid in elite}
         round_index = st.round_index + 1
+        # known = the search pool only: robustness neighbours exist because their
+        # centre passed VALIDATION and must not shape the search (ADR 0013)
+        pool = pipe.search_pool()
         props, cnt = propose_round(cfg=cfg, round_index=round_index, elite=elite, specs=specs,
                                    feedback=fb, available_data=avail,
-                                   known_ids=set(pipe.specs.all()), symbols=usable)
+                                   known_ids=pool, symbols=usable,
+                                   known_keys={_bkey(pipe.specs.get(x)) for x in pool
+                                               if pipe.specs.get(x) is not None} - {None})
         for p in props:
             if evaluated >= max_dev_evals:
                 break
@@ -159,6 +189,7 @@ def run_evolution_cycle(state_dir: Path, provider, cost, *, symbols: Sequence[st
         st.proposed += len(props)
         st.invalid += cnt["invalid"]
         st.duplicates += cnt["duplicates"]
+        st.semantic_duplicates += cnt["semantic_duplicates"]
         st.registered = len(pipe.specs.all())
         fh = first_front_hash(pipe.dev_feedback_all(), cfg)
         st.rounds_without_front_change = 0 if fh != st.front_hash else st.rounds_without_front_change + 1
@@ -178,6 +209,7 @@ def run_evolution_cycle(state_dir: Path, provider, cost, *, symbols: Sequence[st
         s.proposed += len(props)
         s.invalid += cnt["invalid"]
         s.duplicates += cnt["duplicates"]
+        s.semantic_duplicates += cnt["semantic_duplicates"]
     st.save(state_path)
     s.dev_evaluated = evaluated
     s.search_status = st.status
@@ -224,6 +256,15 @@ def run_evolution_cycle(state_dir: Path, provider, cost, *, symbols: Sequence[st
     if s.symbols_blocked:
         s.notes.append(f"symbols blocked by data: {sorted(s.symbols_blocked)}")
     return _finish(s, t0, results_dir or (Path(state_dir) / "evolution"))
+
+
+def _bkey(defn) -> Optional[str]:
+    from evolution import behaviour_key
+    from strategy_spec import SpecError
+    try:
+        return behaviour_key(defn)
+    except (SpecError, KeyError, TypeError):     # a legacy id in a lineage parent list
+        return None
 
 
 def _spec_sources(pipe) -> list[dict]:

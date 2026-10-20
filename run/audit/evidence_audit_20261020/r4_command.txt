@@ -1,0 +1,1 @@
+COINTRADER_SRC=<NEW2 read-only checkout @8ec637153b4375143cbb9b34c00eb32053feca5e>/src NEW2_DATA_DIR=<unzipped upload f6379f02> NEW2_DISCOVERY_ROOT=<fresh dir> NEW2_DISC_MODE=evolve NEW2_COST_PROFILE=public_estimate:data/public_market_estimate/estimate_v1.json python3 run/discovery/runner.py --mode evolve --rounds 3 --evals 2000   # code at commit 8a22e73

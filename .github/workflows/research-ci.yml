@@ -27,6 +27,8 @@ jobs:
           repository: tlsehd195/NEW2
           ref: 8ec637153b4375143cbb9b34c00eb32053feca5e
           path: new2
+          # NEW2 is private: a fine-grained token with Contents: read on NEW2 only
+          token: ${{ secrets.NEW2_READ_TOKEN || github.token }}
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}

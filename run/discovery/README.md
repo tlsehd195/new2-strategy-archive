@@ -69,7 +69,15 @@ passed.  The two engines' procedures differ: `STATISTICS_AND_STATES.md` §9.
 | `state/cycles.md`, `state/last_stderr.log` | legacy v2 | notes of the 2026-10-15 runs; no code writes them |
 
 The current state of the research (all engines, all measurements) is
-summarised in `run/audit/STATUS_CURRENT_20261017.md`.
+summarised in `run/audit/STATUS_CURRENT_20261020.md` (the 2026-10-17 file is
+kept as a dated record).
+
+`python3 evolution_report.py <state_dir> --md OUT.md` re-derives every stage
+count (candidates, DEV, validation members with failure class, statuses,
+locked uses) from the ledgers of an evolution state directory (ADR 0013).
+While a cycle runs, `evolution_cycle_summary.json` says `CYCLE_RUNNING`; a
+crash rewrites it as `CYCLE_FAILED`; a killed cycle leaves `CYCLE_RUNNING`,
+which `ops.py health` reports as `CYCLE_INTERRUPTED` (DEGRADED).
 
 ## Evolution mode (`--mode evolve`, ADR 0004)
 
@@ -208,7 +216,8 @@ audit report.
 - `paper.py` / `autoloop.py` / `data_fetch.py` — isolated paper replay (never PAPER_PASSED) / one evolution cycle / opt-in data acquisition (retry + failure classes)
 - `config/cost_assumed_public_v1.json` — the ASSUMED cost profile (ADR 0007)
 - `public_market_collect.py` / `public_cost_estimate.py` + `config/cost_public_estimate_v2.json` (v1 superseded) — key-less public book collector (opt-in network, bounded; `--manifest-only` re-seals files offline) / offline spread+impact estimator with manifest-hash check, worse-side pricing, thin-book exclusion and `--verify` re-check (ADR 0007, ADR 0008)
-- `cost_calibration.py` + `config/cost_verification_v1.json` — the ONLY way to a verified cost model: fit on execution reports, verify out-of-sample, sealed `CV-…` record (ADR 0006)
+- `cost_calibration.py` + `config/cost_verification_v1.json` — the ONLY way to a verified cost model: fit on execution reports, verify out-of-sample, sealed `CV-…` record (ADR 0006); statuses VERIFIED / NOT_VERIFIED / INSUFFICIENT_DATA / BLOCKED_EXTERNAL_EVIDENCE, `--quarantine FILE` isolates bad rows (ADR 0013)
+- `evolution_report.py` — read-only stage counts and per-member failure classes from an evolution state directory (ADR 0013)
 - `data_manifest.py` — dataset manifest (SHA-256 per file, provenance, cross-month/funding checks)
 - `execution_sim.py` — partial fill / reject / liquidation / late-observation layer
 - `paper_forward.py` + `config/paper_forward_v1.json` — forward paper observation on bars that close after registration; the only source of PAPER_PASSED

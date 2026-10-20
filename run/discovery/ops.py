@@ -129,11 +129,15 @@ def health(state_dir: Path, *, data_dir: Optional[Path] = None,
     if summ is not None:
         checks["last_cycle"] = {"status": summ.get("status"), "finished_at": summ.get("finished_at"),
                                 "context_id": summ.get("context_id")}
+        if summ.get("status") == "CYCLE_RUNNING" and checks["lock"]["status"] != "HELD":
+            # nothing is running: the cycle that wrote this marker was killed
+            checks["last_cycle"]["status"] = "CYCLE_INTERRUPTED"
     failed = (checks["ledgers"]["status"] != "OK" or checks.get("evidence", {}).get("status") == "TAMPERED"
               or checks.get("lock_registry", {}).get("status") == "CORRUPT"
               or checks["config"]["status"] != "OK" or checks.get("data_dir", {}).get("status") == "MISSING")
     degraded = (checks["lock"]["status"] == "STALE" or checks["disk"]["status"] != "OK"
-                or checks.get("last_cycle", {}).get("status") in ("CYCLE_FAILED", "CORRUPT"))
+                or checks.get("last_cycle", {}).get("status") in ("CYCLE_FAILED", "CORRUPT",
+                                                                   "CYCLE_INTERRUPTED"))
     return {"status": "FAILED" if failed else "DEGRADED" if degraded else "OK", "checks": checks,
             "at": iso_now()}
 

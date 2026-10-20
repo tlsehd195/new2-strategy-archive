@@ -67,6 +67,10 @@ EVO_CODE_FILES = tuple(sorted(set(CODE_FILES) | {"public_cost_estimate.py", "por
                                                  "paper_forward.py", "execution_sim.py",
                                                  "config/paper_forward_v1.json"}))
 DEFAULT_PROMOTION_CONFIG = Path(__file__).resolve().parent / "config" / "promotion_v2.json"
+#: append-only record of validation batches run on the real validation windows
+#: in state directories that no longer exist (ADR 0013).  Alpha spending is per
+#: window, not per state directory: a fresh directory must not restart at k = 1.
+DEFAULT_VALIDATION_HISTORY = Path(__file__).resolve().parent / "validation_window_history.jsonl"
 DAY_MS = 86_400_000
 
 STATUSES = ("RESEARCH_ONLY", "VALIDATION_SURVIVOR", "PAPER_TEST_READY", "REJECTED",
@@ -367,7 +371,8 @@ def neighbours(spec: Mapping, limit: int = 12) -> list[dict]:
 class EvolutionPipeline:
     def __init__(self, state_dir: Path, provider, cost, *, symbols: Sequence[str] = ("BTCUSDT", "ETHUSDT"),
                  search_cfg: Optional[SearchConfig] = None,
-                 promotion_config: Optional[Path] = None, order_value: float = 10_000.0):
+                 promotion_config: Optional[Path] = None, order_value: float = 10_000.0,
+                 validation_history: Optional[Path] = None):
         self.state_dir = Path(state_dir)
         self.dir = self.state_dir / "evolution"
         self.dir.mkdir(parents=True, exist_ok=True)
@@ -389,6 +394,7 @@ class EvolutionPipeline:
         self._evals: Optional[dict] = None
         self._ctx: Optional[str] = None
         self._feat_cache: dict = {}
+        self.validation_history = Path(validation_history) if validation_history else None
 
     # -- identity ---------------------------------------------------------------
     def context_id(self) -> str:
@@ -460,10 +466,19 @@ class EvolutionPipeline:
         self._index()[(rec["stage"], rec["strategy_id"], rec["context_id"])] = rec
         return rec
 
+    def search_pool(self) -> set:
+        """Strategies the SEARCH may see: those registered through
+        :meth:`register` (seeds, search proposals — they have a lineage
+        record).  Robustness neighbours are DEV-evaluated only because their
+        centre passed the VALIDATION StepM; letting them into the search pool
+        would make validation outcomes steer the search (ADR 0013)."""
+        return {r["child_id"] for r in self.lineage.records()}
+
     def dev_feedback_all(self) -> dict:
         ctx = self.context_id()
+        pool = self.search_pool()
         return {sid: dev_feedback(r) for (st, sid, c), r in self._index().items()
-                if st == "dev" and c == ctx and r.get("status") == "OK"}
+                if st == "dev" and c == ctx and r.get("status") == "OK" and sid in pool}
 
     # -- low-level study ------------------------------------------------------------
     def _study(self, spec: Mapping, sym: str, bars, funding, fng, lo: int, hi: int,
@@ -549,7 +564,7 @@ class EvolutionPipeline:
                 cs = cell_stats([_Ev(x) for x in ev], sym, f"{sid}|dev")
                 per[sym] = {"n": cs["n"], "mean_bp": cs.get("mean_bp"), "t": cs.get("t"),
                             "p": cs.get("p"), "status": cs["status"],
-                            "dev_end_ts": e["bars"][d1].ts}
+                            "dev_end_ts": e["bars"][d1].ts, **cost_attribution(ev)}
                 events += ev
                 t0, t1 = e["bars"][0].ts, e["bars"][d1].ts
                 span = [t0 if span[0] is None else min(span[0], t0),
@@ -577,6 +592,9 @@ class EvolutionPipeline:
             "per_symbol_mean_bp": {s: v["mean_bp"] for s, v in per.items()},
             "per_symbol_n": {s: v["n"] for s, v in per.items()},
             "complexity": complexity(spec), "family": spec["family"],
+            # same events, same window: before / after trading cost and funding
+            # (reporting only — not in DEV_FEEDBACK_KEYS, never read by the search)
+            **{"dev_" + k: v for k, v in cost_attribution(events).items()},
         }
         fails = []
         if any(v["n"] < sc["min_events_per_symbol"] for v in per.values()):
@@ -637,8 +655,9 @@ class EvolutionPipeline:
         windows = {}
         for sym in syms:
             key = self._val_window_key(sym)
-            k = 1 + sum(1 for b in prior if key in b["windows"])
-            windows[key] = {"symbol": sym, "batch_index": k,
+            ext = self.external_prior_batches(key)
+            k = 1 + sum(1 for b in prior if key in b["windows"]) + ext
+            windows[key] = {"symbol": sym, "batch_index": k, "external_prior_batches": ext,
                             "alpha": spending_alpha(k, vc["alpha_total_per_window"]),
                             "members": sorted(m for m in members if sym in self.specs.get(m)["symbols"])}
         body = {"kind": "PREREGISTERED", "context_id": ctx, "members": sorted(members),
@@ -650,6 +669,20 @@ class EvolutionPipeline:
         body["created_at"] = iso_now()
         append_jsonl(self.batch_path, body)
         return body
+
+    def external_prior_batches(self, key: str) -> int:
+        """Batches already run on validation window ``key`` in OTHER state
+        directories (``validation_history``), minus those recorded from this
+        directory's own batch ledger (no double count when a directory that
+        was written to the history is resumed)."""
+        if self.validation_history is None:
+            return 0
+        own = {b["batch_id"] for b in self._batches() if b["kind"] == "PREREGISTERED"}
+        n = 0
+        for r in iter_jsonl(self.validation_history):
+            if key in (r.get("window_keys") or []) and not (set(r.get("batch_ids") or []) & own):
+                n += int(r.get("batches", 1))
+        return n
 
     def run_validation(self, max_batch: Optional[int] = None) -> Optional[dict]:
         """Complete an open preregistered batch, else preregister and run a new
@@ -703,7 +736,8 @@ class EvolutionPipeline:
                     info = {"n": len(nets), "mean_bp": sum(nets) / len(nets) if nets else None,
                             "hac_t": t if math.isfinite(t) else None,
                             "hac_p": p if math.isfinite(p) else None,
-                            "window": [bars[v0].ts, bars[v1].ts] if v1 > v0 else None}
+                            "window": [bars[v0].ts, bars[v1].ts] if v1 > v0 else None,
+                            **cost_attribution(ev)}
                     if grid0 is not None and nets:
                         s = daily_series(ev, grid0, grid1)
                         if any(abs(x) > 0 for x in s) and len(s) >= vc["min_days"]:
@@ -759,21 +793,25 @@ class EvolutionPipeline:
             keys = {w["symbol"]: k for k, w in batch["windows"].items()}
             rejected = all(m in tests[keys[s]]["rejected"] for s in syms)
             powered = all((per_member[m][s]["n"] or 0) >= vc["min_events_per_symbol"] for s in syms)
+            fclass = validation_failure_class(per_member[m], syms, rejected=rejected, powered=powered,
+                                              min_events=vc["min_events_per_symbol"])
             rec = self._append_eval({"stage": "validation", "strategy_id": m, "context_id": ctx,
                                      "status": "OK", "batch_id": batch["batch_id"],
                                      "per_symbol": per_member[m], "stepm_rejected": rejected,
-                                     "powered": powered, "cost_model": self._cost_block()})
+                                     "powered": powered, "failure_class": fclass,
+                                     "cost_model": self._cost_block()})
             if rejected and powered:
                 outcome[m] = "PASSED_STEPM"
             elif powered:
                 outcome[m] = "REJECTED"
                 self.statuses.set(m, ctx, "REJECTED", stage="validation",
-                                  reasons=["validation StepM did not reject H0 (mean <= 0)"],
+                                  reasons=["validation StepM did not reject H0 (mean <= 0)",
+                                           f"failure_class={fclass}"],
                                   evidence={"validation": rec["record_id"]})
             else:
                 outcome[m] = "INCONCLUSIVE"
                 self.statuses.set(m, ctx, "INCONCLUSIVE", stage="validation",
-                                  reasons=["validation underpowered"],
+                                  reasons=["validation underpowered", f"failure_class={fclass}"],
                                   evidence={"validation": rec["record_id"]})
         result = {"kind": "RESULT", "batch_id": batch["batch_id"], "tests": tests,
                   "outcome": outcome, "at": iso_now()}
@@ -1305,6 +1343,54 @@ class EvolutionPipeline:
             self.statuses.set(sid, ctx, "BLOCKED_STATISTICS", stage="promotion", reasons=failures,
                               evidence=evidence, resume_to="VALIDATION_SURVIVOR")
         return review
+
+
+def cost_attribution(events: Sequence[Mapping]) -> dict:
+    """Before / after cost on the SAME events (same rule, same window): mean
+    gross move, mean trading cost, mean funding and mean net, in bp per
+    trade.  Events the cost model refused are not in ``events`` — the
+    comparison is between pricing and not pricing the trades that were
+    actually taken, never a re-optimised strategy."""
+    n = len(events)
+    if not n:
+        return {"gross_mean_bp": None, "cost_mean_bp": None, "funding_mean_bp": None,
+                "net_mean_bp": None}
+    return {"gross_mean_bp": sum(x["gross_bp"] for x in events) / n,
+            "cost_mean_bp": sum(x["cost_bp"] for x in events) / n,
+            "funding_mean_bp": sum(x["funding_bp"] for x in events) / n,
+            "net_mean_bp": sum(x["net_bp"] for x in events) / n}
+
+
+#: primary reason a validation member did not pass (reporting, never a gate)
+FAILURE_CLASSES = ("PASSED_STEPM", "DATA_MISSING", "INSUFFICIENT_DATA", "NO_EDGE_OUT_OF_SAMPLE",
+                   "FAIL_COST", "FAIL_STAT")
+
+
+def validation_failure_class(per_symbol: Mapping, symbols: Sequence[str], *, rejected: bool,
+                             powered: bool, min_events: int) -> str:
+    """Why a member ended where it did, in the order a reader should act on:
+
+    * DATA_MISSING          – a required symbol produced no validation event
+    * INSUFFICIENT_DATA     – fewer events than the preregistered minimum (UNDETERMINED)
+    * NO_EDGE_OUT_OF_SAMPLE – mean GROSS move <= 0 on a symbol: the DEV edge did
+      not carry over (overfitting / decay), costs are not the reason
+    * FAIL_COST             – gross > 0 but net <= 0 on a symbol: trading cost or
+      funding removed the edge
+    * FAIL_STAT             – net > 0 everywhere but StepM did not reject (too weak
+      or too unstable for the batch-level FWER test)
+    """
+    if rejected and powered:
+        return "PASSED_STEPM"
+    infos = [per_symbol.get(s) or {} for s in symbols]
+    if any(not (i.get("n") or 0) for i in infos):
+        return "DATA_MISSING"
+    if any((i.get("n") or 0) < min_events for i in infos):
+        return "INSUFFICIENT_DATA"
+    if any((i.get("gross_mean_bp") or 0.0) <= 0 for i in infos):
+        return "NO_EDGE_OUT_OF_SAMPLE"
+    if any((i.get("net_mean_bp") or 0.0) <= 0 for i in infos):
+        return "FAIL_COST"
+    return "FAIL_STAT"
 
 
 def cost_breakeven(events: Sequence[Mapping]) -> Optional[float]:
