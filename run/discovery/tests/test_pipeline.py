@@ -238,7 +238,7 @@ class TestStagedPipeline(PipelineCase):
         w1 = next(iter(recs[0]["windows"].values()))
         w2 = next(iter(recs[2]["windows"].values()))
         self.assertEqual((w1["batch_index"], w2["batch_index"]), (1, 2))
-        self.assertAlmostEqual(w2["alpha"], spending_alpha(2, 0.05))
+        self.assertAlmostEqual(w2["alpha"], spending_alpha(2, 0.05 / 2))   # promo-v3: search family split over 2 windows
         self.assertNotEqual(recs[0]["members"], recs[2]["members"])
 
     def test_interrupted_batch_is_completed_not_replaced(self):
@@ -286,7 +286,7 @@ class TestLockedCampaigns(PipelineCase):
         p.run_validation()
         camp = p.run_locked_campaign()
         pre = [r for r in p.campaigns.records() if r["kind"] == "PREREGISTERED"][0]
-        self.assertAlmostEqual(member_alpha(pre, "BTCUSDT"), spending_alpha(1, 0.05) / 2)
+        self.assertAlmostEqual(member_alpha(pre, "BTCUSDT"), spending_alpha(1, 0.05 / 2) / 2)   # promo-v3
         self.assertEqual(sorted(camp["results"]), sorted([e1, e2]))
 
     def test_missing_locked_data_never_consumes_and_resumes(self):

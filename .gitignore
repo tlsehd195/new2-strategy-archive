@@ -4,3 +4,5 @@ push_err.log
 *.tmp56b
 __pycache__/
 *.pyc
+# private account fills and their quarantine (fills_import.py) — never committed
+run/discovery/private_fills/

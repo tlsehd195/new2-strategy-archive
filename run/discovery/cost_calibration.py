@@ -9,9 +9,10 @@ context can become ``verified``:
 2. the sample is split chronologically — the first part calibrates the
    parameters, the second part (never seen by the fit) verifies them;
 3. a preregistered criteria file (``config/cost_verification_v1.json``)
-   decides VERIFIED / NOT_VERIFIED / INSUFFICIENT_DATA /
+   decides VERIFIED / NOT_VERIFIED / INSUFFICIENT_DATA / DATA_INVALID /
    BLOCKED_EXTERNAL_EVIDENCE (too little genuine evidence is INSUFFICIENT_DATA,
-   a failed check on enough evidence is NOT_VERIFIED);
+   a failed check on enough evidence is NOT_VERIFIED, evidence with integrity
+   problems — quarantined or duplicate rows — is DATA_INVALID);
 4. the decision is sealed in an append-only record whose content hash is
    checked again whenever a cost context claims to be verified
    (``CostContext.from_verification``).
@@ -52,7 +53,7 @@ from typing import Iterable, Mapping, Optional, Sequence
 
 from engine_lib import append_jsonl, canonical_json, code_identity, iso_now, iter_jsonl
 
-COST_CALIBRATION_VERSION = "cost-calib-v3"
+COST_CALIBRATION_VERSION = "cost-calib-v4"
 RECORD_SCHEMA = "cost_verification_v1"
 DEFAULT_CRITERIA = Path(__file__).resolve().parent / "config" / "cost_verification_v1.json"
 
@@ -77,9 +78,18 @@ MAX_FILL_DEVIATION = 0.05                # |fill / ref - 1|
 MAX_OVERFILL = 1.05                      # filled_notional / notional (price moves on a fixed qty)
 
 #: statuses of a calibration record.  INSUFFICIENT_DATA = the evidence is genuine
-#: but too small for the preregistered sample rules (collect more, nothing failed);
-#: NOT_VERIFIED = the model failed a check on enough data.
-RECORD_STATUSES = ("VERIFIED", "NOT_VERIFIED", "INSUFFICIENT_DATA", "BLOCKED_EXTERNAL_EVIDENCE")
+#: but too small (or cannot show a preregistered criterion) — collect more, nothing
+#: failed; NOT_VERIFIED = the model failed a check on enough data; DATA_INVALID
+#: (v4) = the evidence itself has integrity problems (quarantined / duplicate rows,
+#: a conflicting export) — fix the data, the model was not judged.
+RECORD_STATUSES = ("VERIFIED", "NOT_VERIFIED", "INSUFFICIENT_DATA", "DATA_INVALID",
+                   "BLOCKED_EXTERNAL_EVIDENCE")
+
+#: the cost-evidence vocabulary of the 2026-10-20 directive, derived (never stored
+#: as a second status) from a cost context and its latest record — see
+#: :func:`evidence_status` and STATISTICS_AND_STATES.md
+EVIDENCE_STATUSES = ("VERIFIED_FROM_ACTUAL_FILLS", "ESTIMATED_FROM_PUBLIC_QUOTES", "INSUFFICIENT_DATA",
+                     "DATA_INVALID", "NOT_CALIBRATED", "REVERIFY_REQUIRED", "NOT_VERIFIED")
 
 
 class CalibrationError(ValueError):
@@ -358,9 +368,17 @@ def load_criteria(path: Optional[Path] = None) -> tuple[dict, str]:
 
 def calibrate_and_verify(obs: Sequence[Observation], base_ctx, *, required_symbols: Sequence[str],
                          order_value: float, criteria_path: Optional[Path] = None,
-                         source_ref: str = "", quarantined: int = 0) -> dict:
+                         source_ref: str = "", quarantined: int = 0,
+                         order_outcomes_observable: bool = True, data_origin: Optional[str] = None,
+                         import_integrity_failed: bool = False) -> dict:
     """Fit on the first ``calibration_fraction`` (by time), verify the fitted
-    context on the rest.  Returns an UNSEALED decision record (see :func:`seal`)."""
+    context on the rest.  Returns an UNSEALED decision record (see :func:`seal`).
+
+    ``order_outcomes_observable=False``: the source shows only executed orders
+    (a trade export), so the reject rate cannot be measured — the criterion is
+    then unmet (INSUFFICIENT_DATA), never "0 rejects".  ``data_origin`` is
+    recorded; ``"synthetic_test"`` can never be VERIFIED.  Quarantined rows,
+    duplicates or ``import_integrity_failed`` make the record DATA_INVALID."""
     from costs_bridge import COST_MODEL_SOURCE_SHA256, CostContext, CostError, REQUIRED_COST_PARAMS
     crit, crit_hash = load_criteria(criteria_path)
     for o in obs:
@@ -374,7 +392,8 @@ def calibrate_and_verify(obs: Sequence[Observation], base_ctx, *, required_symbo
                  "data_sha256": data_sha256(obs), "n_observations": len(obs),
                  "cost_source_sha256": COST_MODEL_SOURCE_SHA256,
                  "code_hash": code_identity(files=("cost_calibration.py", "costs_bridge.py"))["code_hash"],
-                 "base_params": dict(base_ctx.params), "n_quarantined": int(quarantined)}
+                 "base_params": dict(base_ctx.params), "n_quarantined": int(quarantined),
+                 "data_origin": data_origin, "order_outcomes_observable": bool(order_outcomes_observable)}
     if obs:
         rec["collection_period"] = {"first_ts_ms": obs[0].ts_ms, "last_ts_ms": obs[-1].ts_ms,
                                     "days": (obs[-1].ts_ms - obs[0].ts_ms) / 86_400_000}
@@ -388,12 +407,19 @@ def calibrate_and_verify(obs: Sequence[Observation], base_ctx, *, required_symbo
         # in-memory inputs (several files, adapters) get the same duplicate rule as a file load
         reasons.append(f"{dups} duplicate observations — one execution counted twice is not evidence")
     rec["n_duplicates"] = dups
+    integrity: list[str] = []
+    if dups:
+        integrity.append(reasons.pop())
     if quarantined:
-        reasons.append(f"{quarantined} source rows quarantined (invalid or duplicate) — "
-                       "a source with bad rows is not verification evidence")
+        integrity.append(f"{quarantined} source rows quarantined (invalid or duplicate) — "
+                         "a source with bad rows is not verification evidence")
+    if import_integrity_failed:
+        integrity.append("the fill import failed its integrity checks (DATA_INVALID)")
+    if data_origin == "synthetic_test":
+        reasons.append("synthetic test data is never verification evidence")
     if not obs:
-        rec.update({"status": "BLOCKED_EXTERNAL_EVIDENCE",
-                    "reasons": ["no execution observations supplied"] + reasons})
+        rec.update({"status": "DATA_INVALID" if integrity else "BLOCKED_EXTERNAL_EVIDENCE",
+                    "reasons": ["no execution observations supplied"] + integrity + reasons})
         return rec
     missing = [c for c in MODEL_COMPONENTS if c not in components]
     if missing:
@@ -480,7 +506,12 @@ def calibrate_and_verify(obs: Sequence[Observation], base_ctx, *, required_symbo
         s: error_summary([e for o, e in zip(used, errs) if o.symbol == s]) for s in per_sym}
     for s in syms:
         _limits(rec["verification_errors_by_symbol"][s], f"{s}: ")
-    if n_ord and rec["fill_rates"]["REJECTED"] > crit["max_reject_rate"]:
+    if not order_outcomes_observable:
+        # a trades-only export lists executed orders only: "no rejects seen" is not a reject rate
+        rec["fill_rates"] = {s: None for s in FILL_STATUSES}
+        shortfall.append("reject rate not observable from a trades-only export — supply the "
+                         "complete order log (decision log with unfilled orders)")
+    elif n_ord and rec["fill_rates"]["REJECTED"] > crit["max_reject_rate"]:
         reasons.append(f"reject rate {rec['fill_rates']['REJECTED']:.3f} > {crit['max_reject_rate']}")
     # representativeness (informational): which market states the evidence covers
     rec["coverage_notes"] = [f"verification evidence covers {len(rec['by_volatility'])} of "
@@ -489,14 +520,16 @@ def calibrate_and_verify(obs: Sequence[Observation], base_ctx, *, required_symbo
                              "participation buckets; other regimes are not verified"]
     if missing:
         status = "BLOCKED_EXTERNAL_EVIDENCE"
+    elif integrity:
+        status = "DATA_INVALID"
     elif reasons:
         status = "NOT_VERIFIED"
     elif shortfall:
         status = "INSUFFICIENT_DATA"
     else:
         status = "VERIFIED"
-    rec.update({"status": status, "reasons": reasons + shortfall,
-                "sample_shortfall": shortfall})
+    rec.update({"status": status, "reasons": integrity + reasons + shortfall,
+                "sample_shortfall": shortfall, "integrity_issues": integrity})
     return rec
 
 
@@ -538,6 +571,42 @@ def check_record(rec: Mapping) -> None:
         raise CalibrationError("verification was made against a different cost-model source")
     if "exchange_fills" not in rec.get("source_kinds", []):
         raise CalibrationError("only account execution reports can verify the cost model")
+    if rec.get("data_origin") == "synthetic_test":
+        raise CalibrationError("synthetic test data can never verify the cost model")
+
+
+def evidence_status(rec: Optional[Mapping], *, cost_status: Optional[str] = None) -> str:
+    """Directive vocabulary for one cost-evidence situation.
+
+    ``rec`` = the latest cost-verification record for the use in question (or
+    None); ``cost_status`` = ``CostContext.status`` of the context in use.
+    The mapping is a VIEW: stored statuses keep their names
+    (``ESTIMATED_FROM_PUBLIC_DATA`` is shown as ESTIMATED_FROM_PUBLIC_QUOTES,
+    ``BLOCKED_EXTERNAL_EVIDENCE`` — no account fills — as INSUFFICIENT_DATA)."""
+    if rec is not None:
+        st = rec.get("status")
+        if st == "VERIFIED":
+            try:
+                check_record(rec)
+            except CalibrationError as e:
+                msg = str(e)
+                if "altered" in msg:
+                    return "DATA_INVALID"
+                if "synthetic" in msg:
+                    return "NOT_CALIBRATED"
+                return "REVERIFY_REQUIRED"          # e.g. made against another cost-model source
+            if rec.get("criteria_hash") != load_criteria()[1]:
+                return "REVERIFY_REQUIRED"
+            return "VERIFIED_FROM_ACTUAL_FILLS"
+        if st in ("DATA_INVALID", "INSUFFICIENT_DATA", "NOT_VERIFIED"):
+            return st
+        if st == "BLOCKED_EXTERNAL_EVIDENCE":
+            return "INSUFFICIENT_DATA"
+    if cost_status == "ESTIMATED_FROM_PUBLIC_DATA":
+        return "ESTIMATED_FROM_PUBLIC_QUOTES"
+    if cost_status == "VERIFIED":
+        return "VERIFIED_FROM_ACTUAL_FILLS"
+    return "NOT_CALIBRATED"
 
 
 def records(ledger: Path) -> list[dict]:
@@ -579,7 +648,7 @@ def main(argv: Optional[Iterable[str]] = None) -> int:  # pragma: no cover - CLI
         append_record(Path(a.ledger), rec)
     print(json.dumps(rec, indent=1, sort_keys=True, default=str))
     return 0 if rec["status"] == "VERIFIED" else (
-        4 if rec["status"] in ("BLOCKED_EXTERNAL_EVIDENCE", "INSUFFICIENT_DATA") else 2)
+        4 if rec["status"] in ("BLOCKED_EXTERNAL_EVIDENCE", "INSUFFICIENT_DATA") else 2)  # DATA_INVALID -> 2
 
 
 if __name__ == "__main__":  # pragma: no cover

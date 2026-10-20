@@ -3,6 +3,8 @@ name: research-ci
 # shell checks, config schemas, dependency scan and the full unit-test suite.
 # Synthetic data and temp dirs only: no market data is downloaded, no research
 # cycle runs, the locked-TEST ledger is never touched, nothing is deployed.
+# Self-contained: only this repository is checked out (no other repository,
+# token or path is needed — the cost model lives in run/discovery/cost_model.py).
 on:
   push:
     paths: ["run/**", ".github/workflows/research-ci.yml", "data/fill_ledger.jsonl"]
@@ -21,14 +23,6 @@ jobs:
         python: ["3.11", "3.13"]
     steps:
       - uses: actions/checkout@v4
-      - name: Check out the NEW2 cost model (read-only dependency, pinned)
-        uses: actions/checkout@v4
-        with:
-          repository: tlsehd195/NEW2
-          ref: 8ec637153b4375143cbb9b34c00eb32053feca5e
-          path: new2
-          # NEW2 is private: a fine-grained token with Contents: read on NEW2 only
-          token: ${{ secrets.NEW2_READ_TOKEN || github.token }}
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
@@ -46,8 +40,6 @@ jobs:
           shellcheck run/discovery/run_cycle.sh
       - name: Config schemas
         working-directory: run/discovery
-        env:
-          COINTRADER_SRC: ${{ github.workspace }}/new2/src
         run: |
           python - <<'EOF'
           import json, sys
@@ -60,6 +52,8 @@ jobs:
           for name in ASSUMED_PROFILES: load_assumed_profile(name)
           from public_cost_estimate import load_criteria as estimate_criteria
           estimate_criteria()
+          from fills_import import load_import_policy
+          load_import_policy()
           json.load(open("data_exceptions.json"))
           print("configs ok")
           EOF
@@ -68,7 +62,7 @@ jobs:
           python - <<'EOF'
           import ast, pathlib, sys
           local = {p.stem for p in pathlib.Path("run/discovery").rglob("*.py")}
-          allowed = set(sys.stdlib_module_names) | local | {"cointrader"}
+          allowed = set(sys.stdlib_module_names) | local
           legacy = {"funding_cost.py", "portfolio_sim.py"}   # v1 diagnostics, not used by the runner (README)
           bad = []
           for p in pathlib.Path("run/discovery").rglob("*.py"):
@@ -83,7 +77,5 @@ jobs:
           EOF
       - name: Unit tests
         working-directory: run
-        env:
-          COINTRADER_SRC: ${{ github.workspace }}/new2/src
         run: python -m unittest discover -s discovery/tests -v 2>&1 | tail -n 40
         shell: bash -o pipefail {0}

@@ -1,0 +1,65 @@
+{
+  "schema": "promotion_config_v1",
+  "version": "promo-v3",
+  "note": "promo-v2 + one test family for the WHOLE search (2026-10-20 directive §5): the FWER budget alpha_total_per_search is split equally over the validation (and locked) windows of every supported symbol (strategy_spec.SUPPORTED_SYMBOLS), and alpha spending runs per window on that share. Under v2 each window had its own 0.05, so a claim over BTC and ETH windows together had FWER up to 0.10. Stricter, never looser; every other value unchanged. New version => new experiment context.",
+  "dev_screen": {
+    "min_events_per_symbol": 30,
+    "min_mean_bp": 0.0,
+    "min_t": 1.0,
+    "min_fold_positive_share": 0.5,
+    "dev_folds": 4,
+    "max_cost_share": 0.8
+  },
+  "validation": {
+    "method": "romano_wolf_stepm_studentized_per_symbol_window",
+    "alpha_total_per_search": 0.05,
+    "alpha_window_split": "alpha_total_per_search / len(SUPPORTED_SYMBOLS) per window",
+    "alpha_spending": "(alpha_total_per_search/len(SUPPORTED_SYMBOLS))*6/pi^2/k^2 (k = batch index on the window)",
+    "max_batch_size": 20,
+    "bootstrap_B": 1000,
+    "bootstrap_seed": 7,
+    "min_events_per_symbol": 30,
+    "min_days": 30
+  },
+  "robustness": {
+    "cost_multipliers": [
+      1.5,
+      2.0
+    ],
+    "require_positive_at_cost_multiplier": 1.5,
+    "regime_min_positive_share": 0.5,
+    "regime_min_events": 10,
+    "max_validation_mdd_bp": 2500.0,
+    "max_top5pct_event_profit_share": 0.6,
+    "max_top_day_profit_share": 0.35,
+    "min_param_neighbour_positive_share": 0.6,
+    "walk_forward_min_positive_share": 0.6,
+    "ci_level": 0.95,
+    "pbo_partitions": 16,
+    "pbo_min_trials": 8,
+    "max_pbo": 0.5
+  },
+  "locked": {
+    "alpha_total_per_search": 0.05,
+    "alpha_window_split": "alpha_total_per_search / len(SUPPORTED_SYMBOLS) per window",
+    "alpha_spending": "(alpha_total_per_search/len(SUPPORTED_SYMBOLS))*6/pi^2/c^2 (c = campaign index on the window), Bonferroni inside the campaign",
+    "max_campaigns_per_window": 3,
+    "min_events_per_symbol": 30
+  },
+  "promotion": {
+    "unverified_cost_label": "UNVERIFIED_COST_MODEL",
+    "required_evidence": [
+      "dev",
+      "validation",
+      "robustness",
+      "locked"
+    ],
+    "unverified_cost_outcome": "BLOCKED_COST (research candidate only)"
+  },
+  "paper": {
+    "mode": "isolated_replay_only",
+    "start": "day after the symbol's locked window end + embargo",
+    "min_events": 20,
+    "max_runs_per_strategy": 1
+  }
+}

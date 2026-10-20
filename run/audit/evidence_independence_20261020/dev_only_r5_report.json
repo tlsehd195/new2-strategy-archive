@@ -1,0 +1,162 @@
+{
+ "context_id": "C2-8ffa856776dc5d3900ad",
+ "candidates": {
+  "registered_specs": 777,
+  "by_source": {
+   "seed": 705,
+   "evolution": 72
+  },
+  "search_pool": 777,
+  "lineage_edges": 777,
+  "by_operator": {
+   "legacy_translation": 705,
+   "split_symbol": 4,
+   "resample_param": 3,
+   "tweak_param": 6,
+   "add_entry_condition": 4,
+   "tweak_threshold": 5,
+   "change_horizon": 4,
+   "swap_feature": 8,
+   "add_filter": 4,
+   "flip_direction": 2,
+   "crossover": 12,
+   "random_spec": 18,
+   "change_exit": 2
+  }
+ },
+ "dev": {
+  "evaluated": 777,
+  "ok": 777,
+  "screen_pass": 41,
+  "not_ok": {}
+ },
+ "validation": {
+  "batches": 0,
+  "members": 0,
+  "outcomes": {},
+  "failure_classes": {},
+  "members_detail": []
+ },
+ "statuses": {
+  "REJECTED": 672,
+  "INCONCLUSIVE": 64,
+  "RESEARCH_ONLY": 41
+ },
+ "outcomes": {
+  "total": {
+   "FAIL_COST": 232,
+   "UNDETERMINED_POWER": 64,
+   "FAIL_STAT": 440,
+   "PENDING": 41
+  },
+  "by_stage": {
+   "dev_screen": {
+    "FAIL_COST": 232,
+    "UNDETERMINED_POWER": 64,
+    "FAIL_STAT": 440,
+    "PENDING": 41
+   },
+   "validation": {}
+  }
+ },
+ "dedup": {
+  "counts": {
+   "behaviour_equal": 6
+  },
+  "decisions": [
+   {
+    "round": 1,
+    "fingerprint_version": "fp-v2",
+    "kind": "behaviour_equal",
+    "operator": "crossover",
+    "parents": [
+     "S-202b2284faa1e9ac",
+     "S-391396a9487de780"
+    ],
+    "proposed_fingerprint": "DF-05205406c81a506256b3",
+    "proposed_id": "S-ea1be04fa0e3be1f",
+    "reason": "behaviourally identical (normal form of the conditions)",
+    "representative": "S-202b2284faa1e9ac"
+   },
+   {
+    "round": 1,
+    "fingerprint_version": "fp-v2",
+    "kind": "behaviour_equal",
+    "operator": "crossover",
+    "parents": [
+     "S-1a3a2db7ab18831d",
+     "S-6e5d594fd0af0bbe"
+    ],
+    "proposed_fingerprint": "DF-5d19e3858ee4a2696aed",
+    "proposed_id": "S-7c1f8e64afaa6fc4",
+    "reason": "behaviourally identical (normal form of the conditions)",
+    "representative": "S-1a3a2db7ab18831d"
+   },
+   {
+    "round": 2,
+    "fingerprint_version": "fp-v2",
+    "kind": "behaviour_equal",
+    "operator": "change_risk",
+    "parents": [
+     "S-202b2284faa1e9ac"
+    ],
+    "proposed_fingerprint": "DF-c09051ba2cf218ced09a",
+    "proposed_id": "S-0d7f17648693c1b9",
+    "reason": "differs only in risk settings, which no evaluation stage reads",
+    "representative": "S-202b2284faa1e9ac"
+   },
+   {
+    "round": 2,
+    "fingerprint_version": "fp-v2",
+    "kind": "behaviour_equal",
+    "operator": "crossover",
+    "parents": [
+     "S-6d1f375a260fc295",
+     "S-202b2284faa1e9ac"
+    ],
+    "proposed_fingerprint": "DF-39382b34a0c0c48b635e",
+    "proposed_id": "S-bd2f89e5a0b47b3f",
+    "reason": "behaviourally identical (normal form of the conditions)",
+    "representative": "S-6d1f375a260fc295"
+   },
+   {
+    "round": 2,
+    "fingerprint_version": "fp-v2",
+    "kind": "behaviour_equal",
+    "operator": "crossover",
+    "parents": [
+     "S-391396a9487de780",
+     "S-31490fd371859119"
+    ],
+    "proposed_fingerprint": "DF-029a8ce91960fb2fb36c",
+    "proposed_id": "S-777ff681a210bcf4",
+    "reason": "behaviourally identical (normal form of the conditions)",
+    "representative": "S-2d59854060280dc5"
+   },
+   {
+    "round": 2,
+    "fingerprint_version": "fp-v2",
+    "kind": "behaviour_equal",
+    "operator": "crossover",
+    "parents": [
+     "S-5cfcf6e8faf91466",
+     "S-6e5d594fd0af0bbe"
+    ],
+    "proposed_fingerprint": "DF-6ef4234bfc0992166cd7",
+    "proposed_id": "S-18f26c15e0484421",
+    "reason": "behaviourally identical (normal form of the conditions)",
+    "representative": "S-ce2892b62e1979b0"
+   }
+  ],
+  "near_duplicates_kept": [],
+  "fingerprint_versions": [
+   "fp-v2"
+  ]
+ },
+ "survivors": [],
+ "locked": {
+  "registry_present": false,
+  "attempts": 0,
+  "exposed_uses": 0
+ }
+}

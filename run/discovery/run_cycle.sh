@@ -27,7 +27,6 @@
 # 환경변수(모두 선택):
 #   NEW2_DISCOVERY_ROOT  state/, results/, cycle_log.txt 위치 (기본: 이 디렉터리)
 #   NEW2_DATA_DIR        데이터 디렉터리 (runner가 fail-closed 검사)
-#   COINTRADER_SRC       비용모델 단일 소스(공개 NEW2 checkout의 src)
 #   NEW2_DISC_LOG        로그 파일 경로 (기본: $NEW2_DISCOVERY_ROOT/cycle_log.txt)
 #   NEW2_DISC_AUDIT      감사 로그 경로 (기본: $NEW2_DISCOVERY_ROOT/cycle_audit.log, append)
 #   NEW2_DISC_TEE        로그 기록 명령 (기본: tee; 테스트에서 가짜 기록기로 교체)
@@ -94,12 +93,47 @@ mkdir -p "$ROOT" 2>/dev/null || { audit "event=FAILED reason=root_dir_create_fai
 mkdir -p "$(dirname "$LOG")" 2>/dev/null || { audit "event=FAILED reason=log_dir_create_failed log=$LOG"; echo "CYCLE_FAILED cannot create log directory for $LOG"; exit 1; }
 
 # ── 실행: runner / 로그 기록기 / 출력 축약기 종료코드를 각각 보존 ──
-# PIPESTATUS는 파이프라인 직후 첫 명령에서만 유효하므로 곧바로 복사한다.
-"$PY" "$SCRIPT_DIR/runner.py" --batch "$BATCH" --mode "$MODE" 2>&1 | "$TEE" -a "$LOG" | tail -n 15
-st=("${PIPESTATUS[@]}")
-rc="${st[0]}"
+# 파이프라인은 백그라운드 서브셸에서 돌리고 PIPESTATUS를 파일로 받는다. 그래야
+# 이 스크립트가 SIGTERM/SIGINT/SIGHUP을 받았을 때 바로 반응해 runner에 SIGTERM을
+# 전달하고(runner는 CYCLE_FAILED를 기록하고 잠금을 풀고 끝난다), 끝날 때까지
+# 기다린 뒤 CYCLE_FAILED(1)로 끝낼 수 있다. 신호로 끊긴 사이클은 어떤 경우에도
+# 성공으로 보고되지 않는다. 임시 파일은 종료 시 지운다(2026-10-20 지시 §7).
+TMP_RC="$(mktemp "${TMPDIR:-/tmp}/run_cycle_rc.XXXXXX")" || { audit "event=FAILED reason=mktemp_failed"; echo "CYCLE_FAILED cannot create temp file"; exit 1; }
+TMP_PID="$(mktemp "${TMPDIR:-/tmp}/run_cycle_pid.XXXXXX")" || { rm -f "$TMP_RC"; audit "event=FAILED reason=mktemp_failed"; echo "CYCLE_FAILED cannot create temp file"; exit 1; }
+# shellcheck disable=SC2317,SC2329  # invoked by the EXIT trap
+cleanup() { rm -f "$TMP_RC" "$TMP_PID"; }
+trap cleanup EXIT
+interrupted=""
+# shellcheck disable=SC2317,SC2329  # invoked by the signal traps
+on_signal() {
+  interrupted="$1"
+  local rpid
+  rpid="$(cat "$TMP_PID" 2>/dev/null)"
+  if [ -n "$rpid" ]; then kill -TERM "$rpid" 2>/dev/null; fi
+}
+trap 'on_signal TERM' TERM
+trap 'on_signal INT' INT
+trap 'on_signal HUP' HUP
+
+(
+  { "$PY" "$SCRIPT_DIR/runner.py" --batch "$BATCH" --mode "$MODE" & echo "$!" >"$TMP_PID"; wait "$!"; } 2>&1 \
+    | "$TEE" -a "$LOG" | tail -n 15
+  # PIPESTATUS는 파이프라인 직후 첫 명령에서만 유효하므로 곧바로 기록한다.
+  echo "${PIPESTATUS[@]}" >"$TMP_RC"
+) &
+child=$!
+while kill -0 "$child" 2>/dev/null; do
+  wait "$child"
+done
+read -r -a st <"$TMP_RC" 2>/dev/null || st=()
+rc="${st[0]:-1}"
 tee_rc="${st[1]:-1}"
 tail_rc="${st[2]:-1}"
+if [ -n "$interrupted" ]; then
+  audit "event=CYCLE_FAILED reason=signal sig=$interrupted runner_rc=$rc"
+  echo "CYCLE_FAILED signal=$interrupted runner_rc=$rc mode=$MODE"
+  exit 1
+fi
 
 log_failed=0
 if [ "$tee_rc" -ne 0 ] || [ "$tail_rc" -ne 0 ]; then

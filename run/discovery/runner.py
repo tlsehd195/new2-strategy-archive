@@ -1147,7 +1147,7 @@ class Runner:
             return None, retired
         camp = self.campaigns.preregister(
             source="legacy_fdr", source_ref=f"{base}:{k}", context_id=self._ctx, members=members,
-            alpha_total=cfg["alpha_total_per_window"], max_campaigns=cfg["max_campaigns_per_window"],
+            alpha_total=_window_alpha(cfg), max_campaigns=cfg["max_campaigns_per_window"],
             method="legacy cell test (HAC t, n>=30, mean>0) AND p <= campaign member alpha",
             config_hash=cfg["config_hash"])
         return camp, retired
@@ -1630,10 +1630,17 @@ class PrefixShim:
 
 def _locked_campaign_cfg() -> dict:
     """Locked-window campaign settings shared with the evolution pipeline
-    (config/promotion_v1.json ``locked`` section)."""
+    (``locked`` section of the current promotion config; the per-window alpha
+    comes from ``pipeline.window_alpha_total`` — promo-v3 splits one search-wide
+    budget over the windows)."""
     from pipeline import load_promotion_config
     cfg, h = load_promotion_config()
     return {**cfg["locked"], "config_hash": h}
+
+
+def _window_alpha(cfg: Mapping) -> float:
+    from pipeline import window_alpha_total
+    return window_alpha_total(cfg)
 
 
 def _agg_symbol_status(cells) -> str:
@@ -1671,6 +1678,12 @@ def parse_options(argv: Sequence[str]) -> dict:
     i = 0
     while i < len(args):
         a = args[i]
+        if a == "--dev-only":
+            # evolve only: seeds + search rounds + DEV evaluations, no validation /
+            # robustness / locked / paper stage (no confirmatory window is looked at)
+            opts["dev_only"] = True
+            i += 1
+            continue
         key = a[2:].split("=", 1)[0] if a.startswith("--") else None
         if key not in opts:
             raise UsageError(f"unknown argument {a!r}")
@@ -1690,6 +1703,8 @@ def parse_options(argv: Sequence[str]) -> dict:
         if not val.isdigit() or int(val) < (0 if key == "rounds" else 1):
             raise UsageError(f"--{key} must be a positive integer, got {val!r}")
         opts[key] = int(val)
+    if opts.get("dev_only") and opts["mode"] != "evolve":
+        raise UsageError("--dev-only needs --mode evolve")
     return opts
 
 
@@ -1725,12 +1740,13 @@ def cost_from_env() -> CostContext:
                           + " | ".join(ASSUMED_PROFILES) + " | public_estimate:<record.json>)")
 
 
-USAGE = """usage: runner.py [--batch N] [--mode legacy|evolve|full] [--rounds R] [--evals E]
+USAGE = """usage: runner.py [--batch N] [--mode legacy|evolve|full] [--rounds R] [--evals E] [--dev-only]
   --mode legacy  (default) v2 candidate engine: generation BH-FDR, state/state.json,
                  state/discovery_ledger.jsonl, results/cycle_summary.json
   --mode evolve  evolution engine: StepM validation batches + locked campaigns,
                  state/evolution/*, results/evolution_cycle_summary.json
   --mode full    legacy then evolve in one cycle
+  --dev-only     (evolve) DEV evaluation and search only: no validation window is looked at
 Both share the single-use locked-window records (state/lock_test_usage.json,
 state/locked_window_campaigns.jsonl).  A cycle status is not a strategy verdict."""
 
@@ -1785,19 +1801,57 @@ def main(argv: Sequence[str]) -> int:
                 raise PathConfigError(f"validation window history {vh} missing — refusing to "
                                       "restart alpha spending at k = 1")
             print(f"VALIDATION_HISTORY {vh}", file=sys.stderr)
-            es = run_evolution_cycle(paths.state_dir, RunnerDataProvider(paths.data_dir),
-                                     cost, rounds=opts["rounds"],
-                                     max_dev_evals=opts["evals"], results_dir=paths.results_dir,
-                                     forward_feed=FileFeed(paths.data_dir), validation_history=vh)
+            # SIGTERM / SIGINT stop the evolution cycle where it is: the cycle wrapper
+            # records CYCLE_FAILED (never a lingering CYCLE_RUNNING), the lock is
+            # released below and the next run resumes from the ledgers (§7)
+            old = _install_interrupt_handlers()
+            try:
+                es = run_evolution_cycle(paths.state_dir, RunnerDataProvider(paths.data_dir),
+                                         cost, rounds=opts["rounds"],
+                                         max_dev_evals=opts["evals"], results_dir=paths.results_dir,
+                                         forward_feed=FileFeed(paths.data_dir), validation_history=vh,
+                                         confirmatory=not opts.get("dev_only"))
+            finally:
+                _restore_handlers(old)
             print(json.dumps(es.to_json(), default=str))
             erc = CYCLE_EXIT[es.status]
             rc = erc if rc == 0 else (rc if erc == 0 else max(rc, erc))
+    except CycleInterrupted as e:
+        print(json.dumps({"status": "FAILED", "fatal": f"interrupted by {e}"}))
+        return 1
     except Exception as e:  # noqa: BLE001 — a crash is FAILED, never success
         print(json.dumps({"status": "FAILED", "fatal": f"{type(e).__name__}: {e}"}))
         return 1
     finally:
         lock.release()
     return rc
+
+
+class CycleInterrupted(BaseException):
+    """SIGTERM / SIGINT during an evolution cycle (BaseException: no
+    ``except Exception`` on the way can swallow it)."""
+
+
+def _raise_interrupt(signum, _frame):  # pragma: no cover - exercised by a subprocess test
+    raise CycleInterrupted(signal.Signals(signum).name)
+
+
+def _install_interrupt_handlers() -> dict:
+    old = {}
+    for sig in (signal.SIGTERM, signal.SIGINT):
+        try:
+            old[sig] = signal.signal(sig, _raise_interrupt)
+        except (ValueError, OSError):      # not the main thread
+            pass
+    return old
+
+
+def _restore_handlers(old: dict) -> None:
+    for sig, h in old.items():
+        try:
+            signal.signal(sig, h)
+        except (ValueError, OSError):
+            pass
 
 
 if __name__ == "__main__":

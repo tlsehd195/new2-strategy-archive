@@ -1,0 +1,4 @@
+# DEV-only re-screen with the latest working-tree code (directive 2026-10-20 §5), clean copy without COINTRADER_SRC
+env -u COINTRADER_SRC NEW2_DATA_DIR=<unzipped upload f6379f02, dataset sha256 5f0101f7...> NEW2_DISCOVERY_ROOT=<fresh dir> NEW2_DISC_MODE=evolve NEW2_COST_PROFILE=public_estimate:data/public_market_estimate/estimate_v1.json python3 run/discovery/runner.py --mode evolve --dev-only --rounds 3 --evals 2000
+# started 2026-10-20T09:31:57Z, finished 10:19:59Z (2882 s), exit CYCLE_OK; no validation or locked window loaded, no alpha spent,
+# validation_window_history.jsonl unchanged. Then: ledger_check.py <state> (CONSISTENT), evolution_report.py <state>.

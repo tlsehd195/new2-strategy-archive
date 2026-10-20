@@ -83,6 +83,17 @@ def build_report(state_dir: Path, context_id: Optional[str] = None) -> dict:
                                                                       "hac_p")}
                                            for s, x in (v.get("per_symbol") or {}).items()}})
     st_counts = Counter(r["status"] for r in statuses.values())
+    # directive vocabulary (pipeline.outcome_label), per strategy, from the same ledgers
+    from pipeline import outcome_label
+    dev_by = {r["strategy_id"]: r for r in dev}
+    reverify = _reverify_ids(evo, ctx, statuses)
+    labels = {sid: outcome_label(statuses.get(sid), dev=dev_by.get(sid), validation=val.get(sid),
+                                 reverify=sid in reverify)
+              for sid in sorted(set(statuses) | set(dev_by) | reverify)}
+    by_stage = {"dev_screen": Counter(), "validation": Counter()}
+    for sid, lab in labels.items():
+        by_stage["validation" if (statuses.get(sid) or {}).get("stage") == "validation" else "dev_screen"][lab] += 1
+    dedup = _dedup(evo, lineage)
     lp = Path(state_dir) / "lock_test_usage.json"
     attempts = exposed = 0
     if lp.exists():
@@ -108,9 +119,50 @@ def build_report(state_dir: Path, context_id: Optional[str] = None) -> dict:
                        "failure_classes": dict(Counter(m["failure_class"] for m in members)),
                        "members_detail": members},
         "statuses": dict(st_counts),
+        "outcomes": {"total": dict(Counter(labels.values())),
+                     "by_stage": {k: dict(v) for k, v in by_stage.items()}},
+        "dedup": dedup,
         "survivors": sorted(s for s, r in statuses.items() if r["status"] in SURVIVOR_STATUSES),
         "locked": {"registry_present": lp.exists(), "attempts": attempts, "exposed_uses": exposed},
     }
+
+
+def _reverify_ids(evo: Path, ctx: Optional[str], statuses: dict) -> set:
+    """Strategies with a confirmatory status under ANOTHER context and none
+    under ``ctx`` (same rule as ``EvolutionPipeline.reverification_pending``)."""
+    advanced = {"VALIDATION_SURVIVOR", "PAPER_TEST_READY", "PAPER_TESTING", "PAPER_PASSED",
+                "BLOCKED_COST", "BLOCKED_STATISTICS"}
+    latest: dict = {}
+    for r in iter_jsonl(evo / "statuses.jsonl"):
+        latest[(r["strategy_id"], r["context_id"])] = r
+    out = set()
+    for (sid, c), r in latest.items():
+        if c != ctx and sid not in statuses and r["status"] in advanced:
+            if r["status"].startswith("BLOCKED") and r.get("resume_to") != "VALIDATION_SURVIVOR":
+                continue
+            out.add(sid)
+    return out
+
+
+def _dedup(evo: Path, lineage: list) -> dict:
+    """Audit trail of duplicate detection: every proposal the search refused
+    (exact definition / identical behaviour, with its representative and
+    reason) and every near duplicate it kept and flagged."""
+    refused, kinds = [], Counter()
+    for r in iter_jsonl(evo / "rounds.jsonl"):
+        for x in r.get("dedup_log") or []:
+            kinds[x["kind"]] += 1
+            refused.append({"round": r.get("round_index"), **x})
+    for r in iter_jsonl(evo / "rounds.jsonl"):
+        if "dedup_log" not in r:                     # rounds written before fp-v2: counts only
+            kinds["behaviour_equal (count only, pre fp-v2)"] += int(r.get("semantic_duplicates") or 0)
+            kinds["exact_definition (count only, pre fp-v2)"] += int(r.get("duplicates") or 0)
+    flagged = [{"strategy_id": r["child_id"], "near_duplicate_of": r["detail"]["near_duplicate_of"],
+                "reason": r["detail"].get("near_reason"), "operator": r["operator"],
+                "generation": r.get("generation")}
+               for r in lineage if isinstance(r.get("detail"), dict) and "near_duplicate_of" in r["detail"]]
+    return {"counts": dict(kinds), "decisions": refused, "near_duplicates_kept": flagged,
+            "fingerprint_versions": sorted({r.get("fingerprint_version") or "pre fp-v2" for r in lineage})}
 
 
 def to_markdown(rep: dict) -> str:
@@ -125,6 +177,9 @@ def to_markdown(rep: dict) -> str:
              f"| validation outcomes | {v['outcomes']} |",
              f"| failure classes | {v['failure_classes']} |",
              f"| statuses | {rep['statuses']} |",
+             f"| outcomes (directive vocabulary) | {rep['outcomes']['total']} |",
+             f"| outcomes by stage | {rep['outcomes']['by_stage']} |",
+             f"| dedup decisions | {rep['dedup']['counts']} |",
              f"| survivors | {len(rep['survivors'])} |",
              f"| locked TEST attempts / exposed uses | {rep['locked']['attempts']} / {rep['locked']['exposed_uses']} |", "",
              "## Validation members", "",
@@ -134,6 +189,16 @@ def to_markdown(rep: dict) -> str:
         ps = "; ".join(f"{s}: {x['n']} / {_f(x['gross_mean_bp'])} / {_f(x['cost_mean_bp'])} / {_f(x['mean_bp'])}"
                        for s, x in sorted(m["per_symbol"].items()))
         lines.append(f"| `{m['strategy_id']}` | {m['outcome']} | {m['failure_class']} | {m['status']} | {ps} |")
+    dd = rep["dedup"]
+    if dd["decisions"] or dd["near_duplicates_kept"]:
+        lines += ["", "## Duplicate detection", "",
+                  "| round | kind | proposed | representative | operator | reason |", "|---|---|---|---|---|---|"]
+        for x in dd["decisions"]:
+            lines.append(f"| {x['round']} | {x['kind']} | `{x['proposed_id']}` | `{x['representative']}` | "
+                         f"{x['operator']} | {x['reason']} |")
+        for x in dd["near_duplicates_kept"]:
+            lines.append(f"| - | near_duplicate_kept | `{x['strategy_id']}` | `{x['near_duplicate_of']}` | "
+                         f"{x['operator']} | {x['reason']} |")
     return "\n".join(lines) + "\n"
 
 
@@ -156,7 +221,8 @@ def main(argv=None) -> int:  # pragma: no cover - CLI
         Path(a.json).write_text(json.dumps(rep, indent=1, ensure_ascii=False, default=str))
     if a.md:
         Path(a.md).write_text(to_markdown(rep))
-    print(json.dumps({k: rep[k] for k in ("context_id", "candidates", "dev", "statuses", "survivors")}
+    print(json.dumps({k: rep[k] for k in ("context_id", "candidates", "dev", "statuses", "outcomes",
+                                          "survivors")}
                      | {"validation": {k: rep["validation"][k] for k in ("batches", "members", "outcomes",
                                                                           "failure_classes")}},
                      indent=1, default=str))

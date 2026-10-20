@@ -45,6 +45,7 @@ class EvolutionCycleSummary:
     invalid: int = 0
     duplicates: int = 0
     semantic_duplicates: int = 0
+    near_duplicates: int = 0
     search_status: str = ""
     validation_batch: Optional[dict] = None
     robustness_resumed: list = field(default_factory=list)
@@ -88,7 +89,8 @@ def _run_evolution_cycle(state_dir: Path, provider, cost, *, symbols: Sequence[s
                          max_dev_evals: int = 60, seed_legacy: bool = True,
                          promotion_config: Optional[Path] = None,
                          results_dir: Optional[Path] = None,
-                         forward_feed=None, validation_history: Optional[Path] = None) -> EvolutionCycleSummary:
+                         forward_feed=None, validation_history: Optional[Path] = None,
+                         confirmatory: bool = True) -> EvolutionCycleSummary:
     from paper import PaperRefused, run_paper
     from pipeline import EvolutionPipeline, seed_specs_from_legacy
     t0 = time.time()
@@ -175,7 +177,9 @@ def _run_evolution_cycle(state_dir: Path, provider, cost, *, symbols: Sequence[s
                                    feedback=fb, available_data=avail,
                                    known_ids=pool, symbols=usable,
                                    known_keys={_bkey(pipe.specs.get(x)) for x in pool
-                                               if pipe.specs.get(x) is not None} - {None})
+                                               if pipe.specs.get(x) is not None} - {None},
+                                   known_specs={x: pipe.specs.get(x) for x in sorted(pool)
+                                                if _bkey(pipe.specs.get(x)) is not None})
         for p in props:
             if evaluated >= max_dev_evals:
                 break
@@ -210,9 +214,24 @@ def _run_evolution_cycle(state_dir: Path, provider, cost, *, symbols: Sequence[s
         s.invalid += cnt["invalid"]
         s.duplicates += cnt["duplicates"]
         s.semantic_duplicates += cnt["semantic_duplicates"]
+        s.near_duplicates += cnt["near_duplicates"]
     st.save(state_path)
     s.dev_evaluated = evaluated
     s.search_status = st.status
+    if not confirmatory:
+        # DEV-only cycle: no validation / robustness / locked / paper stage runs and
+        # no confirmatory window is read (re-evaluation without spending a look)
+        s.notes.append("DEV-only cycle: confirmatory stages skipped by request")
+        counts: dict = {}
+        for v in pipe.statuses.all(ctx).values():
+            counts[v] = counts.get(v, 0) + 1
+        s.status_counts = counts
+        s.reverify_pending = pipe.reverification_pending()
+        if st.status == "BUDGET_EXHAUSTED":
+            s.status = "CYCLE_BUDGET_EXHAUSTED"
+        elif evaluated == 0:
+            s.status = "CYCLE_NO_PROGRESS"
+        return _finish(s, t0, results_dir or (Path(state_dir) / "evolution"))
     # 5) confirmatory stages
     s.robustness_resumed = pipe.resume_pending_robustness()
     vb = pipe.run_validation()
