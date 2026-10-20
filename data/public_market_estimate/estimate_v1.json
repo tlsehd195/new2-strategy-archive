@@ -1,0 +1,254 @@
+{
+ "claim": "\ucd94\uc815 \uadfc\uac70 \uc788\uc74c(ESTIMATED_FROM_PUBLIC_DATA) \u2014 not verified, never promotable; a public book is not a fill",
+ "criteria": {
+  "fee_profile": "assumed_public_v1",
+  "half_spread_quantile": 0.9,
+  "impact_fit_min_notional": 100000,
+  "impact_ratio_quantile": 0.9,
+  "latency_move_quantile": 0.5,
+  "max_book_age_ms": 5000,
+  "max_gap_minutes": 10,
+  "max_gap_share": 0.02,
+  "max_invalid_share": 0.01,
+  "max_kline_age_ms": 1020000,
+  "max_participation": 0.05,
+  "max_thin_share": 0.01,
+  "min_hours_per_symbol": 72,
+  "min_snapshots_per_symbol": 2000,
+  "note": "Fixed 2026-10-17 BEFORE any estimate was computed from collected data (collection was running on the user's PC; no estimate had been run or looked at). Supersedes v1 for a stricter estimator, never a looser one: (1) the WORSE of the buy and sell side is used per snapshot instead of their average; (2) a notional whose book walk ran out of visible depth in more than max_thin_share of snapshots is excluded from the impact fit as a whole (dropping only the thin snapshots would keep the cheap ones \u2014 selection bias), and the estimate is unusable when no fit notional is left; (3) snapshots with a stale book or stale closed kline, a duplicate timestamp, a symbol that does not match its folder or non-finite numbers are invalid; (4) collect_manifest.json is required and every input file must match its SHA-256 there. All v1 thresholds are unchanged. A change needs a new file (v3) with a reason.",
+  "notionals": [
+   1000,
+   10000,
+   100000,
+   1000000
+  ],
+  "require_manifest": true,
+  "required_symbols": [
+   "BTCUSDT",
+   "ETHUSDT"
+  ],
+  "schema": "cost_public_estimate_criteria_v2",
+  "side_aggregation": "max",
+  "supersedes": "cost_public_estimate_v1.json"
+ },
+ "criteria_sha256": "2557e7c6cd6ca5411d50979129b40a65e2f0e5dbb7b7700735ec7d64e0c893c8",
+ "estimator_sha256": "8f226977e3a9b644792c7df713313bb176a7d3c3930ad82e80f15d790ee9a3a8",
+ "estimator_version": "public-estimate-v2",
+ "fee_basis": {
+  "fee_source": "Binance USDT-M futures public fee schedule for the base (regular, no BNB discount) tier: maker 0.0200%, taker 0.0500%. Not fetched in this environment (Binance hosts are blocked); re-check against the exchange's published page before relying on it.",
+  "observed": false,
+  "profile": "assumed_public_v1",
+  "profile_sha256": "b6478c34e5f1b7bfcae2515ecc32824f60d904b8c09916cff43915082431ef74"
+ },
+ "limitations": [
+  "public order book snapshots, not executions: hidden liquidity, queue position, latency and adverse selection are only approximated",
+  "fees are the public-schedule assumption (not observable in public data)",
+  "estimated over the collection period only; another regime can be costlier"
+ ],
+ "manifest_problems": [],
+ "manifest_sha256": "71602a4d9de327e8705a407e5c0c947b1a9e1e462499fe8e4d7f432d2f7159de",
+ "params": {
+  "fee_rate": 0.0005,
+  "half_spread": 0.00019201213688837407,
+  "impact_coefficient": 0.0010013295956560243,
+  "max_participation": 0.05
+ },
+ "per_symbol": {
+  "BTCUSDT": {
+   "book_too_thin": 8254,
+   "buy_minus_sell_median_bp": {
+    "1000": 7.500111642855245e-09,
+    "10000": 5.249800594242515e-08,
+    "100000": -7.507106047910383e-08,
+    "1000000": -0.021498450903933986
+   },
+   "cost_per_side_bp_by_notional": {
+    "1000": {
+     "buy_median": 0.006123428728521674,
+     "median": 0.006123469975527485,
+     "n": 9600,
+     "p90": 0.006161152332762043,
+     "sell_median": 0.006123421228410031,
+     "thin_share": 0.0
+    },
+    "10000": {
+     "buy_median": 0.006123709963556934,
+     "median": 0.0061239574733473745,
+     "n": 9600,
+     "p90": 0.006162573116363923,
+     "sell_median": 0.006123657465550991,
+     "thin_share": 0.0
+    },
+    "100000": {
+     "buy_median": 0.0061266288420291914,
+     "median": 0.006129595588877379,
+     "n": 9537,
+     "p90": 0.11979834067310507,
+     "sell_median": 0.0061267039130896706,
+     "thin_share": 0.0065625
+    },
+    "1000000": {
+     "buy_median": 0.09077645554800284,
+     "median": 0.22946079511809714,
+     "n": 1409,
+     "p90": 0.522813603760497,
+     "sell_median": 0.11227490645193683,
+     "thin_share": 0.8532291666666667
+    }
+   },
+   "fetch_failed": 0,
+   "first_ms": 1792161777707,
+   "fit_participation_range": [
+    0.00010443902197805202,
+    0.012531204651787996
+   ],
+   "gaps": 0,
+   "half_spread_bp": {
+    "median": 0.00612340623035656,
+    "q": 0.006161087042764734
+   },
+   "half_spread_param": 0.00010798549171475697,
+   "hours": 79.997,
+   "impact_fit_n": 9537,
+   "impact_k_ols": 5.9020379184898847e-05,
+   "impact_k_quantile": 0.0002805866649574069,
+   "impact_param": 0.0002805866649574069,
+   "invalid_reasons": {},
+   "last_ms": 1792449765430,
+   "latency_move_bp": 1.073693830104805,
+   "median_interval_s": 30.001,
+   "not_usable_because": [],
+   "snapshots_invalid": 0,
+   "snapshots_ok": 9600,
+   "thin_share_by_notional": {
+    "1000": 0.0,
+    "10000": 0.0,
+    "100000": 0.0065625,
+    "1000000": 0.8532291666666667
+   },
+   "unsupported_notionals": [
+    "1000000"
+   ],
+   "usable": true
+  },
+  "ETHUSDT": {
+   "book_too_thin": 2362,
+   "buy_minus_sell_median_bp": {
+    "1000": -2.220446049250313e-12,
+    "10000": 4.281930365834796e-07,
+    "100000": 3.60786511777178e-06,
+    "1000000": 0.01220146889635565
+   },
+   "cost_per_side_bp_by_notional": {
+    "1000": {
+     "buy_median": 0.02069095370593743,
+     "median": 0.020691124956728757,
+     "n": 9599,
+     "p90": 0.020993328741170103,
+     "sell_median": 0.020690953708157878,
+     "thin_share": 0.0
+    },
+    "10000": {
+     "buy_median": 0.020693008866423668,
+     "median": 0.020695150092508996,
+     "n": 9599,
+     "p90": 0.021081079941698277,
+     "sell_median": 0.020692580673387084,
+     "thin_share": 0.0
+    },
+    "100000": {
+     "buy_median": 0.020726376592783424,
+     "median": 0.020784878586033173,
+     "n": 9599,
+     "p90": 0.473565943303278,
+     "sell_median": 0.020722768727665652,
+     "thin_share": 0.0
+    },
+    "1000000": {
+     "buy_median": 0.7626818959427517,
+     "median": 0.9980909896012413,
+     "n": 7237,
+     "p90": 1.3359320187111836,
+     "sell_median": 0.7504804270463961,
+     "thin_share": 0.24606729867694552
+    }
+   },
+   "fetch_failed": 0,
+   "first_ms": 1792161777707,
+   "fit_participation_range": [
+    0.00016493412229858415,
+    0.0133405365653368
+   ],
+   "gaps": 0,
+   "half_spread_bp": {
+    "median": 0.020690782462831143,
+    "q": 0.02097824933954072
+   },
+   "half_spread_param": 0.00019201213688837407,
+   "hours": 79.997,
+   "impact_fit_n": 9599,
+   "impact_k_ols": 0.00016851992828291755,
+   "impact_k_quantile": 0.0010013295956560243,
+   "impact_param": 0.0010013295956560243,
+   "invalid_reasons": {
+    "missing depth or closed kline": 1
+   },
+   "last_ms": 1792449765430,
+   "latency_move_bp": 1.8991431195442,
+   "median_interval_s": 30.001,
+   "not_usable_because": [],
+   "snapshots_invalid": 1,
+   "snapshots_ok": 9599,
+   "thin_share_by_notional": {
+    "1000": 0.0,
+    "10000": 0.0,
+    "100000": 0.0,
+    "1000000": 0.24606729867694552
+   },
+   "unsupported_notionals": [
+    "1000000"
+   ],
+   "usable": true
+  }
+ },
+ "reasons": [],
+ "record_id": "PE-371c80b76eeba61b6dd27843",
+ "schema": "cost_public_estimate_v2",
+ "sealed_at": "2026-10-20T01:04:03Z",
+ "source_files": [
+  {
+   "path": "BTCUSDT/public_20261016.jsonl",
+   "sha256": "922311b851264d8038cd7764eb62d3ed98d41bad5c6996ce90fef374b8a4455f"
+  },
+  {
+   "path": "BTCUSDT/public_20261017.jsonl",
+   "sha256": "37834fad4eea29a734f60dbcab7e6e9f1be6b7b2dbd01064f4b4958c1330ddff"
+  },
+  {
+   "path": "BTCUSDT/public_20261018.jsonl",
+   "sha256": "6249413a74cd829e9ad59a93c2ea1cf02e5a947f4cf4eafd89106491f6b4865b"
+  },
+  {
+   "path": "BTCUSDT/public_20261019.jsonl",
+   "sha256": "4a9152e55ab104c7b84bc164d23a11285c9e15c19d3b613d92035a3c1481c8ae"
+  },
+  {
+   "path": "ETHUSDT/public_20261016.jsonl",
+   "sha256": "7cc72d46e472a3efaa9455c0cf34ab0df39a0992fdd4b97373d168045b303375"
+  },
+  {
+   "path": "ETHUSDT/public_20261017.jsonl",
+   "sha256": "bc78fda38552588df4df31f616f45da98de30c0ebc842b480c62e0084f3b152d"
+  },
+  {
+   "path": "ETHUSDT/public_20261018.jsonl",
+   "sha256": "8e8a10c934ccb022cac6f69881f35b6d0b6744ee1efab2d66dc2cffa6ed371ff"
+  },
+  {
+   "path": "ETHUSDT/public_20261019.jsonl",
+   "sha256": "ebf8d10d2715011fd261a2c5104debf22a3cd318354e9152f0d14cb6f46101aa"
+  }
+ ],
+ "status": "ESTIMATED_FROM_PUBLIC_DATA",
+ "supported_max_notional": 100000.0
+}
