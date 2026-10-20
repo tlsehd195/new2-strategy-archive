@@ -20,7 +20,7 @@
 
 ## 결정
 - **검색 풀.** 검색은 `register()`로 등록된 전략(시드와 검색 제안, 계보 기록이 있는 것)만 본다(`EvolutionPipeline.search_pool`). 강건성 이웃은 피드백과 알려진 id 집합에서 빠진다.
-- **행동 키.** `evolution.behaviour_key`는 `all` 논리에서 진입 조건과 필터를 합쳐 해시한다. 제안 단계에서 알려진 키와 같으면 등록하지 않고 `semantic_duplicates`로 센다. `strategy_id`는 바꾸지 않았다(기존 id 안정성 유지).
+- **행동 키.** `evolution.behaviour_key`는 `all` 논리에서 진입 조건과 필터를 합쳐 해시한다. 평가가 쓰지 않는 risk 설정은 키에서 뺀다(R4에서 `change_risk`로 생긴 쌍이 같은 배치에 들어간 것을 보고 추가). 제안 단계에서 알려진 키와 같으면 등록하지 않고 `semantic_duplicates`로 센다. `strategy_id`는 바꾸지 않았다(기존 id 안정성 유지).
 - **비용 전후 비교.** DEV·검증 기록에 같은 사건의 총수익·비용·펀딩·순수익 평균(bp)을 넣는다(`pipeline.cost_attribution`). 검색은 이 값을 읽지 않는다(`DEV_FEEDBACK_KEYS` 그대로). 파라미터 재최적화는 하지 않는다.
 - **탈락 원인.** 검증 기록과 상태 사유에 `failure_class`를 남긴다. 가장 나쁜 종목이 결정한다. `DATA_MISSING` → `INSUFFICIENT_DATA` → `NO_EDGE_OUT_OF_SAMPLE`(총수익 ≤ 0) → `FAIL_COST`(총수익 > 0, 순수익 ≤ 0) → `FAIL_STAT`(순수익 > 0, StepM 미기각) 순서다. 보고용이며 판정 기준이 아니다.
 - **비용 검증 기록(`cost-calib-v3`).**
@@ -30,9 +30,20 @@
   - `order_id`(선택)를 중복 키로 쓴다. 메모리 입력의 중복도 사유로 남긴다.
   - `load_observations_checked`와 CLI `--quarantine FILE`은 잘못된 행을 격리하고 나머지를 읽는다. 격리된 행이 있으면 `VERIFIED`가 될 수 없다.
   - 평균 오차의 95% 구간(정규 근사, 독립 가정), 수집 기간, 변동성·참여율 구간 커버리지를 기록한다(정보용).
-- **창 단위 알파 소비.** `run/discovery/validation_window_history.jsonl`에 실데이터 검증 배치 6건(A1, A2, D1, R1, R2, R3)을 BTC·ETH 두 창 모두에 보수적으로 적었다. `runner.py --mode evolve`는 이 파일(또는 `NEW2_VALIDATION_HISTORY`)을 읽어 배치 번호를 `1 + 폴더 안 배치 + 외부 배치`로 매긴다. 파일이 없으면 실행을 거부한다(exit 1). 같은 폴더의 배치가 기록에 있으면 두 번 세지 않는다. 배치 기록에 `external_prior_batches`가 남는다. 기준은 완화되지 않고 더 엄격해진다.
+- **창 단위 알파 소비.** `run/discovery/validation_window_history.jsonl`에 실데이터 검증 배치 6건(A1, A2, D1, R1, R2, R3)을 BTC·ETH 두 창 모두에 보수적으로 적었고, 이번 R4 배치(`VB-1e6cf93e5972d725`)를 7번째로 더했다. `runner.py --mode evolve`는 이 파일(또는 `NEW2_VALIDATION_HISTORY`)을 읽어 배치 번호를 `1 + 폴더 안 배치 + 외부 배치`로 매긴다. 파일이 없으면 실행을 거부한다(exit 1). 같은 폴더의 배치가 기록에 있으면 두 번 세지 않는다. 배치 기록에 `external_prior_batches`가 남는다. 기준은 완화되지 않고 더 엄격해진다.
 - **사이클 상태 파일.** 시작할 때 `CYCLE_RUNNING`을 쓰고, 예외가 나면 `CYCLE_FAILED`로 덮어쓴 뒤 예외를 다시 올린다. 잠금이 풀린 상태에서 `CYCLE_RUNNING`이 남아 있으면 `ops.py health`는 `CYCLE_INTERRUPTED`(DEGRADED)로 보고한다.
 - **보고 도구.** `evolution_report.py <state_dir>`는 원장에서 단계별 집계와 검증 멤버별 탈락 원인을 다시 계산한다. 상태 파일에는 쓰지 않는다.
+
+## 검증
+- 기준 `900c71c` 전체 테스트 407개 OK. 새 테스트를 기준 코드에 적용하면 실패 4, 오류 13(결함 재현).
+- 수정 후 전체 테스트 427개 OK(`8a22e73` 2회, `b36fabe` 2회). 정적 검사 통과. 증거: `run/audit/evidence_audit_20261020/`.
+- 실데이터 R4(2026-10-20, 코드 `8a22e73`, 컨텍스트 `C2-4a5b6fb6c5a3202b6fc8`, 공개 추정 비용):
+  - 후보 777(시드 705, 진화 72). 행동 중복 6건 차단. DEV 777 OK, 화면 통과 42.
+  - 검증 20명, 배치 k=7, 알파 0.00062: REJECTED 7, INCONCLUSIVE 13, 생존 0.
+  - 탈락 원인: INSUFFICIENT_DATA 13, FAIL_COST 3, NO_EDGE_OUT_OF_SAMPLE 2, FAIL_STAT 2.
+  - 잠금 TEST 사용 0.
+- risk 키 수정(`b36fabe`) 뒤에는 다시 돌리지 않았다. 다시 돌리면 같은 검증 창을 8번째로 보게 된다.
+- 상세 보고서: `run/audit/AUDIT_FULL_20261020.md`.
 
 ## 결과
 - 장점: 검증 창이 검색 데이터가 되는 경로 하나를 막았다. 비용 검증의 거짓 `VERIFIED` 경로 3개(종목 은닉, 단위 오류, 중복)를 막았다. 표본 부족과 실패를 구분한다. 실행 폴더가 바뀌어도 검증 창 알파 소비가 이어진다. 중단된 실행이 성공으로 보이지 않는다. 탈락 원인을 기록에서 셀 수 있다.
