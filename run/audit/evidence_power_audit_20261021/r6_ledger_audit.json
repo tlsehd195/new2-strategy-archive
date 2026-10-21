@@ -1,0 +1,522 @@
+{
+ "context_ids": [
+  "C2-f64e792160a0222650f2"
+ ],
+ "dev_evaluated": 894,
+ "entry_t_20th": 1.6863185122243625,
+ "fail_cost_counterfactual": {
+  "cost_bp_per_trade_median": 14.071,
+  "count": 247,
+  "gross_bp_per_trade_median": 4.78,
+  "if_cost_multiplied_by": {
+   "0.0": {
+    "by_direction": {
+     "long": 49,
+     "short": 13,
+     "symmetric": 11
+    },
+    "sr_ann_cf_q50_q90_max": [
+     0.653,
+     1.118,
+     4.308
+    ],
+    "would_meet_mean_and_t_screen": 73
+   },
+   "0.5": {
+    "by_direction": {
+     "long": 2
+    },
+    "sr_ann_cf_q50_q90_max": [
+     2.044,
+     2.044,
+     2.044
+    ],
+    "would_meet_mean_and_t_screen": 2
+   }
+  },
+  "note": "ceiling: folds and cost-share gates not re-checked; the counterfactual cost is not evidence"
+ },
+ "groups": [
+  {
+   "by_direction": {
+    "long": 291,
+    "short": 522,
+    "symmetric": 81
+   },
+   "count": 894,
+   "dev_sr_ann_q10_50_90_max": [
+    -2.133,
+    -0.595,
+    0.516,
+    1.317
+   ],
+   "families": {
+    "spec:breakout_k+ret_z:long": 11,
+    "spec:breakout_k+taker_share_z:long": 12,
+    "spec:breakout_k:long": 75,
+    "spec:funding_z:short": 80,
+    "spec:hour_utc:long": 31,
+    "spec:hour_utc:short": 30,
+    "spec:ret_z:long": 124,
+    "spec:ret_z:symmetric": 66,
+    "spec:taker_share_z:short": 383,
+    "spec:vol_ratio:long": 7
+   },
+   "label": "all",
+   "n_trades_q10_50_90": [
+    12,
+    684,
+    4516
+   ],
+   "net_bp_q10_50_90": [
+    -46.301,
+    -11.785,
+    53.383
+   ],
+   "t_q10_50_90": [
+    -4.525,
+    -1.23,
+    1.353
+   ]
+  },
+  {
+   "by_direction": {
+    "long": 56,
+    "short": 3,
+    "symmetric": 5
+   },
+   "count": 64,
+   "dev_sr_ann_q10_50_90_max": [
+    0.458,
+    0.676,
+    1.041,
+    1.317
+   ],
+   "families": {
+    "spec:breakout_k+ret_z+taker_share_z:long": 1,
+    "spec:breakout_k+ret_z:long": 8,
+    "spec:breakout_k+ret_z:symmetric": 1,
+    "spec:breakout_k+taker_share_z:long": 9,
+    "spec:breakout_k:long": 33,
+    "spec:ret_z:long": 4,
+    "spec:ret_z:symmetric": 4,
+    "spec:taker_share_z:short": 3,
+    "spec:vol_ratio:long": 1
+   },
+   "label": "DEV screen pass",
+   "n_trades_q10_50_90": [
+    139,
+    291,
+    552
+   ],
+   "net_bp_q10_50_90": [
+    18.606,
+    35.515,
+    62.222
+   ],
+   "t_q10_50_90": [
+    1.081,
+    1.42,
+    2.044
+   ]
+  },
+  {
+   "by_direction": {
+    "long": 21,
+    "short": 148,
+    "symmetric": 2
+   },
+   "count": 171,
+   "dev_sr_ann_q10_50_90_max": [
+    -0.546,
+    0.27,
+    0.777,
+    1.312
+   ],
+   "families": {
+    "spec:breakout_k+funding_z+taker_share_z:long": 2,
+    "spec:breakout_k+ret_z:long": 2,
+    "spec:breakout_k+volume_z:long": 3,
+    "spec:funding_z+ret_z:short": 3,
+    "spec:funding_z+taker_share_z:short": 2,
+    "spec:funding_z:long": 5,
+    "spec:funding_z:short": 52,
+    "spec:ret_z+taker_share_z:short": 4,
+    "spec:ret_z:short": 2,
+    "spec:taker_share_z:short": 81
+   },
+   "label": "dev_underpowered (any direction)",
+   "n_trades_q10_50_90": [
+    0,
+    11,
+    56
+   ],
+   "net_bp_q10_50_90": [
+    -88.78,
+    64.28,
+    321.634
+   ],
+   "t_q10_50_90": [
+    -1.347,
+    0.791,
+    2.308
+   ]
+  },
+  {
+   "by_direction": {
+    "long": 1,
+    "short": 91,
+    "symmetric": 1
+   },
+   "count": 93,
+   "dev_sr_ann_q10_50_90_max": [
+    0.058,
+    0.455,
+    0.826,
+    1.312
+   ],
+   "families": {
+    "spec:breakout_k+funding_z+taker_share_z:long": 1,
+    "spec:funding_z+ret_z:short": 3,
+    "spec:funding_z:short": 34,
+    "spec:ret_z+taker_share_z:short": 2,
+    "spec:ret_z:short": 1,
+    "spec:ret_z:symmetric": 1,
+    "spec:taker_share_z:short": 51
+   },
+   "label": "dev_underpowered with positive net mean",
+   "n_trades_q10_50_90": [
+    8,
+    12,
+    54
+   ],
+   "net_bp_q10_50_90": [
+    22.785,
+    128.167,
+    386.469
+   ],
+   "t_q10_50_90": [
+    0.524,
+    1.387,
+    3.156
+   ]
+  },
+  {
+   "by_direction": {
+    "short": 148
+   },
+   "count": 148,
+   "dev_sr_ann_q10_50_90_max": [
+    -0.471,
+    0.309,
+    0.797,
+    1.312
+   ],
+   "families": {
+    "spec:breakout_k+volume_z:short": 1,
+    "spec:funding_z+ret_z:short": 3,
+    "spec:funding_z+taker_share_z:short": 2,
+    "spec:funding_z:short": 52,
+    "spec:ret_z+taker_share_z:short": 4,
+    "spec:ret_z+vol_ratio:short": 1,
+    "spec:ret_z:short": 2,
+    "spec:taker_share_z+volume_z:short": 1,
+    "spec:taker_share_z:short": 81,
+    "spec:volume_z:short": 1
+   },
+   "label": "dev_underpowered shorts",
+   "n_trades_q10_50_90": [
+    0,
+    12,
+    56
+   ],
+   "net_bp_q10_50_90": [
+    -59.122,
+    73.932,
+    345.38
+   ],
+   "t_q10_50_90": [
+    -0.908,
+    0.908,
+    2.343
+   ]
+  },
+  {
+   "by_direction": {
+    "short": 91
+   },
+   "count": 91,
+   "dev_sr_ann_q10_50_90_max": [
+    0.058,
+    0.455,
+    0.826,
+    1.312
+   ],
+   "families": {
+    "spec:funding_z+ret_z:short": 3,
+    "spec:funding_z:short": 34,
+    "spec:ret_z+taker_share_z:short": 2,
+    "spec:ret_z:short": 1,
+    "spec:taker_share_z:short": 51
+   },
+   "label": "dev_underpowered shorts, net > 0",
+   "n_trades_q10_50_90": [
+    8,
+    12,
+    54
+   ],
+   "net_bp_q10_50_90": [
+    28.311,
+    128.167,
+    386.469
+   ],
+   "t_q10_50_90": [
+    0.524,
+    1.389,
+    3.156
+   ]
+  },
+  {
+   "by_direction": {
+    "long": 150,
+    "short": 59,
+    "symmetric": 38
+   },
+   "count": 247,
+   "dev_sr_ann_q10_50_90_max": [
+    -2.056,
+    -0.664,
+    -0.089,
+    0.184
+   ],
+   "families": {
+    "spec:breakout_k+taker_share_z:long": 3,
+    "spec:breakout_k:long": 19,
+    "spec:funding_z:short": 8,
+    "spec:hour_utc:long": 17,
+    "spec:hour_utc:short": 1,
+    "spec:ret_z:long": 103,
+    "spec:ret_z:symmetric": 32,
+    "spec:taker_share_z:short": 50,
+    "spec:vol_ratio:long": 3,
+    "spec:volume_z:symmetric": 3
+   },
+   "label": "FAIL_COST (gross > 0 >= net)",
+   "n_trades_q10_50_90": [
+    464,
+    1768,
+    5249
+   ],
+   "net_bp_q10_50_90": [
+    -13.038,
+    -9.51,
+    -2.934
+   ],
+   "t_q10_50_90": [
+    -4.572,
+    -1.262,
+    -0.208
+   ]
+  }
+ ],
+ "screen_pass": 64,
+ "screen_pass_dev_sr_ann_q50_max": [
+  0.676,
+  1.317
+ ],
+ "screen_pass_dev_t_sorted": [
+  2.6694744190760007,
+  2.5792912960916747,
+  2.4663231527539353,
+  2.2773929698657973,
+  2.19134743346212,
+  2.140970157710261,
+  2.0444818717120588,
+  2.0006204963337972,
+  1.9680326457125445,
+  1.937028540273288,
+  1.9324720441215422,
+  1.9065111496128133,
+  1.857746992825627,
+  1.83820327972734,
+  1.8023777547918913,
+  1.8012137851747523,
+  1.798265011669941,
+  1.754902085990225,
+  1.7335088936830467,
+  1.6863185122243625,
+  1.683234662423601,
+  1.6725335498789506,
+  1.663524550726621,
+  1.5916805129671652,
+  1.5843207469999512,
+  1.572071971847835,
+  1.5687434549892243,
+  1.5571236538105289,
+  1.5185450888502003,
+  1.5120937329734443,
+  1.4745351926371626,
+  1.4203129873485354,
+  1.398335061006588,
+  1.3972639566236684,
+  1.3802355079734832,
+  1.35568974032773,
+  1.3371362327907237,
+  1.323272803412172,
+  1.301089225951079,
+  1.2942354968533087,
+  1.255123790925441,
+  1.2282166460504065,
+  1.2109501991812894,
+  1.210436815839479,
+  1.208474800787755,
+  1.2052528094407708,
+  1.1932525317168807,
+  1.1766335920787014,
+  1.173261373910498,
+  1.1552087265473914,
+  1.1380493378589078,
+  1.1353215081610937,
+  1.1315009077484743,
+  1.1258001629949317,
+  1.088417097502147,
+  1.0882391062695371,
+  1.0807567227837696,
+  1.0807307096726213,
+  1.0685455408263018,
+  1.0669743346156457,
+  1.0669743346156457,
+  1.0592350779270276,
+  1.0538898253387954,
+  1.02643417717971
+ ],
+ "underpowered_shorts_positive": {
+  "count": 91,
+  "dev_sr_ann_median_max": [
+   0.455,
+   1.312
+  ],
+  "distinct_families": 5,
+  "note": "dev_sr_ann is the pooled daily SR over the whole DEV span: a strategy that trades 2-3 times a year is flat almost every day, so even a large per-trade edge gives a small annual SR and almost no trades in a 6-month validation window",
+  "share_with_t_ge_2": 0.231,
+  "top10_by_dev_sr": [
+   {
+    "dev_sr_ann": 1.3124492025680101,
+    "family": "spec:funding_z:short",
+    "id": "S-d3e6ca4f11d941cd",
+    "n": 12,
+    "net": 65.07669217136748,
+    "per_symbol_n": {
+     "ETHUSDT": 12
+    },
+    "t": 37.679733818433455
+   },
+   {
+    "dev_sr_ann": 1.1021624111173831,
+    "family": "spec:taker_share_z:short",
+    "id": "S-6e5d594fd0af0bbe",
+    "n": 15,
+    "net": 469.310382874614,
+    "per_symbol_n": {
+     "BTCUSDT": 5,
+     "ETHUSDT": 10
+    },
+    "t": 3.563656120954234
+   },
+   {
+    "dev_sr_ann": 0.9946507412526957,
+    "family": "spec:taker_share_z:short",
+    "id": "S-af01606e7845e1d2",
+    "n": 15,
+    "net": 358.8444287495112,
+    "per_symbol_n": {
+     "BTCUSDT": 5,
+     "ETHUSDT": 10
+    },
+    "t": 2.34290737083453
+   },
+   {
+    "dev_sr_ann": 0.9925588400337915,
+    "family": "spec:taker_share_z:short",
+    "id": "S-8722469acaaa2b50",
+    "n": 10,
+    "net": 571.484680113331,
+    "per_symbol_n": {
+     "ETHUSDT": 10
+    },
+    "t": 3.837302216784839
+   },
+   {
+    "dev_sr_ann": 0.9617401163366627,
+    "family": "spec:funding_z:short",
+    "id": "S-abe960cfb32c6aeb",
+    "n": 10,
+    "net": 251.90626211850994,
+    "per_symbol_n": {
+     "ETHUSDT": 10
+    },
+    "t": 2.8308401511956642
+   },
+   {
+    "dev_sr_ann": 0.9058980945052321,
+    "family": "spec:funding_z:short",
+    "id": "S-6a94aee8965abd43",
+    "n": 9,
+    "net": 268.81558164571584,
+    "per_symbol_n": {
+     "ETHUSDT": 9
+    },
+    "t": 2.7947221667890543
+   },
+   {
+    "dev_sr_ann": 0.8926200433774968,
+    "family": "spec:taker_share_z:short",
+    "id": "S-1a3a2db7ab18831d",
+    "n": 15,
+    "net": 665.9351284568878,
+    "per_symbol_n": {
+     "BTCUSDT": 5,
+     "ETHUSDT": 10
+    },
+    "t": 2.535572628683601
+   },
+   {
+    "dev_sr_ann": 0.8844670783890076,
+    "family": "spec:taker_share_z:short",
+    "id": "S-5b2df9904fd75392",
+    "n": 16,
+    "net": 256.8995627635491,
+    "per_symbol_n": {
+     "BTCUSDT": 5,
+     "ETHUSDT": 11
+    },
+    "t": 2.307704742506018
+   },
+   {
+    "dev_sr_ann": 0.8660233167872213,
+    "family": "spec:taker_share_z:short",
+    "id": "S-cc63d25e6385ff6a",
+    "n": 16,
+    "net": 139.53683813809548,
+    "per_symbol_n": {
+     "BTCUSDT": 5,
+     "ETHUSDT": 11
+    },
+    "t": 2.1428720283744283
+   },
+   {
+    "dev_sr_ann": 0.8263417663298583,
+    "family": "spec:taker_share_z:short",
+    "id": "S-b0593075f82ae2f8",
+    "n": 16,
+    "net": 194.64488968002797,
+    "per_symbol_n": {
+     "BTCUSDT": 5,
+     "ETHUSDT": 11
+    },
+    "t": 2.1638828031177173
+   }
+  ],
+  "trades_per_year_median": 2.637
+ }
+}
