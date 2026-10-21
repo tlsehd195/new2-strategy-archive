@@ -29,6 +29,10 @@ from pathlib import Path
 from typing import Callable, Optional, Sequence
 
 BASE = "https://data.binance.vision/data/futures/um/monthly"
+#: the same public bucket served straight from S3 (data.binance.vision is a
+#: CDN in front of it).  Identical files and CHECKSUMs; used where the CDN host
+#: is blocked by an egress policy.  The URL actually used is in the provenance.
+S3_MIRROR = "https://s3-ap-northeast-1.amazonaws.com/data.binance.vision/data/futures/um/monthly"
 KINDS = {
     "klines": ("klines/{sym}/15m/{sym}-15m-{ym}.zip", "klines", "{sym}-15m-{ym}.csv"),
     "funding": ("fundingRate/{sym}/{sym}-fundingRate-{ym}.zip", "funding", "{sym}-fundingRate-{ym}.csv"),
@@ -141,9 +145,9 @@ def _quality_ok(kind: str, sym: str, path: Path) -> tuple[bool, str, dict]:
 
 def fetch_month(data_dir: Path, kind: str, sym: str, ym: str, *,
                 opener: Callable[[str], bytes], attempts: int = 4,
-                sleep: Callable[[float], None] = time.sleep) -> dict:
+                sleep: Callable[[float], None] = time.sleep, base: str = BASE) -> dict:
     rel, sub, name = KINDS[kind]
-    url = f"{BASE}/{rel.format(sym=sym, ym=ym)}"
+    url = f"{base}/{rel.format(sym=sym, ym=ym)}"
     target = Path(data_dir) / sub / name.format(sym=sym, ym=ym)
     out = {"kind": kind, "symbol": sym, "month": ym, "url": url, "path": str(target)}
     try:
@@ -202,7 +206,7 @@ def fetch_missing(data_dir: Path, symbols: Sequence[str], start: str, end: str, 
                   allow: bool = False, kinds: Sequence[str] = ("klines", "funding"),
                   opener: Optional[Callable[[str], bytes]] = None,
                   today: Optional[dt.date] = None, attempts: int = 4,
-                  sleep: Callable[[float], None] = time.sleep) -> dict:
+                  sleep: Callable[[float], None] = time.sleep, base: str = BASE) -> dict:
     """Fetch every missing COMPLETE month in [start, end] (the running month is
     never fetched: monthly archives exist only for finished months)."""
     if not allow:
@@ -218,7 +222,7 @@ def fetch_missing(data_dir: Path, symbols: Sequence[str], start: str, end: str, 
                 if (Path(data_dir) / sub / name.format(sym=sym, ym=ym)).exists():
                     continue
                 results.append(fetch_month(data_dir, kind, sym, ym, opener=opener or _default_opener,
-                                           attempts=attempts, sleep=sleep))
+                                           attempts=attempts, sleep=sleep, base=base))
     blocked = [r for r in results if r["status"] in ("BLOCKED_DATA", "CONFLICT")]
     kinds_count: dict = {}
     for r in blocked:
@@ -236,11 +240,13 @@ def main(argv: Sequence[str]) -> int:  # pragma: no cover - CLI
     ap.add_argument("--start", default="2021-01")
     ap.add_argument("--end", default="2099-12")
     ap.add_argument("--allow-network", action="store_true")
+    ap.add_argument("--base-url", default=os.environ.get("NEW2_DATA_BASE_URL", BASE),
+                    help=f"archive root (default the CDN; the S3 mirror is {S3_MIRROR})")
     a = ap.parse_args(argv)
     if not a.data_dir:
         print("CONFIG_ERROR: --data-dir or NEW2_DATA_DIR required", file=sys.stderr)
         return 1
-    r = fetch_missing(Path(a.data_dir), a.symbols, a.start, a.end, allow=a.allow_network)
+    r = fetch_missing(Path(a.data_dir), a.symbols, a.start, a.end, allow=a.allow_network, base=a.base_url)
     print(json.dumps({k: v for k, v in r.items() if k != "results"}))
     for x in r["results"]:
         if x["status"] != "FETCHED":
