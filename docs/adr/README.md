@@ -21,4 +21,5 @@
 | [0016](0016-independent-window-2020-market-cap-tranches.md) | 새 독립 검증 구간 IW1: 2020년 데이터, 시총 순 묶음, 사전등록과 1회 사용 | Proposed |
 | [0017](0017-paper-review-ssrn3261943-power-precheck.md) | 업로드 논문 검토(SSRN 3261943): DSR 식 대조, IW1 검정력 계산, 사전점검 제안 | Proposed |
 | [0018](0018-short-and-long-short-support-check.md) | 숏·롱숏 지원 점검, DEV 묶음 진단 도구 `bundle_dev.py` | Accepted |
+| [0019](0019-strong-candidate-search-map-elites-dev.md) | 더 강한 후보 탐색(DEV 전용, IW1 측정값): 없음. MAP-Elites 부모 선택을 DEV 전용 옵션으로 추가하고 같은 예산·시드로 비교 | Accepted |
 | [0021](0021-dev-bundle-stable-small-profit.md) | 후보 묶음의 비용 후 안정 수익 DEV 점검(사전 고정 규칙, 앞/뒤 절반), IW1 v2 묶음 검정 초안 | Accepted |
