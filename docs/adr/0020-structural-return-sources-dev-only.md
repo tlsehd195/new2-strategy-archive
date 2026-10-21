@@ -2,7 +2,7 @@
 
 - 상태: Accepted
 - 날짜: 2026-10-21
-- 범위: 새 읽기 전용 도구 `run/structural_search_dev.py`, 테스트 `run/discovery/tests/test_structural_search.py`, 증거 `run/audit/evidence_structural_20261021/`. 엔진·통계 기준·비용 프로필 변경 없음.
+- 범위: 새 읽기 전용 도구 `run/structural_search_dev.py`, 테스트 `run/test_structural_search.py`(numpy·pandas가 필요해 표준 라이브러리 전용인 run/discovery 밖에 둠, CI에서는 안 돎), 증거 `run/audit/evidence_structural_20261021/`. 엔진·통계 기준·비용 프로필 변경 없음.
 - 선행: ADR 0019(더 강한 후보 탐색, Track A 3,857 + Track B 62), [ADR 0016](0016-independent-window-2020-market-cap-tranches.md)
 
 ## 맥락

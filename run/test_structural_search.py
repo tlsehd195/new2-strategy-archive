@@ -1,6 +1,9 @@
 """Structural DEV-only search (ADR 0020): forbidden windows, no look-ahead in
 the funding signal, funding credited to the holding day, CC basis left at 0.
-Synthetic data and temp dirs only."""
+Synthetic data and temp dirs only.
+
+Lives next to the script, outside run/discovery (which must stay stdlib-only
+for CI): ``python3 -m unittest run/test_structural_search.py``."""
 
 from __future__ import annotations
 
@@ -12,7 +15,7 @@ from pathlib import Path
 import numpy as np
 
 HERE = Path(__file__).resolve().parent
-RUN = HERE.parent.parent
+RUN = HERE
 if str(RUN) not in sys.path:
     sys.path.insert(0, str(RUN))
 
