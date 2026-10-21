@@ -12,6 +12,7 @@ Three steps, each a CLI subcommand:
                     per symbol (quality gate only, no strategy is evaluated)
 ``freeze-members``  write the members file of one DEV-only state directory
                     (ids, canonical specs, context) before anything is opened
+``power``           power precheck from the preregistered numbers (diagnostic)
 ``open``            open ONE tranche, once: the history row is written first,
                     then every member is evaluated and StepM decides
 
@@ -342,6 +343,49 @@ def open_tranche(pre: Mapping, prereg_sha: str, tranche: str, data_dir: Path, me
 
 
 # ---------------------------------------------------------------------------
+# power precheck (diagnostic only: no data read, no criterion changed)
+# ---------------------------------------------------------------------------
+
+def _norm_cdf(x: float) -> float:
+    return 0.5 * math.erfc(-x / math.sqrt(2.0))
+
+
+def _norm_ppf(p: float) -> float:
+    lo, hi = -10.0, 10.0
+    for _ in range(200):
+        mid = (lo + hi) / 2
+        if _norm_cdf(mid) < p:
+            lo = mid
+        else:
+            hi = mid
+    return (lo + hi) / 2
+
+
+def power_precheck(pre: Mapping, *, m: Optional[int] = None, k: int = 1,
+                   annual_sr: Sequence[float] = (1.0, 2.0, 3.0), target: float = 0.8) -> dict:
+    """Probability that ONE member with true annualised Sharpe ``sr`` (net of
+    cost, daily returns, 365 days a year) is rejected by the tranche test,
+    from the preregistered numbers alone.  StepM lies between two bounds:
+    the single-test critical value z(1-alpha) (best case: every other member
+    already rejected or perfectly correlated) and the Bonferroni value
+    z(1-alpha/m) (worst case: independent members).  Normal approximation of
+    the studentised mean; serial correlation and sparse trading days lower
+    the real power further.  Changes no criterion."""
+    n = (_end_ms(pre["period"]["read_end"]) + 1 - _ms(pre["period"]["entry_start"])) // DAY_MS
+    m = int(m or pre["members"]["max_batch_size"])
+    alpha = spending_alpha(k, float(pre["test"]["alpha_total_family"]))
+    z_best, z_worst = _norm_ppf(1 - alpha), _norm_ppf(1 - alpha / m)
+    zt = _norm_ppf(target)
+    root = math.sqrt(n / 365.0)
+    rows = {f"{sr:g}": {"power_best": _norm_cdf(sr * root - z_best),
+                        "power_worst": _norm_cdf(sr * root - z_worst)} for sr in annual_sr}
+    return {"n_days": n, "m": m, "tranche_index": k, "alpha": alpha,
+            "z_best": z_best, "z_worst": z_worst, "power_by_annual_sr": rows,
+            f"annual_sr_for_power_{target:g}": {"best": (z_best + zt) / root, "worst": (z_worst + zt) / root},
+            "method": "normal approximation, bounds z(1-alpha) and z(1-alpha/m); diagnostic only"}
+
+
+# ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 
@@ -378,6 +422,12 @@ def _cmd_freeze(a) -> int:
     return 0
 
 
+def _cmd_power(a) -> int:
+    pre, sha = load_prereg(a.prereg)
+    print(json.dumps({"prereg_sha256": sha, **power_precheck(pre, m=a.m, k=a.k)}, indent=1, sort_keys=True))
+    return 0
+
+
 def _cmd_open(a) -> int:
     from costs_bridge import CostContext
     if not a.confirm_single_use:
@@ -409,6 +459,9 @@ def main(argv: Sequence[str]) -> int:
     f.add_argument("--dev-data-dir", required=True)
     f.add_argument("--out", required=True)
     f.add_argument("--expect-context")
+    pw = sub.add_parser("power")
+    pw.add_argument("--m", type=int)
+    pw.add_argument("--k", type=int, default=1)
     o = sub.add_parser("open")
     o.add_argument("--tranche", required=True)
     o.add_argument("--data-dir", required=True)
@@ -416,7 +469,8 @@ def main(argv: Sequence[str]) -> int:
     o.add_argument("--out-dir", required=True)
     o.add_argument("--confirm-single-use", action="store_true")
     a = ap.parse_args(argv)
-    return {"check": _cmd_check, "freeze-members": _cmd_freeze, "open": _cmd_open}[a.cmd](a)
+    return {"check": _cmd_check, "freeze-members": _cmd_freeze, "power": _cmd_power,
+            "open": _cmd_open}[a.cmd](a)
 
 
 if __name__ == "__main__":  # pragma: no cover

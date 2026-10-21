@@ -171,6 +171,18 @@ class TestOpen(unittest.TestCase):
         self.assertIn("S-2", rec["excluded_before_test"])
 
 
+class TestPower(unittest.TestCase):
+    def test_power_bounds_match_the_preregistered_numbers(self):
+        pre, _ = iw.load_prereg()
+        r = iw.power_precheck(pre)
+        self.assertEqual((r["n_days"], r["m"]), (335, 20))
+        p2 = r["power_by_annual_sr"]["2"]
+        self.assertAlmostEqual(p2["power_best"], 0.516, places=2)
+        self.assertAlmostEqual(p2["power_worst"], 0.147, places=2)
+        self.assertLess(iw.power_precheck(pre, m=5)["annual_sr_for_power_0.8"]["worst"],
+                        r["annual_sr_for_power_0.8"]["worst"])
+
+
 class TestFetchMirror(unittest.TestCase):
     def test_base_url_is_used_and_recorded(self):
         from data_fetch import S3_MIRROR, fetch_missing
