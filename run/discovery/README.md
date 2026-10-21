@@ -129,6 +129,12 @@ Environment (all optional, fail-closed when wrong):
   search rounds only.  No validation batch is preregistered, no validation or
   locked window is loaded, no alpha is spent.  Use it to re-screen with new code
   when no new independent window exists.
+- `--selection map_elites` (only with `--mode evolve --dev-only`, ADR 0019) picks
+  parents MAP-Elites style: one champion per cell of direction x holding band
+  (<=32, <=128, <=384, <=768 bars) x signal group (feature kinds of the entry), and
+  parents are drawn uniformly over the occupied cells.  The default `pareto_niche`
+  is unchanged and keeps its search-config hash.  `run/compare_selection_dev.py`
+  compares two such runs (same seed and budget) from their ledgers.
 - `fills_import.py --fills <export.csv|json> --klines <dir> [--fee-prices f.json]
   [--verify --decisions d.jsonl --quotes q.jsonl]` imports a Binance trade-history
   export into `private_fills/` (git-ignored; only counts and hashes are printed),

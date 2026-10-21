@@ -1674,7 +1674,7 @@ def parse_options(argv: Sequence[str]) -> dict:
     legacy), ``--rounds N`` and ``--evals N`` (evolution budgets per cycle).
     Anything else is a usage error — never silently ignored."""
     args = list(argv)
-    opts = {"batch": 10, "mode": "legacy", "rounds": 2, "evals": 60}
+    opts = {"batch": 10, "mode": "legacy", "rounds": 2, "evals": 60, "selection": "pareto_niche"}
     i = 0
     while i < len(args):
         a = args[i]
@@ -1695,6 +1695,12 @@ def parse_options(argv: Sequence[str]) -> dict:
                 raise UsageError(f"--{key} needs a value")
             val = args[i + 1]
             i += 2
+        if key == "selection":
+            from search import SELECTIONS
+            if val not in SELECTIONS:
+                raise UsageError(f"--selection must be one of {SELECTIONS}, got {val!r}")
+            opts["selection"] = val
+            continue
         if key == "mode":
             if val not in MODES:
                 raise UsageError(f"--mode must be one of {MODES}, got {val!r}")
@@ -1705,6 +1711,9 @@ def parse_options(argv: Sequence[str]) -> dict:
         opts[key] = int(val)
     if opts.get("dev_only") and opts["mode"] != "evolve":
         raise UsageError("--dev-only needs --mode evolve")
+    if opts["selection"] != "pareto_niche" and not opts.get("dev_only"):
+        # a new parent selection is a DEV experiment until compared (ADR 0019)
+        raise UsageError("--selection map_elites needs --mode evolve --dev-only")
     return opts
 
 
@@ -1741,12 +1750,15 @@ def cost_from_env() -> CostContext:
 
 
 USAGE = """usage: runner.py [--batch N] [--mode legacy|evolve|full] [--rounds R] [--evals E] [--dev-only]
+                 [--selection pareto_niche|map_elites]
   --mode legacy  (default) v2 candidate engine: generation BH-FDR, state/state.json,
                  state/discovery_ledger.jsonl, results/cycle_summary.json
   --mode evolve  evolution engine: StepM validation batches + locked campaigns,
                  state/evolution/*, results/evolution_cycle_summary.json
   --mode full    legacy then evolve in one cycle
   --dev-only     (evolve) DEV evaluation and search only: no validation window is looked at
+  --selection    (evolve --dev-only) parent selection: pareto_niche (default) or map_elites
+                 (one champion per direction x holding band x signal group cell, ADR 0019)
 Both share the single-use locked-window records (state/lock_test_usage.json,
 state/locked_window_campaigns.jsonl).  A cycle status is not a strategy verdict."""
 
@@ -1806,8 +1818,10 @@ def main(argv: Sequence[str]) -> int:
             # released below and the next run resumes from the ledgers (§7)
             old = _install_interrupt_handlers()
             try:
+                from search import SearchConfig
                 es = run_evolution_cycle(paths.state_dir, RunnerDataProvider(paths.data_dir),
                                          cost, rounds=opts["rounds"],
+                                         search_cfg=SearchConfig(selection=opts["selection"]),
                                          max_dev_evals=opts["evals"], results_dir=paths.results_dir,
                                          forward_feed=FileFeed(paths.data_dir), validation_history=vh,
                                          confirmatory=not opts.get("dev_only"))

@@ -23,6 +23,7 @@ from typing import Optional, Sequence
 from engine_lib import append_jsonl, atomic_write_json, iso_now
 from search import (
     SearchConfig, SearchState, first_front_hash, propose_round, select_elite,
+    select_elite_map,
 )
 
 CYCLE_EXIT = {"CYCLE_OK": 0, "CYCLE_NO_PROGRESS": 0, "CYCLE_BUDGET_EXHAUSTED": 0,
@@ -167,7 +168,11 @@ def _run_evolution_cycle(state_dir: Path, provider, cost, *, symbols: Sequence[s
             s.notes.append("per-cycle DEV evaluation budget reached")
             break
         fb = pipe.dev_feedback_all()
-        elite = select_elite(fb, cfg)
+        cells = None
+        if cfg.selection == "map_elites":
+            elite, cells = select_elite_map(fb, cfg, pipe.specs.get)
+        else:
+            elite = select_elite(fb, cfg)
         specs = {sid: pipe.specs.get(sid) for sid in elite}
         round_index = st.round_index + 1
         # known = the search pool only: robustness neighbours exist because their
@@ -203,6 +208,7 @@ def _run_evolution_cycle(state_dir: Path, provider, cost, *, symbols: Sequence[s
         elif st.rounds_without_front_change >= cfg.patience:
             st.status = "CONVERGED"
         rec = {"round_index": round_index, "elite": elite, "proposed": len(props), **cnt,
+               "selection": cfg.selection, **({"map_cells": cells} if cells is not None else {}),
                "front_hash": fh, "status": st.status, "context_id": ctx,
                "config_hash": cfg.config_hash(), "at": iso_now()}
         append_jsonl(pipe.dir / "rounds.jsonl", rec)

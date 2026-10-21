@@ -35,7 +35,7 @@ from evolution import (
     crossover, definition_fingerprint, mutate, near_duplicate, near_signature, random_spec,
 )
 
-SEARCH_VERSION = "search-v1(pareto+niche,dev-only)"
+SEARCH_VERSION = "search-v1(pareto+niche,dev-only)"   # selection=map_elites changes the config hash
 
 #: the ONLY evaluation fields the search may read (all computed on DEV data)
 DEV_FEEDBACK_KEYS = ("dev_n", "dev_mean_bp", "dev_t", "dev_fold_pos_share", "dev_mdd_bp",
@@ -68,9 +68,16 @@ class SearchConfig:
     patience: int = 8                  # rounds without a first-front change
     max_t_objective: float = 6.0       # dev t is capped: beyond it, more t is not "better"
     operator_weights: dict = field(default_factory=lambda: dict(OPERATOR_WEIGHTS))
+    #: parent selection: "pareto_niche" (default) or "map_elites" (ADR 0019)
+    selection: str = "pareto_niche"
 
     def to_json(self) -> dict:
-        return asdict(self)
+        d = asdict(self)
+        if d["selection"] == "pareto_niche":
+            # the default is left out so configs (and contexts) from before
+            # the option existed keep their hash (R6 reproduces exactly)
+            d.pop("selection")
+        return d
 
     def config_hash(self) -> str:
         return hashlib.sha256(canonical_json({"version": SEARCH_VERSION,
@@ -139,6 +146,51 @@ def select_elite(feedback: Mapping[str, Mapping], cfg: SearchConfig) -> list[str
             if len(elite) >= cfg.elite_size:
                 return elite
     return elite
+
+
+# ---------------------------------------------------------------------------
+# MAP-Elites parent selection (Mouret & Clune 2015, arXiv 1504.04909; ADR 0019)
+# ---------------------------------------------------------------------------
+
+SELECTIONS = ("pareto_niche", "map_elites")
+#: holding-period bands of the map (bars of 15m, upper bounds inclusive)
+MAP_HORIZON_BANDS = (32, 128, 384, 768)
+
+
+def map_cell(spec: Mapping) -> str:
+    """Map cell of a spec: direction x holding band x signal group (the
+    sorted feature kinds of the entry conditions)."""
+    from strategy_spec import FEATURES, canonicalize_spec
+    s = canonicalize_spec(spec)
+    h = int(s["exit"]["horizon"])
+    band = next(b for b in MAP_HORIZON_BANDS if h <= b)
+    kinds = "+".join(sorted({FEATURES[c["feature"]].kind for c in s["entry"]["conditions"]}))
+    return f"{s['direction']}|h<={band}|{kinds}"
+
+
+def select_elite_map(feedback: Mapping[str, Mapping], cfg: SearchConfig, spec_of) -> tuple[list[str], dict]:
+    """One champion per map cell (same eligibility as :func:`select_elite`:
+    a usable DEV result with a positive mean).  Inside a cell: screen pass
+    first, then capped DEV t, fold share, smaller drawdown, id.  The elite is
+    every champion (sorted by cell), so ``propose_round`` draws parents
+    uniformly over the occupied cells instead of over the best region."""
+    best: dict[str, tuple] = {}
+    for sid, fb in feedback.items():
+        o = objectives(fb, cfg)
+        if o is None or (fb.get("dev_mean_bp") or 0) <= 0:
+            continue
+        spec = spec_of(sid)
+        if spec is None:
+            continue
+        try:
+            cell = map_cell(spec)
+        except Exception:  # noqa: BLE001 — not a spec
+            continue
+        key = (bool(fb.get("screen_pass")), o[0], o[1], o[2], sid)
+        if cell not in best or key > best[cell][0]:
+            best[cell] = (key, sid)
+    cells = {c: v[1] for c, v in sorted(best.items())}
+    return list(cells.values()), cells
 
 
 def first_front_hash(feedback: Mapping[str, Mapping], cfg: SearchConfig) -> str:

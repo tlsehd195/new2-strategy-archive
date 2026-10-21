@@ -212,7 +212,7 @@ def feature(sd: SymData, name: str, p: dict) -> np.ndarray:
         w = p["window"]
         s = pd.Series(c).shift(1)
         r = s.rolling(w, min_periods=w)
-        mx, mu, sdv = r.max().to_numpy(), r.mean().to_numpy(), r.std(ddof=1).to_numpy()
+        mx, sdv = r.max().to_numpy(), r.std(ddof=1).to_numpy()
         out = (c - mx) / np.where(sdv > 0, sdv, np.nan)
         out[:w + 1] = np.nan
     elif name == "vol_ratio":

@@ -1,0 +1,13 @@
+# 2026-10-21 08:50..10:18Z, four DEV-only evolve runs in parallel, each in a fresh NEW2_DISCOVERY_ROOT,
+# same data (upload f6379f02, BTC/ETH), same cost, same seed (SearchConfig default 20261015)
+env -u COINTRADER_SRC NEW2_DATA_DIR=<unzipped f6379f02> NEW2_DISCOVERY_ROOT=<fresh> NEW2_DISC_MODE=evolve \
+  NEW2_COST_PROFILE=public_estimate:data/public_market_estimate/estimate_v1.json \
+  python3 run/discovery/runner.py --mode evolve --dev-only --rounds R --evals 4000 --selection SEL
+#   base8: R=8 SEL=pareto_niche  -> C2-4249176cda367b00a3ab (same 894 / 64 as R6; new context only because the code hash changed)
+#   map8 : R=8 SEL=map_elites    -> C2-bcec99d22e7f0010f848
+#   base24: R=24 SEL=pareto_niche, map24: R=24 SEL=map_elites (same contexts as above, longer)
+python3 run/compare_selection_dev.py base8=.../evolution map8=... base24=... map24=... --out selection_comparison.json
+python3 run/iw1_statistic_dev.py --data-dir <f6379f02 + alts bundle klines/funding> \
+  --candidates iw1_statistic_top_candidates.json --out iw1_statistic_top_dev.json
+# strong search (run/audit/evidence_strong_search_20261021/):
+python3 run/strong_search_dev.py --data-dir <same combined dir> --out <dir>
