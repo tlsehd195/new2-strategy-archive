@@ -1,0 +1,224 @@
+{
+ "alt_months": {
+  "ADAUSDT": {
+   "funding": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   },
+   "klines": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   }
+  },
+  "AVAXUSDT": {
+   "funding": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   },
+   "klines": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   }
+  },
+  "BCHUSDT": {
+   "funding": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   },
+   "klines": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   }
+  },
+  "BNBUSDT": {
+   "funding": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   },
+   "klines": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   }
+  },
+  "DOGEUSDT": {
+   "funding": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   },
+   "klines": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   }
+  },
+  "HYPEUSDT": {
+   "funding": {
+    "first": "2025-05",
+    "last": "2026-09",
+    "n": 17
+   },
+   "klines": {
+    "first": "2025-05",
+    "last": "2026-09",
+    "n": 17
+   }
+  },
+  "LINKUSDT": {
+   "funding": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   },
+   "klines": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   }
+  },
+  "LTCUSDT": {
+   "funding": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   },
+   "klines": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   }
+  },
+  "NEARUSDT": {
+   "funding": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   },
+   "klines": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   }
+  },
+  "SOLUSDT": {
+   "funding": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   },
+   "klines": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   }
+  },
+  "SUIUSDT": {
+   "funding": {
+    "first": "2023-05",
+    "last": "2026-09",
+    "n": 41
+   },
+   "klines": {
+    "first": "2023-05",
+    "last": "2026-09",
+    "n": 41
+   }
+  },
+  "TRXUSDT": {
+   "funding": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   },
+   "klines": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   }
+  },
+  "UNIUSDT": {
+   "funding": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   },
+   "klines": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   }
+  },
+  "XLMUSDT": {
+   "funding": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   },
+   "klines": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   }
+  },
+  "XMRUSDT": {
+   "funding": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   },
+   "klines": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   }
+  },
+  "XRPUSDT": {
+   "funding": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   },
+   "klines": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   }
+  },
+  "ZECUSDT": {
+   "funding": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   },
+   "klines": {
+    "first": "2021-01",
+    "last": "2026-09",
+    "n": 69
+   }
+  }
+ },
+ "bundles": {
+  "alts_2021_2026_binance_um_15m_funding.zip": {
+   "content": "alts 2021-01..2026-09 (not preregistered; same era as BTC/ETH selection data)",
+   "files": 2186,
+   "sha256": "e8cac279984cab1108080360c3fe9572abeb4312d3eddde12f5cab7557107f18"
+  },
+  "iw1_2020_binance_um_15m_funding.zip": {
+   "content": "2020 klines 15m + fundingRate, 19 symbols tried (16 with 2020 data)",
+   "files": 324,
+   "sha256": "15c4714ab45befce606c37d726e9c41ab956536fb8488b1d9139de30e1b8e70f"
+  }
+ },
+ "fetched_at": "2026-10-21T05:51:04.929636+00:00",
+ "not_published_months": "months before each symbol's listing (data_fetch NOT_PUBLISHED)",
+ "provenance_rows": 2510,
+ "quality_blocks": 0
+}
