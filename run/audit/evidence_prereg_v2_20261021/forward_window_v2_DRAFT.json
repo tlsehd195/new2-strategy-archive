@@ -1,6 +1,6 @@
 {
  "schema": "forward_window_prereg_v2_DRAFT",
- "status": "DRAFT - NOT IN FORCE. Decisions D3 and D4 answered 'yes' by 동동 on 2026-10-21 (see decided). D1, D2, D5 still open. Not under run/discovery/config/, read by no code. Becomes a prereg only when the user approves the remaining decisions and the file is committed with its sha256 BEFORE window_start.",
+ "status": "DRAFT - NOT IN FORCE. All of D1-D5 decided by 동동 on 2026-10-21 (see decided). Becomes a prereg only when the members file is frozen on or before 2026-10-31 and this file is committed with its sha256 BEFORE window_start (2026-11-01), after a final read-through by the user. No window is open.",
  "note": "Drafted 2026-10-21 after ADR 0022 (power audit). Goal: raise power WITHOUT loosening any criterion: a longer, forward, never-seen window; one pooled basket test instead of per-symbol intersection; fewer members. Every number below that is a statistical criterion (alpha, one-sided StepM, min events) is the same as promo-v3 / IW1 v1 or stricter.",
  "family": "forward-window-family-v2",
  "window": {
@@ -10,7 +10,7 @@
   "length_months": 12,
   "warmup": "indicator warmup data from BEFORE window_start may be read; entries only inside the window; exits at or before window_end",
   "single_look": "evaluated ONCE after window_end. No interim evaluation, no peeking at member P&L inside the window. Paper replays or live monitoring of the same members are forbidden to be used for decisions on this family.",
-  "extension_option": "24 months (window_end 2028-10-31) is the same design with the power in power_table.length_24m; choosing it is open decision D1."
+  "extension_option": "DECIDED (D1): 12 months; no 24-month extension. More evidence comes from a second window of the same family."
  },
  "basket": {
   "rule": "BTC, ETH and the first 13 further symbols of the market-cap order below that have a Binance USD-M perpetual with >=180 days of history at window_start. Fixed in this file; a symbol that stops trading is kept with zero return afterwards (no survivorship repair).",
@@ -44,7 +44,7 @@
  "cost": {
   "profile": "assumed_public_v1",
   "order_value": 10000.0,
-  "measured_alt_cost": "open decision D2: if an alt order-book estimate (criteria v2, ESTIMATED_FROM_PUBLIC_DATA) is sealed BEFORE window_end and BEFORE any member result is computed, the user may switch to it by amending this file in writing; default stays assumed_public_v1."
+  "measured_alt_cost": "DECIDED (D2): see decided.D2. Default stays assumed_public_v1."
  },
  "test": {
   "statistic": "per member, equal-weight average over basket symbols of the daily net return series (bp, exit-day booking) on the common UTC-day grid of the window",
@@ -140,15 +140,14 @@
   "compare_now": "BTC/ETH 6m, batch 8: 6.9-8.0; IW1 A: 2.8-4.0",
   "K_note": "With D3 decided K=1: use the FIRST (best) bound in the tables; the K=5 worst bound no longer applies. The beta-hedged gate lowers power further: it needs a genuine non-market edge, so treat the best bound as an upper bound and the 'rho 0.6' rows as the realistic ones."
  },
- "open_decisions": {
-  "D1": "12 months (result ~2027-11) or 24 months (result ~2028-11)? Recommended: 12 months with the option to register a SECOND window of the same family (alpha spending k=2) rather than extending this one.",
-  "D2": "keep assumed_public_v1 (default) or switch to a measured alt cost if one is sealed first.",
-  "D5": "who freezes the members file and when (needs a DEV-only evolve run on the then-current code; suggested 2026-10-31)."
- },
+ "open_decisions": {},
  "not_changed": "no stats criterion is looser than promo-v3 / IW1 v1; locked TEST, paper and promotion rules (ADR 0009/0010) are unchanged; IW1 stays closed.",
  "reliability_flag": "All cost-dependent numbers (DEV SR of the bundle, member selection, universe) rest on the ASSUMED cost profile assumed_public_v1 for alts, not on a measurement (ADR 0022/0024). Alt order books were not collected. Re-select the universe and members if a measured alt cost is sealed before freeze (D2).",
  "decided": {
   "D3": "yes - the 5 members are tested as ONE bundle hypothesis (equal-weight daily series of the 5 members, then the basket average). K=1, one more degree of selection: the bundle is chosen on DEV (ADR 0024 top-5), reported as such.",
-  "D4": "yes - second gate: beta-hedged bundle series must also reject H0 (mean <= 0) at the same alpha. Intersection-union test: size <= alpha without splitting alpha; power <= the weaker of the two."
+  "D4": "yes - second gate: beta-hedged bundle series must also reject H0 (mean <= 0) at the same alpha. Intersection-union test: size <= alpha without splitting alpha; power <= the weaker of the two.",
+  "D1": "12 months (2026-11-01..2027-10-31). Result earliest 2027-11. A second window of the same family (alpha spending k=2) rather than extending this one.",
+  "D2": "the assumed alt cost is replaced by a MEASURED alt cost (criteria cost_public_estimate_v2_alts.json, ESTIMATED_FROM_PUBLIC_DATA) when one is sealed. To prevent cherry-picking, replacement is allowed only if the estimate is sealed BEFORE the freeze date (D5): then the universe rule, the member selection and the evaluation all use it, re-run from scratch. Sealed later: assumed_public_v1 stays for this window; the measured cost is reported alongside as a diagnostic.",
+  "D5": "members file frozen on 2026-10-31 (DEV-only evolve run on the then-current code, ADR 0023 entry rule DEV SR >= 1.0). If fewer than 5 members meet the entry rule, the window is not registered and nothing is spent."
  }
 }
