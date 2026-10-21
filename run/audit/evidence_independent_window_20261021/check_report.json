@@ -1,0 +1,194 @@
+{
+ "opened": {
+  "A": false,
+  "B": false
+ },
+ "overlap_issues": [],
+ "prereg_sha256": "49721cc7daadb4968390ebdab1ceee0e91c05eaa85a44ed8717d4fa69c0edf79",
+ "status": "READY",
+ "symbols": {
+  "ADAUSDT": {
+   "eligible": true,
+   "first_ts": 1580457600000,
+   "missing": [],
+   "n_bars": 32224,
+   "n_months": 12,
+   "quality_ok": true
+  },
+  "AVAXUSDT": {
+   "eligible": false,
+   "first_ts": 1600844400000,
+   "missing": [],
+   "n_bars": 9572,
+   "n_months": 4,
+   "quality_ok": true
+  },
+  "BCHUSDT": {
+   "eligible": true,
+   "first_ts": 1577836800000,
+   "missing": [],
+   "n_bars": 35136,
+   "n_months": 12,
+   "quality_ok": true
+  },
+  "BNBUSDT": {
+   "eligible": true,
+   "first_ts": 1581321600000,
+   "missing": [],
+   "n_bars": 31264,
+   "n_months": 11,
+   "quality_ok": true
+  },
+  "BTCUSDT": {
+   "eligible": true,
+   "first_ts": 1577836800000,
+   "missing": [],
+   "n_bars": 35136,
+   "n_months": 12,
+   "quality_ok": true
+  },
+  "DOGEUSDT": {
+   "eligible": true,
+   "first_ts": 1594371600000,
+   "missing": [],
+   "n_bars": 16764,
+   "n_months": 6,
+   "quality_ok": true
+  },
+  "ETHUSDT": {
+   "eligible": true,
+   "first_ts": 1577836800000,
+   "missing": [],
+   "n_bars": 35136,
+   "n_months": 12,
+   "quality_ok": true
+  },
+  "HYPEUSDT": {
+   "eligible": false,
+   "first_ts": null,
+   "missing": [
+    "no 2020 files"
+   ],
+   "n_bars": 0,
+   "n_months": 0,
+   "quality_ok": false
+  },
+  "LINKUSDT": {
+   "eligible": true,
+   "first_ts": 1579248000000,
+   "missing": [],
+   "n_bars": 33568,
+   "n_months": 12,
+   "quality_ok": true
+  },
+  "LTCUSDT": {
+   "eligible": true,
+   "first_ts": 1578556800000,
+   "missing": [],
+   "n_bars": 34336,
+   "n_months": 12,
+   "quality_ok": true
+  },
+  "NEARUSDT": {
+   "eligible": false,
+   "first_ts": 1602748800000,
+   "missing": [],
+   "n_bars": 7456,
+   "n_months": 3,
+   "quality_ok": true
+  },
+  "SOLUSDT": {
+   "eligible": false,
+   "first_ts": 1600066800000,
+   "missing": [],
+   "n_bars": 10436,
+   "n_months": 4,
+   "quality_ok": true
+  },
+  "SUIUSDT": {
+   "eligible": false,
+   "first_ts": null,
+   "missing": [
+    "no 2020 files"
+   ],
+   "n_bars": 0,
+   "n_months": 0,
+   "quality_ok": false
+  },
+  "TRXUSDT": {
+   "eligible": true,
+   "first_ts": 1579075200000,
+   "missing": [],
+   "n_bars": 33760,
+   "n_months": 12,
+   "quality_ok": true
+  },
+  "UNIUSDT": {
+   "eligible": false,
+   "first_ts": 1600412400000,
+   "missing": [],
+   "n_bars": 10052,
+   "n_months": 4,
+   "quality_ok": true
+  },
+  "XLMUSDT": {
+   "eligible": true,
+   "first_ts": 1579507200000,
+   "missing": [],
+   "n_bars": 33280,
+   "n_months": 12,
+   "quality_ok": true
+  },
+  "XMRUSDT": {
+   "eligible": true,
+   "first_ts": 1580716800000,
+   "missing": [],
+   "n_bars": 31936,
+   "n_months": 11,
+   "quality_ok": true
+  },
+  "XRPUSDT": {
+   "eligible": true,
+   "first_ts": 1578298500000,
+   "missing": [],
+   "n_bars": 34623,
+   "n_months": 12,
+   "quality_ok": true
+  },
+  "ZECUSDT": {
+   "eligible": true,
+   "first_ts": 1580889600000,
+   "missing": [],
+   "n_bars": 31744,
+   "n_months": 11,
+   "quality_ok": true
+  }
+ },
+ "tranches": {
+  "A": {
+   "fixed_ineligible": [],
+   "short": false,
+   "symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "BNBUSDT",
+    "XRPUSDT",
+    "TRXUSDT",
+    "ZECUSDT"
+   ]
+  },
+  "B": {
+   "fixed_ineligible": [],
+   "short": false,
+   "symbols": [
+    "DOGEUSDT",
+    "XMRUSDT",
+    "LINKUSDT",
+    "ADAUSDT",
+    "XLMUSDT",
+    "BCHUSDT",
+    "LTCUSDT"
+   ]
+  }
+ }
+}
