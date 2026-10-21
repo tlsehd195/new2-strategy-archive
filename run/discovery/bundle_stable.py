@@ -1,4 +1,4 @@
-"""Stable small-profit bundle check on DEV (preregistered rules, ADR 0020).
+"""Stable small-profit bundle check on DEV (preregistered rules, ADR 0021).
 
 Takes the DEV-pass strategies of ONE DEV-only evolve context, re-runs their
 DEV events (the same ``_study`` call as ``dev_evaluate``) under the primary

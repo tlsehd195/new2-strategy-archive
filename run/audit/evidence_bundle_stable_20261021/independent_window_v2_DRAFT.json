@@ -1,6 +1,6 @@
 {
  "schema": "independent_window_prereg_v2_DRAFT",
- "status": "DRAFT — NOT IN FORCE. Proposed in ADR 0020 only. independent_window.py reads v1; nothing reads this file. Adopting it is the user's decision and must happen before tranche A is opened.",
+ "status": "DRAFT — NOT IN FORCE. Proposed in ADR 0021 only. independent_window.py reads v1; nothing reads this file. Adopting it is the user's decision and must happen before tranche A is opened.",
  "window_id": "IW1",
  "why": "v1 tests each of up to 20 members with StepM; a bundle of members cannot be tested. A preregistered bundle is ONE hypothesis, so it keeps the full tranche alpha instead of sharing it with 19 others.",
  "unchanged_from_v1": ["independence", "source", "market_cap_order", "period", "eligibility", "tranches", "cost (assumed_public_v1, order_value 10000)", "single_use", "outcome_meaning", "family independent-window-family-v1, alpha_total 0.05, spending_alpha(k, 0.05)"],
