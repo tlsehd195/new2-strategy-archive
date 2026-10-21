@@ -1,0 +1,36 @@
+{
+ "campaign": null,
+ "context_id": "C2-f64e792160a0222650f2",
+ "cost_status": "ESTIMATED_FROM_PUBLIC_DATA",
+ "dev_evaluated": 894,
+ "duplicates": 15,
+ "finished_at": "2026-10-21T05:01:36Z",
+ "forward": [],
+ "invalid": 103,
+ "near_duplicates": 0,
+ "notes": [
+  "DEV-only cycle: confirmatory stages skipped by request"
+ ],
+ "paper": [],
+ "proposed": 189,
+ "reverify_pending": [],
+ "robustness_resumed": [],
+ "rounds": 8,
+ "runtime_seconds": 3553.444799423218,
+ "search_status": "ACTIVE",
+ "seeded": 705,
+ "semantic_duplicates": 30,
+ "started_at": "2026-10-21T04:02:22Z",
+ "status": "CYCLE_OK",
+ "status_counts": {
+  "INCONCLUSIVE": 93,
+  "REJECTED": 737,
+  "RESEARCH_ONLY": 64
+ },
+ "symbols_blocked": {},
+ "symbols_used": [
+  "BTCUSDT",
+  "ETHUSDT"
+ ],
+ "validation_batch": null
+}
