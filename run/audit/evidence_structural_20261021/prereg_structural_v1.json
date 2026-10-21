@@ -1,0 +1,44 @@
+{
+  "schema": "structural_prereg_v1",
+  "written": "2026-10-21T09:50Z",
+  "written_before_any_result": true,
+  "question": "Does a market-structure return source (funding, relative value, settlement timing) survive assumed costs on DEV data only?",
+  "universe": ["ADAUSDT","AVAXUSDT","BCHUSDT","BNBUSDT","DOGEUSDT","LINKUSDT","LTCUSDT","NEARUSDT","SOLUSDT","TRXUSDT","UNIUSDT","XLMUSDT","XMRUSDT","XRPUSDT","ZECUSDT"],
+  "universe_note": "the 15 alts of the uploaded alts bundle with data from 2021-01; HYPE and SUI excluded (listed later). BTC and ETH not used at all.",
+  "segments": {
+    "S1": {"read": ["2021-01-01","2023-09-18"], "entry_from": "2021-04-01", "use": "all choices"},
+    "S2": {"read": ["2024-06-19","2025-10-20"], "entry_from": "2024-08-01", "use": "reported only, never used to choose"}
+  },
+  "never_read": [["2000-01-01","2020-12-31","IW1"],["2023-09-19","2024-06-18","BTC validation/locked TEST + embargo, all symbols"],["2025-10-21","2099-12-31","ETH validation/locked/paper + embargo, all symbols"]],
+  "missing_bars": "never filled; a symbol-day whose open (or the next open) is missing is flat that day",
+  "decision_timing": "signals use only information before the bar/open where the trade is executed",
+  "cost": {
+    "perp": "assumed_public_v1 (taker 5bp + half spread 2bp + slippage 3bp + 0.1*sqrt(10k USDT / traded value of the 15m bar before execution)), every side",
+    "spot_leg_for_cash_and_carry": "ASSUMED: Binance spot base taker 10bp + half spread 2bp + slippage 3bp + same impact term on the perp bar volume (spot volume not in the data: understates impact)",
+    "funding": "actual settled funding from the data, paid/received on every held perp position",
+    "sensitivity": "every result also at 2x cost"
+  },
+  "families": {
+    "CC": {"what": "cash-and-carry funding harvest: long spot + short perp, 1 unit notional per symbol, portfolio = mean over symbols with data",
+           "limit": "no spot or quarterly prices in the data and Binance hosts are blocked here: basis P&L is NOT measured and set to 0, so CC numbers are an upper bound on funding income after costs, not a backtest",
+           "configs": [
+             {"id": "CC1", "rule": "always on, all symbols"},
+             {"id": "CC2", "rule": "per symbol: in when mean of last 3 settled rates > 1e-4, out when < 0 (hysteresis), decided at 00:00 open"},
+             {"id": "CC3", "rule": "as CC2 with 3e-4"},
+             {"id": "CC4", "rule": "top 3 by mean of last 21 settled rates (7 days), only if > 0, weekly"},
+             {"id": "CC5", "rule": "top 5, as CC4"}]},
+    "XC": {"what": "perp-only cross-sectional carry on the 15-symbol universe: short the 5 highest funding, long the 5 lowest, dollar neutral (Track B tried k=2 of 6 symbols; this is the broad-universe version)",
+           "configs": [
+             {"id": "XC1", "signal_settlements": 3, "rebalance_days": 7},
+             {"id": "XC2", "signal_settlements": 21, "rebalance_days": 7},
+             {"id": "XC3", "signal_settlements": 21, "rebalance_days": 1}]},
+    "PR": {"what": "pairs relative value (Gatev distance method + OLS hedge): every 30 days pick the N pairs with the smallest sum of squared differences of normalised log prices over the past F days; spread = log a - beta log b (beta, mean, sd from formation only); enter when |z| > z_in on day d open, executed at the d+1 open; exit when z crosses 0 or at period end; legs sized 1/(1+|beta|) and beta/(1+|beta|)",
+           "configs": "F in {60,120} x N in {5,10} x z_in in {1.5,2.0} = PR1..PR8"},
+    "FT": {"what": "funding-settlement timing on 15m bars: at each settlement T, if the last settled rate (known before T) > thr go short, < -thr go long (against the crowded side); windows pre [T-60m, T), straddle [T-15m, T+15m) (receives/pays the funding at T), post [T, T+60m); per-symbol events, daily sum, equal weight over symbols",
+           "configs": "window in {pre, straddle, post} x thr in {1e-4, 3e-4} = FT1..FT6"}
+  },
+  "trial_count": 22,
+  "statistics": "annualised Sharpe of daily portfolio returns (net of cost and funding) in S1; DSR with N=22 and with N=22+3919 (strong-search Track A 3857 + Track B 62 on the same days, one family); 5 folds; S2 and 2x cost reported for every config; correlation with the equal-weight long portfolio of the universe",
+  "bar_for_interesting": "unchanged from the project: DSR >= 0.95 at the family-wide N and positive S1 folds; nothing here is a validation and nothing is promoted",
+  "not_done": "basis (spot vs perp, quarterly futures) cannot be measured with the data available; recorded as untested"
+}

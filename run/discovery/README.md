@@ -112,6 +112,14 @@ kept for the record — v3 makes the whole search one FWER family per window, se
 Market data acquisition is separate and opt-in:
 `python3 data_fetch.py --data-dir DIR --symbols BTCUSDT ETHUSDT --allow-network`
 (checksum + quality gate + atomic commit; existing files are never overwritten).
+Where `data.binance.vision` is blocked, `--base-url` with the same bucket's S3 endpoint
+(`data_fetch.S3_MIRROR`) fetches the identical files; the URL used is in the provenance.
+
+Independent window IW1 (ADR 0016): 2020 data, the year before `READ_START`, in
+market-cap tranches, preregistered in `config/independent_window_v1.json`.
+`independent_window.py check --data-dir D` (overlap + data readiness, no strategy
+evaluated) → `freeze-members` (members of one DEV-only state directory) →
+`open --tranche A --confirm-single-use` (once; the history row is written first).
 
 Environment (all optional, fail-closed when wrong):
 
@@ -129,6 +137,12 @@ Environment (all optional, fail-closed when wrong):
   search rounds only.  No validation batch is preregistered, no validation or
   locked window is loaded, no alpha is spent.  Use it to re-screen with new code
   when no new independent window exists.
+- `--selection map_elites` (only with `--mode evolve --dev-only`, ADR 0019) picks
+  parents MAP-Elites style: one champion per cell of direction x holding band
+  (<=32, <=128, <=384, <=768 bars) x signal group (feature kinds of the entry), and
+  parents are drawn uniformly over the occupied cells.  The default `pareto_niche`
+  is unchanged and keeps its search-config hash.  `run/compare_selection_dev.py`
+  compares two such runs (same seed and budget) from their ledgers.
 - `fills_import.py --fills <export.csv|json> --klines <dir> [--fee-prices f.json]
   [--verify --decisions d.jsonl --quotes q.jsonl]` imports a Binance trade-history
   export into `private_fills/` (git-ignored; only counts and hashes are printed),

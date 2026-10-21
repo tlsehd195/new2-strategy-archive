@@ -1,0 +1,2 @@
+env -u COINTRADER_SRC NEW2_DATA_DIR=<unzipped f6379f02> NEW2_DISCOVERY_ROOT=<fresh> NEW2_DISC_MODE=evolve NEW2_COST_PROFILE=public_estimate:data/public_market_estimate/estimate_v1.json python3 run/discovery/runner.py --mode evolve --dev-only --rounds 8 --evals 4000
+# 2026-10-21T04:02:22Z..05:01:36Z (3553 s) CYCLE_OK

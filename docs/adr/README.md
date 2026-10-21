@@ -18,7 +18,11 @@
 | [0012](0012-evolve-real-data-run-public-estimate-cost.md) | 공개 호가 추정 비용으로 실데이터 evolve R3 (검증 진입 20, 생존 0) | Accepted |
 | [0013](0013-audit-search-pool-cost-evidence-alpha-history.md) | 전체 감사: 검색 풀 분리, 행동 중복, 비용 전후 비교, 비용 검증 상태 세분, 창 단위 알파 소비 | Proposed |
 | [0014](0014-archive-independence-fills-import-dedup-v2-search-family.md) | 아카이브 독립, 체결 가져오기, 행동 중복 fp-v2, 탐색 단위 다중검정(promo-v3), 상태·원장 검사 | Proposed |
+| [0016](0016-independent-window-2020-market-cap-tranches.md) | 새 독립 검증 구간 IW1: 2020년 데이터, 시총 순 묶음, 사전등록과 1회 사용 | Proposed |
+| [0017](0017-paper-review-ssrn3261943-power-precheck.md) | 업로드 논문 검토(SSRN 3261943): DSR 식 대조, IW1 검정력 계산, 사전점검 제안 | Proposed |
 | [0018](0018-short-and-long-short-support-check.md) | 숏·롱숏 지원 점검, DEV 묶음 진단 도구 `bundle_dev.py` | Accepted |
+| [0019](0019-strong-candidate-search-map-elites-dev.md) | 더 강한 후보 탐색(DEV 전용, IW1 측정값): 없음. MAP-Elites 부모 선택을 DEV 전용 옵션으로 추가하고 같은 예산·시드로 비교 | Accepted |
+| [0021](0021-dev-bundle-stable-small-profit.md) | 후보 묶음의 비용 후 안정 수익 DEV 점검(사전 고정 규칙, 앞/뒤 절반), IW1 v2 묶음 검정 초안 | Accepted |
 | [0022](0022-false-negative-power-audit.md) | 거짓 음성 점검: 가상 엣지 검정력, 관문별 기여, 비용 가정, 숏 보류 후보, 검정력 개선 제안 | Accepted (측정만) |
 | [0023](0023-forward-window-prereg-v2-draft.md) | 사전등록 v2 초안: 12개월 전진 창, 바구니 평균 검정 (효력 없음) | Proposed |
 | [0024](0024-liquid-universe-dev-search.md) | 유동성 높은 9종목 DEV 재탐색 (가정 비용): 단일 후보 기준 미달, 묶음은 유망하나 베타 미확인 | Accepted (측정만) |
