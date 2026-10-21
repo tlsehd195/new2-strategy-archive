@@ -1,0 +1,2 @@
+env -u COINTRADER_SRC NEW2_COST_PROFILE=public_estimate:data/public_market_estimate/estimate_v1.json python3 run/discovery/bundle_stable.py <R6 state dir> <unzipped f6379f02> --context C2-f64e792160a0222650f2 --out run/audit/evidence_bundle_stable_20261021/bundle_stable_r6.json
+# R6 state regenerated 2026-10-21T09:35:31Z..10:26:37Z with the ADR 0015 command (CYCLE_OK, ctx C2-f64e792160a0222650f2, 894 DEV, 64 RESEARCH_ONLY = R6 list); bundle run ~7.5 min

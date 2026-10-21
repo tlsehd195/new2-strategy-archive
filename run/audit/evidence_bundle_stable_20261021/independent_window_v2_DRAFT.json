@@ -1,0 +1,22 @@
+{
+ "schema": "independent_window_prereg_v2_DRAFT",
+ "status": "DRAFT — NOT IN FORCE. Proposed in ADR 0020 only. independent_window.py reads v1; nothing reads this file. Adopting it is the user's decision and must happen before tranche A is opened.",
+ "window_id": "IW1",
+ "why": "v1 tests each of up to 20 members with StepM; a bundle of members cannot be tested. A preregistered bundle is ONE hypothesis, so it keeps the full tranche alpha instead of sharing it with 19 others.",
+ "unchanged_from_v1": ["independence", "source", "market_cap_order", "period", "eligibility", "tranches", "cost (assumed_public_v1, order_value 10000)", "single_use", "outcome_meaning", "family independent-window-family-v1, alpha_total 0.05, spending_alpha(k, 0.05)"],
+ "members": {
+  "rule": "all DEV-pass strategies (RESEARCH_ONLY at dev_screen) of one DEV-only evolve state dir, frozen to a members file (ids, canonical specs, context, hash) BEFORE the tranche is opened",
+  "excluded_before_test": "as v1 (needs data absent for 2020)"
+ },
+ "bundle": {
+  "rule": "fixed before opening, no fitting on any data: bundle-stable-v1 B2_DIR_THIRDS (1/3 each to the equal-weight long, short and symmetric groups) with bundle-stable-v1 sizing (capital 1 per strategy split over tranche symbols, 1/K per event, exit-day booking)",
+  "alternative_if_user_prefers": "B1_EW_ALL (equal weight over all members)"
+ },
+ "test": {
+  "primary": "one-sided H0: mean daily bundle return <= 0 on [entry_start, read_end], stationary bootstrap (B=1000, seed 7, q = stats_mc.default_q(n_days)) at the tranche's full spending alpha",
+  "market_condition": "also required: the beta-hedged bundle return (beta estimated on the same days against the equal-weight buy-and-hold of the tranche symbols) has a positive mean. 2020 was a strong up year; this stops a long tilt from passing as skill",
+  "pass": "primary rejects H0 AND market_condition AND pooled events >= 60 AND >= 30 days with a non-zero bundle return",
+  "members_diagnostic": "per-member StepM as in v1 is reported but is not a gate under v2"
+ },
+ "power_note": "normal approximation, 335 days, alpha 0.0304: annual SR 0.8 -> 13%, 1.5 -> 33%, 2.0 -> 52%, 3.0 -> 84%. bundle-stable-v1 R6 bundles had SR 0.44-0.90 on the DEV half they were not fitted on (public-estimate cost) and a negative return under assumed_public_v1. Opening IW1 with them is not recommended."
+}
