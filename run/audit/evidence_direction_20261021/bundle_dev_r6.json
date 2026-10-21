@@ -1,0 +1,123 @@
+{
+ "bundles": {
+  "long": {
+   "days": 1763,
+   "mdd_bp": 3030.0291192678606,
+   "mean_bp_day": 5.716827327181752,
+   "sharpe_ann": 1.301307316666867
+  },
+  "long+short": {
+   "days": 1763,
+   "mdd_bp": 2914.2868855762745,
+   "mean_bp_day": 5.746837573838892,
+   "sharpe_ann": 1.3864674546462605
+  },
+  "long+short+symmetric": {
+   "days": 1763,
+   "mdd_bp": 2770.282740671878,
+   "mean_bp_day": 6.197140718829765,
+   "sharpe_ann": 1.5665423851913587
+  },
+  "long50/short50": {
+   "days": 1763,
+   "mdd_bp": 2390.7041788273746,
+   "mean_bp_day": 6.01192808597696,
+   "sharpe_ann": 1.694353625937814
+  },
+  "short": {
+   "days": 1763,
+   "mdd_bp": 6144.068605666658,
+   "mean_bp_day": 6.307028844772169,
+   "sharpe_ann": 1.032216287788707
+  },
+  "symmetric": {
+   "days": 1763,
+   "mdd_bp": 6571.474210799985,
+   "mean_bp_day": 11.510717829722063,
+   "sharpe_ann": 1.0120854250234648
+  }
+ },
+ "context_id": "C2-f64e792160a0222650f2",
+ "corr_long_vs_short": -0.1168789878089235,
+ "corr_long_vs_symmetric": 0.035538920432847315,
+ "data": "dev only",
+ "members": {
+  "long": [
+   "S-00bfeb8ed64b092c",
+   "S-02d11e89cebc308b",
+   "S-0f439995bcd4af4d",
+   "S-181c15b4139efdd3",
+   "S-1ec0bc1c95b4c488",
+   "S-202b2284faa1e9ac",
+   "S-209ce2dd7db8d919",
+   "S-21113d1f21e54643",
+   "S-23be1526ebe239b8",
+   "S-28e523543ff2e86d",
+   "S-2a2b74714bf8deaf",
+   "S-2d59854060280dc5",
+   "S-391396a9487de780",
+   "S-3a3dbdf422939143",
+   "S-3b932a500832bd74",
+   "S-3f1ba25668936097",
+   "S-3f825ccdd41fb32d",
+   "S-3f9bee804cd3003b",
+   "S-453555caf895a33d",
+   "S-536416d892f93e61",
+   "S-5a47c0baf0100e04",
+   "S-5e78172a43be4822",
+   "S-5f8884793cae1ba1",
+   "S-63f95ff089ff1ea1",
+   "S-6b558706e36cca5a",
+   "S-6d1f375a260fc295",
+   "S-706cd371788987ea",
+   "S-709c0acee26b7519",
+   "S-72655636c7034155",
+   "S-80fe4b122603f292",
+   "S-863298b6e9ae91d3",
+   "S-8e033ef78d187315",
+   "S-8e45919cce207805",
+   "S-8f4053d8e7125ca5",
+   "S-90882f36d927630a",
+   "S-9d752d63324074cc",
+   "S-a2aa1c77ccf11ba3",
+   "S-a990790314cf322d",
+   "S-aa609b6862018d48",
+   "S-acda232f3d3b97f5",
+   "S-ace182d55342733b",
+   "S-adec1de192ad9818",
+   "S-adf9e2e1e6bc8af8",
+   "S-af5b9301777d21a5",
+   "S-b5e5df1c18d5a57d",
+   "S-bc62b843361277d5",
+   "S-bdae1ff0b24876cc",
+   "S-c515b31a298bdaf1",
+   "S-ce1509d352d34861",
+   "S-d00961a63fe7e300",
+   "S-db25d24ca1ca4c96",
+   "S-e941fd88b7880cd1",
+   "S-e9b22519727c25ec",
+   "S-e9d1bf7b37ad8eb8",
+   "S-f2273f0c4c2e00fd",
+   "S-fd45e2af64d20e15"
+  ],
+  "short": [
+   "S-4d4ec0ad8481a2a2",
+   "S-91ab3cffaa7bab47",
+   "S-f8b1648d499419f6"
+  ],
+  "symmetric": [
+   "S-043c5506668fb8f1",
+   "S-599eb25afe1731e6",
+   "S-64db241c60255cb4",
+   "S-d2815e608ab226a1",
+   "S-ed2d1c8ed9cf1879"
+  ]
+ },
+ "n_members": {
+  "long": 56,
+  "short": 3,
+  "symmetric": 5
+ },
+ "use": "diagnostic only (members selected on the same DEV days; never a gate)",
+ "version": "bundle-dev-v1"
+}
