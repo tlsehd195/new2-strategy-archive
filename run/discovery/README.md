@@ -112,6 +112,14 @@ kept for the record — v3 makes the whole search one FWER family per window, se
 Market data acquisition is separate and opt-in:
 `python3 data_fetch.py --data-dir DIR --symbols BTCUSDT ETHUSDT --allow-network`
 (checksum + quality gate + atomic commit; existing files are never overwritten).
+Where `data.binance.vision` is blocked, `--base-url` with the same bucket's S3 endpoint
+(`data_fetch.S3_MIRROR`) fetches the identical files; the URL used is in the provenance.
+
+Independent window IW1 (ADR 0016): 2020 data, the year before `READ_START`, in
+market-cap tranches, preregistered in `config/independent_window_v1.json`.
+`independent_window.py check --data-dir D` (overlap + data readiness, no strategy
+evaluated) → `freeze-members` (members of one DEV-only state directory) →
+`open --tranche A --confirm-single-use` (once; the history row is written first).
 
 Environment (all optional, fail-closed when wrong):
 
