@@ -1,0 +1,12 @@
+{
+ "schema": "liquid_universe_search_prereg_v1",
+ "fixed": "2026-10-21, committed BEFORE the search was run on this universe",
+ "why": "coordinator relay of 동동: the alt order-book measurement is not possible now; proceed with the assumed cost. Under assumed_public_v1 the one-side cost of TRX and ZEC is 125-167 bp (ADR 0022), which swamps the equal-weight average of IW1 tranche A; a rule that works on liquid symbols is penalised by the illiquid ones.",
+ "universe_rule": "all symbols of the project's alt bundle (+BTC/ETH) whose assumed_public_v1 one-side cost for a 10,000 USDT order, median over S1 bars (2021-01..2023-09), is <= 75 bp. Cost-based, not performance-based. Measured in run/audit/evidence_power_audit_20261021/cost_per_side_by_symbol_S1.txt before this file.",
+ "universe": ["BTCUSDT","ETHUSDT","BNBUSDT","XRPUSDT","SOLUSDT","ADAUSDT","DOGEUSDT","LTCUSDT","LINKUSDT"],
+ "excluded_by_rule": {"AVAXUSDT": 79.5, "SUIUSDT": 89.6, "BCHUSDT": 100.1, "NEARUSDT": 107.2, "TRXUSDT": 125.0, "UNIUSDT": 123.9, "XLMUSDT": 141.1, "ZECUSDT": 167.3, "XMRUSDT": 171.6},
+ "unchanged": "rule space (stage 1/2, Track B), S1 = 2021-01..2023-09-18 chosen on, S2 = 2024-06-19..2025-10-20 reported only (no BTC), forbidden reads, assumed_public_v1 cost, statistic, DSR/PBO/null reference, 60-event minimum",
+ "trials_accounting": "this is a second search on the same rules and the same time stretches. The null expectation of the best SR is reported for this run's trials AND for the sum with ADR 0019's 3,857; the larger one is the one to compare with.",
+ "success_bar_set_now": "a candidate is 'stronger' only if S1 annual SR exceeds the null expected max for the SUMMED trial count AND its S2 annual SR is > 1. Nothing else counts. If nothing meets it the result is reported as no stronger candidate, and no window is opened.",
+ "not_done": "IW1, BTC/ETH validation and locked windows, anything from 2025-10-21, and any statistical criterion are untouched"
+}
