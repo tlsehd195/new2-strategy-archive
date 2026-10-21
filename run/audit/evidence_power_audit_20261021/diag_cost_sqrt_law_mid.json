@@ -1,0 +1,1 @@
+{"profile_id": "sqrt_law_mid (DIAGNOSTIC): assumed fee+spread+slippage, impact Y=1 sigma_d=5% -> 0.05/sqrt(96) on bar participation", "fee_rate": 0.0005, "base_half_spread": 0.0002, "slippage_margin_per_side": 0.0003, "impact_coefficient": 0.0051, "max_participation": 0.05}

@@ -1,0 +1,19 @@
+BTCUSDT    medVol $  98.33M  part_med 1.02e-04  assumed/side med   20.1bp p90   27.4  est/side   7.0bp  refused>5% 0.000%
+ETHUSDT    medVol $  48.36M  part_med 2.07e-04  assumed/side med   24.4bp p90   34.0  est/side   7.1bp  refused>5% 0.000%
+ADAUSDT    medVol $   3.74M  part_med 2.67e-03  assumed/side med   61.7bp p90  110.5  est/side   7.4bp  refused>5% 0.079%
+AVAXUSDT   medVol $   2.07M  part_med 4.83e-03  assumed/side med   79.5bp p90  154.5  est/side   7.6bp  refused>5% 0.959%
+BCHUSDT    medVol $   1.23M  part_med 8.12e-03  assumed/side med  100.1bp p90  174.3  est/side   7.8bp  refused>5% 1.724%
+BNBUSDT    medVol $   4.41M  part_med 2.27e-03  assumed/side med   57.6bp p90   97.8  est/side   7.4bp  refused>5% 0.014%
+DOGEUSDT   medVol $   3.29M  part_med 3.04e-03  assumed/side med   65.1bp p90  120.5  est/side   7.5bp  refused>5% 1.131%
+HYPEUSDT none
+LINKUSDT   medVol $   2.50M  part_med 4.00e-03  assumed/side med   73.3bp p90  118.1  est/side   7.6bp  refused>5% 0.043%
+LTCUSDT    medVol $   2.73M  part_med 3.66e-03  assumed/side med   70.5bp p90  114.7  est/side   7.5bp  refused>5% 0.020%
+NEARUSDT   medVol $   1.06M  part_med 9.45e-03  assumed/side med  107.2bp p90  233.6  est/side   7.9bp  refused>5% 10.577%
+SOLUSDT    medVol $   5.34M  part_med 1.87e-03  assumed/side med   53.3bp p90  100.5  est/side   7.4bp  refused>5% 0.240%
+SUIUSDT    medVol $   1.58M  part_med 6.34e-03  assumed/side med   89.6bp p90  154.7  est/side   7.7bp  refused>5% 0.776%
+TRXUSDT    medVol $   0.76M  part_med 1.32e-02  assumed/side med  125.0bp p90  212.8  est/side   8.1bp  refused>5% 6.159%
+UNIUSDT    medVol $   0.77M  part_med 1.30e-02  assumed/side med  123.9bp p90  218.2  est/side   8.1bp  refused>5% 7.350%
+XLMUSDT    medVol $   0.58M  part_med 1.72e-02  assumed/side med  141.1bp p90  233.6  est/side   8.2bp  refused>5% 17.617%
+XMRUSDT    medVol $   0.38M  part_med 2.61e-02  assumed/side med  171.6bp p90  233.6  est/side   8.5bp  refused>5% 19.803%
+XRPUSDT    medVol $   5.35M  part_med 1.87e-03  assumed/side med   53.2bp p90   84.0  est/side   7.4bp  refused>5% 0.001%
+ZECUSDT    medVol $   0.40M  part_med 2.47e-02  assumed/side med  167.3bp p90  233.6  est/side   8.5bp  refused>5% 23.175%

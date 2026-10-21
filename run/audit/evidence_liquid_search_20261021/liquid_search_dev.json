@@ -1,0 +1,7068 @@
+{
+ "version": "liquid-search-dev-v1",
+ "segments": {
+  "S1": {
+   "read_start": "2021-01-01",
+   "entry_start": "2021-04-01",
+   "read_end": "2023-09-18",
+   "symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "BNBUSDT",
+    "XRPUSDT",
+    "SOLUSDT",
+    "ADAUSDT",
+    "DOGEUSDT",
+    "LTCUSDT",
+    "LINKUSDT"
+   ],
+   "use": "search (all choices are made here)"
+  },
+  "S2": {
+   "read_start": "2024-06-19",
+   "entry_start": "2024-07-15",
+   "read_end": "2025-10-20",
+   "symbols": [
+    "ETHUSDT",
+    "BNBUSDT",
+    "XRPUSDT",
+    "SOLUSDT",
+    "ADAUSDT",
+    "DOGEUSDT",
+    "LTCUSDT",
+    "LINKUSDT"
+   ],
+   "use": "second DEV stretch, reported only (ETH part already in the engine's DEV)"
+  }
+ },
+ "forbidden_reads": [
+  [
+   "*",
+   "2000-01-01",
+   "2020-12-31",
+   "IW1 (2020) and earlier"
+  ],
+  [
+   "*",
+   "2023-09-19",
+   "2024-06-18",
+   "BTC validation + locked TEST (cross-symbol, ADR 0010) and embargo"
+  ],
+  [
+   "*",
+   "2025-10-21",
+   "2099-12-31",
+   "ETH validation, locked TEST and paper window, with embargo"
+  ],
+  [
+   "BTCUSDT",
+   "2024-06-19",
+   "2099-12-31",
+   "BTC paper window (after its locked TEST)"
+  ]
+ ],
+ "cost": {
+  "profile_id": "assumed_public_v1",
+  "sha256": "b6478c34e5f1b7bfcae2515ecc32824f60d904b8c09916cff43915082431ef74"
+ },
+ "order_value": 10000.0,
+ "statistic": "equal-weight mean over the segment symbols of daily net bp (exit-day booking for Track A, daily mark-to-market for Track B); annual SR = mean/sd*sqrt(365)",
+ "datasets": {
+  "S1": {
+   "BTCUSDT": {
+    "pieces": [
+     [
+      1609459200000.0,
+      1695080700000.0,
+      "5d34a262fa17fbc291c042ffcd5cef92d465c33560b68ff47a2e477965b63972"
+     ]
+    ],
+    "gap_days": []
+   },
+   "ETHUSDT": {
+    "pieces": [
+     [
+      1609459200000.0,
+      1695080700000.0,
+      "f062439c55b6b50d9561ecdc56c1287341e6e52b347ff5b7422f7cf879778cbd"
+     ]
+    ],
+    "gap_days": []
+   },
+   "BNBUSDT": {
+    "pieces": [
+     [
+      1609459200000.0,
+      1695080700000.0,
+      "65471c992d52d9f6bce4b03c22f610228299005f1eaf68850f523235341286ca"
+     ]
+    ],
+    "gap_days": []
+   },
+   "XRPUSDT": {
+    "pieces": [
+     [
+      1609459200000.0,
+      1645832700000.0,
+      "ce467af773d89aa31f20d61085a7a2d190ddf6db4bfc113b304b901cd665c159"
+     ],
+     [
+      1648944000000.0,
+      1695080700000.0,
+      "0e9a64922d39fcb454d26970cd3b8aa19c481bfb1fd1daff19cc7856d1a5c935"
+     ]
+    ],
+    "gap_days": [
+     "2022-02-26",
+     "2022-02-27",
+     "2022-02-28",
+     "2022-04-01",
+     "2022-04-02"
+    ]
+   },
+   "SOLUSDT": {
+    "pieces": [
+     [
+      1609459200000.0,
+      1645832700000.0,
+      "9ebedbad4eba7e8f97432aa9a2c73b0c2bd0a22a85a8e8691cd77ebfda33c641"
+     ],
+     [
+      1648944000000.0,
+      1695080700000.0,
+      "12858bb1d34d5e2a2fc88587a72cb699604b2b5536883d4d970def633205b75d"
+     ]
+    ],
+    "gap_days": [
+     "2022-02-26",
+     "2022-02-27",
+     "2022-02-28",
+     "2022-04-01",
+     "2022-04-02"
+    ]
+   },
+   "ADAUSDT": {
+    "pieces": [
+     [
+      1609459200000.0,
+      1695080700000.0,
+      "e241df410a99b8ee4a8546c7eeee20bb090944178fe49022bd431fb4f8fa0441"
+     ]
+    ],
+    "gap_days": []
+   },
+   "DOGEUSDT": {
+    "pieces": [
+     [
+      1609459200000.0,
+      1695080700000.0,
+      "5cebbf41207a8f42b33efd75426a2cb6bfaf7cf1a5fad3bf16bc0a3f9a0f700c"
+     ]
+    ],
+    "gap_days": []
+   },
+   "LTCUSDT": {
+    "pieces": [
+     [
+      1609459200000.0,
+      1645832700000.0,
+      "2fd3e344ac453103dc1e755c3bc3e74bb562e89d2a19adb09af30ca0b1a46275"
+     ],
+     [
+      1648944000000.0,
+      1695080700000.0,
+      "63b4023360f7c53106b352ae7bdcfb72d0f851cd9aa4894f6d5480601300afca"
+     ]
+    ],
+    "gap_days": [
+     "2022-02-26",
+     "2022-02-27",
+     "2022-02-28",
+     "2022-04-01",
+     "2022-04-02"
+    ]
+   },
+   "LINKUSDT": {
+    "pieces": [
+     [
+      1609459200000.0,
+      1695080700000.0,
+      "9f26426ba6b563c84065e9eb3efb53a4724653351c3bc372f0de487437656c8f"
+     ]
+    ],
+    "gap_days": []
+   }
+  },
+  "S2": {
+   "ETHUSDT": {
+    "pieces": [
+     [
+      1717200000000.0,
+      1761003900000.0,
+      "826fb014c8bf1492cd755a49875e337017dd0027e57b92ebcf6d5a3e1bf7b47b"
+     ]
+    ],
+    "gap_days": []
+   },
+   "BNBUSDT": {
+    "pieces": [
+     [
+      1717200000000.0,
+      1761003900000.0,
+      "544b41aaab25b9420f74411dd385e1abbabe255786c125b2e0a928b65240479b"
+     ]
+    ],
+    "gap_days": []
+   },
+   "XRPUSDT": {
+    "pieces": [
+     [
+      1717200000000.0,
+      1761003900000.0,
+      "3bd5a4a7e9bc199d4edfd9a2bb14f2f7f060444b1ff2826bc68087044644f92c"
+     ]
+    ],
+    "gap_days": []
+   },
+   "SOLUSDT": {
+    "pieces": [
+     [
+      1717200000000.0,
+      1761003900000.0,
+      "743e4c31d4a76c56f0328cced340f15f44343be721d162da36bd612936ee3308"
+     ]
+    ],
+    "gap_days": []
+   },
+   "ADAUSDT": {
+    "pieces": [
+     [
+      1717200000000.0,
+      1761003900000.0,
+      "299eab60fe1c63fe1ce6d63e54ada72b5b92485796bac628f412ca23e6197d69"
+     ]
+    ],
+    "gap_days": []
+   },
+   "DOGEUSDT": {
+    "pieces": [
+     [
+      1717200000000.0,
+      1761003900000.0,
+      "adbdaec9053e6a512a91ebc12443d589f215ddf93ac59c32a189ab49c52c020b"
+     ]
+    ],
+    "gap_days": []
+   },
+   "LTCUSDT": {
+    "pieces": [
+     [
+      1717200000000.0,
+      1761003900000.0,
+      "8c796e725236af9910230fc126a865e1175136f462e03db2ddb32eaf1ef63aeb"
+     ]
+    ],
+    "gap_days": []
+   },
+   "LINKUSDT": {
+    "pieces": [
+     [
+      1717200000000.0,
+      1761003900000.0,
+      "65b4c3dc3fabf4eec2ded0327847d9f246fbe8e7c5866b2f78edaa9a5f3cb3a8"
+     ]
+    ],
+    "gap_days": []
+   }
+  }
+ },
+ "trials": {
+  "track_a_stage1": 3132,
+  "track_a_stage2": 662,
+  "track_a": 3794,
+  "track_b": 62,
+  "total": 3856,
+  "track_a_with_60plus_events": 3599,
+  "effective_independent_trials_estimate": 77.42234350330776
+ },
+ "track_a_sr_distribution_S1": {
+  "50": -1.5891335806765172,
+  "90": 0.3690688378065363,
+  "99": 0.9832726063784284,
+  "99.9": 1.185268254218343,
+  "100": 1.287385568326986
+ },
+ "null_reference": {
+  "expected_max_sr_ann_if_all_trials_unskilled_unit_variance": 2.304675498991769,
+  "expected_max_sr_ann_effective_trials": 1.5512501818117148,
+  "years_S1": 2.4684931506849317
+ },
+ "pbo_cscv_S1_track_a": {
+  "pbo": 0.20675,
+  "combinations": 4000,
+  "trials": 3599,
+  "median_oos_sr_ann_of_is_best": -0.7520615226546454,
+  "share_oos_sr_of_is_best_positive": 0.28325
+ },
+ "s1_to_s2_transfer": {
+  "top300_by_S1": {
+   "spearman_S1_vs_S2": 0.13101759746663227,
+   "median_S2_sr_ann": 1.1126872712296665,
+   "share_S2_positive": 0.8733333333333333
+  },
+  "random300": {
+   "spearman_S1_vs_S2": 0.922245785452235,
+   "median_S2_sr_ann": -2.215396617945089,
+   "share_S2_positive": 0.22333333333333333
+  }
+ },
+ "track_a_distinct_leaders": [
+  {
+   "rank": 1,
+   "strategy_id": "S-52a7463a3140a8ca",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "vol_ratio",
+       "op": "gt",
+       "params": {
+        "long": 768,
+        "short": 48
+       },
+       "value": 2.0
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "ret_z",
+      "op": "gt",
+      "params": {
+       "lookback": 96,
+       "min_history": 0,
+       "window": 2048
+      },
+      "value": 0.5
+     }
+    ],
+    "exit": {
+     "horizon": 192,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:vol_ratio:long",
+    "data": [
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 192
+    }
+   },
+   "cluster_size": 3,
+   "S1": {
+    "sr_ann": 1.287385568326986,
+    "mean_bp_day": 4.181261924052137,
+    "mdd_bp": 619.502445816659,
+    "days": 901,
+    "active_days": 110,
+    "n_events": 173,
+    "fold_sr_ann": [
+     2.4999603058624067,
+     0.6916417600962151,
+     0.13053752120332487,
+     1.7690928543004159,
+     0.35743361892463726
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 25,
+      "mean_bp": 108.60779951285238,
+      "sr_ann": 0.6553781005780137
+     },
+     "ETHUSDT": {
+      "n": 16,
+      "mean_bp": 202.41690672926254,
+      "sr_ann": 0.8247029281976929
+     },
+     "BNBUSDT": {
+      "n": 14,
+      "mean_bp": 20.121440589093186,
+      "sr_ann": 0.08288750946789562
+     },
+     "XRPUSDT": {
+      "n": 19,
+      "mean_bp": 443.4442832586998,
+      "sr_ann": 0.8941907155108498
+     },
+     "SOLUSDT": {
+      "n": 17,
+      "mean_bp": 365.3130530637944,
+      "sr_ann": 0.9813802994527525
+     },
+     "ADAUSDT": {
+      "n": 16,
+      "mean_bp": -119.28847747043852,
+      "sr_ann": -0.4457059191364379
+     },
+     "DOGEUSDT": {
+      "n": 39,
+      "mean_bp": 324.96990134615237,
+      "sr_ann": 0.7043468414816
+     },
+     "LTCUSDT": {
+      "n": 13,
+      "mean_bp": 381.42394063252806,
+      "sr_ann": 0.8860622638824422
+     },
+     "LINKUSDT": {
+      "n": 14,
+      "mean_bp": -192.08555334240208,
+      "sr_ann": -0.5766644023644523
+     }
+    },
+    "fold_positive_share": 1.0,
+    "mean_net_bp_trade": 195.9875892609178,
+    "mean_cost_bp_trade": 76.72803476513815,
+    "top5pct_profit_share": 0.4042073405237058,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": -0.004041238761668222
+   },
+   "S1_cost_x1.5_sr_ann": 1.0454357212665946,
+   "S2": {
+    "sr_ann": -0.020714491139026056,
+    "mean_bp_day": -0.06330358039781238,
+    "mdd_bp": 1078.717636118684,
+    "days": 463,
+    "active_days": 40,
+    "n_events": 64,
+    "fold_sr_ann": [
+     -1.8291479966669275,
+     1.4254894524132045,
+     -0.7502449915932906,
+     1.778956973329978,
+     -2.749560750191887
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 6,
+      "mean_bp": -120.43610479574966,
+      "sr_ann": -0.24120796720482007
+     },
+     "BNBUSDT": {
+      "n": 8,
+      "mean_bp": -308.02787465671395,
+      "sr_ann": -1.6483132601405235
+     },
+     "XRPUSDT": {
+      "n": 13,
+      "mean_bp": 12.79866368278424,
+      "sr_ann": 0.07385576519094442
+     },
+     "SOLUSDT": {
+      "n": 6,
+      "mean_bp": -94.80048209696331,
+      "sr_ann": -0.20941398327575875
+     },
+     "ADAUSDT": {
+      "n": 7,
+      "mean_bp": 517.8062357450591,
+      "sr_ann": 1.0052389363678051
+     },
+     "DOGEUSDT": {
+      "n": 12,
+      "mean_bp": 6.816749307574118,
+      "sr_ann": 0.015345150935250738
+     },
+     "LTCUSDT": {
+      "n": 9,
+      "mean_bp": -233.7318790192768,
+      "sr_ann": -0.46998836067666167
+     },
+     "LINKUSDT": {
+      "n": 3,
+      "mean_bp": 583.9752327358286,
+      "sr_ann": 1.040639403424077
+     }
+    },
+    "fold_positive_share": 0.4,
+    "mean_net_bp_trade": -3.663694715523363,
+    "mean_cost_bp_trade": 65.50669429053804,
+    "top5pct_profit_share": 0.4547859510811404,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 2,
+   "strategy_id": "S-263e92dfdbe1a227",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "funding_z",
+       "op": "gt",
+       "params": {
+        "window": 90
+       },
+       "value": 2.0
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "vol_ratio",
+      "op": "gt",
+      "params": {
+       "long": 1536,
+       "short": 96
+      },
+      "value": 1.2
+     }
+    ],
+    "exit": {
+     "horizon": 384,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:funding_z:long",
+    "data": [
+     "funding",
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 384
+    }
+   },
+   "cluster_size": 2,
+   "S1": {
+    "sr_ann": 1.2207426101683154,
+    "mean_bp_day": 3.5636724748334103,
+    "mdd_bp": 948.8832295256898,
+    "days": 901,
+    "active_days": 37,
+    "n_events": 66,
+    "fold_sr_ann": [
+     3.5912681255737757,
+     0.4427773965719224,
+     NaN,
+     -1.0326356595699626,
+     -1.9741411810240908
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 8,
+      "mean_bp": 92.39705972263198,
+      "sr_ann": 0.4079653306939758
+     },
+     "ETHUSDT": {
+      "n": 8,
+      "mean_bp": 73.90808890461977,
+      "sr_ann": 0.25308189946400245
+     },
+     "BNBUSDT": {
+      "n": 5,
+      "mean_bp": 174.24059728466887,
+      "sr_ann": 0.1715441951978557
+     },
+     "XRPUSDT": {
+      "n": 7,
+      "mean_bp": 818.9278016997474,
+      "sr_ann": 0.6352657863275057
+     },
+     "SOLUSDT": {
+      "n": 6,
+      "mean_bp": 1338.0494602659367,
+      "sr_ann": 0.8154941887344295
+     },
+     "ADAUSDT": {
+      "n": 8,
+      "mean_bp": 456.5227771459754,
+      "sr_ann": 0.6207773588618951
+     },
+     "DOGEUSDT": {
+      "n": 9,
+      "mean_bp": 1215.4481464046812,
+      "sr_ann": 0.7821581014403095
+     },
+     "LTCUSDT": {
+      "n": 9,
+      "mean_bp": -167.4315369709838,
+      "sr_ann": -0.39683246717172505
+     },
+     "LINKUSDT": {
+      "n": 6,
+      "mean_bp": -24.824525430360342,
+      "sr_ann": -0.05658064914868213
+     }
+    },
+    "fold_positive_share": 0.5,
+    "mean_net_bp_trade": 437.84575906703213,
+    "mean_cost_bp_trade": 68.13296135488277,
+    "top5pct_profit_share": 0.42432518770947686,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.08330384494603511
+   },
+   "S1_cost_x1.5_sr_ann": 1.1274148071896837,
+   "S2": {
+    "sr_ann": 0.9546739337496996,
+    "mean_bp_day": 1.8903366835054267,
+    "mdd_bp": 255.97657935904476,
+    "days": 463,
+    "active_days": 18,
+    "n_events": 35,
+    "fold_sr_ann": [
+     NaN,
+     2.164889030485574,
+     -1.9810934311121469,
+     1.9918311435329612,
+     0.327541826077002
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 4,
+      "mean_bp": 65.56047959535626,
+      "sr_ann": 0.18519268471100572
+     },
+     "BNBUSDT": {
+      "n": 9,
+      "mean_bp": 86.68074506767938,
+      "sr_ann": 0.6313804632651491
+     },
+     "XRPUSDT": {
+      "n": 5,
+      "mean_bp": 467.5034161059419,
+      "sr_ann": 1.0421316955895092
+     },
+     "SOLUSDT": {
+      "n": 5,
+      "mean_bp": -444.69394749859623,
+      "sr_ann": -1.2677750768803226
+     },
+     "ADAUSDT": {
+      "n": 2,
+      "mean_bp": 129.7541639623571,
+      "sr_ann": 0.49865754899456605
+     },
+     "DOGEUSDT": {
+      "n": 3,
+      "mean_bp": 1910.4324609721277,
+      "sr_ann": 0.9808520063076287
+     },
+     "LTCUSDT": {
+      "n": 4,
+      "mean_bp": 73.68534206569576,
+      "sr_ann": 0.22118309968586966
+     },
+     "LINKUSDT": {
+      "n": 3,
+      "mean_bp": -146.718656809016,
+      "sr_ann": -0.3238885502735418
+     }
+    },
+    "fold_positive_share": 0.75,
+    "mean_net_bp_trade": 200.05163073440283,
+    "mean_cost_bp_trade": 72.98982046379979,
+    "top5pct_profit_share": 0.5123360256455508,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 3,
+   "strategy_id": "S-9058dc1347ef0b5d",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "funding_z",
+       "op": "gt",
+       "params": {
+        "window": 90
+       },
+       "value": 1.5
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "hour_utc",
+      "op": "between",
+      "params": {},
+      "value": [
+       0.0,
+       12.0
+      ]
+     }
+    ],
+    "exit": {
+     "horizon": 768,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:funding_z:long",
+    "data": [
+     "funding",
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 768
+    }
+   },
+   "cluster_size": 12,
+   "S1": {
+    "sr_ann": 1.1668998802830224,
+    "mean_bp_day": 9.312821145681063,
+    "mdd_bp": 1633.301527271502,
+    "days": 901,
+    "active_days": 56,
+    "n_events": 116,
+    "fold_sr_ann": [
+     2.7082533308091072,
+     2.642424333870182,
+     -1.4240006242195882,
+     -1.1303817249274348,
+     -3.137406934716053
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 14,
+      "mean_bp": -51.970005792826214,
+      "sr_ann": -0.1765377612539847
+     },
+     "ETHUSDT": {
+      "n": 12,
+      "mean_bp": 68.11018044392684,
+      "sr_ann": 0.2750360382813265
+     },
+     "BNBUSDT": {
+      "n": 14,
+      "mean_bp": 262.80441677456344,
+      "sr_ann": 0.5221534987819539
+     },
+     "XRPUSDT": {
+      "n": 12,
+      "mean_bp": 807.8861756247215,
+      "sr_ann": 0.6638043722391077
+     },
+     "SOLUSDT": {
+      "n": 14,
+      "mean_bp": 1787.3444560636851,
+      "sr_ann": 1.3194093326924308
+     },
+     "ADAUSDT": {
+      "n": 11,
+      "mean_bp": 294.77633240905664,
+      "sr_ann": 0.32472892440672524
+     },
+     "DOGEUSDT": {
+      "n": 15,
+      "mean_bp": 2208.215896760919,
+      "sr_ann": 0.6030960943101091
+     },
+     "LTCUSDT": {
+      "n": 11,
+      "mean_bp": 378.7943279357007,
+      "sr_ann": 0.6677893025362581
+     },
+     "LINKUSDT": {
+      "n": 13,
+      "mean_bp": -269.3314966413898,
+      "sr_ann": -0.7360538961353504
+     }
+    },
+    "fold_positive_share": 0.4,
+    "mean_net_bp_trade": 651.0143678476529,
+    "mean_cost_bp_trade": 82.19753628523902,
+    "top5pct_profit_share": 0.5488720268872408,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.01976337305871323
+   },
+   "S1_cost_x1.5_sr_ann": 1.1010460974514824,
+   "S2": {
+    "sr_ann": 1.3758894219676507,
+    "mean_bp_day": 10.74253040972608,
+    "mdd_bp": 399.2867615913687,
+    "days": 463,
+    "active_days": 42,
+    "n_events": 62,
+    "fold_sr_ann": [
+     -0.857762161100575,
+     2.7324471969519224,
+     0.10233033463913987,
+     3.9277948310106345,
+     -0.8900176175108069
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 13,
+      "mean_bp": 695.6641899795427,
+      "sr_ann": 1.609675183504617
+     },
+     "BNBUSDT": {
+      "n": 14,
+      "mean_bp": -26.26478812010235,
+      "sr_ann": -0.12002330784287683
+     },
+     "XRPUSDT": {
+      "n": 7,
+      "mean_bp": 2184.468384135948,
+      "sr_ann": 1.1660158634902058
+     },
+     "SOLUSDT": {
+      "n": 9,
+      "mean_bp": 308.9276725887318,
+      "sr_ann": 0.6552423543959474
+     },
+     "ADAUSDT": {
+      "n": 4,
+      "mean_bp": 1261.3900895009324,
+      "sr_ann": 1.0668463539251214
+     },
+     "DOGEUSDT": {
+      "n": 7,
+      "mean_bp": 662.48701255409,
+      "sr_ann": 0.6288638128256289
+     },
+     "LTCUSDT": {
+      "n": 5,
+      "mean_bp": 106.78596677632554,
+      "sr_ann": 0.1805627824877432
+     },
+     "LINKUSDT": {
+      "n": 3,
+      "mean_bp": 941.9593931861897,
+      "sr_ann": 1.280223840351533
+     }
+    },
+    "fold_positive_share": 0.6,
+    "mean_net_bp_trade": 641.7795586713775,
+    "mean_cost_bp_trade": 79.9431374274557,
+    "top5pct_profit_share": 0.4265114284305119,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 4,
+   "strategy_id": "S-6a718a291b711ce7",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "funding_z",
+       "op": "gt",
+       "params": {
+        "window": 90
+       },
+       "value": 2.0
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "vol_ratio",
+      "op": "gt",
+      "params": {
+       "long": 192,
+       "short": 16
+      },
+      "value": 1.5
+     }
+    ],
+    "exit": {
+     "horizon": 384,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:funding_z:long",
+    "data": [
+     "funding",
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 384
+    }
+   },
+   "cluster_size": 4,
+   "S1": {
+    "sr_ann": 1.151700393945975,
+    "mean_bp_day": 5.424658696208885,
+    "mdd_bp": 1941.1953533436354,
+    "days": 901,
+    "active_days": 47,
+    "n_events": 89,
+    "fold_sr_ann": [
+     3.2967424521803896,
+     -1.7421536000135518,
+     NaN,
+     -1.8475479938002837,
+     -1.4240006242195882
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 9,
+      "mean_bp": -2.6844016956210717,
+      "sr_ann": -0.009791154523756729
+     },
+     "ETHUSDT": {
+      "n": 9,
+      "mean_bp": 63.33315394929022,
+      "sr_ann": 0.19692684342621267
+     },
+     "BNBUSDT": {
+      "n": 9,
+      "mean_bp": 109.48547254030251,
+      "sr_ann": 0.1859459462613179
+     },
+     "XRPUSDT": {
+      "n": 11,
+      "mean_bp": 1020.4105835098509,
+      "sr_ann": 0.6422928126734379
+     },
+     "SOLUSDT": {
+      "n": 7,
+      "mean_bp": 2086.8752333861335,
+      "sr_ann": 1.1284142399170243
+     },
+     "ADAUSDT": {
+      "n": 12,
+      "mean_bp": -29.833442094019826,
+      "sr_ann": -0.06223621057681345
+     },
+     "DOGEUSDT": {
+      "n": 12,
+      "mean_bp": 1561.3352972558378,
+      "sr_ann": 0.7888364499311635
+     },
+     "LTCUSDT": {
+      "n": 8,
+      "mean_bp": -9.93058276478692,
+      "sr_ann": -0.03207849306475932
+     },
+     "LINKUSDT": {
+      "n": 12,
+      "mean_bp": -139.48927564355873,
+      "sr_ann": -0.2973353374892151
+     }
+    },
+    "fold_positive_share": 0.25,
+    "mean_net_bp_trade": 494.2534535680659,
+    "mean_cost_bp_trade": 68.0314148604569,
+    "top5pct_profit_share": 0.5300229688914481,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.07227702585263415
+   },
+   "S1_cost_x1.5_sr_ann": 1.078118536156905,
+   "S2": {
+    "sr_ann": 1.6120684457359546,
+    "mean_bp_day": 4.2077212529739265,
+    "mdd_bp": 318.34329879746633,
+    "days": 463,
+    "active_days": 24,
+    "n_events": 42,
+    "fold_sr_ann": [
+     -0.009674063417987114,
+     3.510391225872909,
+     -1.981093431112147,
+     2.6719341641670082,
+     0.7167105915818414
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 7,
+      "mean_bp": 241.2006878084672,
+      "sr_ann": 1.0151864140096891
+     },
+     "BNBUSDT": {
+      "n": 10,
+      "mean_bp": 118.08270643703335,
+      "sr_ann": 0.48321065670510277
+     },
+     "XRPUSDT": {
+      "n": 5,
+      "mean_bp": 519.5932640664856,
+      "sr_ann": 1.1873204630253262
+     },
+     "SOLUSDT": {
+      "n": 4,
+      "mean_bp": -114.26841794816426,
+      "sr_ann": -0.4720160681353975
+     },
+     "ADAUSDT": {
+      "n": 4,
+      "mean_bp": 60.7041771695703,
+      "sr_ann": 0.10456004996974522
+     },
+     "DOGEUSDT": {
+      "n": 4,
+      "mean_bp": 1204.359986753699,
+      "sr_ann": 0.8184884953768107
+     },
+     "LTCUSDT": {
+      "n": 4,
+      "mean_bp": 673.9095646651637,
+      "sr_ann": 0.9148993794278402
+     },
+     "LINKUSDT": {
+      "n": 4,
+      "mean_bp": 704.8450197730783,
+      "sr_ann": 0.8906351527245512
+     }
+    },
+    "fold_positive_share": 0.6,
+    "mean_net_bp_trade": 371.0809409765576,
+    "mean_cost_bp_trade": 68.37018056378355,
+    "top5pct_profit_share": 0.44061995163510415,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 5,
+   "strategy_id": "S-f6da701254e5c19b",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "vol_ratio",
+       "op": "gt",
+       "params": {
+        "long": 1536,
+        "short": 96
+       },
+       "value": 2.0
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "ret_z",
+      "op": "lt",
+      "params": {
+       "lookback": 96,
+       "min_history": 0,
+       "window": 2048
+      },
+      "value": -0.5
+     }
+    ],
+    "exit": {
+     "horizon": 768,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:vol_ratio:long",
+    "data": [
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 768
+    }
+   },
+   "cluster_size": 2,
+   "S1": {
+    "sr_ann": 1.1490465932276313,
+    "mean_bp_day": 7.36728439585849,
+    "mdd_bp": 1538.0963144793695,
+    "days": 901,
+    "active_days": 53,
+    "n_events": 135,
+    "fold_sr_ann": [
+     3.077755564189343,
+     2.470462100467478,
+     -1.2949376411003906,
+     1.0700319088187662,
+     -1.032561019552224
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 12,
+      "mean_bp": -43.788218722579415,
+      "sr_ann": -0.0710675357138889
+     },
+     "ETHUSDT": {
+      "n": 13,
+      "mean_bp": 82.05928083040841,
+      "sr_ann": 0.12206743566498943
+     },
+     "BNBUSDT": {
+      "n": 12,
+      "mean_bp": -492.76676038144655,
+      "sr_ann": -0.706768433195662
+     },
+     "XRPUSDT": {
+      "n": 20,
+      "mean_bp": 935.9963624339441,
+      "sr_ann": 1.2520316883924105
+     },
+     "SOLUSDT": {
+      "n": 16,
+      "mean_bp": 926.3329995060865,
+      "sr_ann": 0.7233245059067459
+     },
+     "ADAUSDT": {
+      "n": 17,
+      "mean_bp": -47.879608473951144,
+      "sr_ann": -0.09203701827271414
+     },
+     "DOGEUSDT": {
+      "n": 20,
+      "mean_bp": 1283.2176272450984,
+      "sr_ann": 1.4120176682069534
+     },
+     "LTCUSDT": {
+      "n": 12,
+      "mean_bp": 296.345547384412,
+      "sr_ann": 0.5671867928462628
+     },
+     "LINKUSDT": {
+      "n": 13,
+      "mean_bp": 243.49209647965316,
+      "sr_ann": 0.39108924622403274
+     }
+    },
+    "fold_positive_share": 0.6,
+    "mean_net_bp_trade": 442.5282160445667,
+    "mean_cost_bp_trade": 81.4637557851305,
+    "top5pct_profit_share": 0.3691581956416146,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.059643778414756835
+   },
+   "S1_cost_x1.5_sr_ann": 1.0456544788396684,
+   "S2": {
+    "sr_ann": 1.7576180606770675,
+    "mean_bp_day": 13.160942375864135,
+    "mdd_bp": 651.3701579261433,
+    "days": 463,
+    "active_days": 18,
+    "n_events": 54,
+    "fold_sr_ann": [
+     1.7385845121688313,
+     2.375640237717194,
+     2.554523689527805,
+     1.9445310244156362,
+     -1.1728149082240245
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 7,
+      "mean_bp": 456.41806229357593,
+      "sr_ann": 1.1212155450937087
+     },
+     "BNBUSDT": {
+      "n": 7,
+      "mean_bp": 496.0491001014734,
+      "sr_ann": 1.5187641012508586
+     },
+     "XRPUSDT": {
+      "n": 8,
+      "mean_bp": 2211.575015068004,
+      "sr_ann": 1.4936400409066921
+     },
+     "SOLUSDT": {
+      "n": 5,
+      "mean_bp": 762.2889480019115,
+      "sr_ann": 1.1463865003876692
+     },
+     "ADAUSDT": {
+      "n": 7,
+      "mean_bp": 1033.5587079601182,
+      "sr_ann": 1.4816423939209902
+     },
+     "DOGEUSDT": {
+      "n": 9,
+      "mean_bp": 743.4562118024832,
+      "sr_ann": 1.4295150298459143
+     },
+     "LTCUSDT": {
+      "n": 6,
+      "mean_bp": 992.5833961737953,
+      "sr_ann": 1.163142461705638
+     },
+     "LINKUSDT": {
+      "n": 5,
+      "mean_bp": 139.0596647791733,
+      "sr_ann": 0.3198373662324082
+     }
+    },
+    "fold_positive_share": 0.8,
+    "mean_net_bp_trade": 902.7431585222362,
+    "mean_cost_bp_trade": 78.0137134215435,
+    "top5pct_profit_share": 0.2534373812053614,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 6,
+   "strategy_id": "S-8dd1a65946f78939",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "ret_z",
+       "op": "lt",
+       "params": {
+        "lookback": 48,
+        "min_history": 0,
+        "window": 2048
+       },
+       "value": -3.0
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "ret_z",
+      "op": "gt",
+      "params": {
+       "lookback": 384,
+       "min_history": 0,
+       "window": 2048
+      },
+      "value": 0.0
+     }
+    ],
+    "exit": {
+     "horizon": 96,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:ret_z:long",
+    "data": [
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 96
+    }
+   },
+   "cluster_size": 1,
+   "S1": {
+    "sr_ann": 1.1414333016997165,
+    "mean_bp_day": 2.0962286082900663,
+    "mdd_bp": 309.97644324520707,
+    "days": 901,
+    "active_days": 43,
+    "n_events": 65,
+    "fold_sr_ann": [
+     2.3569555941152993,
+     1.4234602887326462,
+     -0.6671719557756253,
+     0.7704398988539266,
+     1.1043119952233926
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 5,
+      "mean_bp": 381.9267155367536,
+      "sr_ann": 0.7563690461916243
+     },
+     "ETHUSDT": {
+      "n": 5,
+      "mean_bp": 114.13296179765823,
+      "sr_ann": 0.4205943952857871
+     },
+     "BNBUSDT": {
+      "n": 6,
+      "mean_bp": 281.0879487105614,
+      "sr_ann": 1.0787225525588893
+     },
+     "XRPUSDT": {
+      "n": 7,
+      "mean_bp": 150.1913403254163,
+      "sr_ann": 0.6194866090601479
+     },
+     "SOLUSDT": {
+      "n": 8,
+      "mean_bp": -186.11728835527757,
+      "sr_ann": -0.28255670505824726
+     },
+     "ADAUSDT": {
+      "n": 9,
+      "mean_bp": 378.9081360034295,
+      "sr_ann": 0.740073394932041
+     },
+     "DOGEUSDT": {
+      "n": 11,
+      "mean_bp": 686.3166596998825,
+      "sr_ann": 0.7046518142966391
+     },
+     "LTCUSDT": {
+      "n": 8,
+      "mean_bp": 179.24992793998075,
+      "sr_ann": 0.7626956024143929
+     },
+     "LINKUSDT": {
+      "n": 6,
+      "mean_bp": 145.90578766726796,
+      "sr_ann": 0.5157437892313846
+     }
+    },
+    "fold_positive_share": 0.8,
+    "mean_net_bp_trade": 261.51258130190996,
+    "mean_cost_bp_trade": 81.36410293318652,
+    "top5pct_profit_share": 0.46858874866849426,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.12678491993254223
+   },
+   "S1_cost_x1.5_sr_ann": 0.9724269973272227,
+   "S2": {
+    "sr_ann": 1.8281199206570025,
+    "mean_bp_day": 1.7813951715807748,
+    "mdd_bp": 64.91517165185905,
+    "days": 463,
+    "active_days": 17,
+    "n_events": 27,
+    "fold_sr_ann": [
+     NaN,
+     3.2297748080316255,
+     1.9815139692179247,
+     2.6450583943224952,
+     -2.828896509624825
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 1,
+      "mean_bp": 21.680450450285782,
+      "sr_ann": 0.8878834005911792
+     },
+     "BNBUSDT": {
+      "n": 7,
+      "mean_bp": -38.33514842719859,
+      "sr_ann": -0.4114047733769811
+     },
+     "XRPUSDT": {
+      "n": 5,
+      "mean_bp": 467.26353878857253,
+      "sr_ann": 1.7407304469589586
+     },
+     "SOLUSDT": {
+      "n": 4,
+      "mean_bp": -42.754574286268664,
+      "sr_ann": -0.22286503432896684
+     },
+     "ADAUSDT": {
+      "n": 2,
+      "mean_bp": -27.745775738572007,
+      "sr_ann": -0.16360340430482945
+     },
+     "DOGEUSDT": {
+      "n": 2,
+      "mean_bp": 539.0341690496095,
+      "sr_ann": 1.2530066573815595
+     },
+     "LTCUSDT": {
+      "n": 3,
+      "mean_bp": 530.9584321382727,
+      "sr_ann": 1.2819308306392225
+     },
+     "LINKUSDT": {
+      "n": 3,
+      "mean_bp": 688.0672747468711,
+      "sr_ann": 1.233586037932552
+     }
+    },
+    "fold_positive_share": 0.75,
+    "mean_net_bp_trade": 244.38102650130332,
+    "mean_cost_bp_trade": 82.04536417307308,
+    "top5pct_profit_share": 0.29507269199096514,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 7,
+   "strategy_id": "S-dd7ac4f330c4ad44",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "vol_ratio",
+       "op": "gt",
+       "params": {
+        "long": 1536,
+        "short": 96
+       },
+       "value": 1.5
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "ret_z",
+      "op": "lt",
+      "params": {
+       "lookback": 96,
+       "min_history": 0,
+       "window": 2048
+      },
+      "value": -0.5
+     }
+    ],
+    "exit": {
+     "horizon": 192,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:vol_ratio:long",
+    "data": [
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 192
+    }
+   },
+   "cluster_size": 1,
+   "S1": {
+    "sr_ann": 1.140834988645576,
+    "mean_bp_day": 8.042605936571888,
+    "mdd_bp": 3184.39196203996,
+    "days": 901,
+    "active_days": 175,
+    "n_events": 466,
+    "fold_sr_ann": [
+     4.300022598343275,
+     1.4576985771426623,
+     -1.7093928954136124,
+     0.9257906385507977,
+     -2.183728608631643
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 50,
+      "mean_bp": -29.564305131159006,
+      "sr_ann": -0.2336946530784037
+     },
+     "ETHUSDT": {
+      "n": 49,
+      "mean_bp": 117.90201001545245,
+      "sr_ann": 0.5321459214830997
+     },
+     "BNBUSDT": {
+      "n": 60,
+      "mean_bp": 33.980685236077804,
+      "sr_ann": 0.23013620236210391
+     },
+     "XRPUSDT": {
+      "n": 56,
+      "mean_bp": 126.97589310553306,
+      "sr_ann": 0.6527127045673555
+     },
+     "SOLUSDT": {
+      "n": 46,
+      "mean_bp": 289.63368309045484,
+      "sr_ann": 0.6271026014200348
+     },
+     "ADAUSDT": {
+      "n": 52,
+      "mean_bp": 98.76443875582814,
+      "sr_ann": 0.5458579988056461
+     },
+     "DOGEUSDT": {
+      "n": 57,
+      "mean_bp": 633.0485300379637,
+      "sr_ann": 1.1988361946754995
+     },
+     "LTCUSDT": {
+      "n": 49,
+      "mean_bp": -161.47077259910134,
+      "sr_ann": -0.8421396990375435
+     },
+     "LINKUSDT": {
+      "n": 47,
+      "mean_bp": 109.3280550024627,
+      "sr_ann": 0.5196587101901592
+     }
+    },
+    "fold_positive_share": 0.6,
+    "mean_net_bp_trade": 139.95169858296447,
+    "mean_cost_bp_trade": 82.74807652267432,
+    "top5pct_profit_share": 0.4574630454579294,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.0495830017179285
+   },
+   "S1_cost_x1.5_sr_ann": 0.8034680444216862,
+   "S2": {
+    "sr_ann": 0.8652262828620948,
+    "mean_bp_day": 4.241755015034105,
+    "mdd_bp": 1283.4848875811917,
+    "days": 463,
+    "active_days": 73,
+    "n_events": 210,
+    "fold_sr_ann": [
+     -3.236535929674776,
+     2.1867400443683715,
+     0.8850490608683338,
+     3.157266259392343,
+     -1.834113974702158
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 26,
+      "mean_bp": 53.640417480222325,
+      "sr_ann": 0.5079703544457126
+     },
+     "BNBUSDT": {
+      "n": 33,
+      "mean_bp": 64.40205830423405,
+      "sr_ann": 0.6867176006947017
+     },
+     "XRPUSDT": {
+      "n": 28,
+      "mean_bp": 80.09815758384342,
+      "sr_ann": 0.5720041054775673
+     },
+     "SOLUSDT": {
+      "n": 21,
+      "mean_bp": 45.33968441821652,
+      "sr_ann": 0.28264493531845225
+     },
+     "ADAUSDT": {
+      "n": 24,
+      "mean_bp": 21.429408511660387,
+      "sr_ann": 0.14135582971204325
+     },
+     "DOGEUSDT": {
+      "n": 23,
+      "mean_bp": 49.00033042334318,
+      "sr_ann": 0.41051413774698636
+     },
+     "LTCUSDT": {
+      "n": 29,
+      "mean_bp": 39.073570120570366,
+      "sr_ann": 0.2450358273595264
+     },
+     "LINKUSDT": {
+      "n": 26,
+      "mean_bp": 239.31588748143741,
+      "sr_ann": 1.2783033170287559
+     }
+    },
+    "fold_positive_share": 0.6,
+    "mean_net_bp_trade": 74.81647893183963,
+    "mean_cost_bp_trade": 85.30437888983296,
+    "top5pct_profit_share": 0.3072253522582727,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 8,
+   "strategy_id": "S-fa16df542032817c",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "funding_z",
+       "op": "gt",
+       "params": {
+        "window": 270
+       },
+       "value": 1.5
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "vol_ratio",
+      "op": "gt",
+      "params": {
+       "long": 192,
+       "short": 16
+      },
+      "value": 1.5
+     }
+    ],
+    "exit": {
+     "horizon": 768,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:funding_z:long",
+    "data": [
+     "funding",
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 768
+    }
+   },
+   "cluster_size": 1,
+   "S1": {
+    "sr_ann": 1.1118324802621318,
+    "mean_bp_day": 6.339916015545375,
+    "mdd_bp": 1495.3320341027802,
+    "days": 901,
+    "active_days": 43,
+    "n_events": 73,
+    "fold_sr_ann": [
+     2.902279303502553,
+     -0.790734676595754,
+     NaN,
+     -0.5230698583043247,
+     -1.6249854855589418
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 7,
+      "mean_bp": -88.77948330962576,
+      "sr_ann": -0.24379641042894004
+     },
+     "ETHUSDT": {
+      "n": 4,
+      "mean_bp": -22.1208836257085,
+      "sr_ann": -0.025343256641592666
+     },
+     "BNBUSDT": {
+      "n": 9,
+      "mean_bp": 587.1499773488945,
+      "sr_ann": 0.7040463606324813
+     },
+     "XRPUSDT": {
+      "n": 10,
+      "mean_bp": 823.0496265362893,
+      "sr_ann": 0.44181957457705695
+     },
+     "SOLUSDT": {
+      "n": 6,
+      "mean_bp": 1810.012871019665,
+      "sr_ann": 0.9657163379228471
+     },
+     "ADAUSDT": {
+      "n": 10,
+      "mean_bp": 371.7926401472531,
+      "sr_ann": 0.5329900136203305
+     },
+     "DOGEUSDT": {
+      "n": 9,
+      "mean_bp": 2788.1123618366487,
+      "sr_ann": 0.6166180199511537
+     },
+     "LTCUSDT": {
+      "n": 7,
+      "mean_bp": 164.043694398715,
+      "sr_ann": 0.29078500989553613
+     },
+     "LINKUSDT": {
+      "n": 11,
+      "mean_bp": -201.25890169878676,
+      "sr_ann": -0.28124049270193224
+     }
+    },
+    "fold_positive_share": 0.25,
+    "mean_net_bp_trade": 704.2517667131156,
+    "mean_cost_bp_trade": 69.9669497869025,
+    "top5pct_profit_share": 0.540640993946705,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.03422457281952904
+   },
+   "S1_cost_x1.5_sr_ann": 1.0597896781161091,
+   "S2": {
+    "sr_ann": 1.454782806800281,
+    "mean_bp_day": 10.589069617359769,
+    "mdd_bp": 246.55025439258588,
+    "days": 463,
+    "active_days": 22,
+    "n_events": 39,
+    "fold_sr_ann": [
+     NaN,
+     2.902003977700372,
+     NaN,
+     2.601345304529279,
+     0.7595100813381968
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 6,
+      "mean_bp": 711.1017831250156,
+      "sr_ann": 1.3283213866254424
+     },
+     "BNBUSDT": {
+      "n": 10,
+      "mean_bp": 539.3420732781684,
+      "sr_ann": 1.451461405294647
+     },
+     "XRPUSDT": {
+      "n": 5,
+      "mean_bp": 2397.609143863412,
+      "sr_ann": 0.9946944015102214
+     },
+     "SOLUSDT": {
+      "n": 4,
+      "mean_bp": -246.80917049553076,
+      "sr_ann": -0.3977877990178577
+     },
+     "ADAUSDT": {
+      "n": 3,
+      "mean_bp": 1823.627630634893,
+      "sr_ann": 1.3491727216411404
+     },
+     "DOGEUSDT": {
+      "n": 4,
+      "mean_bp": 1364.9509551788462,
+      "sr_ann": 1.0479871107512773
+     },
+     "LTCUSDT": {
+      "n": 4,
+      "mean_bp": 902.4643145322154,
+      "sr_ann": 1.1722912392638485
+     },
+     "LINKUSDT": {
+      "n": 3,
+      "mean_bp": 1340.1764743616488,
+      "sr_ann": 1.4063976118251413
+     }
+    },
+    "fold_positive_share": 1.0,
+    "mean_net_bp_trade": 1005.6900990436048,
+    "mean_cost_bp_trade": 70.49519007421756,
+    "top5pct_profit_share": 0.3167790455101316,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 9,
+   "strategy_id": "S-f21f27d98c2cfb95",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "funding_z",
+       "op": "gt",
+       "params": {
+        "window": 30
+       },
+       "value": 2.0
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "rsi",
+      "op": "gt",
+      "params": {
+       "period": 192
+      },
+      "value": 55.0
+     }
+    ],
+    "exit": {
+     "horizon": 384,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:funding_z:long",
+    "data": [
+     "funding",
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 384
+    }
+   },
+   "cluster_size": 2,
+   "S1": {
+    "sr_ann": 1.0985201461632466,
+    "mean_bp_day": 6.515225140593881,
+    "mdd_bp": 2524.460787711316,
+    "days": 901,
+    "active_days": 69,
+    "n_events": 125,
+    "fold_sr_ann": [
+     3.3243020226263003,
+     -1.8913258567773532,
+     -1.7917879132003567,
+     -1.9407101264316875,
+     -2.1485518048701517
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 18,
+      "mean_bp": -155.40536241169033,
+      "sr_ann": -0.6051422674578787
+     },
+     "ETHUSDT": {
+      "n": 15,
+      "mean_bp": 87.23743553708321,
+      "sr_ann": 0.36756389403144407
+     },
+     "BNBUSDT": {
+      "n": 15,
+      "mean_bp": 23.552834202866894,
+      "sr_ann": 0.06556338881923292
+     },
+     "XRPUSDT": {
+      "n": 14,
+      "mean_bp": 710.9485598849452,
+      "sr_ann": 0.5234903459483182
+     },
+     "SOLUSDT": {
+      "n": 12,
+      "mean_bp": 710.2443936051253,
+      "sr_ann": 0.943351457256923
+     },
+     "ADAUSDT": {
+      "n": 11,
+      "mean_bp": 522.2634434581051,
+      "sr_ann": 0.954212964751547
+     },
+     "DOGEUSDT": {
+      "n": 12,
+      "mean_bp": 2527.581917432379,
+      "sr_ann": 0.8417706240477568
+     },
+     "LTCUSDT": {
+      "n": 13,
+      "mean_bp": 125.90789809889228,
+      "sr_ann": 0.27847195533352825
+     },
+     "LINKUSDT": {
+      "n": 15,
+      "mean_bp": -148.09953211847267,
+      "sr_ann": -0.4131039031831897
+     }
+    },
+    "fold_positive_share": 0.2,
+    "mean_net_bp_trade": 422.6556853206062,
+    "mean_cost_bp_trade": 73.91173429894577,
+    "top5pct_profit_share": 0.5229978935880584,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.022702938096232143
+   },
+   "S1_cost_x1.5_sr_ann": 1.0075758709385363,
+   "S2": {
+    "sr_ann": 0.6385060806099804,
+    "mean_bp_day": 1.8784369125858416,
+    "mdd_bp": 544.5274501272567,
+    "days": 463,
+    "active_days": 31,
+    "n_events": 48,
+    "fold_sr_ann": [
+     -1.0207579929926884,
+     0.8376381943310013,
+     1.9626731759349618,
+     1.3466160631467334,
+     1.5040931035121983
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 7,
+      "mean_bp": 170.51303127461827,
+      "sr_ann": 0.6448926040670995
+     },
+     "BNBUSDT": {
+      "n": 15,
+      "mean_bp": 20.511574748743087,
+      "sr_ann": 0.1450885604127611
+     },
+     "XRPUSDT": {
+      "n": 3,
+      "mean_bp": 572.0338477371691,
+      "sr_ann": 0.8283966827449875
+     },
+     "SOLUSDT": {
+      "n": 8,
+      "mean_bp": -184.1525556138091,
+      "sr_ann": -0.44115610008586315
+     },
+     "ADAUSDT": {
+      "n": 3,
+      "mean_bp": 431.9456524933932,
+      "sr_ann": 0.5133278719588572
+     },
+     "DOGEUSDT": {
+      "n": 4,
+      "mean_bp": 1076.605954720201,
+      "sr_ann": 0.495936354877975
+     },
+     "LTCUSDT": {
+      "n": 5,
+      "mean_bp": -47.76346443019131,
+      "sr_ann": -0.1712916859923641
+     },
+     "LINKUSDT": {
+      "n": 3,
+      "mean_bp": -49.95302281552555,
+      "sr_ann": -0.13936929056081757
+     }
+    },
+    "fold_positive_share": 0.8,
+    "mean_net_bp_trade": 144.95271508787414,
+    "mean_cost_bp_trade": 82.52837403968424,
+    "top5pct_profit_share": 0.5656899258221977,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 10,
+   "strategy_id": "S-a6945c94b04870a6",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "vol_ratio",
+       "op": "gt",
+       "params": {
+        "long": 1536,
+        "short": 96
+       },
+       "value": 2.0
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "vol_ratio",
+      "op": "gt",
+      "params": {
+       "long": 192,
+       "short": 16
+      },
+      "value": 1.5
+     }
+    ],
+    "exit": {
+     "horizon": 768,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:vol_ratio:long",
+    "data": [
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 768
+    }
+   },
+   "cluster_size": 1,
+   "S1": {
+    "sr_ann": 1.096737224761175,
+    "mean_bp_day": 8.053616657784634,
+    "mdd_bp": 1840.3716555722776,
+    "days": 901,
+    "active_days": 64,
+    "n_events": 138,
+    "fold_sr_ann": [
+     2.784781658478721,
+     1.4972680639717488,
+     -1.2991793249151413,
+     0.9555715071360231,
+     -0.18296449911366763
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 13,
+      "mean_bp": 91.5980938396379,
+      "sr_ann": 0.15574211358065354
+     },
+     "ETHUSDT": {
+      "n": 13,
+      "mean_bp": -255.58655892424883,
+      "sr_ann": -0.3628832877590141
+     },
+     "BNBUSDT": {
+      "n": 15,
+      "mean_bp": -351.7048489911212,
+      "sr_ann": -0.5791740393585751
+     },
+     "XRPUSDT": {
+      "n": 19,
+      "mean_bp": 1427.3070531235198,
+      "sr_ann": 1.237661939118929
+     },
+     "SOLUSDT": {
+      "n": 15,
+      "mean_bp": 960.4936226082893,
+      "sr_ann": 0.699457160065271
+     },
+     "ADAUSDT": {
+      "n": 16,
+      "mean_bp": -168.43838280235371,
+      "sr_ann": -0.3164711978953504
+     },
+     "DOGEUSDT": {
+      "n": 21,
+      "mean_bp": 1249.8955458470548,
+      "sr_ann": 0.833343573026032
+     },
+     "LTCUSDT": {
+      "n": 14,
+      "mean_bp": 292.1062747886571,
+      "sr_ann": 0.5515199563324776
+     },
+     "LINKUSDT": {
+      "n": 12,
+      "mean_bp": 295.47347712328536,
+      "sr_ann": 0.42467624063187154
+     }
+    },
+    "fold_positive_share": 0.6,
+    "mean_net_bp_trade": 473.23751795634485,
+    "mean_cost_bp_trade": 81.32897878999113,
+    "top5pct_profit_share": 0.4581811155989434,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.05918596260511064
+   },
+   "S1_cost_x1.5_sr_ann": 1.0051053266534349,
+   "S2": {
+    "sr_ann": 1.7654922714817147,
+    "mean_bp_day": 13.36838075200043,
+    "mdd_bp": 936.6016071831327,
+    "days": 463,
+    "active_days": 26,
+    "n_events": 59,
+    "fold_sr_ann": [
+     1.744787801917984,
+     3.5346425316144003,
+     2.1203604382396892,
+     1.6702832278783906,
+     -2.0067456486830095
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 9,
+      "mean_bp": 222.20149958166428,
+      "sr_ann": 0.5659471618602204
+     },
+     "BNBUSDT": {
+      "n": 7,
+      "mean_bp": 278.26962517989256,
+      "sr_ann": 0.7981619944066892
+     },
+     "XRPUSDT": {
+      "n": 9,
+      "mean_bp": 1813.0375492691592,
+      "sr_ann": 1.4352241681042843
+     },
+     "SOLUSDT": {
+      "n": 5,
+      "mean_bp": 951.0661934715988,
+      "sr_ann": 1.4515388344764557
+     },
+     "ADAUSDT": {
+      "n": 8,
+      "mean_bp": 1279.8507555444387,
+      "sr_ann": 1.1297902624523175
+     },
+     "DOGEUSDT": {
+      "n": 10,
+      "mean_bp": 1360.790752432043,
+      "sr_ann": 1.1885215921531902
+     },
+     "LTCUSDT": {
+      "n": 7,
+      "mean_bp": 8.979222522508215,
+      "sr_ann": 0.014572044192829084
+     },
+     "LINKUSDT": {
+      "n": 4,
+      "mean_bp": 146.63609895035884,
+      "sr_ann": 0.31054608521961125
+     }
+    },
+    "fold_positive_share": 0.8,
+    "mean_net_bp_trade": 839.2624119560949,
+    "mean_cost_bp_trade": 72.93026303337702,
+    "top5pct_profit_share": 0.3853831276816898,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 11,
+   "strategy_id": "S-8bacd9d6ea4923e6",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "funding_z",
+       "op": "gt",
+       "params": {
+        "window": 90
+       },
+       "value": 1.5
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "ret_z",
+      "op": "lt",
+      "params": {
+       "lookback": 96,
+       "min_history": 0,
+       "window": 2048
+      },
+      "value": -0.5
+     }
+    ],
+    "exit": {
+     "horizon": 768,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:funding_z:long",
+    "data": [
+     "funding",
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 768
+    }
+   },
+   "cluster_size": 6,
+   "S1": {
+    "sr_ann": 1.0626348717457197,
+    "mean_bp_day": 10.874158070535987,
+    "mdd_bp": 1111.6239944642875,
+    "days": 901,
+    "active_days": 57,
+    "n_events": 101,
+    "fold_sr_ann": [
+     2.1711624273732513,
+     2.7096943947786643,
+     -1.4240006242195884,
+     0.8298096984530088,
+     -0.9893845000218534
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 15,
+      "mean_bp": -52.91787144327576,
+      "sr_ann": -0.205295217407633
+     },
+     "ETHUSDT": {
+      "n": 11,
+      "mean_bp": -19.663020880441476,
+      "sr_ann": -0.04571579443990465
+     },
+     "BNBUSDT": {
+      "n": 13,
+      "mean_bp": 331.89774227096734,
+      "sr_ann": 0.5527037250804759
+     },
+     "XRPUSDT": {
+      "n": 10,
+      "mean_bp": 1676.5596501140928,
+      "sr_ann": 0.7471390183535127
+     },
+     "SOLUSDT": {
+      "n": 12,
+      "mean_bp": 1132.7868472126318,
+      "sr_ann": 1.0218754696128824
+     },
+     "ADAUSDT": {
+      "n": 8,
+      "mean_bp": 163.8951662534754,
+      "sr_ann": 0.16044841552774175
+     },
+     "DOGEUSDT": {
+      "n": 12,
+      "mean_bp": 4114.105688365787,
+      "sr_ann": 0.6800839160301362
+     },
+     "LTCUSDT": {
+      "n": 9,
+      "mean_bp": 387.126963882404,
+      "sr_ann": 0.4966756466712946
+     },
+     "LINKUSDT": {
+      "n": 11,
+      "mean_bp": 31.847955703303526,
+      "sr_ann": 0.08366580240159596
+     }
+    },
+    "fold_positive_share": 0.6,
+    "mean_net_bp_trade": 873.054928653231,
+    "mean_cost_bp_trade": 78.77698877986055,
+    "top5pct_profit_share": 0.6381840726065258,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.03774755400021108
+   },
+   "S1_cost_x1.5_sr_ann": 1.019019645870142,
+   "S2": {
+    "sr_ann": 1.38821687053481,
+    "mean_bp_day": 7.4565613186197695,
+    "mdd_bp": 376.6215030702533,
+    "days": 463,
+    "active_days": 29,
+    "n_events": 43,
+    "fold_sr_ann": [
+     -1.5052644800122748,
+     2.9576517846389248,
+     2.212681837738292,
+     NaN,
+     0.5968795457809789
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 7,
+      "mean_bp": 376.7849355444062,
+      "sr_ann": 0.7562355982987038
+     },
+     "BNBUSDT": {
+      "n": 9,
+      "mean_bp": 60.89585545074414,
+      "sr_ann": 0.19933751100850133
+     },
+     "XRPUSDT": {
+      "n": 6,
+      "mean_bp": 2119.531751070024,
+      "sr_ann": 1.1460872915171771
+     },
+     "SOLUSDT": {
+      "n": 6,
+      "mean_bp": -24.968327946546633,
+      "sr_ann": -0.05398547169448541
+     },
+     "ADAUSDT": {
+      "n": 3,
+      "mean_bp": 2145.9560012460333,
+      "sr_ann": 1.40163374459175
+     },
+     "DOGEUSDT": {
+      "n": 4,
+      "mean_bp": -170.57269418087736,
+      "sr_ann": -0.6315122321458728
+     },
+     "LTCUSDT": {
+      "n": 5,
+      "mean_bp": 466.57271398502564,
+      "sr_ann": 0.8274296363130298
+     },
+     "LINKUSDT": {
+      "n": 3,
+      "mean_bp": 1259.2415135398314,
+      "sr_ann": 1.4063592128501707
+     }
+    },
+    "fold_positive_share": 0.75,
+    "mean_net_bp_trade": 642.3047238178516,
+    "mean_cost_bp_trade": 78.85746997018136,
+    "top5pct_profit_share": 0.3714683344004638,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 12,
+   "strategy_id": "S-0b9d8e8db62b67fd",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "ret_z",
+       "op": "lt",
+       "params": {
+        "lookback": 192,
+        "min_history": 0,
+        "window": 2048
+       },
+       "value": -3.0
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "volume_z",
+      "op": "gt",
+      "params": {
+       "window": 384
+      },
+      "value": 1.0
+     }
+    ],
+    "exit": {
+     "horizon": 96,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:ret_z:long",
+    "data": [
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 96
+    }
+   },
+   "cluster_size": 1,
+   "S1": {
+    "sr_ann": 1.0575371474698296,
+    "mean_bp_day": 5.535928886779782,
+    "mdd_bp": 2243.592364334141,
+    "days": 901,
+    "active_days": 66,
+    "n_events": 188,
+    "fold_sr_ann": [
+     3.1642489455979157,
+     0.7803548607655477,
+     -1.5878652988390205,
+     -0.06303470697288949,
+     0.7697538538795654
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 21,
+      "mean_bp": -121.62222631092358,
+      "sr_ann": -0.6451713712656967
+     },
+     "ETHUSDT": {
+      "n": 21,
+      "mean_bp": -35.40313083254299,
+      "sr_ann": -0.14786463344491332
+     },
+     "BNBUSDT": {
+      "n": 28,
+      "mean_bp": 131.78340447746703,
+      "sr_ann": 0.4356175022980978
+     },
+     "XRPUSDT": {
+      "n": 19,
+      "mean_bp": 317.2702534251619,
+      "sr_ann": 0.8050589117095832
+     },
+     "SOLUSDT": {
+      "n": 18,
+      "mean_bp": 843.7408010045218,
+      "sr_ann": 0.9650322077965602
+     },
+     "ADAUSDT": {
+      "n": 20,
+      "mean_bp": 499.0928146067998,
+      "sr_ann": 1.4219545862280476
+     },
+     "DOGEUSDT": {
+      "n": 16,
+      "mean_bp": 30.991663491904966,
+      "sr_ann": 0.10897235798400685
+     },
+     "LTCUSDT": {
+      "n": 24,
+      "mean_bp": 116.95051036088633,
+      "sr_ann": 0.43496290883349215
+     },
+     "LINKUSDT": {
+      "n": 21,
+      "mean_bp": 476.1161965577983,
+      "sr_ann": 1.0685340943258348
+     }
+    },
+    "fold_positive_share": 0.6,
+    "mean_net_bp_trade": 238.78110288775133,
+    "mean_cost_bp_trade": 74.16760820912569,
+    "top5pct_profit_share": 0.38170327265087695,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.25677783915624286
+   },
+   "S1_cost_x1.5_sr_ann": 0.9004334740151367,
+   "S2": {
+    "sr_ann": 1.2058133634048676,
+    "mean_bp_day": 3.3443255497550712,
+    "mdd_bp": 612.0243516424762,
+    "days": 463,
+    "active_days": 30,
+    "n_events": 65,
+    "fold_sr_ann": [
+     1.2454205464989336,
+     2.036266367540099,
+     4.028093948806097,
+     1.9918311435329616,
+     -1.8739790623134491
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 13,
+      "mean_bp": 159.4620681043019,
+      "sr_ann": 1.4333108406515374
+     },
+     "BNBUSDT": {
+      "n": 11,
+      "mean_bp": -63.66591397909333,
+      "sr_ann": -0.5292440880361026
+     },
+     "XRPUSDT": {
+      "n": 8,
+      "mean_bp": 292.459540781632,
+      "sr_ann": 0.7709333054122718
+     },
+     "SOLUSDT": {
+      "n": 6,
+      "mean_bp": 351.19028612092467,
+      "sr_ann": 0.8378132143320769
+     },
+     "ADAUSDT": {
+      "n": 6,
+      "mean_bp": 390.90273732207146,
+      "sr_ann": 0.6786611108810765
+     },
+     "DOGEUSDT": {
+      "n": 8,
+      "mean_bp": 358.64665655591256,
+      "sr_ann": 1.0488517221854459
+     },
+     "LTCUSDT": {
+      "n": 8,
+      "mean_bp": 49.62592060022115,
+      "sr_ann": 0.27035928601964593
+     },
+     "LINKUSDT": {
+      "n": 5,
+      "mean_bp": 191.25698410935667,
+      "sr_ann": 0.4373844893264756
+     }
+    },
+    "fold_positive_share": 0.8,
+    "mean_net_bp_trade": 190.57510517373512,
+    "mean_cost_bp_trade": 69.75617298067316,
+    "top5pct_profit_share": 0.3263478878994998,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 13,
+   "strategy_id": "S-5943a60950273ce8",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 768
+       },
+       "value": 0.0
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "funding_z",
+      "op": "lt",
+      "params": {
+       "window": 90
+      },
+      "value": -1.0
+     }
+    ],
+    "exit": {
+     "horizon": 384,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:breakout_k:long",
+    "data": [
+     "funding",
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 384
+    }
+   },
+   "cluster_size": 1,
+   "S1": {
+    "sr_ann": 1.04197654264553,
+    "mean_bp_day": 3.125971702861321,
+    "mdd_bp": 1228.9591161814963,
+    "days": 901,
+    "active_days": 63,
+    "n_events": 82,
+    "fold_sr_ann": [
+     2.5807156158275544,
+     -0.04735092576355547,
+     -2.2532378061642424,
+     2.4442752453117396,
+     -0.389999009657807
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 20,
+      "mean_bp": 141.20428562485966,
+      "sr_ann": 0.5574053655566859
+     },
+     "ETHUSDT": {
+      "n": 17,
+      "mean_bp": 43.20508147133231,
+      "sr_ann": 0.19934319140565387
+     },
+     "BNBUSDT": {
+      "n": 13,
+      "mean_bp": 391.66475725941723,
+      "sr_ann": 1.0315893272207017
+     },
+     "XRPUSDT": {
+      "n": 5,
+      "mean_bp": -254.88321378376799,
+      "sr_ann": -0.653031127442051
+     },
+     "SOLUSDT": {
+      "n": 10,
+      "mean_bp": 439.10461680832793,
+      "sr_ann": 0.9838796890586847
+     },
+     "ADAUSDT": {
+      "n": 4,
+      "mean_bp": 130.25992953295324,
+      "sr_ann": 0.284903328171645
+     },
+     "DOGEUSDT": {
+      "n": 4,
+      "mean_bp": 3517.9779559492954,
+      "sr_ann": 0.689118857979561
+     },
+     "LTCUSDT": {
+      "n": 7,
+      "mean_bp": 451.9879888659729,
+      "sr_ann": 0.795568340556494
+     },
+     "LINKUSDT": {
+      "n": 2,
+      "mean_bp": -2087.6034832675305,
+      "sr_ann": -0.6789968310289125
+     }
+    },
+    "fold_positive_share": 0.4,
+    "mean_net_bp_trade": 309.1281041280787,
+    "mean_cost_bp_trade": 63.49195051941768,
+    "top5pct_profit_share": 0.4831933598539443,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.07264858129112609
+   },
+   "S1_cost_x1.5_sr_ann": 0.9384737552490281,
+   "S2": {
+    "sr_ann": -0.6948906730694924,
+    "mean_bp_day": -0.8169201777170192,
+    "mdd_bp": 516.8248710267815,
+    "days": 463,
+    "active_days": 25,
+    "n_events": 33,
+    "fold_sr_ann": [
+     -1.0462538347555879,
+     0.7695839398304654,
+     -2.720365362631803,
+     1.874286393133642,
+     -2.474494380532827
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 5,
+      "mean_bp": -207.09973775032458,
+      "sr_ann": -1.04460783665746
+     },
+     "BNBUSDT": {
+      "n": 3,
+      "mean_bp": -903.3849077873624,
+      "sr_ann": -0.9002855420725573
+     },
+     "XRPUSDT": {
+      "n": 2,
+      "mean_bp": -426.5797676609118,
+      "sr_ann": -0.976172730220985
+     },
+     "SOLUSDT": {
+      "n": 9,
+      "mean_bp": 171.9675886165621,
+      "sr_ann": 0.7175341408581022
+     },
+     "ADAUSDT": {
+      "n": 3,
+      "mean_bp": -24.37503376560456,
+      "sr_ann": -0.05834503769216361
+     },
+     "DOGEUSDT": {
+      "n": 3,
+      "mean_bp": 120.14814747539198,
+      "sr_ann": 0.8201588472555357
+     },
+     "LTCUSDT": {
+      "n": 5,
+      "mean_bp": -7.482715728819267,
+      "sr_ann": -0.017099572082108376
+     },
+     "LINKUSDT": {
+      "n": 3,
+      "mean_bp": -74.89115028754314,
+      "sr_ann": -0.5034649158261613
+     }
+    },
+    "fold_positive_share": 0.4,
+    "mean_net_bp_trade": -91.69310115951028,
+    "mean_cost_bp_trade": 77.82995186396359,
+    "top5pct_profit_share": 0.3211313752419685,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 14,
+   "strategy_id": "S-cd1cc84f39fa7e20",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "vol_ratio",
+       "op": "gt",
+       "params": {
+        "long": 1536,
+        "short": 96
+       },
+       "value": 2.0
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "hour_utc",
+      "op": "between",
+      "params": {},
+      "value": [
+       0.0,
+       12.0
+      ]
+     }
+    ],
+    "exit": {
+     "horizon": 768,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:vol_ratio:long",
+    "data": [
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 768
+    }
+   },
+   "cluster_size": 1,
+   "S1": {
+    "sr_ann": 1.018538388165192,
+    "mean_bp_day": 6.095310682454809,
+    "mdd_bp": 1854.1055164983873,
+    "days": 901,
+    "active_days": 78,
+    "n_events": 163,
+    "fold_sr_ann": [
+     2.9931616559844163,
+     0.39180336591208703,
+     -1.1359357864899708,
+     1.6169348213808301,
+     -2.434196948998753
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 15,
+      "mean_bp": -98.28785916564557,
+      "sr_ann": -0.280381434067469
+     },
+     "ETHUSDT": {
+      "n": 17,
+      "mean_bp": 312.6228820073951,
+      "sr_ann": 0.8508194717225688
+     },
+     "BNBUSDT": {
+      "n": 17,
+      "mean_bp": 60.16232015771351,
+      "sr_ann": 0.1926347977239053
+     },
+     "XRPUSDT": {
+      "n": 22,
+      "mean_bp": 738.3971265328969,
+      "sr_ann": 0.9236063433376976
+     },
+     "SOLUSDT": {
+      "n": 16,
+      "mean_bp": 716.9215975099222,
+      "sr_ann": 0.5465322090802294
+     },
+     "ADAUSDT": {
+      "n": 19,
+      "mean_bp": -66.12275134210142,
+      "sr_ann": -0.16630864333909318
+     },
+     "DOGEUSDT": {
+      "n": 28,
+      "mean_bp": 581.4392676478758,
+      "sr_ann": 0.5163364880169339
+     },
+     "LTCUSDT": {
+      "n": 14,
+      "mean_bp": 179.03193477803435,
+      "sr_ann": 0.36335303798160234
+     },
+     "LINKUSDT": {
+      "n": 15,
+      "mean_bp": -45.47019164744575,
+      "sr_ann": -0.08741729607459804
+     }
+    },
+    "fold_positive_share": 0.6,
+    "mean_net_bp_trade": 303.2323578161107,
+    "mean_cost_bp_trade": 81.5098741739263,
+    "top5pct_profit_share": 0.5003313747392651,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.07375471522536747
+   },
+   "S1_cost_x1.5_sr_ann": 0.883745495916011,
+   "S2": {
+    "sr_ann": 1.561707407524856,
+    "mean_bp_day": 11.702925287130894,
+    "mdd_bp": 835.2259887232321,
+    "days": 463,
+    "active_days": 31,
+    "n_events": 62,
+    "fold_sr_ann": [
+     1.7774158387442514,
+     3.0590754186454965,
+     1.2805241252888262,
+     1.6729881175506607,
+     -2.185807790947967
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 8,
+      "mean_bp": 58.246088185821606,
+      "sr_ann": 0.12022813664013692
+     },
+     "BNBUSDT": {
+      "n": 7,
+      "mean_bp": 265.45210842930885,
+      "sr_ann": 0.7312829828925823
+     },
+     "XRPUSDT": {
+      "n": 10,
+      "mean_bp": 1735.4321910382234,
+      "sr_ann": 1.4930412384754155
+     },
+     "SOLUSDT": {
+      "n": 5,
+      "mean_bp": 544.4767320115344,
+      "sr_ann": 0.9803368080445142
+     },
+     "ADAUSDT": {
+      "n": 8,
+      "mean_bp": 1004.9525213369307,
+      "sr_ann": 0.8334565997608538
+     },
+     "DOGEUSDT": {
+      "n": 10,
+      "mean_bp": 1229.319656913816,
+      "sr_ann": 1.0876375238285483
+     },
+     "LTCUSDT": {
+      "n": 8,
+      "mean_bp": 414.7793302158333,
+      "sr_ann": 0.5789983090654597
+     },
+     "LINKUSDT": {
+      "n": 6,
+      "mean_bp": -450.70919215984856,
+      "sr_ann": -1.009938662733269
+     }
+    },
+    "fold_positive_share": 0.8,
+    "mean_net_bp_trade": 699.155407476336,
+    "mean_cost_bp_trade": 82.60230527743111,
+    "top5pct_profit_share": 0.42437202459208423,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 15,
+   "strategy_id": "S-d972cbbcbd8ac748",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "funding_z",
+       "op": "gt",
+       "params": {
+        "window": 30
+       },
+       "value": 2.0
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "vol_ratio",
+      "op": "gt",
+      "params": {
+       "long": 1536,
+       "short": 96
+      },
+      "value": 1.2
+     }
+    ],
+    "exit": {
+     "horizon": 384,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:funding_z:long",
+    "data": [
+     "funding",
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 384
+    }
+   },
+   "cluster_size": 1,
+   "S1": {
+    "sr_ann": 1.012519162520204,
+    "mean_bp_day": 4.709060815916009,
+    "mdd_bp": 1108.2882458171534,
+    "days": 901,
+    "active_days": 46,
+    "n_events": 74,
+    "fold_sr_ann": [
+     2.786198503461692,
+     0.6159477443918308,
+     NaN,
+     -1.4773644432103092,
+     -2.043662362457071
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 9,
+      "mean_bp": 107.02449495630137,
+      "sr_ann": 0.2605492558997657
+     },
+     "ETHUSDT": {
+      "n": 9,
+      "mean_bp": 228.023649675718,
+      "sr_ann": 0.8953792116159471
+     },
+     "BNBUSDT": {
+      "n": 9,
+      "mean_bp": 16.135461276656468,
+      "sr_ann": 0.026171244206839684
+     },
+     "XRPUSDT": {
+      "n": 7,
+      "mean_bp": 337.5600022519683,
+      "sr_ann": 0.2788242701117607
+     },
+     "SOLUSDT": {
+      "n": 6,
+      "mean_bp": 1095.164296488322,
+      "sr_ann": 0.8052683936402788
+     },
+     "ADAUSDT": {
+      "n": 8,
+      "mean_bp": 656.9111216518448,
+      "sr_ann": 0.8349160968137694
+     },
+     "DOGEUSDT": {
+      "n": 8,
+      "mean_bp": 2906.5178812095614,
+      "sr_ann": 0.6386537659203172
+     },
+     "LTCUSDT": {
+      "n": 10,
+      "mean_bp": -105.09109837964063,
+      "sr_ann": -0.2790645418326037
+     },
+     "LINKUSDT": {
+      "n": 8,
+      "mean_bp": -170.66314133796615,
+      "sr_ann": -0.5075472170866343
+     }
+    },
+    "fold_positive_share": 0.5,
+    "mean_net_bp_trade": 516.023975084634,
+    "mean_cost_bp_trade": 70.96998347918094,
+    "top5pct_profit_share": 0.5229955093385891,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.07282633848448447
+   },
+   "S1_cost_x1.5_sr_ann": 0.9446098855953724,
+   "S2": {
+    "sr_ann": 1.2116068978432089,
+    "mean_bp_day": 2.5952875020750463,
+    "mdd_bp": 303.68127536216537,
+    "days": 463,
+    "active_days": 23,
+    "n_events": 37,
+    "fold_sr_ann": [
+     -1.981093431112147,
+     1.709332977424997,
+     2.373906696012498,
+     1.9918311435329612,
+     0.7056867118230371
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 4,
+      "mean_bp": 29.341000319019244,
+      "sr_ann": 0.06986446302675893
+     },
+     "BNBUSDT": {
+      "n": 9,
+      "mean_bp": 50.97349568250718,
+      "sr_ann": 0.33934891379971993
+     },
+     "XRPUSDT": {
+      "n": 4,
+      "mean_bp": 491.59015567592013,
+      "sr_ann": 0.8919243973015426
+     },
+     "SOLUSDT": {
+      "n": 7,
+      "mean_bp": 27.116847115291616,
+      "sr_ann": 0.062114262033309046
+     },
+     "ADAUSDT": {
+      "n": 2,
+      "mean_bp": -44.693130355513965,
+      "sr_ann": -0.4219403488576483
+     },
+     "DOGEUSDT": {
+      "n": 4,
+      "mean_bp": 1815.173895227248,
+      "sr_ann": 1.1926565244524645
+     },
+     "LTCUSDT": {
+      "n": 4,
+      "mean_bp": 37.371885746423246,
+      "sr_ann": 0.1136106295213365
+     },
+     "LINKUSDT": {
+      "n": 3,
+      "mean_bp": -146.718656809016,
+      "sr_ann": -0.3238885502735418
+     }
+    },
+    "fold_positive_share": 0.8,
+    "mean_net_bp_trade": 259.8093218293506,
+    "mean_cost_bp_trade": 72.2056925552571,
+    "top5pct_profit_share": 0.43810336800554234,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 16,
+   "strategy_id": "S-f2418a2a6c066d64",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "vol_ratio",
+       "op": "gt",
+       "params": {
+        "long": 1536,
+        "short": 96
+       },
+       "value": 1.5
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "ret_z",
+      "op": "gt",
+      "params": {
+       "lookback": 384,
+       "min_history": 0,
+       "window": 2048
+      },
+      "value": 0.0
+     }
+    ],
+    "exit": {
+     "horizon": 192,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:vol_ratio:long",
+    "data": [
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 192
+    }
+   },
+   "cluster_size": 1,
+   "S1": {
+    "sr_ann": 1.0000268230002431,
+    "mean_bp_day": 3.8780677037201468,
+    "mdd_bp": 1642.8435034051467,
+    "days": 901,
+    "active_days": 191,
+    "n_events": 310,
+    "fold_sr_ann": [
+     3.7416399662236848,
+     0.4009078692012405,
+     -2.670675392859523,
+     0.6750827752767568,
+     -0.10521420205601589
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 31,
+      "mean_bp": 138.6893577721128,
+      "sr_ann": 1.0406689243199911
+     },
+     "ETHUSDT": {
+      "n": 28,
+      "mean_bp": 81.88664246853348,
+      "sr_ann": 0.6695905211232123
+     },
+     "BNBUSDT": {
+      "n": 29,
+      "mean_bp": 26.525568888984175,
+      "sr_ann": 0.14595674673494075
+     },
+     "XRPUSDT": {
+      "n": 39,
+      "mean_bp": 131.39691373385728,
+      "sr_ann": 0.5515762972559708
+     },
+     "SOLUSDT": {
+      "n": 31,
+      "mean_bp": 167.49514853043826,
+      "sr_ann": 0.6332342667552917
+     },
+     "ADAUSDT": {
+      "n": 37,
+      "mean_bp": -136.49884498369,
+      "sr_ann": -0.7521207832659381
+     },
+     "DOGEUSDT": {
+      "n": 55,
+      "mean_bp": 451.8937772500413,
+      "sr_ann": 1.1101797036654644
+     },
+     "LTCUSDT": {
+      "n": 30,
+      "mean_bp": -70.28100445929527,
+      "sr_ann": -0.3277871917307322
+     },
+     "LINKUSDT": {
+      "n": 30,
+      "mean_bp": -130.8762053003067,
+      "sr_ann": -0.5669538047975452
+     }
+    },
+    "fold_positive_share": 0.6,
+    "mean_net_bp_trade": 101.44274519182798,
+    "mean_cost_bp_trade": 81.15370584417003,
+    "top5pct_profit_share": 0.42119123992625435,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.026618200070980067
+   },
+   "S1_cost_x1.5_sr_ann": 0.5987113006928639,
+   "S2": {
+    "sr_ann": 0.971917820556041,
+    "mean_bp_day": 4.283317404793033,
+    "mdd_bp": 965.9287508601801,
+    "days": 463,
+    "active_days": 79,
+    "n_events": 151,
+    "fold_sr_ann": [
+     -3.02520381632152,
+     4.101057564149959,
+     0.14728104799454414,
+     2.231133887266542,
+     -2.877473969845581
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 15,
+      "mean_bp": 16.531963614220203,
+      "sr_ann": 0.07843391750154788
+     },
+     "BNBUSDT": {
+      "n": 23,
+      "mean_bp": -72.19962297405233,
+      "sr_ann": -1.2467366064427714
+     },
+     "XRPUSDT": {
+      "n": 23,
+      "mean_bp": 202.3564940263768,
+      "sr_ann": 0.7648219338908436
+     },
+     "SOLUSDT": {
+      "n": 18,
+      "mean_bp": 59.18464508151848,
+      "sr_ann": 0.2752670258356101
+     },
+     "ADAUSDT": {
+      "n": 13,
+      "mean_bp": 400.35883982831456,
+      "sr_ann": 1.3714736113283643
+     },
+     "DOGEUSDT": {
+      "n": 19,
+      "mean_bp": 297.88086621392665,
+      "sr_ann": 0.8823889054218541
+     },
+     "LTCUSDT": {
+      "n": 21,
+      "mean_bp": 27.86625356548521,
+      "sr_ann": 0.13134394878191494
+     },
+     "LINKUSDT": {
+      "n": 19,
+      "mean_bp": 5.731782461126972,
+      "sr_ann": 0.027023538240592143
+     }
+    },
+    "fold_positive_share": 0.6,
+    "mean_net_bp_trade": 105.06892494936024,
+    "mean_cost_bp_trade": 76.90493126392423,
+    "top5pct_profit_share": 0.3821264956308382,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 17,
+   "strategy_id": "S-ce84c114373533f2",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "funding_z",
+       "op": "gt",
+       "params": {
+        "window": 90
+       },
+       "value": 2.0
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "ret_z",
+      "op": "lt",
+      "params": {
+       "lookback": 96,
+       "min_history": 0,
+       "window": 2048
+      },
+      "value": -0.5
+     }
+    ],
+    "exit": {
+     "horizon": 192,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:funding_z:long",
+    "data": [
+     "funding",
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 192
+    }
+   },
+   "cluster_size": 1,
+   "S1": {
+    "sr_ann": 0.9994901339645453,
+    "mean_bp_day": 3.4387254854795137,
+    "mdd_bp": 1016.8008073416058,
+    "days": 901,
+    "active_days": 55,
+    "n_events": 119,
+    "fold_sr_ann": [
+     2.6491018269001723,
+     -2.026487738282587,
+     NaN,
+     2.187512459158495,
+     0.0795137532274099
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 13,
+      "mean_bp": 90.54920192410621,
+      "sr_ann": 0.6000624318546625
+     },
+     "ETHUSDT": {
+      "n": 13,
+      "mean_bp": 45.1461344511134,
+      "sr_ann": 0.2701366225933069
+     },
+     "BNBUSDT": {
+      "n": 10,
+      "mean_bp": 234.83481319432263,
+      "sr_ann": 0.4738687421781543
+     },
+     "XRPUSDT": {
+      "n": 17,
+      "mean_bp": 581.6097058850087,
+      "sr_ann": 0.8994078412477439
+     },
+     "SOLUSDT": {
+      "n": 17,
+      "mean_bp": 445.94736232153696,
+      "sr_ann": 1.023526104887441
+     },
+     "ADAUSDT": {
+      "n": 15,
+      "mean_bp": -83.86116997148724,
+      "sr_ann": -0.23547420828814117
+     },
+     "DOGEUSDT": {
+      "n": 11,
+      "mean_bp": 587.6998607866616,
+      "sr_ann": 0.4764594024803152
+     },
+     "LTCUSDT": {
+      "n": 11,
+      "mean_bp": -285.2318174566116,
+      "sr_ann": -0.8168654088892734
+     },
+     "LINKUSDT": {
+      "n": 12,
+      "mean_bp": 352.8780308635651,
+      "sr_ann": 1.1885287553229662
+     }
+    },
+    "fold_positive_share": 0.75,
+    "mean_net_bp_trade": 234.32457951053263,
+    "mean_cost_bp_trade": 76.24339854589229,
+    "top5pct_profit_share": 0.4790072074952804,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.07824860255463743
+   },
+   "S1_cost_x1.5_sr_ann": 0.8425844803682494,
+   "S2": {
+    "sr_ann": 0.4712689947211967,
+    "mean_bp_day": 0.5921798955689065,
+    "mdd_bp": 214.8378932399765,
+    "days": 463,
+    "active_days": 19,
+    "n_events": 40,
+    "fold_sr_ann": [
+     1.981093431112148,
+     1.2439862291097545,
+     NaN,
+     NaN,
+     -0.08034678985292303
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 5,
+      "mean_bp": -72.06547352208463,
+      "sr_ann": -0.6981372941450609
+     },
+     "BNBUSDT": {
+      "n": 6,
+      "mean_bp": 164.66429194380657,
+      "sr_ann": 0.5254255846707238
+     },
+     "XRPUSDT": {
+      "n": 5,
+      "mean_bp": 159.16375874987722,
+      "sr_ann": 0.3668065794013538
+     },
+     "SOLUSDT": {
+      "n": 5,
+      "mean_bp": -20.007097574995328,
+      "sr_ann": -0.11010779296900193
+     },
+     "ADAUSDT": {
+      "n": 6,
+      "mean_bp": 31.260746263898415,
+      "sr_ann": 0.20877904225278
+     },
+     "DOGEUSDT": {
+      "n": 4,
+      "mean_bp": 166.58154856804646,
+      "sr_ann": 0.662174505606662
+     },
+     "LTCUSDT": {
+      "n": 5,
+      "mean_bp": 349.157875107294,
+      "sr_ann": 0.982504614718746
+     },
+     "LINKUSDT": {
+      "n": 4,
+      "mean_bp": -432.4218510329106,
+      "sr_ann": -1.694143378260606
+     }
+    },
+    "fold_positive_share": 0.6666666666666666,
+    "mean_net_bp_trade": 54.83585832968074,
+    "mean_cost_bp_trade": 74.97666170541761,
+    "top5pct_profit_share": 0.29766585995300254,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 18,
+   "strategy_id": "S-2a0a393eeeb81cdf",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "vol_ratio",
+       "op": "gt",
+       "params": {
+        "long": 1536,
+        "short": 96
+       },
+       "value": 1.5
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "ret_z",
+      "op": "lt",
+      "params": {
+       "lookback": 96,
+       "min_history": 0,
+       "window": 2048
+      },
+      "value": -0.5
+     }
+    ],
+    "exit": {
+     "horizon": 384,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:vol_ratio:long",
+    "data": [
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 384
+    }
+   },
+   "cluster_size": 1,
+   "S1": {
+    "sr_ann": 0.9978276113772854,
+    "mean_bp_day": 9.704614987471063,
+    "mdd_bp": 3703.8419574700056,
+    "days": 901,
+    "active_days": 145,
+    "n_events": 382,
+    "fold_sr_ann": [
+     3.145206765316786,
+     1.194970825893378,
+     -1.9515764824225037,
+     1.1474265248756088,
+     -2.8667365435291488
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 42,
+      "mean_bp": -51.165076162615364,
+      "sr_ann": -0.26749248953854377
+     },
+     "ETHUSDT": {
+      "n": 40,
+      "mean_bp": 143.39467119094374,
+      "sr_ann": 0.5022823453210553
+     },
+     "BNBUSDT": {
+      "n": 47,
+      "mean_bp": 157.6166825899223,
+      "sr_ann": 0.6754816578136743
+     },
+     "XRPUSDT": {
+      "n": 45,
+      "mean_bp": 171.87900036658172,
+      "sr_ann": 0.5091091465137896
+     },
+     "SOLUSDT": {
+      "n": 35,
+      "mean_bp": 475.45786902164735,
+      "sr_ann": 0.8577676925962836
+     },
+     "ADAUSDT": {
+      "n": 45,
+      "mean_bp": 102.18007548787342,
+      "sr_ann": 0.39123825919071586
+     },
+     "DOGEUSDT": {
+      "n": 49,
+      "mean_bp": 821.0563804079284,
+      "sr_ann": 0.8593583708747202
+     },
+     "LTCUSDT": {
+      "n": 40,
+      "mean_bp": -258.5338288668464,
+      "sr_ann": -0.9326929224467992
+     },
+     "LINKUSDT": {
+      "n": 39,
+      "mean_bp": 226.5587663678421,
+      "sr_ann": 0.5464855115377147
+     }
+    },
+    "fold_positive_share": 0.6,
+    "mean_net_bp_trade": 206.00712809791327,
+    "mean_cost_bp_trade": 81.99564900715266,
+    "top5pct_profit_share": 0.4439557696899338,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.10047243569795786
+   },
+   "S1_cost_x1.5_sr_ann": 0.8004159208842859,
+   "S2": {
+    "sr_ann": 0.5420733965001897,
+    "mean_bp_day": 3.4069183967880745,
+    "mdd_bp": 1760.7366365824323,
+    "days": 463,
+    "active_days": 66,
+    "n_events": 185,
+    "fold_sr_ann": [
+     -1.1864176727238087,
+     4.148951984995551,
+     -1.331149610579155,
+     1.9782029539699608,
+     -0.32899969136118096
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 23,
+      "mean_bp": -50.39627599366261,
+      "sr_ann": -0.29532208246700303
+     },
+     "BNBUSDT": {
+      "n": 27,
+      "mean_bp": 38.7967004564341,
+      "sr_ann": 0.2900562370699376
+     },
+     "XRPUSDT": {
+      "n": 26,
+      "mean_bp": 215.03632921949443,
+      "sr_ann": 0.8665547985082511
+     },
+     "SOLUSDT": {
+      "n": 19,
+      "mean_bp": 49.454664596696425,
+      "sr_ann": 0.25721799867825423
+     },
+     "ADAUSDT": {
+      "n": 22,
+      "mean_bp": -103.6881389744984,
+      "sr_ann": -0.542554114582601
+     },
+     "DOGEUSDT": {
+      "n": 22,
+      "mean_bp": 133.06537167383186,
+      "sr_ann": 0.4723293640772252
+     },
+     "LTCUSDT": {
+      "n": 24,
+      "mean_bp": 43.32321444808676,
+      "sr_ann": 0.21662392863991123
+     },
+     "LINKUSDT": {
+      "n": 22,
+      "mean_bp": 205.19044200227452,
+      "sr_ann": 0.8490019713979116
+     }
+    },
+    "fold_positive_share": 0.4,
+    "mean_net_bp_trade": 68.21203103623257,
+    "mean_cost_bp_trade": 84.70339627187785,
+    "top5pct_profit_share": 0.3313011106179404,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 19,
+   "strategy_id": "S-acebc1167bbef119",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "ret_z",
+       "op": "gt",
+       "params": {
+        "lookback": 192,
+        "min_history": 0,
+        "window": 2048
+       },
+       "value": 2.5
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "ret_z",
+      "op": "gt",
+      "params": {
+       "lookback": 96,
+       "min_history": 0,
+       "window": 2048
+      },
+      "value": 0.5
+     }
+    ],
+    "exit": {
+     "horizon": 384,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:ret_z:long",
+    "data": [
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 384
+    }
+   },
+   "cluster_size": 2,
+   "S1": {
+    "sr_ann": 0.9832371239445467,
+    "mean_bp_day": 5.8833845866485355,
+    "mdd_bp": 2569.601097736582,
+    "days": 901,
+    "active_days": 169,
+    "n_events": 309,
+    "fold_sr_ann": [
+     2.775086726748141,
+     -0.5531577995988549,
+     -1.4066169637927814,
+     1.6224010632439345,
+     -0.9337211753642419
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 31,
+      "mean_bp": 164.20724832855606,
+      "sr_ann": 0.7900393767122785
+     },
+     "ETHUSDT": {
+      "n": 32,
+      "mean_bp": 210.05529835211257,
+      "sr_ann": 0.8664901281296024
+     },
+     "BNBUSDT": {
+      "n": 41,
+      "mean_bp": -17.51596665225898,
+      "sr_ann": -0.09621341705441878
+     },
+     "XRPUSDT": {
+      "n": 38,
+      "mean_bp": 124.59274980078708,
+      "sr_ann": 0.4093923816726322
+     },
+     "SOLUSDT": {
+      "n": 33,
+      "mean_bp": 156.2109062340016,
+      "sr_ann": 0.38789562028750757
+     },
+     "ADAUSDT": {
+      "n": 33,
+      "mean_bp": 11.900679161960195,
+      "sr_ann": 0.04157936221879619
+     },
+     "DOGEUSDT": {
+      "n": 42,
+      "mean_bp": 570.1811193705788,
+      "sr_ann": 0.7044668822998924
+     },
+     "LTCUSDT": {
+      "n": 27,
+      "mean_bp": 53.244858192715036,
+      "sr_ann": 0.203365032886972
+     },
+     "LINKUSDT": {
+      "n": 32,
+      "mean_bp": 29.590656411202616,
+      "sr_ann": 0.11405727740806489
+     }
+    },
+    "fold_positive_share": 0.4,
+    "mean_net_bp_trade": 154.39600522049503,
+    "mean_cost_bp_trade": 87.2708271870128,
+    "top5pct_profit_share": 0.46248333521959023,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.13434537704444582
+   },
+   "S1_cost_x1.5_sr_ann": 0.7098993748713835,
+   "S2": {
+    "sr_ann": 1.0933776212944706,
+    "mean_bp_day": 8.150944224683277,
+    "mdd_bp": 1212.80439891585,
+    "days": 463,
+    "active_days": 67,
+    "n_events": 139,
+    "fold_sr_ann": [
+     0.31277337540276395,
+     2.292170167390926,
+     0.21698905157546436,
+     1.5179097981190695,
+     -0.2285815213828171
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 14,
+      "mean_bp": 219.24721040052236,
+      "sr_ann": 0.5940201135531937
+     },
+     "BNBUSDT": {
+      "n": 19,
+      "mean_bp": 126.4430941131535,
+      "sr_ann": 0.7576194147901687
+     },
+     "XRPUSDT": {
+      "n": 21,
+      "mean_bp": 132.0911296346496,
+      "sr_ann": 0.432498910224321
+     },
+     "SOLUSDT": {
+      "n": 16,
+      "mean_bp": 42.15911546990626,
+      "sr_ann": 0.12568773176087916
+     },
+     "ADAUSDT": {
+      "n": 19,
+      "mean_bp": 482.62174017785173,
+      "sr_ann": 1.074885693032874
+     },
+     "DOGEUSDT": {
+      "n": 18,
+      "mean_bp": 567.3629564326734,
+      "sr_ann": 1.3993242175157952
+     },
+     "LTCUSDT": {
+      "n": 16,
+      "mean_bp": 3.953788615542706,
+      "sr_ann": 0.01488863355171281
+     },
+     "LINKUSDT": {
+      "n": 16,
+      "mean_bp": 114.07195047546821,
+      "sr_ann": 0.3464800600170095
+     }
+    },
+    "fold_positive_share": 0.8,
+    "mean_net_bp_trade": 217.2021396275313,
+    "mean_cost_bp_trade": 86.18699272689345,
+    "top5pct_profit_share": 0.36524464774584614,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 20,
+   "strategy_id": "S-769437cb1b55ad41",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "vol_ratio",
+       "op": "gt",
+       "params": {
+        "long": 768,
+        "short": 48
+       },
+       "value": 2.0
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "vol_ratio",
+      "op": "gt",
+      "params": {
+       "long": 1536,
+       "short": 96
+      },
+      "value": 1.2
+     }
+    ],
+    "exit": {
+     "horizon": 96,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:vol_ratio:long",
+    "data": [
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 96
+    }
+   },
+   "cluster_size": 1,
+   "S1": {
+    "sr_ann": 0.976503659195533,
+    "mean_bp_day": 6.945878493020187,
+    "mdd_bp": 1396.7488176681964,
+    "days": 901,
+    "active_days": 178,
+    "n_events": 425,
+    "fold_sr_ann": [
+     1.7059295491917645,
+     1.497071108861211,
+     -0.17262848348653306,
+     0.7963393333643838,
+     1.2226887786646172
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 52,
+      "mean_bp": -25.100845405302582,
+      "sr_ann": -0.18827760867731635
+     },
+     "ETHUSDT": {
+      "n": 43,
+      "mean_bp": 80.00611500630819,
+      "sr_ann": 0.4352027494937649
+     },
+     "BNBUSDT": {
+      "n": 49,
+      "mean_bp": -52.09317127906882,
+      "sr_ann": -0.4057327419003041
+     },
+     "XRPUSDT": {
+      "n": 50,
+      "mean_bp": 184.11108452113024,
+      "sr_ann": 0.8622560934994447
+     },
+     "SOLUSDT": {
+      "n": 44,
+      "mean_bp": 295.84064367221976,
+      "sr_ann": 0.7274844955716139
+     },
+     "ADAUSDT": {
+      "n": 42,
+      "mean_bp": 276.3928130699148,
+      "sr_ann": 1.0849083569240832
+     },
+     "DOGEUSDT": {
+      "n": 72,
+      "mean_bp": 209.73353132044747,
+      "sr_ann": 0.9573722445902985
+     },
+     "LTCUSDT": {
+      "n": 42,
+      "mean_bp": 57.82096770759174,
+      "sr_ann": 0.3547505351709253
+     },
+     "LINKUSDT": {
+      "n": 31,
+      "mean_bp": 173.59159719412517,
+      "sr_ann": 0.6555819553725365
+     }
+    },
+    "fold_positive_share": 0.8,
+    "mean_net_bp_trade": 132.52736164682517,
+    "mean_cost_bp_trade": 73.2216201828448,
+    "top5pct_profit_share": 0.3987038092551282,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.21297654746486705
+   },
+   "S1_cost_x1.5_sr_ann": 0.7111495290909635,
+   "S2": {
+    "sr_ann": 0.028881493241183845,
+    "mean_bp_day": 0.11622242144839019,
+    "mdd_bp": 1774.6820559787486,
+    "days": 463,
+    "active_days": 69,
+    "n_events": 146,
+    "fold_sr_ann": [
+     -0.7526173128843091,
+     0.11008851491681343,
+     4.305223396216851,
+     0.02903252250533984,
+     -2.6306416485649406
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 19,
+      "mean_bp": -103.89199733989315,
+      "sr_ann": -0.813384686929545
+     },
+     "BNBUSDT": {
+      "n": 22,
+      "mean_bp": -74.71375103385961,
+      "sr_ann": -1.1418055121608013
+     },
+     "XRPUSDT": {
+      "n": 25,
+      "mean_bp": -4.183445982150179,
+      "sr_ann": -0.0383640426007437
+     },
+     "SOLUSDT": {
+      "n": 14,
+      "mean_bp": 27.06856405618917,
+      "sr_ann": 0.12216761259677433
+     },
+     "ADAUSDT": {
+      "n": 14,
+      "mean_bp": 143.00832366681882,
+      "sr_ann": 0.4601116253466032
+     },
+     "DOGEUSDT": {
+      "n": 21,
+      "mean_bp": 77.22642133268725,
+      "sr_ann": 0.35689274948542016
+     },
+     "LTCUSDT": {
+      "n": 21,
+      "mean_bp": -180.41827757003117,
+      "sr_ann": -0.8553073536386517
+     },
+     "LINKUSDT": {
+      "n": 10,
+      "mean_bp": 393.8677023663586,
+      "sr_ann": 1.31711494402016
+     }
+    },
+    "fold_positive_share": 0.6,
+    "mean_net_bp_trade": 2.9485469112660305,
+    "mean_cost_bp_trade": 77.98999882170892,
+    "top5pct_profit_share": 0.359850404130078,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 21,
+   "strategy_id": "S-71e769b881db4401",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "funding_z",
+       "op": "lt",
+       "params": {
+        "window": 270
+       },
+       "value": -1.5
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "vol_ratio",
+      "op": "gt",
+      "params": {
+       "long": 192,
+       "short": 16
+      },
+      "value": 1.5
+     }
+    ],
+    "exit": {
+     "horizon": 768,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:funding_z:long",
+    "data": [
+     "funding",
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 768
+    }
+   },
+   "cluster_size": 1,
+   "S1": {
+    "sr_ann": 0.9581153312660793,
+    "mean_bp_day": 4.468523138691044,
+    "mdd_bp": 1507.7459730644778,
+    "days": 901,
+    "active_days": 131,
+    "n_events": 214,
+    "fold_sr_ann": [
+     1.5427099186357787,
+     1.3677323162218193,
+     -0.4128359263471475,
+     1.7643767583682022,
+     0.7614225091222252
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 25,
+      "mean_bp": 426.23027346044944,
+      "sr_ann": 1.1597299896299007
+     },
+     "ETHUSDT": {
+      "n": 28,
+      "mean_bp": 457.9295401995641,
+      "sr_ann": 1.027376918394989
+     },
+     "BNBUSDT": {
+      "n": 22,
+      "mean_bp": 76.70040676371849,
+      "sr_ann": 0.2657696807371231
+     },
+     "XRPUSDT": {
+      "n": 20,
+      "mean_bp": 13.910414064521541,
+      "sr_ann": 0.05299553973522716
+     },
+     "SOLUSDT": {
+      "n": 17,
+      "mean_bp": -78.18153065685947,
+      "sr_ann": -0.1344463132249752
+     },
+     "ADAUSDT": {
+      "n": 28,
+      "mean_bp": 36.308182349482465,
+      "sr_ann": 0.10887320991113092
+     },
+     "DOGEUSDT": {
+      "n": 31,
+      "mean_bp": 123.06304129977698,
+      "sr_ann": 0.30717282845330035
+     },
+     "LTCUSDT": {
+      "n": 23,
+      "mean_bp": 172.74633322588562,
+      "sr_ann": 0.45867833019348664
+     },
+     "LINKUSDT": {
+      "n": 20,
+      "mean_bp": 165.8094955173525,
+      "sr_ann": 0.43948559338428245
+     }
+    },
+    "fold_positive_share": 0.8,
+    "mean_net_bp_trade": 169.3236174375966,
+    "mean_cost_bp_trade": 90.37623554130357,
+    "top5pct_profit_share": 0.28645554865605,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.0022542064847212284
+   },
+   "S1_cost_x1.5_sr_ann": 0.7019874227258415,
+   "S2": {
+    "sr_ann": -0.06144931399094357,
+    "mean_bp_day": -0.2770655507176872,
+    "mdd_bp": 2944.329477086849,
+    "days": 463,
+    "active_days": 63,
+    "n_events": 92,
+    "fold_sr_ann": [
+     2.8144199489467345,
+     1.3041476718804714,
+     -2.068305998290574,
+     3.9745284684404973,
+     -2.4525503831582918
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 15,
+      "mean_bp": 240.18900897229625,
+      "sr_ann": 0.5695940211796146
+     },
+     "BNBUSDT": {
+      "n": 7,
+      "mean_bp": 72.05586386565103,
+      "sr_ann": 0.23524685596684666
+     },
+     "XRPUSDT": {
+      "n": 12,
+      "mean_bp": 231.21953291577623,
+      "sr_ann": 0.49717557992690153
+     },
+     "SOLUSDT": {
+      "n": 11,
+      "mean_bp": -25.942386271880125,
+      "sr_ann": -0.05831860194795188
+     },
+     "ADAUSDT": {
+      "n": 12,
+      "mean_bp": -346.0987256855385,
+      "sr_ann": -0.8274949785771999
+     },
+     "DOGEUSDT": {
+      "n": 10,
+      "mean_bp": 227.10494936670733,
+      "sr_ann": 0.48343430239695856
+     },
+     "LTCUSDT": {
+      "n": 11,
+      "mean_bp": -270.35225356594833,
+      "sr_ann": -0.7198272721321343
+     },
+     "LINKUSDT": {
+      "n": 14,
+      "mean_bp": -197.62393740829506,
+      "sr_ann": -0.5947640571259412
+     }
+    },
+    "fold_positive_share": 0.6,
+    "mean_net_bp_trade": -11.154899998459916,
+    "mean_cost_bp_trade": 81.64047014157381,
+    "top5pct_profit_share": 0.33940171705816036,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 22,
+   "strategy_id": "S-be888cf158bef1d9",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 768
+       },
+       "value": 0.0
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "ret_z",
+      "op": "lt",
+      "params": {
+       "lookback": 384,
+       "min_history": 0,
+       "window": 2048
+      },
+      "value": 0.0
+     }
+    ],
+    "exit": {
+     "horizon": 384,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:breakout_k:long",
+    "data": [
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 384
+    }
+   },
+   "cluster_size": 1,
+   "S1": {
+    "sr_ann": 0.9534092098616934,
+    "mean_bp_day": 2.5445861278934885,
+    "mdd_bp": 1052.1394956406011,
+    "days": 901,
+    "active_days": 57,
+    "n_events": 69,
+    "fold_sr_ann": [
+     3.1651783207408015,
+     -1.9751116391950339,
+     -1.3305517273009813,
+     -0.5207087743899217,
+     0.14206156221585753
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 11,
+      "mean_bp": -12.121571031968848,
+      "sr_ann": -0.06717245080771118
+     },
+     "ETHUSDT": {
+      "n": 12,
+      "mean_bp": 90.17818661494185,
+      "sr_ann": 0.3084258228015606
+     },
+     "BNBUSDT": {
+      "n": 7,
+      "mean_bp": -728.1942788714736,
+      "sr_ann": -0.9105682205237556
+     },
+     "XRPUSDT": {
+      "n": 6,
+      "mean_bp": 679.547071181671,
+      "sr_ann": 0.4867269329359254
+     },
+     "SOLUSDT": {
+      "n": 14,
+      "mean_bp": 1138.9310472213008,
+      "sr_ann": 1.1667670723478292
+     },
+     "ADAUSDT": {
+      "n": 7,
+      "mean_bp": 270.3821633502616,
+      "sr_ann": 0.3780563426813595
+     },
+     "DOGEUSDT": {
+      "n": 2,
+      "mean_bp": 2846.908880419757,
+      "sr_ann": 0.5554590783572694
+     },
+     "LTCUSDT": {
+      "n": 5,
+      "mean_bp": 106.72289594231363,
+      "sr_ann": 0.13774456013179076
+     },
+     "LINKUSDT": {
+      "n": 5,
+      "mean_bp": -671.963313406037,
+      "sr_ann": -1.0097104435519129
+     }
+    },
+    "fold_positive_share": 0.4,
+    "mean_net_bp_trade": 299.0441871172217,
+    "mean_cost_bp_trade": 69.02325664379629,
+    "top5pct_profit_share": 0.46051476212619386,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": -0.0021785351068822055
+   },
+   "S1_cost_x1.5_sr_ann": 0.8467114736497561,
+   "S2": {
+    "sr_ann": 0.46363317837661594,
+    "mean_bp_day": 1.6146186357661982,
+    "mdd_bp": 1031.3164601670119,
+    "days": 463,
+    "active_days": 26,
+    "n_events": 27,
+    "fold_sr_ann": [
+     -3.8624988734098515,
+     2.43828586032062,
+     NaN,
+     -0.07725789128665321,
+     -2.822511589143449
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 7,
+      "mean_bp": -62.900742455649215,
+      "sr_ann": -0.16908385638743278
+     },
+     "BNBUSDT": {
+      "n": 2,
+      "mean_bp": -1571.4357679814893,
+      "sr_ann": -1.2010176685172866
+     },
+     "XRPUSDT": {
+      "n": 4,
+      "mean_bp": 1713.10208797736,
+      "sr_ann": 0.8413727995928817
+     },
+     "SOLUSDT": {
+      "n": 4,
+      "mean_bp": -903.6719153459906,
+      "sr_ann": -1.7119453542726364
+     },
+     "ADAUSDT": {
+      "n": 2,
+      "mean_bp": 2049.126592025204,
+      "sr_ann": 1.0400706532535051
+     },
+     "DOGEUSDT": {
+      "n": 4,
+      "mean_bp": 1118.075478902948,
+      "sr_ann": 0.5697021102985653
+     },
+     "LTCUSDT": {
+      "n": 2,
+      "mean_bp": -464.31222561350273,
+      "sr_ann": -1.16965470235805
+     },
+     "LINKUSDT": {
+      "n": 2,
+      "mean_bp": -657.9635894650753,
+      "sr_ann": -0.6216522209130189
+     }
+    },
+    "fold_positive_share": 0.25,
+    "mean_net_bp_trade": 221.501756551037,
+    "mean_cost_bp_trade": 59.51937619386246,
+    "top5pct_profit_share": 0.6033508918084958,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 23,
+   "strategy_id": "S-a77470b1f72ae8c7",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "ret_z",
+       "op": "gt",
+       "params": {
+        "lookback": 192,
+        "min_history": 0,
+        "window": 2048
+       },
+       "value": 1.5
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "funding_z",
+      "op": "lt",
+      "params": {
+       "window": 90
+      },
+      "value": -1.0
+     }
+    ],
+    "exit": {
+     "horizon": 384,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:ret_z:long",
+    "data": [
+     "funding",
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 384
+    }
+   },
+   "cluster_size": 1,
+   "S1": {
+    "sr_ann": 0.9532422472018924,
+    "mean_bp_day": 3.533038137084724,
+    "mdd_bp": 1345.9092915354092,
+    "days": 901,
+    "active_days": 118,
+    "n_events": 173,
+    "fold_sr_ann": [
+     1.773450690359206,
+     -0.8442815303565262,
+     -1.6014068905069623,
+     3.359001069013097,
+     -1.002811151200679
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 24,
+      "mean_bp": 182.31846034650604,
+      "sr_ann": 0.7500542491884424
+     },
+     "ETHUSDT": {
+      "n": 23,
+      "mean_bp": 183.9200704864408,
+      "sr_ann": 1.0342541690845108
+     },
+     "BNBUSDT": {
+      "n": 24,
+      "mean_bp": 33.430325802383635,
+      "sr_ann": 0.13204722483555198
+     },
+     "XRPUSDT": {
+      "n": 17,
+      "mean_bp": -183.59004441350845,
+      "sr_ann": -0.7605424267182526
+     },
+     "SOLUSDT": {
+      "n": 22,
+      "mean_bp": 340.69768716281675,
+      "sr_ann": 0.8833081233558636
+     },
+     "ADAUSDT": {
+      "n": 20,
+      "mean_bp": 5.379177019762222,
+      "sr_ann": 0.019425483195712988
+     },
+     "DOGEUSDT": {
+      "n": 14,
+      "mean_bp": 1059.0775937068634,
+      "sr_ann": 0.6268913719460812
+     },
+     "LTCUSDT": {
+      "n": 18,
+      "mean_bp": 150.34687606579794,
+      "sr_ann": 0.6800261401595116
+     },
+     "LINKUSDT": {
+      "n": 11,
+      "mean_bp": -252.17801992449824,
+      "sr_ann": -0.4170100778362843
+     }
+    },
+    "fold_positive_share": 0.4,
+    "mean_net_bp_trade": 165.60350435618508,
+    "mean_cost_bp_trade": 96.24584383926972,
+    "top5pct_profit_share": 0.45772930604209594,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.07180046345326645
+   },
+   "S1_cost_x1.5_sr_ann": 0.6769479246837365,
+   "S2": {
+    "sr_ann": 0.33125337849690195,
+    "mean_bp_day": 1.0074586579724867,
+    "mdd_bp": 899.3312074967595,
+    "days": 463,
+    "active_days": 42,
+    "n_events": 64,
+    "fold_sr_ann": [
+     2.4474508636351784,
+     1.3601271091854361,
+     1.0698973355922619,
+     0.22618342988986773,
+     -1.0576306864524199
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 10,
+      "mean_bp": 43.725486554867416,
+      "sr_ann": 0.25849573592129726
+     },
+     "BNBUSDT": {
+      "n": 7,
+      "mean_bp": -125.51933548764171,
+      "sr_ann": -0.47025302794614415
+     },
+     "XRPUSDT": {
+      "n": 8,
+      "mean_bp": -49.49857247199364,
+      "sr_ann": -0.1799055819890599
+     },
+     "SOLUSDT": {
+      "n": 11,
+      "mean_bp": 540.3672681449602,
+      "sr_ann": 1.0349205995580215
+     },
+     "ADAUSDT": {
+      "n": 7,
+      "mean_bp": -295.5098624172163,
+      "sr_ann": -1.1322036394621824
+     },
+     "DOGEUSDT": {
+      "n": 8,
+      "mean_bp": 32.109181836162236,
+      "sr_ann": 0.08421584924242706
+     },
+     "LTCUSDT": {
+      "n": 7,
+      "mean_bp": -203.47071404268667,
+      "sr_ann": -0.5313106171481794
+     },
+     "LINKUSDT": {
+      "n": 6,
+      "mean_bp": 310.1577604510527,
+      "sr_ann": 1.0072634618246517
+     }
+    },
+    "fold_positive_share": 0.8,
+    "mean_net_bp_trade": 58.30666983015762,
+    "mean_cost_bp_trade": 90.52481811994913,
+    "top5pct_profit_share": 0.4556148852132131,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 24,
+   "strategy_id": "S-a4fafaccc0d81080",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "vol_ratio",
+       "op": "gt",
+       "params": {
+        "long": 1536,
+        "short": 96
+       },
+       "value": 2.0
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "ret_z",
+      "op": "gt",
+      "params": {
+       "lookback": 384,
+       "min_history": 0,
+       "window": 2048
+      },
+      "value": 0.0
+     }
+    ],
+    "exit": {
+     "horizon": 768,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:vol_ratio:long",
+    "data": [
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 768
+    }
+   },
+   "cluster_size": 1,
+   "S1": {
+    "sr_ann": 0.9511284751696003,
+    "mean_bp_day": 4.655997732812967,
+    "mdd_bp": 1293.038420383576,
+    "days": 901,
+    "active_days": 52,
+    "n_events": 62,
+    "fold_sr_ann": [
+     1.8405670227375766,
+     -1.8679389883180453,
+     -1.3868928245064596,
+     1.9103348919837753,
+     0.25790526073515485
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 5,
+      "mean_bp": 683.9331975611587,
+      "sr_ann": 0.8227301744201747
+     },
+     "ETHUSDT": {
+      "n": 7,
+      "mean_bp": 164.83129859555675,
+      "sr_ann": 0.34006227900139785
+     },
+     "BNBUSDT": {
+      "n": 7,
+      "mean_bp": -145.40420186783132,
+      "sr_ann": -0.1804188973947812
+     },
+     "XRPUSDT": {
+      "n": 7,
+      "mean_bp": 3049.3449808660653,
+      "sr_ann": 1.012846309581012
+     },
+     "SOLUSDT": {
+      "n": 6,
+      "mean_bp": 731.2087532241268,
+      "sr_ann": 0.3910834846508705
+     },
+     "ADAUSDT": {
+      "n": 4,
+      "mean_bp": -443.6464359699803,
+      "sr_ann": -0.4598279615000235
+     },
+     "DOGEUSDT": {
+      "n": 17,
+      "mean_bp": 1260.0574220969238,
+      "sr_ann": 0.6862845433993369
+     },
+     "LTCUSDT": {
+      "n": 4,
+      "mean_bp": -1504.7260110523027,
+      "sr_ann": -0.9940559794661884
+     },
+     "LINKUSDT": {
+      "n": 5,
+      "mean_bp": -1032.0647644970634,
+      "sr_ann": -0.8410029475316936
+     }
+    },
+    "fold_positive_share": 0.6,
+    "mean_net_bp_trade": 608.9594454093606,
+    "mean_cost_bp_trade": 73.13288457294611,
+    "top5pct_profit_share": 0.5955896838715798,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": 0.0524401597882149
+   },
+   "S1_cost_x1.5_sr_ann": 0.8961424374224923,
+   "S2": {
+    "sr_ann": 0.5503118387646364,
+    "mean_bp_day": 3.0156548139115813,
+    "mdd_bp": 1675.7088626752295,
+    "days": 463,
+    "active_days": 23,
+    "n_events": 31,
+    "fold_sr_ann": [
+     -1.9145749939469525,
+     3.1542077810580325,
+     -2.681861824454755,
+     1.671975026701627,
+     -2.218821059332779
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 4,
+      "mean_bp": -767.7504137752737,
+      "sr_ann": -1.1876521927598749
+     },
+     "BNBUSDT": {
+      "n": 4,
+      "mean_bp": -299.91557640193366,
+      "sr_ann": -0.8118559007777656
+     },
+     "XRPUSDT": {
+      "n": 6,
+      "mean_bp": 1086.6281901043822,
+      "sr_ann": 0.6166259234491372
+     },
+     "SOLUSDT": {
+      "n": 2,
+      "mean_bp": -1427.233035526287,
+      "sr_ann": -0.8013682107094626
+     },
+     "ADAUSDT": {
+      "n": 4,
+      "mean_bp": 1781.1525579098627,
+      "sr_ann": 0.8682076045879367
+     },
+     "DOGEUSDT": {
+      "n": 4,
+      "mean_bp": 2114.1981589230986,
+      "sr_ann": 0.7497380251604389
+     },
+     "LTCUSDT": {
+      "n": 5,
+      "mean_bp": -359.9361583305057,
+      "sr_ann": -0.47678035989305767
+     },
+     "LINKUSDT": {
+      "n": 2,
+      "mean_bp": -1003.1878769078556,
+      "sr_ann": -1.118320274279674
+     }
+    },
+    "fold_positive_share": 0.4,
+    "mean_net_bp_trade": 360.32211066866125,
+    "mean_cost_bp_trade": 68.9288382122214,
+    "top5pct_profit_share": 0.5509606588569458,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  },
+  {
+   "rank": 25,
+   "strategy_id": "S-6ea2ecf510cf8018",
+   "spec": {
+    "schema": "strategy_spec_v1",
+    "direction": "long",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m",
+    "entry": {
+     "logic": "all",
+     "conditions": [
+      {
+       "feature": "vol_ratio",
+       "op": "gt",
+       "params": {
+        "long": 768,
+        "short": 48
+       },
+       "value": 2.0
+      }
+     ]
+    },
+    "filters": [
+     {
+      "feature": "vol_ratio",
+      "op": "gt",
+      "params": {
+       "long": 1536,
+       "short": 96
+      },
+      "value": 1.2
+     }
+    ],
+    "exit": {
+     "horizon": 192,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "risk": {
+     "sizing": "vol_inverse",
+     "risk_per_trade": 0.01,
+     "max_leverage": 1.0,
+     "max_concurrent": 2
+    },
+    "family": "spec:vol_ratio:long",
+    "data": [
+     "klines"
+    ],
+    "primary_cell": {
+     "symbol": "BTCUSDT",
+     "horizon": 192
+    }
+   },
+   "cluster_size": 1,
+   "S1": {
+    "sr_ann": 0.9452476173623442,
+    "mean_bp_day": 5.806557236619733,
+    "mdd_bp": 3131.562079463688,
+    "days": 901,
+    "active_days": 160,
+    "n_events": 367,
+    "fold_sr_ann": [
+     2.8236974913078705,
+     0.681162705691054,
+     -1.3516210817606724,
+     1.1463632314472414,
+     0.798664728635733
+    ],
+    "per_symbol": {
+     "BTCUSDT": {
+      "n": 45,
+      "mean_bp": 22.788513729486905,
+      "sr_ann": 0.1354048220156883
+     },
+     "ETHUSDT": {
+      "n": 37,
+      "mean_bp": 84.37606330637159,
+      "sr_ann": 0.4443989425682829
+     },
+     "BNBUSDT": {
+      "n": 42,
+      "mean_bp": -45.73315404269255,
+      "sr_ann": -0.3167850610758006
+     },
+     "XRPUSDT": {
+      "n": 43,
+      "mean_bp": 254.27055092449726,
+      "sr_ann": 0.9675120961316144
+     },
+     "SOLUSDT": {
+      "n": 37,
+      "mean_bp": 190.22195125718375,
+      "sr_ann": 0.41197472926823586
+     },
+     "ADAUSDT": {
+      "n": 37,
+      "mean_bp": 26.21887285974112,
+      "sr_ann": 0.13235283002606718
+     },
+     "DOGEUSDT": {
+      "n": 63,
+      "mean_bp": 356.1764475405894,
+      "sr_ann": 0.9340213621622087
+     },
+     "LTCUSDT": {
+      "n": 34,
+      "mean_bp": 51.20296127328054,
+      "sr_ann": 0.25045383635424767
+     },
+     "LINKUSDT": {
+      "n": 29,
+      "mean_bp": 59.8898821017785,
+      "sr_ann": 0.29595201946353367
+     }
+    },
+    "fold_positive_share": 0.8,
+    "mean_net_bp_trade": 128.2980180701619,
+    "mean_cost_bp_trade": 77.49894798032464,
+    "top5pct_profit_share": 0.44213922549462253,
+    "long_share": 1.0,
+    "corr_with_buy_and_hold": -0.04811249822867914
+   },
+   "S1_cost_x1.5_sr_ann": 0.6626362232404592,
+   "S2": {
+    "sr_ann": 0.22083865835116973,
+    "mean_bp_day": 0.8533702267361573,
+    "mdd_bp": 1086.1675481209277,
+    "days": 463,
+    "active_days": 68,
+    "n_events": 142,
+    "fold_sr_ann": [
+     -2.5274618130550013,
+     2.8571624543739023,
+     -0.8836547702252691,
+     2.3733936647041225,
+     -2.477811507043878
+    ],
+    "per_symbol": {
+     "ETHUSDT": {
+      "n": 19,
+      "mean_bp": -204.14490920723915,
+      "sr_ann": -1.0009543611200553
+     },
+     "BNBUSDT": {
+      "n": 22,
+      "mean_bp": -89.73495209492756,
+      "sr_ann": -0.6533394075766866
+     },
+     "XRPUSDT": {
+      "n": 25,
+      "mean_bp": -18.01674805387835,
+      "sr_ann": -0.12537898093305777
+     },
+     "SOLUSDT": {
+      "n": 14,
+      "mean_bp": -36.079977188513034,
+      "sr_ann": -0.14283703736974462
+     },
+     "ADAUSDT": {
+      "n": 14,
+      "mean_bp": 234.70385982875914,
+      "sr_ann": 0.8336957958513586
+     },
+     "DOGEUSDT": {
+      "n": 19,
+      "mean_bp": 60.32327364567097,
+      "sr_ann": 0.2004399178104107
+     },
+     "LTCUSDT": {
+      "n": 19,
+      "mean_bp": 5.07170571304244,
+      "sr_ann": 0.019659091773891014
+     },
+     "LINKUSDT": {
+      "n": 10,
+      "mean_bp": 544.0985277424638,
+      "sr_ann": 1.8551636008440655
+     }
+    },
+    "fold_positive_share": 0.4,
+    "mean_net_bp_trade": 22.259741688948772,
+    "mean_cost_bp_trade": 77.97258143729894,
+    "top5pct_profit_share": 0.3793591009002922,
+    "long_share": 1.0
+   },
+   "deflation": {
+    "all_trials": {
+     "trials": 3856,
+     "expected_max_sr_ann_null_unit": 2.304675498991769,
+     "expected_max_sr_ann_null_scaled": 14.969499725795522,
+     "dsr": 0.0
+    },
+    "effective_trials": {
+     "trials": 77.42234350330776,
+     "expected_max_sr_ann_null_unit": 1.5512501818117148,
+     "expected_max_sr_ann_null_scaled": 10.07579556489816,
+     "dsr": 0.0
+    }
+   }
+  }
+ ],
+ "bundles_of_leaders": {
+  "top5_distinct": {
+   "S1_sr_ann": 2.160344657815135,
+   "S2_sr_ann": 2.4559903694141436,
+   "S1_fold_sr_ann": [
+    5.318410387499591,
+    2.6621632924217837,
+    -1.1084442720667926,
+    1.0674005299769596,
+    -2.381665370569549
+   ],
+   "corr_with_buy_and_hold_S1": 0.08038140015785335,
+   "corr_with_buy_and_hold_S2": 0.04905022043710646
+  },
+  "top10_distinct": {
+   "S1_sr_ann": 2.5383296100112105,
+   "S2_sr_ann": 2.5464425418148187,
+   "S1_fold_sr_ann": [
+    7.07072303758608,
+    2.2085380125464424,
+    -2.1328728830721704,
+    1.134061072084574,
+    -2.379179353558045
+   ],
+   "corr_with_buy_and_hold_S1": 0.10243167530142026,
+   "corr_with_buy_and_hold_S2": 0.05814916935506265
+  },
+  "top25_distinct": {
+   "S1_sr_ann": 3.0233131484199216,
+   "S2_sr_ann": 2.535661141049357,
+   "S1_fold_sr_ann": [
+    8.204220479611418,
+    2.110098643042935,
+    -3.670946475034289,
+    2.459081092998823,
+    -2.384634661471128
+   ],
+   "corr_with_buy_and_hold_S1": 0.19332326481847661,
+   "corr_with_buy_and_hold_S2": 0.10468067790268866
+  }
+ },
+ "buy_and_hold_reference": {
+  "S1": {
+   "sr_ann": 0.19760369466331434,
+   "mean_bp_day": 4.422866929854151
+  },
+  "S2": {
+   "sr_ann": 1.0131969468694275,
+   "mean_bp_day": 20.153692277180063
+  }
+ },
+ "track_b": [
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 30,
+    "mode": "long_short",
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": 0.6528266231440896,
+    "mean_bp_day": 10.971284788285574,
+    "mdd_bp": 9057.886247153941,
+    "fold_sr_ann": [
+     3.2536983318705746,
+     -0.24042169488693746,
+     0.8584841730935222,
+     -1.3578627365623719,
+     -2.0443354426789586
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": 0.5535368016831728,
+   "S2": {
+    "sr_ann": 0.3885358161611733,
+    "mean_bp_day": 6.1537122257149,
+    "mdd_bp": 6468.1795695076635
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 30,
+    "mode": "long_only",
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": 0.6514284568966774,
+    "mean_bp_day": 8.373453134740645,
+    "mdd_bp": 5849.603148218302,
+    "fold_sr_ann": [
+     2.790695070262793,
+     -0.32325758829792706,
+     -0.5932863900496724,
+     0.06739204847284097,
+     -2.036109242551388
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": 0.5874265366581726,
+   "S2": {
+    "sr_ann": 0.9794036792526867,
+    "mean_bp_day": 12.025360262582712,
+    "mdd_bp": 4533.089318628565
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 3,
+    "mode": "long_only",
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": 0.47831016717255553,
+    "mean_bp_day": 5.64703035550342,
+    "mdd_bp": 5896.842709449682,
+    "fold_sr_ann": [
+     2.0390774696993947,
+     1.5955614777472698,
+     -0.7034767455197112,
+     0.12445008130086996,
+     -2.7599297418446387
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": 0.29393564219388674,
+   "S2": {
+    "sr_ann": -0.4119743962815313,
+    "mean_bp_day": -4.218944214836157,
+    "mdd_bp": 7418.914863990586
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 14,
+    "mode": "long_only",
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": 0.3823636642208613,
+    "mean_bp_day": 5.032191998508752,
+    "mdd_bp": 8088.779441087381,
+    "fold_sr_ann": [
+     2.5210413188683924,
+     -1.5490921825946207,
+     -0.49120006607864974,
+     0.07621221726219833,
+     -0.5590688085961494
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": 0.28215885278988095,
+   "S2": {
+    "sr_ann": 0.14369546274510156,
+    "mean_bp_day": 1.7418346890288368,
+    "mdd_bp": 4614.679685400499
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 3,
+    "mode": "long_short",
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": 0.38074697688624604,
+    "mean_bp_day": 6.573149556486243,
+    "mdd_bp": 12078.896881579456,
+    "fold_sr_ann": [
+     1.1835455086479871,
+     2.49100897179776,
+     1.0994073049599158,
+     -0.9111244435281376,
+     -3.8260224892768107
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": 0.12818964798450458,
+   "S2": {
+    "sr_ann": -1.7914771236403233,
+    "mean_bp_day": -28.59158070685238,
+    "mdd_bp": 18500.646001950932
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 14,
+    "mode": "long_short",
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": 0.28759942891268886,
+    "mean_bp_day": 4.967925361969459,
+    "mdd_bp": 5684.460640430596,
+    "fold_sr_ann": [
+     2.0936821959832037,
+     -1.7566053612453358,
+     1.1486102807519123,
+     -0.7314191087290732,
+     -0.33587748411100976
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": 0.13464594150797196,
+   "S2": {
+    "sr_ann": -1.0348854303724109,
+    "mean_bp_day": -16.670022899122394,
+    "mdd_bp": 8933.435708967358
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 30,
+    "mode": "long_only",
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": 0.25870461269414075,
+    "mean_bp_day": 3.2044697001165305,
+    "mdd_bp": 7920.685817809726,
+    "fold_sr_ann": [
+     2.1858237646242924,
+     -0.4850311742257004,
+     -1.2359029496206873,
+     -0.8049850836493497,
+     -1.1641923220768067
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": 0.08584455959963251,
+   "S2": {
+    "sr_ann": 0.026608645890343948,
+    "mean_bp_day": 0.32829748563715627,
+    "mdd_bp": 5837.6216714556385
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 30,
+    "mode": "short_only",
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": 0.1756140570922914,
+    "mean_bp_day": 2.5978316535449295,
+    "mdd_bp": 7464.497719074771,
+    "fold_sr_ann": [
+     0.8841964256473196,
+     -0.04315741956280758,
+     1.187688305647411,
+     -1.3668381322590286,
+     -0.8465830069633304
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": 0.11864362049921454,
+   "S2": {
+    "sr_ann": -0.4503202902511041,
+    "mean_bp_day": -5.871648036867812,
+    "mdd_bp": 5907.922727228737
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 14,
+    "mode": "long_only",
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": 0.1451682822311671,
+    "mean_bp_day": 1.8031447476654574,
+    "mdd_bp": 9702.6724372584,
+    "fold_sr_ann": [
+     2.626177139906118,
+     -0.8046988732202379,
+     -2.093404401783316,
+     -0.20235216631637049,
+     -0.6385022014122426
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.13650947416375137,
+   "S2": {
+    "sr_ann": 0.29804143811157974,
+    "mean_bp_day": 3.7271315714304287,
+    "mdd_bp": 4473.008799542893
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 7,
+    "mode": "long_only",
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": 0.1051690454284808,
+    "mean_bp_day": 1.3434398704300938,
+    "mdd_bp": 9150.604704501977,
+    "fold_sr_ann": [
+     1.9091874531081463,
+     -0.7258751914780338,
+     -2.1703501885133396,
+     1.0445857627335233,
+     -1.5564528623903588
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.06980785268297506,
+   "S2": {
+    "sr_ann": -0.42165866788955364,
+    "mean_bp_day": -5.001958952982778,
+    "mdd_bp": 5921.420377025741
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 60,
+    "mode": "long_only",
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": 0.1031402139328528,
+    "mean_bp_day": 1.5360955270486893,
+    "mdd_bp": 7436.622430520892,
+    "fold_sr_ann": [
+     1.0443576118658244,
+     0.7032679199183529,
+     -2.411496445130852,
+     0.47189925605975974,
+     -1.740260708021003
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": 0.0514168107008122,
+   "S2": {
+    "sr_ann": 0.9581745378718318,
+    "mean_bp_day": 12.83909446853645,
+    "mdd_bp": 4445.68939820724
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 90,
+    "mode": "long_only",
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": 0.08601335502236072,
+    "mean_bp_day": 1.214219249537485,
+    "mdd_bp": 7667.70291889391,
+    "fold_sr_ann": [
+     0.611599674012899,
+     0.8273236190790626,
+     -1.1830643906690586,
+     0.6361028710994271,
+     -2.378106431283257
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": 0.034008829232757824,
+   "S2": {
+    "sr_ann": 0.9424721834936957,
+    "mean_bp_day": 13.192964983421794,
+    "mdd_bp": 5409.636923138785
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 30,
+    "mode": "long_short",
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": 0.060212867151260625,
+    "mean_bp_day": 1.0511121932385232,
+    "mdd_bp": 12020.843284071412,
+    "fold_sr_ann": [
+     1.822646449592293,
+     -0.4074275222969404,
+     0.40983441276080246,
+     -2.4123159922709574,
+     -1.373386064515177
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.18483392682609678,
+   "S2": {
+    "sr_ann": -1.1745844715265399,
+    "mean_bp_day": -18.67080981973314,
+    "mdd_bp": 9533.848359059171
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 3,
+    "mode": "short_only",
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": 0.05751710821039902,
+    "mean_bp_day": 0.9261192009828147,
+    "mdd_bp": 8015.540082770805,
+    "fold_sr_ann": [
+     -0.35883834279935983,
+     1.4233337061498494,
+     1.4388319566397363,
+     -0.9336066525048319,
+     -1.8737703342570937
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.07796838432457091,
+   "S2": {
+    "sr_ann": -1.6420345223887527,
+    "mean_bp_day": -24.37263649201622,
+    "mdd_bp": 14051.44685385735
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 14,
+    "mode": "short_only",
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": -0.0042914173712805485,
+    "mean_bp_day": -0.06426663653929103,
+    "mdd_bp": 6157.25914687444,
+    "fold_sr_ann": [
+     0.030527516602834398,
+     -0.8924871907344838,
+     1.465077649149967,
+     -1.4380137717606023,
+     0.07711558273339107
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.09284594647248934,
+   "S2": {
+    "sr_ann": -1.3699470695785227,
+    "mean_bp_day": -18.411857588151232,
+    "mdd_bp": 10010.327741179522
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_mom",
+    "L": 14,
+    "k": 2,
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": -0.025292037764061134,
+    "mean_bp_day": -0.11607682512508205,
+    "mdd_bp": 3589.7425043430208,
+    "fold_sr_ann": [
+     2.3958356058895385,
+     -0.6037611568965819,
+     -1.1266143962491357,
+     -0.8736155158327149,
+     -2.2572008087545465
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.4933101833780297,
+   "S2": {
+    "sr_ann": 0.415379830774621,
+    "mean_bp_day": 1.6757128548641018,
+    "mdd_bp": 1314.4475622655166
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 14,
+    "mode": "long_short",
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -0.06995543433762691,
+    "mean_bp_day": -1.3040289221342303,
+    "mdd_bp": 12719.680457153674,
+    "fold_sr_ann": [
+     1.7645574909229245,
+     -0.8440587428795834,
+     -0.6236869201139414,
+     -1.3001642339748107,
+     -0.7394352312406963
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.4451977410802118,
+   "S2": {
+    "sr_ann": -0.7859719139996039,
+    "mean_bp_day": -12.771893803453105,
+    "mdd_bp": 9191.28315136225
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 90,
+    "mode": "long_short",
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": -0.13562725724590394,
+    "mean_bp_day": -2.279304184936541,
+    "mdd_bp": 11023.307422590464,
+    "fold_sr_ann": [
+     -0.476376569495947,
+     1.2826096150647246,
+     0.9858892520485203,
+     -0.4210329271989271,
+     -3.30151404896809
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.2223861444368467,
+   "S2": {
+    "sr_ann": 0.2523924329543326,
+    "mean_bp_day": 4.088119914996432,
+    "mdd_bp": 7023.732324542954
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 30,
+    "mode": "short_only",
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -0.13732031350487367,
+    "mean_bp_day": -2.153357506878005,
+    "mdd_bp": 9251.244185390731,
+    "fold_sr_ann": [
+     -0.006752773812991901,
+     -0.1293553079988081,
+     0.9339496927643808,
+     -1.7644988991694506,
+     -0.4392239703808738
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.2739051440071312,
+   "S2": {
+    "sr_ann": -1.4531067648809983,
+    "mean_bp_day": -18.9991073053703,
+    "mdd_bp": 10375.618800093298
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 7,
+    "mode": "long_short",
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": -0.14147467503958835,
+    "mean_bp_day": -2.441416177399462,
+    "mdd_bp": 8116.536586055276,
+    "fold_sr_ann": [
+     0.883945577003311,
+     -0.8882694135198778,
+     -0.6281333303169245,
+     1.0109441123233727,
+     -2.265906294468575
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.4008832418358097,
+   "S2": {
+    "sr_ann": -1.7568042608583605,
+    "mean_bp_day": -30.157610183145614,
+    "mdd_bp": 15400.2660417218
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 60,
+    "mode": "long_only",
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -0.1767444024268141,
+    "mean_bp_day": -2.517001173310762,
+    "mdd_bp": 11398.855100980589,
+    "fold_sr_ann": [
+     1.1927358836905366,
+     0.46296520800285657,
+     -2.7974896944341707,
+     -0.6474451447889729,
+     -2.057565988684076
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.33474883695056123,
+   "S2": {
+    "sr_ann": 0.9143099564753115,
+    "mean_bp_day": 12.393437274142675,
+    "mdd_bp": 3915.3960300051303
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 14,
+    "mode": "short_only",
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -0.18977482267058554,
+    "mean_bp_day": -3.1071736697996877,
+    "mdd_bp": 9001.909854050498,
+    "fold_sr_ann": [
+     0.009070147431158943,
+     -0.39718193196493157,
+     0.5163649940872215,
+     -1.3141271154700769,
+     -0.26389388470177005
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.4041134352444627,
+   "S2": {
+    "sr_ann": -1.2528441512663142,
+    "mean_bp_day": -16.499025374883523,
+    "mdd_bp": 9966.783511099557
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 60,
+    "mode": "long_short",
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": -0.21377678704644115,
+    "mean_bp_day": -3.5950153157625273,
+    "mdd_bp": 10442.90490869361,
+    "fold_sr_ann": [
+     0.3574811708968867,
+     1.0145571430859168,
+     -1.0595068167674155,
+     -0.3634320176881967,
+     -2.623669320733271
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.3066676303330257,
+   "S2": {
+    "sr_ann": 0.24496444868705272,
+    "mean_bp_day": 3.856092967300332,
+    "mdd_bp": 9714.99542740166
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 7,
+    "mode": "short_only",
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": -0.24721044586705984,
+    "mean_bp_day": -3.7848560478295563,
+    "mdd_bp": 6531.3718124068655,
+    "fold_sr_ann": [
+     -0.5884220122817643,
+     -0.42991562471055056,
+     0.48630104462989754,
+     -0.028134511073878155,
+     -1.0954710629725166
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.39418493053661985,
+   "S2": {
+    "sr_ann": -1.7593182815581392,
+    "mean_bp_day": -25.15565123016284,
+    "mdd_bp": 13415.006269705471
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 90,
+    "mode": "short_only",
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": -0.25817557117095336,
+    "mean_bp_day": -3.493523434474031,
+    "mdd_bp": 7229.131127190711,
+    "fold_sr_ann": [
+     -2.5515256239341992,
+     0.7925887569024558,
+     1.2731375836305105,
+     -0.7606630186704991,
+     -1.5818418980405602
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.31179864056717926,
+   "S2": {
+    "sr_ann": -0.851582600812669,
+    "mean_bp_day": -9.104845068425359,
+    "mdd_bp": 5194.994541992187
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 90,
+    "mode": "long_only",
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -0.3274287511397179,
+    "mean_bp_day": -4.518532990721784,
+    "mdd_bp": 13123.630643008986,
+    "fold_sr_ann": [
+     0.6562039249131951,
+     0.4489112596086616,
+     -3.523041127586072,
+     -0.40491447081962323,
+     -2.6736156467346377
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.4493498396551123,
+   "S2": {
+    "sr_ann": 0.7414679033869908,
+    "mean_bp_day": 10.23206985955543,
+    "mdd_bp": 5498.014422443097
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 7,
+    "mode": "long_only",
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -0.329794319096987,
+    "mean_bp_day": -3.8287997247542433,
+    "mdd_bp": 12913.81832305791,
+    "fold_sr_ann": [
+     2.2939404391993095,
+     -0.9189937327471992,
+     -2.864357724899296,
+     0.010763156078592177,
+     -3.3222946411381433
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.7866656813070054,
+   "S2": {
+    "sr_ann": -0.003483299406196345,
+    "mean_bp_day": -0.04021092125958898,
+    "mdd_bp": 7752.241584129666
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_mom",
+    "L": 1,
+    "k": 2,
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": -0.3299287958106265,
+    "mean_bp_day": -1.595769509643575,
+    "mdd_bp": 4351.030343991215,
+    "fold_sr_ann": [
+     1.469606472428683,
+     -3.129507272678839,
+     -2.8248836657092293,
+     0.12026437289819208,
+     -0.7184082096200999
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.9070433058178712,
+   "S2": {
+    "sr_ann": -1.7096721456537394,
+    "mean_bp_day": -6.533587911751934,
+    "mdd_bp": 3223.7725399841916
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 60,
+    "mode": "short_only",
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": -0.40920208291381877,
+    "mean_bp_day": -5.131110842811217,
+    "mdd_bp": 7950.11153406566,
+    "fold_sr_ann": [
+     -1.5111475284466225,
+     0.6178396557436839,
+     0.1751015052727785,
+     -0.9497872553624969,
+     -1.085618962918715
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.4722409791866013,
+   "S2": {
+    "sr_ann": -0.7915583656352894,
+    "mean_bp_day": -8.983001501236114,
+    "mdd_bp": 7310.089130752465
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_carry",
+    "k": 2,
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": -0.4113887439583664,
+    "mean_bp_day": -1.8359805825829558,
+    "mdd_bp": 3636.600309647424,
+    "fold_sr_ann": [
+     0.3543371579040705,
+     0.8613471596970467,
+     -1.810041553273584,
+     -0.11617577008125106,
+     -3.5944888661050025
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.8871776236159591,
+   "S2": {
+    "sr_ann": -1.1821669299993074,
+    "mean_bp_day": -4.4287344258538655,
+    "mdd_bp": 2620.492577651564
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_mom",
+    "L": 30,
+    "k": 2,
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": -0.45304056418165717,
+    "mean_bp_day": -2.0622838054470045,
+    "mdd_bp": 4758.3673065518105,
+    "fold_sr_ann": [
+     1.8357793629754824,
+     -2.5091635493167503,
+     -0.9745787214265337,
+     -0.5471686369460453,
+     -3.5893448930417433
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.7868675851996416,
+   "S2": {
+    "sr_ann": -0.13834629659177952,
+    "mean_bp_day": -0.5578536915611066,
+    "mdd_bp": 2329.466931865967
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 7,
+    "mode": "short_only",
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -0.518412613146784,
+    "mean_bp_day": -8.708670050047965,
+    "mdd_bp": 11288.886682026983,
+    "fold_sr_ann": [
+     -0.27310149326357425,
+     -0.509868399442671,
+     0.23246038010981754,
+     -1.0672184734942902,
+     -2.009185007719252
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.8361573687123333,
+   "S2": {
+    "sr_ann": -1.4368489600643326,
+    "mean_bp_day": -20.193903198439653,
+    "mdd_bp": 12833.181234212301
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_carry",
+    "thr": 0.0003,
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": -0.586188451799563,
+    "mean_bp_day": -5.528974607190696,
+    "mdd_bp": 6866.040762589103,
+    "fold_sr_ann": [
+     -2.2292215470798404,
+     0.44826222831314805,
+     0.35358352205396104,
+     0.07291243324639402,
+     -1.5447271559578726
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.7286800803671983,
+   "S2": {
+    "sr_ann": -0.07717376732813663,
+    "mean_bp_day": -0.6895791764741227,
+    "mdd_bp": 3197.9904636442147
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_carry",
+    "thr": 0.0001,
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": -0.6020384129422446,
+    "mean_bp_day": -7.089671275811735,
+    "mdd_bp": 9972.635069227937,
+    "fold_sr_ann": [
+     -2.2784339848372777,
+     0.6957058548607667,
+     0.43608467130973383,
+     0.3781443676226757,
+     -1.290093410932671
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.7250583234726693,
+   "S2": {
+    "sr_ann": -0.6311628884271591,
+    "mean_bp_day": -6.828874113215284,
+    "mdd_bp": 5786.312832763708
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 60,
+    "mode": "short_only",
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -0.6590963230908212,
+    "mean_bp_day": -8.831934395070357,
+    "mdd_bp": 11150.206074990308,
+    "fold_sr_ann": [
+     -1.1900692145656997,
+     0.4525115085256201,
+     0.03677663288151505,
+     -1.7502081973498234,
+     -1.6028029841688443
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.8277589269233264,
+   "S2": {
+    "sr_ann": -0.8513204134149985,
+    "mean_bp_day": -9.51897500350914,
+    "mdd_bp": 6831.692090729607
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 60,
+    "mode": "long_short",
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -0.6692612928944698,
+    "mean_bp_day": -11.34893556838112,
+    "mdd_bp": 18763.915052292483,
+    "fold_sr_ann": [
+     0.5612923158359238,
+     0.7146601631902312,
+     -1.333251135137436,
+     -2.2773251219354345,
+     -3.4324757779719266
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.9350122738956058,
+   "S2": {
+    "sr_ann": 0.18233795725864124,
+    "mean_bp_day": 2.8744622706335243,
+    "mdd_bp": 7299.464506601201
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 7,
+    "mode": "long_short",
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -0.6849476421679834,
+    "mean_bp_day": -12.537469774802206,
+    "mdd_bp": 18379.744178567467,
+    "fold_sr_ann": [
+     1.2732893863737664,
+     -1.055833762959313,
+     -1.1676730187866753,
+     -0.9759354014582088,
+     -4.357798203327823
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -1.2640226963758567,
+   "S2": {
+    "sr_ann": -1.2408402056784935,
+    "mean_bp_day": -20.23411411969925,
+    "mdd_bp": 12792.699351611653
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 90,
+    "mode": "short_only",
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -0.6949753841034653,
+    "mean_bp_day": -9.640660924850186,
+    "mdd_bp": 11115.967649045162,
+    "fold_sr_ann": [
+     -2.4854355494660805,
+     0.5002655101159703,
+     0.48964784711989867,
+     -1.4401225291411288,
+     -1.6921779900716747
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -0.8149822066972829,
+   "S2": {
+    "sr_ann": -1.0787495782899377,
+    "mean_bp_day": -12.27875968457023,
+    "mdd_bp": 6193.893438237258
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_rev",
+    "L": 7,
+    "k": 2,
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": -0.8028087809059573,
+    "mean_bp_day": -3.9946759993832344,
+    "mdd_bp": 4909.384559228046,
+    "fold_sr_ann": [
+     0.1747871815482575,
+     0.26860048160188094,
+     -1.759367580224088,
+     -2.1043091977455477,
+     -2.248734825687485
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -1.352887755003486,
+   "S2": {
+    "sr_ann": -2.6752366767073363,
+    "mean_bp_day": -11.335742385215244,
+    "mdd_bp": 5560.255553068481
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 3,
+    "mode": "long_only",
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -0.8058385629323014,
+    "mean_bp_day": -9.758711951985605,
+    "mdd_bp": 15994.751761154985,
+    "fold_sr_ann": [
+     1.6061117041119495,
+     -1.5309797233033102,
+     -2.1295335278529617,
+     -1.3664975488460827,
+     -2.0735126429611217
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -1.478230452522729,
+   "S2": {
+    "sr_ann": -0.7301690356054044,
+    "mean_bp_day": -9.542011145005159,
+    "mdd_bp": 7972.498384519096
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 90,
+    "mode": "long_short",
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -0.8455438906483923,
+    "mean_bp_day": -14.159193915571969,
+    "mdd_bp": 21703.526630745808,
+    "fold_sr_ann": [
+     -0.545441922678855,
+     0.7449070386162648,
+     -0.5867823417868725,
+     -1.9202610718597197,
+     -3.733271542430493
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -1.0447253990175274,
+   "S2": {
+    "sr_ann": -0.12190208570749204,
+    "mean_bp_day": -2.046689825014795,
+    "mdd_bp": 7766.193457517796
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 3,
+    "mode": "short_only",
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -0.8664177409199405,
+    "mean_bp_day": -14.330206241157311,
+    "mdd_bp": 14583.803739413675,
+    "fold_sr_ann": [
+     -0.8321196187466898,
+     -1.13317164793565,
+     0.4280895289633042,
+     -1.8005993873413333,
+     -1.9774009757214548
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -1.3611761109871177,
+   "S2": {
+    "sr_ann": -2.393983764330323,
+    "mean_bp_day": -29.695703422185222,
+    "mdd_bp": 15638.856860942791
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_rev",
+    "L": 30,
+    "k": 2,
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": -0.8900771063938494,
+    "mean_bp_day": -4.0982546270639855,
+    "mdd_bp": 4290.426303147534,
+    "fold_sr_ann": [
+     -2.5486049255520777,
+     0.8364473377886296,
+     -0.6679282756670618,
+     -0.8619634254551393,
+     0.5622553877588488
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -1.2116734424978224,
+   "S2": {
+    "sr_ann": -1.542195009880929,
+    "mean_bp_day": -6.3030580312429345,
+    "mdd_bp": 3094.5400015203168
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_carry",
+    "thr": 0.0001,
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -0.8936329847917738,
+    "mean_bp_day": -12.574403300458133,
+    "mdd_bp": 11836.121817400506,
+    "fold_sr_ann": [
+     -1.5980763449098883,
+     -0.08021604086351168,
+     -1.2683160957840642,
+     0.14514663200187833,
+     -3.0549684177608247
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -1.3137935548609243,
+   "S2": {
+    "sr_ann": -2.761005251937218,
+    "mean_bp_day": -25.142915262667305,
+    "mdd_bp": 11854.1468847429
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_mom",
+    "L": 3,
+    "k": 2,
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": -0.9468704473584756,
+    "mean_bp_day": -4.651803731665249,
+    "mdd_bp": 5973.843789866597,
+    "fold_sr_ann": [
+     0.6386568943824782,
+     -4.206108001966569,
+     -1.6937120170690225,
+     -0.7632359828360239,
+     -1.8878862337011773
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -1.4936573970836649,
+   "S2": {
+    "sr_ann": -2.504495590238273,
+    "mean_bp_day": -9.959539717620885,
+    "mdd_bp": 5344.183276257886
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_carry",
+    "thr": 0.0003,
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -0.9738307445849771,
+    "mean_bp_day": -11.598810618351608,
+    "mdd_bp": 11784.922772191767,
+    "fold_sr_ann": [
+     -1.9761718963033832,
+     0.15128260163985024,
+     -1.4802612605421566,
+     0.45728779015528953,
+     -3.9233865544727218
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -1.408731357125929,
+   "S2": {
+    "sr_ann": -2.4210452681215076,
+    "mean_bp_day": -12.574049375702437,
+    "mdd_bp": 6204.123371263209
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_mom",
+    "L": 30,
+    "k": 2,
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -1.1085098275632055,
+    "mean_bp_day": -5.319059683245748,
+    "mdd_bp": 7540.523872853373,
+    "fold_sr_ann": [
+     1.810089988494411,
+     -2.4305932651146205,
+     -2.50785927704528,
+     -1.3291609875490304,
+     -4.412887202732888
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -1.9480864886107456,
+   "S2": {
+    "sr_ann": -1.9510513646058827,
+    "mean_bp_day": -7.894759368751276,
+    "mdd_bp": 4044.7247512604836
+   }
+  },
+  {
+   "config": {
+    "kind": "ts_mom",
+    "L": 3,
+    "mode": "long_short",
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -1.3069046551598096,
+    "mean_bp_day": -24.08891819314292,
+    "mdd_bp": 27999.14134099628,
+    "fold_sr_ann": [
+     0.24987978746408396,
+     -2.1573144549546313,
+     -0.9489051010472183,
+     -2.452417175124976,
+     -3.100329117408126
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -2.185286205158905,
+   "S2": {
+    "sr_ann": -2.463783545705499,
+    "mean_bp_day": -39.23771456719038,
+    "mdd_bp": 19151.201764382633
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_rev",
+    "L": 3,
+    "k": 2,
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": -1.312663939980021,
+    "mean_bp_day": -6.509782259006564,
+    "mdd_bp": 6398.544535597255,
+    "fold_sr_ann": [
+     -1.6432426191388798,
+     0.9467024057751379,
+     -2.0681994577843628,
+     -1.693093099183579,
+     -2.3081543127478983
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -1.8414914090067889,
+   "S2": {
+    "sr_ann": -1.2326352817967396,
+    "mean_bp_day": -4.7441414776551385,
+    "mdd_bp": 2532.261343732257
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_mom",
+    "L": 7,
+    "k": 2,
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": -1.5337852478690972,
+    "mean_bp_day": -7.510952825241782,
+    "mdd_bp": 6888.54481843729,
+    "fold_sr_ann": [
+     -1.3171677783652465,
+     -3.411529798642023,
+     -1.4470884107525284,
+     -0.7533212113972145,
+     -2.1047427917271095
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -2.093980991882779,
+   "S2": {
+    "sr_ann": -0.5389028318770095,
+    "mean_bp_day": -2.3291219201705315,
+    "mdd_bp": 2353.7878953345344
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_rev",
+    "L": 14,
+    "k": 2,
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": -1.8685815814937665,
+    "mean_bp_day": -8.58251081094831,
+    "mdd_bp": 8265.449571879586,
+    "fold_sr_ann": [
+     -3.364592325619173,
+     -1.2363100931712991,
+     -1.803153040086679,
+     -1.8383371773631811,
+     -0.38482347627946556
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -2.313907680258775,
+   "S2": {
+    "sr_ann": -2.7385394927546414,
+    "mean_bp_day": -11.254407483396854,
+    "mdd_bp": 5337.35917042066
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_rev",
+    "L": 1,
+    "k": 2,
+    "rebalance_days": 7
+   },
+   "S1": {
+    "sr_ann": -2.024732622184359,
+    "mean_bp_day": -9.862179879079193,
+    "mdd_bp": 9318.367754686386,
+    "fold_sr_ann": [
+     -2.4532701835781463,
+     -0.0634371566101369,
+     -1.0266849497362984,
+     -2.9042237403181876,
+     -4.796588496091591
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -2.5640895841141256,
+   "S2": {
+    "sr_ann": -1.918596364900513,
+    "mean_bp_day": -7.4105324455946455,
+    "mdd_bp": 3647.6958417909377
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_rev",
+    "L": 30,
+    "k": 2,
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -2.314672518088523,
+    "mean_bp_day": -11.120873584703101,
+    "mdd_bp": 10641.288951839202,
+    "fold_sr_ann": [
+     -3.2200172862011875,
+     -1.7256680271469333,
+     -2.4059289382177598,
+     -2.949809133576649,
+     -1.0264473217551144
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -3.141686947255372,
+   "S2": {
+    "sr_ann": -3.1612951835602074,
+    "mean_bp_day": -12.827745772896558,
+    "mdd_bp": 5939.24629285111
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_mom",
+    "L": 7,
+    "k": 2,
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -2.3847046460033527,
+    "mean_bp_day": -11.424509700424915,
+    "mdd_bp": 12946.598048851069,
+    "fold_sr_ann": [
+     0.0835382751548996,
+     -3.7165755891301497,
+     -4.885509139962212,
+     -2.4159464089171547,
+     -6.790536907618709
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -3.9948815550895094,
+   "S2": {
+    "sr_ann": -4.521820830065552,
+    "mean_bp_day": -18.76472137538593,
+    "mdd_bp": 8759.004982270631
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_mom",
+    "L": 14,
+    "k": 2,
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -2.3989182422439685,
+    "mean_bp_day": -11.568331985626228,
+    "mdd_bp": 12858.677869393132,
+    "fold_sr_ann": [
+     -0.7808124908909087,
+     -3.527783227372868,
+     -2.6597938917973076,
+     -2.0207030419441936,
+     -6.9016243857296935
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -3.606772532565393,
+   "S2": {
+    "sr_ann": -2.482290533927209,
+    "mean_bp_day": -11.303924092711894,
+    "mdd_bp": 5644.66151225232
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_rev",
+    "L": 14,
+    "k": 2,
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -2.6165446893252446,
+    "mean_bp_day": -12.540502403103645,
+    "mdd_bp": 11482.237658706417,
+    "fold_sr_ann": [
+     -1.458148027924459,
+     -2.6863882914645183,
+     -5.210393022948987,
+     -3.612056943886832,
+     -2.688021837354208
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -3.8405810501895856,
+   "S2": {
+    "sr_ann": -4.661577524151947,
+    "mean_bp_day": -20.730999944311865,
+    "mdd_bp": 9744.97420415077
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_mom",
+    "L": 3,
+    "k": 2,
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -3.2035359626648936,
+    "mean_bp_day": -16.817757645164598,
+    "mdd_bp": 17658.57266284786,
+    "fold_sr_ann": [
+     0.49235504960488513,
+     -5.55205836522496,
+     -6.075853326086269,
+     -3.997780674611012,
+     -8.410189833985141
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -5.3698305113928315,
+   "S2": {
+    "sr_ann": -6.290485999393411,
+    "mean_bp_day": -28.24980870023668,
+    "mdd_bp": 13079.661428209567
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_carry",
+    "k": 2,
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -3.4403601597538045,
+    "mean_bp_day": -16.021517062979687,
+    "mdd_bp": 14435.90590707802,
+    "fold_sr_ann": [
+     -1.7731263933832095,
+     -4.219121974842741,
+     -3.9116042566259925,
+     -3.915734874185534,
+     -7.926535071543431
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -5.608920268814722,
+   "S2": {
+    "sr_ann": -7.772748853215122,
+    "mean_bp_day": -26.649941694843243,
+    "mdd_bp": 12570.75456220446
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_rev",
+    "L": 7,
+    "k": 2,
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -4.392234990990989,
+    "mean_bp_day": -20.704408136417083,
+    "mdd_bp": 18709.071532223574,
+    "fold_sr_ann": [
+     -3.220506824364513,
+     -4.200620444466096,
+     -6.400063971431731,
+     -4.490523849323659,
+     -9.482385649430803
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -6.042264638754273,
+   "S2": {
+    "sr_ann": -5.322991118365576,
+    "mean_bp_day": -22.256406790524675,
+    "mdd_bp": 10396.031030695674
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_rev",
+    "L": 3,
+    "k": 2,
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -5.992429470772318,
+    "mean_bp_day": -30.865420420625714,
+    "mdd_bp": 27959.152465242034,
+    "fold_sr_ann": [
+     -4.408837436401674,
+     -5.60894554680796,
+     -9.156644703331422,
+     -6.389192359132557,
+     -11.12174723684496
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -8.22030936997045,
+   "S2": {
+    "sr_ann": -6.95224543089522,
+    "mean_bp_day": -31.011625228685748,
+    "mdd_bp": 14529.117622471462
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_mom",
+    "L": 1,
+    "k": 2,
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -7.166378825495355,
+    "mean_bp_day": -37.388276908419385,
+    "mdd_bp": 34587.06566365569,
+    "fold_sr_ann": [
+     -2.2264531471451434,
+     -8.238441473191267,
+     -13.288900366062466,
+     -6.8326242832549555,
+     -19.032270803018754
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -10.747384638511324,
+   "S2": {
+    "sr_ann": -10.558763290777499,
+    "mean_bp_day": -44.00615046457655,
+    "mdd_bp": 20410.12304654361
+   }
+  },
+  {
+   "config": {
+    "kind": "xs_rev",
+    "L": 1,
+    "k": 2,
+    "rebalance_days": 1
+   },
+   "S1": {
+    "sr_ann": -8.218054303054108,
+    "mean_bp_day": -42.52790416424582,
+    "mdd_bp": 38479.256339653126,
+    "fold_sr_ann": [
+     -4.386296934643624,
+     -10.972097188446952,
+     -9.85573054290962,
+     -11.070853955186907,
+     -16.59315317329873
+    ]
+   },
+   "S1_cost_x1.5_sr_ann": -11.848546965008358,
+   "S2": {
+    "sr_ann": -12.34443359339582,
+    "mean_bp_day": -52.96372585961282,
+    "mdd_bp": 24522.20507300073
+   }
+  }
+ ],
+ "engine_crosscheck": [],
+ "runtime_seconds": 144.120756149292
+}
