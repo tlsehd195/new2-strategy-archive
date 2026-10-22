@@ -37,11 +37,12 @@
  },
  "e_process": {
   "factor": "1 + lam_b * Z_b, Z_b = (X_b - c) / (B + c) >= -1",
-  "bet_rule": "predictable plug-in (no prior on the edge): lam_b = clip(mu / (v + mu^2), 0, 0.75) with mu = sum(Z_1..Z_{b-1}) / (b - 1 + 3) and v = (3 * s0^2 + sum Z_i^2) / (b - 1 + 3), s0 = block_sd / (B + c)",
+  "bet_rule": "Waudby-Smith & Ramdas (2010.09686 v7) hedged-capital BETTING PRODUCT (Theorem 3, one-sided K+): capital prod(1 + lam_b Z_b) with the predictable plug-in bet of eq. (15)/(26), in Z units, no prior on the edge (wording corrected 2026-10-22, ADR 0032: this was called 'PrPl-EB', but the paper's PrPl-EB is the exponential supermartingale of Theorem 2, a different and much weaker rule; formula, code and numbers are unchanged): lam_b = min(sqrt(2 * ln(2 / alpha) / (s2_{b-1} * b * ln(1 + b))), 0.75), alpha = 0.0091; s2_0 = s0^2, s2_t = (s0^2 + sum_{i<=t} (Z_i - mu_i)^2) / (t + 1), mu_t = sum_{i<=t} Z_i / (t + 1), s0 = block_sd / (B + c). Code: run/evalue_walkforward_sim.py log_e_hedged_prpl_bet (alias log_e_prpl_eb, alpha=0.0091). Changed 2026-10-22 (ADR 0030, decision V3)",
+  "bet_rule_previous": "predictable plug-in: lam_b = clip(mu / (v + mu^2), 0, 0.75) with mu = sum(Z_1..Z_{b-1}) / (b - 1 + 3) and v = (3 * s0^2 + sum Z_i^2) / (b - 1 + 3) (replaced: same type I, lower power; ADR 0027)",
   "lam_max": 0.75,
   "E_b": "product of the factors of blocks 1..b (E_0 = 1)",
   "reject_H0": "the first time E_b >= 1/alpha = 1/0.0091 (about 110)",
-  "prior_from_spent_windows": "NOT USED for the bet (decision V3). Spent BTC/ETH windows and DEV overstate Sharpe by about 3-5x (ADR 0021: H1 1.9-2.5 -> H2 0.44-0.90); simulated 5x overestimate lost half the power at true SR 3, the plug-in needs no prior.",
+  "prior_from_spent_windows": "NOT USED for the bet (decision V3). Spent BTC/ETH windows and DEV overstate Sharpe by about 3-5x (ADR 0021: H1 1.9-2.5 -> H2 0.44-0.90); simulated 5x overestimate lost half the power at true SR 3; the eq. (15) bet uses no estimate of the edge at all.",
   "breach": "if a realised X_b < -B ever occurs (margin floor failed, e.g. ADL or exchange failure), the family is VOID: no rejection may be claimed from that block on, and the breach is reported"
  },
  "alpha": 0.0091,
@@ -69,7 +70,8 @@
    "sr4": 14
   },
   "toy_engine": "a 12-rule toy engine on an AR(0.2) asset reached block SR 1.4 and rejected in 57 % of paths by 60 blocks; on martingale assets it never exceeded 0.025 %",
-  "power_at_alpha_0.0091_garch_t4": {
+  "power_at_alpha_0.0091_garch_t4_prpl_eb (this draft's bet rule; ../evidence_paper_faithful_20261022/evalue_v3_alpha_results.json)": {"sr0_by_24": 0.0, "sr0_by_36": 0.0, "sr1_by_24": 0.003, "sr1_by_36": 0.033, "sr2_by_24": 0.146, "sr2_by_36": 0.52, "sr3_by_24": 0.674, "sr3_by_36": 0.94, "sr4_by_24": 0.94, "sr4_by_36": 0.992, "null_max_by_60": 0.0003},
+  "power_at_alpha_0.0091_garch_t4_previous_plugin": {
    "sr2_by_24": 0.057,
    "sr2_by_36": 0.366,
    "sr3_by_24": 0.472,
@@ -82,7 +84,7 @@
  "open_decisions": {
   "V1": "DECIDED 2026-10-22: share forward data, Bonferroni split 7:3 (v2 0.0213, v3 0.0091), ratio confirmed by 동동. First block 2026-12-01 still a suggestion.",
   "V2": "DECIDED 2026-10-22: equal-weight bundle of the top 5 (see pipeline.bundle)",
-  "V3": "recommended (updated 2026-10-22, ADR 0027): Waudby-Smith & Ramdas PrPl-EB, eq. (15) of 2010.09686 v7 in Z units: lam_b = min(sqrt(2 log(2/alpha) / (s2_{b-1} * b * log(1+b))), 0.75), s2_b = (s0^2 + sum_{i<=b} (Z_i - mu_i)^2) / (b+1), mu_b = sum_{i<=b} Z_i / (b+1). At alpha 0.0091 (synthetic GARCH t4) 36-block power SR2 37.6% -> 52.0%, SR3 87.5% -> 94.0%, null <= 0.03%. e_process.bet_rule still holds the old plug-in until the user confirms; not yet confirmed",
+  "V3": "DECIDED 2026-10-22 by 동동 ('추천하는 걸로 진행', ADR 0030): WS-R eq. (15)/(26) bet as a betting product (Theorem 3 hedged K+; not the paper's Theorem 2 exponential PrPl-EB, ADR 0032), see e_process.bet_rule. Synthetic (GARCH t4, alpha 0.0091): 36-block power SR2 52.0% (plug-in 37.6%), SR3 94.0% (87.5%), null <= 0.03%; run/audit/evidence_paper_faithful_20261022/evalue_v3_alpha_results.json",
   "V4": "DECIDED 2026-10-22: liquid 9 symbols of ADR 0024 (see universe)",
   "first_block": "DECIDED 2026-10-22: 2026-12-01"
  },

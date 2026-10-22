@@ -131,7 +131,8 @@ def stepm_boot_t(x, q, rng, B, alpha=ALPHA, ac=None):
     says sigma* "can be obtained by applying the same algorithm to the
     bootstrap data matrix"; the same estimator (Hansen kappa variance) is
     applied to each resampled series.  (Goetze-Kuensch's "natural" estimator
-    is for moving/circular blocks and was not read.)"""
+    is for moving/circular blocks, not for the stationary bootstrap; it was
+    read later and is in ``pdf_check_sim.stepm_gk``, ADR 0030.)"""
     n = x.shape[0]
     ac = acov_all(x) if ac is None else ac
     sig = np.sqrt(hansen_var(ac, q) / n)
