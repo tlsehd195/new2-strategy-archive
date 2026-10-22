@@ -103,6 +103,12 @@ class TestOpen(unittest.TestCase):
         self.sha = "f" * 64
         self.members = members_of(self.pre, self.sha, [hour_spec(0, 2)] + [hour_spec(h, h + 2) for h in (6, 12)])
 
+    def open_tranche(self, *a, **kw):
+        """ACTIVE gate stand-in (the gate itself: test_pipeline_flow_20261022) and a temp registry."""
+        kw.setdefault("gate", {"lifecycle": "ACTIVE", "prereg_sha256": a[1]})
+        kw.setdefault("registry_path", self.td / "registry.jsonl")
+        return iw.open_tranche(*a, **kw)
+
     def test_tranches_follow_market_cap_order_and_skip_ineligible(self):
         chk = iw.data_check(self.data, self.pre)
         self.assertFalse(chk["AAAUSDT"]["eligible"])
@@ -112,7 +118,7 @@ class TestOpen(unittest.TestCase):
         self.assertEqual(tr["B"]["symbols"], [])
 
     def test_open_once_writes_history_first_and_refuses_reuse(self):
-        r = iw.open_tranche(self.pre, self.sha, "A", self.data, self.members, self.hist,
+        r = self.open_tranche(self.pre, self.sha, "A", self.data, self.members, self.hist,
                             self.td / "out", verified_fee_cost())
         self.assertEqual(r["symbols"], ["BTCUSDT", "BBBUSDT"])
         self.assertAlmostEqual(r["test"]["alpha"], 0.05 * 6 / 3.141592653589793 ** 2)
@@ -122,14 +128,14 @@ class TestOpen(unittest.TestCase):
         self.assertEqual(len(rows), 1)
         self.assertTrue((self.td / "out" / "IW1-A_result.json").exists())
         with self.assertRaises(iw.WindowRefused):
-            iw.open_tranche(self.pre, self.sha, "A", self.data, self.members, self.hist,
+            self.open_tranche(self.pre, self.sha, "A", self.data, self.members, self.hist,
                             self.td / "out2", verified_fee_cost())
 
     def test_no_bar_after_read_end_is_used(self):
         write_symbol(self.data, "BTCUSDT", ["2020-04"], seed=9)
         e = iw.load_symbol(self.data, "BTCUSDT", self.pre)
         self.assertLessEqual(e["bars"][-1].ts, iw._end_ms("2020-03-31"))
-        r = iw.open_tranche(self.pre, self.sha, "A", self.data, self.members, self.hist,
+        r = self.open_tranche(self.pre, self.sha, "A", self.data, self.members, self.hist,
                             self.td / "out", verified_fee_cost())
         self.assertLessEqual(r["data"]["BTCUSDT"]["n_bars"], 91 * 96)
 
@@ -138,9 +144,9 @@ class TestOpen(unittest.TestCase):
         bad["members"][0]["spec"]["exit"]["horizon"] = 16
         n0 = len(list(iter_jsonl(self.hist)))
         with self.assertRaises(iw.WindowRefused):
-            iw.open_tranche(self.pre, self.sha, "A", self.data, bad, self.hist, self.td / "o", verified_fee_cost())
+            self.open_tranche(self.pre, self.sha, "A", self.data, bad, self.hist, self.td / "o", verified_fee_cost())
         with self.assertRaises(iw.WindowRefused):
-            iw.open_tranche(self.pre, "0" * 64, "A", self.data, self.members, self.hist, self.td / "o",
+            self.open_tranche(self.pre, "0" * 64, "A", self.data, self.members, self.hist, self.td / "o",
                             verified_fee_cost())
         self.assertEqual(len(list(iter_jsonl(self.hist))), n0)
 
