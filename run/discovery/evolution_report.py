@@ -40,7 +40,11 @@ def _latest_context(evo: Path) -> Optional[str]:
     return last
 
 
-def build_report(state_dir: Path, context_id: Optional[str] = None) -> dict:
+def build_report(state_dir: Path, context_id: Optional[str] = None,
+                 registry_path: Optional[Path] = None) -> dict:
+    """``registry_path``: the independent-validation registry (ADR 0029); its
+    runs are reported in ``independent`` and never mixed with the DEV screen or
+    the in-state validation batches (which ran on the spent BTC/ETH windows)."""
     from pipeline import validation_failure_class
     evo = Path(state_dir) / "evolution"
     ctx = context_id or _latest_context(evo)
@@ -105,8 +109,27 @@ def build_report(state_dir: Path, context_id: Optional[str] = None) -> dict:
                 exposed += sum(1 for x in atts if x.get("exposed"))
         exposed += sum(len(v) for per in data["legacy_v1"].values() if isinstance(per, dict)
                        for v in per.values() if isinstance(v, list))
+    # consistency of the ledgers with each other (ADR 0029): nothing incomplete
+    # is counted as complete, and every count above can be traced to records
+    dev_ids = [r["strategy_id"] for r in dev]
+    dup_dev = sorted(k for k, n in Counter(dev_ids).items() if n > 1)
+    val_ids = [r["strategy_id"] for r in evals if r["stage"] == "validation"]
+    consistency = {
+        "duplicate_dev_records": dup_dev,
+        "duplicate_validation_records": sorted(k for k, n in Counter(val_ids).items() if n > 1),
+        # search-pool candidates only: robustness neighbours are DEV-evaluated without a status
+        "dev_ok_without_status": sorted(r["strategy_id"] for r in dev_ok
+                                        if r["strategy_id"] not in statuses and r["strategy_id"] in pool),
+        "status_without_dev_record": sorted(s for s, r in statuses.items()
+                                            if r.get("stage") in ("dev", "dev_screen") and s not in set(dev_ids)),
+        "incomplete_batches": sorted(b["batch_id"] for b in pre if b["batch_id"] not in results),
+    }
+    consistency["ok"] = not any(consistency.values())
+    independent = _independent(registry_path)
     return {
         "context_id": ctx,
+        "consistency": consistency,
+        "independent": independent,
         "candidates": {"registered_specs": len(specs), "by_source": dict(src),
                        "search_pool": len(pool),
                        "lineage_edges": len(lineage),
@@ -144,6 +167,16 @@ def _reverify_ids(evo: Path, ctx: Optional[str], statuses: dict) -> set:
     return out
 
 
+def _independent(registry_path: Optional[Path]) -> dict:
+    """Independent validation runs (validation_registry.jsonl): only COMPLETED
+    runs count; RUNNING runs are listed as incomplete."""
+    if registry_path is None:
+        from independent_window import DEFAULT_REGISTRY
+        registry_path = DEFAULT_REGISTRY
+    from validation_registry import ValidationRegistry
+    return {"registry": str(registry_path), **ValidationRegistry(Path(registry_path)).summary()}
+
+
 def _dedup(evo: Path, lineage: list) -> dict:
     """Audit trail of duplicate detection: every proposal the search refused
     (exact definition / identical behaviour, with its representative and
@@ -161,14 +194,21 @@ def _dedup(evo: Path, lineage: list) -> dict:
                 "reason": r["detail"].get("near_reason"), "operator": r["operator"],
                 "generation": r.get("generation")}
                for r in lineage if isinstance(r.get("detail"), dict) and "near_duplicate_of" in r["detail"]]
-    return {"counts": dict(kinds), "decisions": refused, "near_duplicates_kept": flagged,
+    unique: dict = {}
+    for x in refused:
+        unique.setdefault(x["kind"], set()).add(x["proposed_id"])
+    return {"counts": dict(kinds), "unique_proposed": {k: len(v) for k, v in sorted(unique.items())},
+            "counts_note": "counts = refusal decisions (one definition can be proposed and refused "
+                           "several times); unique_proposed = distinct refused definitions",
+            "decisions": refused, "near_duplicates_kept": flagged,
             "fingerprint_versions": sorted({r.get("fingerprint_version") or "pre fp-v2" for r in lineage})}
 
 
 def to_markdown(rep: dict) -> str:
     c, d, v = rep["candidates"], rep["dev"], rep["validation"]
     lines = [f"# Evolution report — context `{rep['context_id']}`", "",
-             "Derived from the ledgers by `run/discovery/evolution_report.py`. Not a strategy verdict.", "",
+             "Derived from the ledgers by `run/discovery/evolution_report.py`. Not a strategy verdict. "
+             "DEV screen pass is not a validation; only INDEPENDENT rows are independent evidence.", "",
              "| stage | count |", "|---|---|",
              f"| registered specifications | {c['registered_specs']} ({c['by_source']}) |",
              f"| search pool (seed + search) | {c['search_pool']} |",
@@ -179,8 +219,13 @@ def to_markdown(rep: dict) -> str:
              f"| statuses | {rep['statuses']} |",
              f"| outcomes (directive vocabulary) | {rep['outcomes']['total']} |",
              f"| outcomes by stage | {rep['outcomes']['by_stage']} |",
-             f"| dedup decisions | {rep['dedup']['counts']} |",
-             f"| survivors | {len(rep['survivors'])} |",
+             f"| dedup decisions (distinct definitions) | {rep['dedup']['counts']} ({rep['dedup']['unique_proposed']}) |",
+             f"| in-state validation survivors (spent BTC/ETH windows) | {len(rep['survivors'])} |",
+             f"| INDEPENDENT runs completed / incomplete | {rep['independent']['by_state'].get('COMPLETED', 0)} / "
+             f"{len(rep['independent']['incomplete_runs'])} |",
+             f"| INDEPENDENT members evaluated / passes | {rep['independent']['completed_members']} / "
+             f"{len(rep['independent']['independent_passes'])} |",
+             f"| ledger consistency | {'ok' if rep['consistency']['ok'] else {k: v for k, v in rep['consistency'].items() if v and k != 'ok'}} |",
              f"| locked TEST attempts / exposed uses | {rep['locked']['attempts']} / {rep['locked']['exposed_uses']} |", "",
              "## Validation members", "",
              "| strategy | outcome | class | status | per symbol n / gross / cost / net (bp) |",
