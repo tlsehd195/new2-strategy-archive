@@ -33,3 +33,4 @@
 | [0027](0027-paper-faithful-recheck-of-estimated-parts.md) | 추정·변형 항목을 논문 원문과 대조: alpha 지출=Tian–Ramdas와 같음, StepM bootstrap-t·Politis–White 블록·Dufour MMC·WS-R PrPl-EB 추가(기본값 그대로), 합성 오류율 재확인 | Accepted (측정·도구) |
 | [0028](0028-short-top-candidates-and-long-short-regime-mix-dev.md) | 숏 전용 상위 후보 성적, 롱·숏 묶음 상관과 국면별 비중 전환(앞/뒤 절반) DEV 점검: 우연 최대치 못 넘고 조합 이득 없음 | Accepted (측정만) |
 | [0029](0029-dev-to-independent-flow-prereg-gate-repro.md) | DEV→독립 검증 흐름 연결(등록 원장·재개), 사전등록 활성화 게이트, 재현성 번들, 비용 민감도·실제 거래 중복 진단, 재시작 결함 2건 수정 | Accepted |
+| [0030](0030-one-candidate-per-entry-signal-and-conservative-stop-fill.md) | 검증 배치에 진입 신호당 후보 하나(청산만 다른 변형 제외), 손절은 봉 극단가 체결(보수적): R6 재실행에서 DEV 통과 64→63, 배치 후보 33 | Accepted |
