@@ -367,8 +367,10 @@ def open_tranche(pre: Mapping, prereg_sha: str, tranche: str, data_dir: Path, me
     if series:
         n = len(next(iter(series.values())))
         q = default_q(n)
-        sm = stepm(series, alpha=alpha, B=int(tc["bootstrap_B"]), q=q, seed=int(tc["bootstrap_seed"]))
-        res.update({"rejected": sorted(sm["rejected"]), "steps": sm["steps"], "q": q, "n_days": n})
+        sm = stepm(series, alpha=alpha, B=int(tc["bootstrap_B"]), q=q, seed=int(tc["bootstrap_seed"]),
+                   studentize=tc.get("studentize", "fixed"))
+        res.update({"rejected": sorted(sm["rejected"]), "steps": sm["steps"], "q": q, "n_days": n,
+                    "stepm_method": sm["method"]})
     hp = {s: v["pooled_hac_p"] for s, v in per_member.items() if v["pooled_hac_p"] is not None}
     hk = sorted(hp)
     res["diag_by"] = sorted(s for s, ok in zip(hk, by_fdr([hp[s] for s in hk], len(ids), alpha)) if ok)
