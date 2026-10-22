@@ -8,15 +8,21 @@
  "why_this_null": "The e-process below is valid under this conditional-mean null whatever the dependence, volatility clustering or right tail of returns (Waudby-Smith & Ramdas 2010.09686 Prop. 2-3; Ville). It does NOT need i.i.d. blocks or a model of returns. It needs a LOWER bound on X_b, which is why the stop and the margin floor are part of the hypothesis.",
  "blocks": {
   "length": "one calendar month (simulated as 30 days)",
-  "first_block_start": "2026-12-01 suggested (first full month after v2's window starts; members/engine frozen before it). Still to be confirmed by the user.",
+  "first_block_start": "2026-12-01 (DECIDED 2026-10-22 by 동동, \"그대로 진행\"). Engine, bundle rule and this file must be frozen and committed with sha256 before it.",
   "warmup": "the engine may read any data strictly before the block start; entries only inside the block; every position is closed at or before the block end (the next block starts flat)",
   "no_end_date": "the e-process may be monitored after every block and stopped at any time; the error rate holds for any stopping rule (anytime-valid). A block's X_b is booked once, after the block ends, and is never revised."
  },
  "pipeline": {
   "engine": "OPEN: commit sha and config hash of run/discovery at freeze (filled in at freeze, never changed afterwards)",
-  "rerun_rule": "at each block start, run the DEV-only evolve search with the frozen code, config and seed on data up to the day before the block start; take the strategy (or bundle, decision V2) the frozen selection rule ranks first",
+  "rerun_rule": "at each block start, run the DEV-only evolve search with the frozen code, config and seed on data up to the day before the block start; take the top 5 strategies of the frozen selection rule and trade them as ONE equal-weight bundle (decision V2)",
   "no_human_choice": "no person may change the engine, the candidate list, the cost profile, the sizing or the selection between blocks. A change ends this family; the e-value at that moment is reported as the final result, and any new design is a new family with its own alpha.",
-  "flat_block": "if the selection rule picks nothing, X_b = 0 for that block (factor 1, no evidence either way)"
+  "flat_block": "if the selection rule picks nothing, X_b = 0 for that block (factor 1, no evidence either way)",
+  "bundle": {
+   "decided": "2026-10-22 by 동동 (\"너 선택대로\")",
+   "members": 5,
+   "weights": "equal; fewer than 5 eligible -> the eligible ones equally weighted, none -> flat block (X_b = 0)",
+   "why": "same unit as v2 D3; spreads single-rule noise (ADR 0021: bundles cut volatility); the e-process still tests ONE hypothesis (the pipeline's bundle)"
+  }
  },
  "sizing_and_bounds": {
   "vol_target": "position size such that the strategy's DEV daily volatility is 1 % of the block capital",
@@ -75,14 +81,31 @@
  },
  "open_decisions": {
   "V1": "DECIDED 2026-10-22: share forward data, Bonferroni split 7:3 (v2 0.0213, v3 0.0091), ratio confirmed by 동동. First block 2026-12-01 still a suggestion.",
-  "V2": "what the pipeline trades each block: the single top strategy, or an equal-weight bundle of the top 5 (as v2 D3)",
-  "V3": "bet rule: plug-in without prior (recommended) or a prior from spent windows shrunk by a fixed factor",
-  "V4": "universe: v2's 15-symbol basket or BTC/ETH only"
+  "V2": "DECIDED 2026-10-22: equal-weight bundle of the top 5 (see pipeline.bundle)",
+  "V3": "recommended: plug-in without prior (current e_process.bet_rule); not yet confirmed",
+  "V4": "DECIDED 2026-10-22: liquid 9 symbols of ADR 0024 (see universe)",
+  "first_block": "DECIDED 2026-10-22: 2026-12-01"
  },
  "not_allowed": [
   "opening IW1, BTC/ETH validation or locked windows for this design",
   "loosening alpha or replacing the e-process with a fixed-sample test after seeing interim e-values",
   "clipping block losses after the fact instead of the stop + margin floor (simulated type I 3-24 % at 120 blocks)",
   "connecting to the NEW2 trading system; this is research and paper evaluation only"
- ]
+ ],
+ "universe": {
+  "decided": "2026-10-22 by 동동 (\"너 선택대로\")",
+  "symbols": [
+   "BTCUSDT",
+   "ETHUSDT",
+   "BNBUSDT",
+   "XRPUSDT",
+   "SOLUSDT",
+   "ADAUSDT",
+   "DOGEUSDT",
+   "LTCUSDT",
+   "LINKUSDT"
+  ],
+  "rule": "ADR 0024 liquid-9 rule: one-side cost of a 10k USDT order <= 75 bp under assumed_public_v1 (chosen by cost only, not by performance)",
+  "note": "if a measured alt cost is sealed before the first block (cost rule), the 75 bp rule is re-applied with it and the list may change; a symbol that stops trading is kept with zero return afterwards"
+ }
 }
