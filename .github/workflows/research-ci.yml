@@ -84,7 +84,10 @@ jobs:
         shell: bash -o pipefail {0}
       - name: Root-level research tests (run/test_*.py, DEV-only tools; ADR 0025)
         working-directory: run
-        run: python -m unittest -v $(ls test_*.py | sed 's/\.py$//') 2>&1 | tail -n 20
+        # these DEV-only analysis tools use numpy/pandas (the engine in run/discovery stays stdlib-only)
+        run: |
+          python -m pip install --quiet "numpy==2.2.6" "pandas==2.2.3"
+          python -m unittest -v $(ls test_*.py | sed 's/\.py$//') 2>&1 | tail -n 20
         shell: bash -o pipefail {0}
       - name: Current-tool compile (run/*_dev.py and power-audit tools; legacy v1 scripts listed in run/LEGACY_SCRIPTS.md)
         run: python -m compileall -q run/*_dev.py run/power_audit_*.py run/test_*.py
