@@ -1,0 +1,88 @@
+{
+ "schema": "walkforward_evalue_prereg_v3_DRAFT",
+ "status": "DRAFT - NOT IN FORCE. Nothing reads this file. The current prereg v2 draft (run/audit/evidence_prereg_v2_20261021/forward_window_v2_DRAFT.json) is untouched. This becomes a prereg only after the open decisions below are made by the user, the engine commit and config hashes are filled in, and the file is committed with its sha256 BEFORE the first block starts.",
+ "drafted": "2026-10-22 (ADR 0025), from the synthetic simulations in sim_results.json of this directory",
+ "family": "walkforward-evalue-family-v3",
+ "hypothesis": "The strategy that the frozen engine picks using only data up to the start of a block makes money after cost in that block.",
+ "null_H0": "For every block b: E[X_b | everything known before block b starts] <= 0, where X_b is the realised net P&L of block b as a fraction of the capital given to the block (after cost, funding, the in-block stop and the margin floor).",
+ "why_this_null": "The e-process below is valid under this conditional-mean null whatever the dependence, volatility clustering or right tail of returns (Waudby-Smith & Ramdas 2010.09686 Prop. 2-3; Ville). It does NOT need i.i.d. blocks or a model of returns. It needs a LOWER bound on X_b, which is why the stop and the margin floor are part of the hypothesis.",
+ "blocks": {
+  "length": "one calendar month (simulated as 30 days)",
+  "first_block_start": "2026-12-01 suggested (first full month after v2's window starts; members/engine frozen before it). Still to be confirmed by the user.",
+  "warmup": "the engine may read any data strictly before the block start; entries only inside the block; every position is closed at or before the block end (the next block starts flat)",
+  "no_end_date": "the e-process may be monitored after every block and stopped at any time; the error rate holds for any stopping rule (anytime-valid). A block's X_b is booked once, after the block ends, and is never revised."
+ },
+ "pipeline": {
+  "engine": "OPEN: commit sha and config hash of run/discovery at freeze (filled in at freeze, never changed afterwards)",
+  "rerun_rule": "at each block start, run the DEV-only evolve search with the frozen code, config and seed on data up to the day before the block start; take the strategy (or bundle, decision V2) the frozen selection rule ranks first",
+  "no_human_choice": "no person may change the engine, the candidate list, the cost profile, the sizing or the selection between blocks. A change ends this family; the e-value at that moment is reported as the final result, and any new design is a new family with its own alpha.",
+  "flat_block": "if the selection rule picks nothing, X_b = 0 for that block (factor 1, no evidence either way)"
+ },
+ "sizing_and_bounds": {
+  "vol_target": "position size such that the strategy's DEV daily volatility is 1 % of the block capital",
+  "block_sd": 0.0548,
+  "stop_L": 0.0548,
+  "stop_rule": "if the block's running net P&L reaches -L, close everything and stay flat until the block ends",
+  "floor_B": 0.1095,
+  "floor_rule": "isolated margin of B: a gap through the stop cannot lose more than B of the block capital",
+  "gap_allowance_c": 0.0027,
+  "gap_allowance_reason": "the margin floor hands the trader the part of a gap below -B, so a no-skill strategy can show a slightly positive mean (simulated: up to +0.066 % per block with GJR + skewed t3 tails, +0.023 % with skewed t4); c = 0.27 % is 4x the worst simulated bias and 12x the t4 bias",
+  "units": "all three numbers are fractions of the block capital; they are fixed here, not estimated later"
+ },
+ "e_process": {
+  "factor": "1 + lam_b * Z_b, Z_b = (X_b - c) / (B + c) >= -1",
+  "bet_rule": "predictable plug-in (no prior on the edge): lam_b = clip(mu / (v + mu^2), 0, 0.75) with mu = sum(Z_1..Z_{b-1}) / (b - 1 + 3) and v = (3 * s0^2 + sum Z_i^2) / (b - 1 + 3), s0 = block_sd / (B + c)",
+  "lam_max": 0.75,
+  "E_b": "product of the factors of blocks 1..b (E_0 = 1)",
+  "reject_H0": "the first time E_b >= 1/alpha = 1/0.0091 (about 110)",
+  "prior_from_spent_windows": "NOT USED for the bet (decision V3). Spent BTC/ETH windows and DEV overstate Sharpe by about 3-5x (ADR 0021: H1 1.9-2.5 -> H2 0.44-0.90); simulated 5x overestimate lost half the power at true SR 3, the plug-in needs no prior.",
+  "breach": "if a realised X_b < -B ever occurs (margin floor failed, e.g. ADL or exchange failure), the family is VOID: no rejection may be claimed from that block on, and the breach is reported"
+ },
+ "alpha": 0.0091,
+ "alpha_note": "DECIDED 2026-10-22 (동동): Bonferroni split of the forward-window family alpha 0.0304 with prereg v2 (v2 0.0213 + v3 0.0091 = 0.0304). Reject when E_b >= 1/0.0091 (about 110). One hypothesis (the pipeline), no further split inside the family.",
+ "relation_to_v2": "DECIDED (V1, option 2): v2 and v3 share the forward data from 2026-11 and split alpha 7:3 (v2 0.0213, v3 0.0091). Evidence for the ratio: split_results.json in this directory. Ratio 7:3 confirmed by 동동 2026-10-22.",
+ "cost": {
+  "profile": "assumed_public_v1 unless a measured alt cost is sealed before the first block (same rule as v2 D2)",
+  "order_value": 10000.0
+ },
+ "simulated_operating_characteristics": {
+  "source": "sim_results.json (synthetic only, seed 20261022)",
+  "type1_max_over_null_processes_120_blocks": 0.0083,
+  "type1_plugin_max_120_blocks": 0.0021,
+  "power_plugin_garch_t4": {
+   "sr2_by_24": 0.28,
+   "sr2_by_36": 0.62,
+   "sr3_by_24": 0.76,
+   "sr3_by_36": 0.95,
+   "sr4_by_24": 0.94,
+   "sr1_by_60": 0.21
+  },
+  "median_blocks_to_reject_plugin": {
+   "sr2": 31,
+   "sr3": 19,
+   "sr4": 14
+  },
+  "toy_engine": "a 12-rule toy engine on an AR(0.2) asset reached block SR 1.4 and rejected in 57 % of paths by 60 blocks; on martingale assets it never exceeded 0.025 %",
+  "power_at_alpha_0.0091_garch_t4": {
+   "sr2_by_24": 0.057,
+   "sr2_by_36": 0.366,
+   "sr3_by_24": 0.472,
+   "sr3_by_36": 0.877,
+   "sr4_by_24": 0.84,
+   "sr4_by_36": 0.983
+  },
+  "note": "the other numbers in this block are at alpha 0.0304 (before the split)"
+ },
+ "open_decisions": {
+  "V1": "DECIDED 2026-10-22: share forward data, Bonferroni split 7:3 (v2 0.0213, v3 0.0091), ratio confirmed by 동동. First block 2026-12-01 still a suggestion.",
+  "V2": "what the pipeline trades each block: the single top strategy, or an equal-weight bundle of the top 5 (as v2 D3)",
+  "V3": "bet rule: plug-in without prior (recommended) or a prior from spent windows shrunk by a fixed factor",
+  "V4": "universe: v2's 15-symbol basket or BTC/ETH only"
+ },
+ "not_allowed": [
+  "opening IW1, BTC/ETH validation or locked windows for this design",
+  "loosening alpha or replacing the e-process with a fixed-sample test after seeing interim e-values",
+  "clipping block losses after the fact instead of the stop + margin floor (simulated type I 3-24 % at 120 blocks)",
+  "connecting to the NEW2 trading system; this is research and paper evaluation only"
+ ]
+}
