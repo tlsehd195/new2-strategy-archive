@@ -806,9 +806,10 @@ class EvolutionPipeline:
                     if len(set(len(v) for v in series.values())) != 1:
                         raise RuntimeError("validation series misaligned")
                     q = default_q(len(next(iter(series.values()))))
-                    sm = stepm(series, alpha=w["alpha"], B=vc["bootstrap_B"], q=q, seed=batch["seed"])
+                    sm = stepm(series, alpha=w["alpha"], B=vc["bootstrap_B"], q=q, seed=batch["seed"],
+                               studentize=vc.get("studentize", "fixed"))
                     res.update({"rejected": sm["rejected"], "steps": sm["steps"], "q": q,
-                                "n_days": sm["n"]})
+                                "n_days": sm["n"], "stepm_method": sm["method"]})
                     try:
                         res["spa"] = {k: v for k, v in spa_test(series, B=vc["bootstrap_B"], q=q,
                                                                  seed=batch["seed"]).items()

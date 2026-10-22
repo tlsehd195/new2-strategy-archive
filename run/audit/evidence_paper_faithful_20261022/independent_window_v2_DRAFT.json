@@ -1,0 +1,105 @@
+{
+ "schema": "independent_window_prereg_v1",
+ "window_id": "IW1",
+ "status": "DRAFT_NOT_IN_FORCE: config/independent_window_v1.json stays the prereg in force; apply this only at the re-freeze (members file), BEFORE tranche A is opened",
+ "supersedes": {
+  "file": "discovery/config/independent_window_v1.json",
+  "sha256": "49721cc7daadb4968390ebdab1ceee0e91c05eaa85a44ed8717d4fa69c0edf79"
+ },
+ "change_from_v1": "ONLY test.studentize: 'fixed' (v1 implicit) -> 'bootstrap_t' (Romano-Wolf 2005 eq. (11): sigma* recomputed on each resample). Reason: paper form; synthetic FWER at 5% closer to nominal (fixed sigma 5.25-6.0% / 11.4%, bootstrap-t 4.1-5.5% / 7.1%; ADR 0027). Stricter; alpha, members rule, tranches, cost unchanged. Decided by 동동 2026-10-22 ('추천하는 걸로 진행'), ADR 0028.",
+ "note": "Fixed 2026-10-21 BEFORE any strategy was evaluated on these data (only archive download and the data quality gate had run). A new search family, separate from the BTC/ETH validation windows that were already looked at 7 times. A change needs a new file (v2) with a reason; a change after a tranche was opened never re-opens it.",
+ "family": "independent-window-family-v1",
+ "independence": {
+  "claim": "time-disjoint: every read ends 2020-12-31, the day before runner.READ_START (2021-01-01). No DEV, validation, locked TEST or paper read in this archive covers 2020.",
+  "selection_read_start": "2021-01-01",
+  "not_claimed": "Seed hypotheses were partly translated from older NEW2 research and the literature; that research may have looked at 2020 markets in other ways. Assets move together, so tranches of the same year are not independent of each other."
+ },
+ "source": {
+  "archive": "Binance USD-M public monthly archive (data.binance.vision bucket, fetched through its S3 endpoint because the CDN host is blocked here)",
+  "kinds": [
+   "klines 15m",
+   "fundingRate"
+  ],
+  "fetcher": "run/discovery/data_fetch.py --base-url <S3 mirror> (SHA-256 against the published CHECKSUM, quality gate, provenance)"
+ },
+ "market_cap_order": {
+  "as_of": "2026-10-21",
+  "source": "coingecko.com front page (rank by market cap), cross-checked with coinmarketcap.com for ranks 1-14",
+  "excluded_kinds": "stablecoins (USDT, USDC, USDS, USDE, DAI, USD1), tokenized/real-world assets and tokens without a Binance USD-M perpetual archive (FIGR_HELOC, WBT, LEO, RAIN, CC)",
+  "order_ex_btc_eth": [
+   "BNBUSDT",
+   "XRPUSDT",
+   "SOLUSDT",
+   "TRXUSDT",
+   "ZECUSDT",
+   "HYPEUSDT",
+   "DOGEUSDT",
+   "XMRUSDT",
+   "LINKUSDT",
+   "ADAUSDT",
+   "NEARUSDT",
+   "XLMUSDT",
+   "BCHUSDT",
+   "LTCUSDT",
+   "UNIUSDT",
+   "AVAXUSDT",
+   "SUIUSDT"
+  ]
+ },
+ "period": {
+  "read_start": "2020-01-01",
+  "read_end": "2020-12-31",
+  "entry_start": "2020-02-01",
+  "warmup_days_after_first_bar": 30,
+  "exits": "every exit at or before the last bar of read_end (events that would end later are not taken)"
+ },
+ "eligibility": {
+  "rule": "a symbol is eligible when at least min_months complete months of 2020 have a kline file AND a funding file that pass the engine's quality gate (merged window and funding quality OK)",
+  "min_months": 6
+ },
+ "tranches": [
+  {
+   "id": "A",
+   "fixed": [
+    "BTCUSDT",
+    "ETHUSDT"
+   ],
+   "alts_from_order": 4,
+   "rule": "BTC and ETH (their 2020 data was never read) plus the first 4 ELIGIBLE symbols of order_ex_btc_eth; an ineligible symbol is skipped and the next one in order takes its place"
+  },
+  {
+   "id": "B",
+   "fixed": [],
+   "alts_from_order": 7,
+   "rule": "reserve: the next 7 eligible symbols after tranche A, in order. Not to be opened in the same decision as A."
+  }
+ ],
+ "members": {
+  "rule": "the validation candidates of one DEV-only evolve state directory, exactly as pipeline.validation_candidates() ranks them (DEV screen pass, capped DEV t, one per near-duplicate group), first max_batch_size of promotion_v3. Frozen to a members file (ids + canonical specs + context) BEFORE the tranche is opened.",
+  "max_batch_size": 20,
+  "transfer": "every member's rule is applied to every tranche symbol, whatever symbols its own spec names",
+  "excluded_before_test": "a member whose spec needs a dataset absent for 2020 (e.g. fng) is listed as excluded and is not part of the test family"
+ },
+ "cost": {
+  "profile": "assumed_public_v1",
+  "why": "symbol-agnostic and more expensive than the BTC/ETH public estimate (2bp half spread + 3bp slippage + 5bp taker fee per side); no 2020 or alt order books exist here",
+  "order_value": 10000.0
+ },
+ "test": {
+  "statistic": "per member, the equal-weight average over tranche symbols of the daily net return series (stats_mc.daily_series, bp, exit-day booking) on the common UTC-day grid [entry_start, read_end]",
+  "method": "Romano-Wolf StepM (stats_mc.stepm, studentize='bootstrap_t'), H0: mean <= 0, one-sided",
+  "studentize": "bootstrap_t",
+  "alpha_total_family": 0.05,
+  "alpha_spending": "tranche k (1-based, in the order tranches are opened) gets stats_mc.spending_alpha(k, 0.05); tranche A opened first gets 0.0304",
+  "bootstrap_B": 1000,
+  "bootstrap_seed": 7,
+  "q": "stats_mc.default_q(n_days)",
+  "pass": "StepM rejects H0 for the member AND pooled events >= 60 AND at least 30 days with a non-zero pooled return",
+  "diagnostics_not_gates": [
+   "per-symbol n, mean bp, HAC t",
+   "BH/BY on pooled HAC p"
+  ]
+ },
+ "single_use": "a tranche is opened at most once: a RESERVED marker is written before any strategy is evaluated, the window key is appended to run/discovery/validation_window_history.jsonl, and a key already in the history refuses the run",
+ "outcome_meaning": "PASSED_INDEPENDENT_WINDOW is research evidence only. Cost stays unverified, so locked TEST, paper and promotion rules (ADR 0009/0010) are unchanged."
+}

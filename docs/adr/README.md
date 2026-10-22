@@ -31,3 +31,4 @@
 | [0025](0025-walkforward-evalue-prereg-v3-draft.md) | 매 블록 e-값 누적 검증: 합성 시뮬레이션(1종 오류·검정력·사전분포·널 생성법)과 사전등록 v3 초안 (효력 없음) | Proposed |
 | [0026](0026-top5-bundle-regime-and-buy-and-hold.md) | 상위 5개 묶음 국면별(하락장) 성적과 단순 보유 비교(DEV, 가정 비용): 하락장 약 0, 수익은 상승장에 집중, 베타는 작음 | Accepted (측정만) |
 | [0027](0027-paper-faithful-recheck-of-estimated-parts.md) | 추정·변형 항목을 논문 원문과 대조: alpha 지출=Tian–Ramdas와 같음, StepM bootstrap-t·Politis–White 블록·Dufour MMC·WS-R PrPl-EB 추가(기본값 그대로), 합성 오류율 재확인 | Accepted (측정·도구) |
+| [0028](0028-adopt-prpl-eb-bootstrap-t-pbo005-as-drafts.md) | 사용자 결정으로 논문 그대로 채택(초안·새 버전, 효력 없음): e-값 v3 베팅 PrPl-EB, StepM bootstrap-t·PBO 0.05인 promotion_v4, IW1 v2 초안 | Accepted (초안) |
