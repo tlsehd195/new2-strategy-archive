@@ -159,6 +159,7 @@
   "v3_alpha": 0.0091,
   "v3_file": "run/audit/evidence_evalue_v3_20261022/walkforward_evalue_v3_DRAFT.json",
   "why_7_to_3": "run/audit/evidence_evalue_v3_20261022/split_results.json: with both earning the same edge, P(either rejects by 36 months) is nearly flat across splits (SR2 0.67-0.68, SR3 0.90-0.96), so the split decides WHEN evidence arrives. 7:3 keeps v2's 12-month power within 2-4 points of the unsplit test (SR2 0.675 -> 0.626, SR3 0.900 -> 0.880) while v3 still reaches SR3 0.88 / SR2 0.37 by 36 months.",
-  "power_table_note": "power_table below was computed at alpha 0.0304 and is now slightly optimistic for v2 (see split_results.json)"
+  "power_table_note": "power_table below was computed at alpha 0.0304 and is now slightly optimistic for v2 (see split_results.json)",
+  "ratio_confirmed": "2026-10-22 by 동동 (\"추천으로 해\"): 7:3 final"
  }
 }

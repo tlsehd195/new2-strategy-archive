@@ -40,7 +40,7 @@
  },
  "alpha": 0.0091,
  "alpha_note": "DECIDED 2026-10-22 (동동): Bonferroni split of the forward-window family alpha 0.0304 with prereg v2 (v2 0.0213 + v3 0.0091 = 0.0304). Reject when E_b >= 1/0.0091 (about 110). One hypothesis (the pipeline), no further split inside the family.",
- "relation_to_v2": "DECIDED (V1, option 2): v2 and v3 share the forward data from 2026-11 and split alpha 7:3 (v2 0.0213, v3 0.0091). Evidence for the ratio: split_results.json in this directory.",
+ "relation_to_v2": "DECIDED (V1, option 2): v2 and v3 share the forward data from 2026-11 and split alpha 7:3 (v2 0.0213, v3 0.0091). Evidence for the ratio: split_results.json in this directory. Ratio 7:3 confirmed by 동동 2026-10-22.",
  "cost": {
   "profile": "assumed_public_v1 unless a measured alt cost is sealed before the first block (same rule as v2 D2)",
   "order_value": 10000.0
@@ -74,7 +74,7 @@
   "note": "the other numbers in this block are at alpha 0.0304 (before the split)"
  },
  "open_decisions": {
-  "V1": "DECIDED 2026-10-22: share forward data, split alpha 7:3 (ratio itself to be confirmed by the user before freeze)",
+  "V1": "DECIDED 2026-10-22: share forward data, Bonferroni split 7:3 (v2 0.0213, v3 0.0091), ratio confirmed by 동동. First block 2026-12-01 still a suggestion.",
   "V2": "what the pipeline trades each block: the single top strategy, or an equal-weight bundle of the top 5 (as v2 D3)",
   "V3": "bet rule: plug-in without prior (recommended) or a prior from spent windows shrunk by a fixed factor",
   "V4": "universe: v2's 15-symbol basket or BTC/ETH only"
