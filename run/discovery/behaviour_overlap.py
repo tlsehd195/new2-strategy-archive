@@ -1,4 +1,4 @@
-"""Empirical behaviour overlap of candidates on their DEV trades (ADR 0025).
+"""Empirical behaviour overlap of candidates on their DEV trades (ADR 0027).
 
 ``evolution.behaviour_key`` / ``near_duplicate`` compare DEFINITIONS: they
 fold exact equivalences and flag thresholds within half a mutation step.
@@ -17,7 +17,7 @@ This module compares what the candidates actually DID on the DEV window:
 Same entries with different exits (another horizon or stop) are NOT
 identical: their risk differs, so they are never merged by this module.
 The diagnostic changes no candidate list and no gate; a policy that acts on
-it is a decision for the user (it is listed as a follow-up in ADR 0025).
+it is a decision for the user (it is listed as a follow-up in ADR 0027).
 """
 
 from __future__ import annotations

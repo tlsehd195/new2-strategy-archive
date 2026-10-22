@@ -124,7 +124,7 @@ evaluated) → `freeze-members` (members of one DEV-only state directory) →
 Environment (all optional, fail-closed when wrong):
 
 - `NEW2_DISCOVERY_ROOT` (default: this directory) — state/, results/, cycle_log.txt live here
-- `NEW2_DATA_DIR` (required, no default since ADR 0025) — must exist
+- `NEW2_DATA_DIR` (required, no default since ADR 0027) — must exist
 - the cost model is this repository's `cost_model.py` (no other repository, checkout,
   token or path is needed; `COINTRADER_SRC` is no longer read — directive 2026-10-20)
 - `NEW2_DISC_LOG` — log file (default `$NEW2_DISCOVERY_ROOT/cycle_log.txt`)

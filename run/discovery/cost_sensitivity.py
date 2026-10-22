@@ -1,4 +1,4 @@
-"""Cost sensitivity of a strategy on its DEV window (ADR 0025).
+"""Cost sensitivity of a strategy on its DEV window (ADR 0027).
 
 The cost model (``cost_model.CandleCostModel``) and its assumptions
 (``config/cost_assumed_public_v1.json`` or a sealed estimate / verification)

@@ -1,0 +1,53 @@
+design 0.5 1.0 0.5 0.007 0.3245 0.78075
+design 0.5 1.0 0.75 0.00575 0.325 0.779
+design 0.5 1.0 0.9 0.00775 0.32075 0.77275
+design 1.0 1.5 0.5 0.01225 0.317 0.80775
+design 1.0 1.5 0.75 0.00775 0.43275 0.8445
+design 1.0 1.5 0.9 0.011 0.44025 0.842
+design 1.0 2.0 0.5 0.00625 0.12 0.6615
+design 1.0 2.0 0.75 0.00925 0.377 0.818
+design 1.0 2.0 0.9 0.00775 0.4055 0.82825
+design 1.5 2.0 0.5 0.00775 0.1465 0.663
+design 1.5 2.0 0.75 0.01175 0.406 0.83
+design 1.5 2.0 0.9 0.0135 0.46625 0.837
+design 1.5 3.0 0.5 0.00175 0.00475 0.1365
+design 1.5 3.0 0.75 0.0085 0.12925 0.671
+design 1.5 3.0 0.9 0.009 0.27625 0.78475
+design 2.0 4.0 0.5 0.00025 0.0 0.00425
+design 2.0 4.0 0.75 0.00575 0.019 0.3025
+design 2.0 4.0 0.9 0.00775 0.07875 0.582
+type1 iid_normal 0.0 0.0 0.0016 0.05255
+type1 garch_t4 0.0 0.0 0.00085 0.0338
+type1 gjr_skewt 0.0 0.0 0.0021 0.14345
+type1 regime_t4 0.0 0.0 0.00155 0.05015
+type1 gjr_skewt3 0.0 0.0 0.0021 0.1557
+type1 garch_t4 -0.5 0.0 0.0 0.0008
+type1 ar_garch 0.0 0.05 0.00115 0.04175
+type1 ar_garch 0.0 -0.05 0.00075 0.03005
+power iid_normal 1.0 0.0168 0.0068
+power iid_normal 2.0 0.19 0.1224
+power iid_normal 3.0 0.6364 0.565
+power iid_normal 4.0 0.936 0.9238
+power garch_t4 1.0 0.0138 0.0052
+power garch_t4 2.0 0.2774 0.128
+power garch_t4 3.0 0.757 0.6506
+power garch_t4 4.0 0.9414 0.9432
+power regime_t4 1.0 0.0164 0.0064
+power regime_t4 2.0 0.2056 0.1186
+power regime_t4 3.0 0.635 0.5542
+power regime_t4 4.0 0.9176 0.9178
+prior 0.0 0.0002 {'sr1': 0.0002, 'sr2': 0.0012, 'sr3': 0.0012, 'sr5': 0.0012}
+prior 1.0 0.012 {'x0.5': 0.0, 'x1': 0.0082, 'x1.5': 0.0326, 'x2': 0.0386, 'x3': 0.04, 'x5': 0.0396}
+prior 2.0 0.2772 {'x0.5': 0.211, 'x1': 0.4484, 'x1.5': 0.4544, 'x2': 0.4544, 'x3': 0.4488, 'x5': 0.3376}
+prior 3.0 0.7662 {'x0.5': 0.8618, 'x1': 0.8862, 'x1.5': 0.886, 'x2': 0.8824, 'x3': 0.8418, 'x5': 0.4128}
+pipeline garch_t4 0.0 -0.0014494240597494143 -0.10841423090612665 0.0 0.00025
+pipeline gjr_skewt 0.0 -0.0015587717259503374 -0.09874478923091191 0.00025 0.00025
+pipeline regime_t4 0.0 -0.0014013310522550872 -0.0967451755167276 0.0 0.00025
+pipeline ar_garch 0.05 -5.48763481379914e-06 -0.000407172632300933 0.00175 0.00225
+pipeline ar_garch 0.1 0.004928658190613691 0.33428309653886235 0.01575 0.01675
+pipeline ar_garch 0.15 0.01312569962468203 0.8546059397393042 0.156 0.16
+pipeline ar_garch 0.2 0.023178383220004838 1.4046159679543417 0.567 0.58875
+mc_null garch_t4 0.0 {'sign_flip': np.float64(0.058), 'block_sign_flip': np.float64(0.048), 'stationary_boot': np.float64(0.002), 'iid_boot': np.float64(0.06)}
+mc_null regime_t4 0.0 {'sign_flip': np.float64(0.038), 'block_sign_flip': np.float64(0.045), 'stationary_boot': np.float64(0.004), 'iid_boot': np.float64(0.037)}
+mc_null gjr_skewt 0.0 {'sign_flip': np.float64(0.059), 'block_sign_flip': np.float64(0.045), 'stationary_boot': np.float64(0.004), 'iid_boot': np.float64(0.053)}
+mc_null ar_garch 0.05 {'sign_flip': np.float64(0.097), 'block_sign_flip': np.float64(0.063), 'stationary_boot': np.float64(0.005), 'iid_boot': np.float64(0.085)}

@@ -42,7 +42,7 @@ def _latest_context(evo: Path) -> Optional[str]:
 
 def build_report(state_dir: Path, context_id: Optional[str] = None,
                  registry_path: Optional[Path] = None) -> dict:
-    """``registry_path``: the independent-validation registry (ADR 0025); its
+    """``registry_path``: the independent-validation registry (ADR 0027); its
     runs are reported in ``independent`` and never mixed with the DEV screen or
     the in-state validation batches (which ran on the spent BTC/ETH windows)."""
     from pipeline import validation_failure_class
@@ -109,7 +109,7 @@ def build_report(state_dir: Path, context_id: Optional[str] = None,
                 exposed += sum(1 for x in atts if x.get("exposed"))
         exposed += sum(len(v) for per in data["legacy_v1"].values() if isinstance(per, dict)
                        for v in per.values() if isinstance(v, list))
-    # consistency of the ledgers with each other (ADR 0025): nothing incomplete
+    # consistency of the ledgers with each other (ADR 0027): nothing incomplete
     # is counted as complete, and every count above can be traced to records
     dev_ids = [r["strategy_id"] for r in dev]
     dup_dev = sorted(k for k, n in Counter(dev_ids).items() if n > 1)

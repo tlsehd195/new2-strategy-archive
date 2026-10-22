@@ -28,4 +28,6 @@
 | [0022](0022-false-negative-power-audit.md) | 거짓 음성 점검: 가상 엣지 검정력, 관문별 기여, 비용 가정, 숏 보류 후보, 검정력 개선 제안 | Accepted (측정만) |
 | [0023](0023-forward-window-prereg-v2-draft.md) | 사전등록 v2 초안: 12개월 전진 창, 바구니 평균 검정 (효력 없음) | Proposed |
 | [0024](0024-liquid-universe-dev-search.md) | 유동성 높은 9종목 DEV 재탐색 (가정 비용): 단일 후보 기준 미달, 묶음은 유망하나 베타 미확인 | Accepted (측정만) |
-| [0025](0025-dev-to-independent-flow-prereg-gate-repro.md) | DEV→독립 검증 흐름 연결(등록 원장·재개), 사전등록 활성화 게이트, 재현성 번들, 비용 민감도·실제 거래 중복 진단, 재시작 결함 2건 수정 | Accepted |
+| [0025](0025-walkforward-evalue-prereg-v3-draft.md) | 매 블록 e-값 누적 검증: 합성 시뮬레이션(1종 오류·검정력·사전분포·널 생성법)과 사전등록 v3 초안 (효력 없음) | Proposed |
+| [0026](0026-top5-bundle-regime-and-buy-and-hold.md) | 상위 5개 묶음 국면별(하락장) 성적과 단순 보유 비교(DEV, 가정 비용): 하락장 약 0, 수익은 상승장에 집중, 베타는 작음 | Accepted (측정만) |
+| [0027](0027-dev-to-independent-flow-prereg-gate-repro.md) | DEV→독립 검증 흐름 연결(등록 원장·재개), 사전등록 활성화 게이트, 재현성 번들, 비용 민감도·실제 거래 중복 진단, 재시작 결함 2건 수정 | Accepted |

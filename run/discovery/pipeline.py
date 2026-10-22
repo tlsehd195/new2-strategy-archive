@@ -569,7 +569,7 @@ class EvolutionPipeline:
         if have is not None:
             # the record exists; a run that stopped between the record and the
             # status write left the candidate without a status: write it now
-            # from the stored record (ADR 0025), never re-evaluate
+            # from the stored record (ADR 0027), never re-evaluate
             if record_status and self.statuses.status(sid, ctx) is None:
                 self._dev_status(sid, have)
             return have
@@ -873,7 +873,7 @@ class EvolutionPipeline:
             if prev is not None and prev.get("batch_id") == batch["batch_id"]:
                 # resumed batch (the run stopped after this member's record and
                 # before the RESULT row): reuse the record — never a second one —
-                # and require the recomputation to agree with it (ADR 0025)
+                # and require the recomputation to agree with it (ADR 0027)
                 if (prev.get("stepm_rejected"), prev.get("powered")) != (rejected, powered):
                     raise EvidenceTampered(f"{m}: resumed batch {batch['batch_id']} disagrees with "
                                            f"its stored validation record {prev['record_id']}")

@@ -1,6 +1,6 @@
 env -u COINTRADER_SRC NEW2_DATA_DIR=<unzipped upload f6379f02> NEW2_DISCOVERY_ROOT=<fresh> NEW2_DISC_MODE=evolve NEW2_COST_PROFILE=public_estimate:data/public_market_estimate/estimate_v1.json python3 run/discovery/runner.py --mode evolve --dev-only --rounds 8 --evals 4000
 # 2026-10-22T07:24:30Z..08:32:56Z (4105 s), exit 0, CYCLE_OK (= the pipeline ran; not a strategy verdict)
-# code: the ADR 0025 tree (same evaluation code as commit 2e95c01); context C2-bf2caecb65585a8d89c7
+# code: the ADR 0027 tree (same evaluation code as commit 2e95c01); context C2-bf2caecb65585a8d89c7
 python3 run/discovery/behaviour_overlap.py --state-dir <state> --data-dir <data> --ids r6_rerun_dev_pass_ids.txt --out r6_dev_pass_behaviour_overlap.json   # 7m52s
 python3 run/discovery/cost_sensitivity.py --state-dir <state> --data-dir <data> --ids <first 10 of validation_candidates()> --out r6_top10_cost_sensitivity   # 60m23s
 python3 run/discovery/repro_bundle.py dev --state-dir <state> --out r6_rerun_dev_repro_bundle.json
