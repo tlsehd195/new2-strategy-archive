@@ -67,17 +67,21 @@ EVO_CODE_FILES = tuple(sorted(set(CODE_FILES) | {"public_cost_estimate.py", "por
                                                  "paper_forward.py", "execution_sim.py",
                                                  "config/paper_forward_v1.json",
                                                  "config/exit_fill_v1.json",
-                                                 "config/candidate_selection_v1.json"}))
-#: which DEV screen-pass candidates go into a validation batch (ADR 0031)
-DEFAULT_SELECTION_CONFIG = Path(__file__).resolve().parent / "config" / "candidate_selection_v1.json"
+                                                 "config/candidate_selection_v1.json",
+                                                 "config/candidate_selection_v2.json"}))
+#: which DEV screen-pass candidates go into a validation batch (ADR 0031, v2: ADR 0033)
+DEFAULT_SELECTION_CONFIG = Path(__file__).resolve().parent / "config" / "candidate_selection_v2.json"
 
 
 def load_selection_config(path: Path = DEFAULT_SELECTION_CONFIG) -> dict:
+    """v2 (ADR 0033, default) or v1 (ADR 0031: no near-entry rule)."""
     cfg = json.loads(Path(path).read_text(encoding="utf-8"))
-    if cfg.get("schema") != "candidate_selection_v1" or not all(
-            isinstance(cfg.get(k), bool) for k in ("one_per_entry_signal", "one_per_near_duplicate")):
-        raise ValueError(f"{path}: not a candidate_selection_v1 config")
-    return cfg
+    keys = {"candidate_selection_v1": ("one_per_entry_signal", "one_per_near_duplicate"),
+            "candidate_selection_v2": ("one_per_entry_signal", "one_per_near_entry_signal",
+                                       "one_per_near_duplicate")}.get(cfg.get("schema"))
+    if keys is None or not all(isinstance(cfg.get(k), bool) for k in keys):
+        raise ValueError(f"{path}: not a candidate_selection_v1/v2 config")
+    return {"one_per_near_entry_signal": False, **cfg}
 DEFAULT_PROMOTION_CONFIG = Path(__file__).resolve().parent / "config" / "promotion_v3.json"
 #: append-only record of validation batches run on the real validation windows
 #: in state directories that no longer exist (ADR 0013).  Alpha spending is per
@@ -708,7 +712,7 @@ class EvolutionPipeline:
         # strategies already submitted to validation in this context: a twin is
         # a second look at the same hypothesis, not a new one.  The skipped ones
         # stay RESEARCH_ONLY and are listed by :meth:`near_duplicate_skips`.
-        from evolution import entry_signal_key, near_duplicate, near_signature
+        from evolution import entry_signal_key, near_duplicate, near_entry_duplicate, near_signature
         sel = load_selection_config()
         groups: dict = {}
         entries: dict = {}
@@ -722,9 +726,25 @@ class EvolutionPipeline:
             d = self.specs.get(sid)
             ek = entry_signal_key(d)
             if sel["one_per_entry_signal"] and ek in entries:
-                self._near_skips[sid] = {"twin": entries[ek], "reason": f"same entry signal {ek}, "
-                                         "different exit (one per entry signal, ADR 0031)"}
+                # evidence of the decision: both exits (horizon, stop, take-profit),
+                # so a skipped variant with another risk profile stays visible
+                ex, tex = canonicalize_spec(d)["exit"], canonicalize_spec(self.specs.get(entries[ek]))["exit"]
+                self._near_skips[sid] = {"twin": entries[ek], "entry_signal_key": ek,
+                                         "exit": ex, "twin_exit": tex,
+                                         "reason": f"same entry signal {ek}, "
+                                         + ("different exit" if ex != tex else "same exit")
+                                         + " (one per entry signal, ADR 0031)"}
                 continue
+            if sel["one_per_near_entry_signal"]:
+                # entries within half a mutation step, exit ignored (ADR 0033)
+                twin = next((o for o in entries.values()
+                             if near_entry_duplicate(d, self.specs.get(o)) is not None), None)
+                if twin is not None:
+                    self._near_skips[sid] = {
+                        "twin": twin, "entry_signal_key": ek, "exit": canonicalize_spec(d)["exit"],
+                        "twin_exit": canonicalize_spec(self.specs.get(twin))["exit"],
+                        "reason": near_entry_duplicate(d, self.specs.get(twin)) + " (ADR 0033)"}
+                    continue
             ns = near_signature(d)[0]
             twin = (next((o for o in groups.get(ns, []) if near_duplicate(d, self.specs.get(o)) is not None), None)
                     if sel["one_per_near_duplicate"] else None)

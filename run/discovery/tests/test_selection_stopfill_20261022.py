@@ -25,6 +25,7 @@ from test_pipeline import EDGE, NOISE, PipelineCase, SyntheticProvider, hour_spe
 PINNED_NEW = {
     "config/exit_fill_v1.json": "42f7f95dd610",
     "config/candidate_selection_v1.json": "07320d5c835e",
+    "config/candidate_selection_v2.json": "8e7042292b4f",
 }
 
 
@@ -56,7 +57,77 @@ class TestEntrySignalKey(unittest.TestCase):
         self.assertEqual(entry_signal_key(a), entry_signal_key(b))
 
 
+def zspec(thr=1.0, *, window=96, horizon=8, stop=None):
+    s = {"schema": "strategy_spec_v1", "direction": "long", "symbols": ["BTCUSDT"],
+         "entry": {"logic": "all", "conditions": [
+             {"feature": "ret_z", "params": {"window": window}, "op": "gt", "value": thr}]},
+         "filters": [], "exit": {"horizon": horizon}}
+    if stop:
+        s["exit"]["stop_loss_bp"] = stop
+    return s
+
+
+class TestEntryBoundaries(unittest.TestCase):
+    """ADR 0033: boundary cases of the exact entry key and the near-entry rule."""
+
+    def test_exact_equivalences_share_the_key(self):
+        a = hour_spec(10, 14)
+        b = json.loads(json.dumps(a))
+        b["entry"]["conditions"][0]["value"] = [9.5, 14]            # integer feature: same hours
+        c = json.loads(json.dumps(a))
+        c["entry"]["logic"] = "any"                                 # one condition: any == all
+        d = dict(json.loads(json.dumps(a)), risk={"risk_per_trade": 0.02})   # risk is not read
+        for x in (b, c, d):
+            self.assertEqual(entry_signal_key(a), entry_signal_key(x))
+
+    def test_near_entry_boundary_ignores_the_exit(self):
+        from evolution import _near_tolerance, near_duplicate, near_entry_duplicate
+        tol = _near_tolerance("ret_z")
+        a = zspec(1.0)
+        inside = zspec(1.0 + tol - 1e-6, horizon=24, stop=80.0)
+        edge = zspec(1.0 + tol, horizon=24, stop=80.0)
+        self.assertNotEqual(entry_signal_key(a), entry_signal_key(inside))   # not exact
+        self.assertIsNone(near_duplicate(a, inside))                         # exit differs: v1 misses it
+        self.assertIsNotNone(near_entry_duplicate(a, inside))                # v2 catches it
+        self.assertIsNone(near_entry_duplicate(a, edge))                     # exactly half a step: different
+        self.assertIsNone(near_entry_duplicate(a, zspec(1.0, window=97)))    # other parameter: different
+        self.assertIsNone(near_entry_duplicate(a, dict(zspec(1.0), direction="short")))
+        self.assertIsNone(near_entry_duplicate(a, dict(zspec(1.0), symbols=["ETHUSDT"])))
+
+    def test_integer_feature_has_no_near_band(self):
+        from evolution import near_entry_duplicate
+        self.assertIsNone(near_entry_duplicate(hour_spec(0, 2), hour_spec(0, 3, horizon=9)))
+        self.assertIsNotNone(near_entry_duplicate(hour_spec(0, 2), hour_spec(0, 2, horizon=9)))
+
+
 class TestOnePerEntrySignal(PipelineCase):
+    def test_near_entry_variant_with_other_exit_is_skipped_with_evidence(self):
+        from unittest import mock
+        p = self.pipe(SyntheticProvider())
+        e1, e2, *_ = self.register_all(p, [EDGE, hour_spec(0, 3)] + NOISE[:7])
+        self.assertTrue({e1, e2} <= set(p.validation_candidates()))
+        # same two DEV-pass ids, read as near-entry twins with different exits
+        fake = {e1: zspec(1.0), e2: zspec(1.1, horizon=24, stop=80.0)}
+        real = p.specs.get
+        with mock.patch.object(p.specs, "get", side_effect=lambda s: fake.get(s) or real(s)):
+            cands = set(p.validation_candidates())
+            self.assertEqual(len({e1, e2} & cands), 1)
+            skipped = ({e1, e2} - cands).pop()
+            skip = p.near_duplicate_skips()[skipped]
+        self.assertIn("exit ignored", skip["reason"])
+        self.assertNotEqual(skip["exit"], skip["twin_exit"])
+        self.assertEqual(skip["twin"], ({e1, e2} & cands).pop())
+
+    def test_exact_entry_skip_records_both_exits(self):
+        p = self.pipe(SyntheticProvider())
+        e1, e2, *_ = self.register_all(p, [EDGE, with_exit(EDGE, horizon=9)] + NOISE[:7])
+        cands = set(p.validation_candidates())
+        skipped = ({e1, e2} - cands).pop()
+        skip = p.near_duplicate_skips()[skipped]
+        self.assertEqual({skip["exit"]["horizon"], skip["twin_exit"]["horizon"]}, {8, 9})
+        self.assertIn("different exit", skip["reason"])
+        self.assertTrue(skip["entry_signal_key"].startswith("EK-"))
+
     def test_exit_variant_is_skipped_and_stays_research_only(self):
         p = self.pipe(SyntheticProvider())
         ctx = p.context_id()
@@ -101,6 +172,9 @@ class TestOnePerEntrySignal(PipelineCase):
             with self.assertRaises(ValueError):
                 load_selection_config(bad)
         self.assertTrue(load_selection_config()["one_per_entry_signal"])
+        self.assertTrue(load_selection_config()["one_per_near_entry_signal"])     # v2 default (ADR 0033)
+        v1 = load_selection_config(DISC / "config" / "candidate_selection_v1.json")
+        self.assertFalse(v1["one_per_near_entry_signal"])                         # v1: rule absent
 
 
 def bar(o, h, lo, c, ts=0):
