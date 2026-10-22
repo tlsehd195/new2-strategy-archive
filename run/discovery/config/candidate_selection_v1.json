@@ -1,0 +1,6 @@
+{
+ "schema": "candidate_selection_v1",
+ "note": "Fixed 2026-10-22 (ADR 0030). Which DEV screen-pass candidates go into a preregistered validation batch. one_per_entry_signal: candidates whose entry signal is exactly the same (same direction, symbols, timeframe, normal-form entry conditions and filters) and that differ only in the exit (horizon, stop-loss, take-profit) are one hypothesis; only the highest-ranked one (capped DEV t, then id) is submitted, counting members already submitted in the same context. The others stay RESEARCH_ONLY and are listed with the reason. one_per_near_duplicate keeps the earlier rule (ADR 0013/0019). This can only remove candidates from a batch, never add one.",
+ "one_per_entry_signal": true,
+ "one_per_near_duplicate": true
+}

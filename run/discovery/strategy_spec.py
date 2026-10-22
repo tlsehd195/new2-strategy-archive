@@ -41,6 +41,7 @@ from __future__ import annotations
 import json
 import math
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Callable, Mapping, Optional, Sequence
 
 SPEC_SCHEMA = "strategy_spec_v1"
@@ -537,16 +538,37 @@ def build_spec_signal(spec: Mapping, aux: Mapping) -> Callable:
     return sig
 
 
-def stop_exit_rule(spec: Mapping) -> Optional[Callable]:
+#: how an intrabar stop is filled (versioned config, ADR 0030)
+EXIT_FILL_CONFIG = Path(__file__).resolve().parent / "config" / "exit_fill_v1.json"
+STOP_FILLS = ("stop_price", "bar_extreme")
+
+
+def default_stop_fill(path: Path = EXIT_FILL_CONFIG) -> str:
+    """The stop fill mode of the versioned exit-fill config (refuses an unknown one)."""
+    cfg = json.loads(Path(path).read_text(encoding="utf-8"))
+    mode = cfg.get("stop_fill")
+    if cfg.get("schema") != "exit_fill_v1" or mode not in STOP_FILLS:
+        raise ValueError(f"{path}: not an exit_fill_v1 config with a known stop_fill ({mode!r})")
+    return mode
+
+
+def stop_exit_rule(spec: Mapping, stop_fill: Optional[str] = None) -> Optional[Callable]:
     """Intrabar stop-loss / take-profit exit for the event study, or None.
 
     Conservative fills: a bar that touches both levels counts as a stop; a
     bar that OPENS beyond a level fills at its open (gap), never at the
-    better level."""
+    better level.  ``stop_fill`` (default: ``config/exit_fill_v1.json``):
+    ``"bar_extreme"`` fills a stop touched inside a bar at that bar's worst
+    price (low for a long, high for a short) — stop slippage bounded by the
+    bar, never better than the stop price; ``"stop_price"`` is the earlier
+    exact fill at the stop level (an optimistic stop-market fill)."""
     s = canonicalize_spec(spec)
     sl, tp = s["exit"]["stop_loss_bp"], s["exit"]["take_profit_bp"]
     if sl is None and tp is None:
         return None
+    mode = default_stop_fill() if stop_fill is None else stop_fill
+    if mode not in STOP_FILLS:
+        raise ValueError(f"unknown stop_fill {mode!r} (one of {STOP_FILLS})")
 
     def rule(bars, entry_i: int, side: int, horizon: int):
         entry = bars[entry_i].open
@@ -561,6 +583,8 @@ def stop_exit_rule(spec: Mapping) -> Optional[Callable]:
                 if j > entry_i and gap:
                     return j, b.open, "stop_gap"
                 if touch:
+                    if mode == "bar_extreme":
+                        return j, (min(b.low, sl_px) if side == 1 else max(b.high, sl_px)), "stop"
                     return j, sl_px, "stop"
             if tp_px is not None:
                 gap = (b.open >= tp_px) if side == 1 else (b.open <= tp_px)

@@ -458,6 +458,16 @@ def behaviour_key(spec: Mapping) -> str:
     return "BK-" + hashlib.sha256(canonical_json(_behaviour_body(spec)).encode()).hexdigest()[:20]
 
 
+def entry_signal_key(spec: Mapping) -> str:
+    """Hash of WHEN a strategy enters (the behaviour key without the exit).
+
+    Two strategies with the same key take the same entries on every input and
+    differ only in how they leave (horizon, stop-loss, take-profit); a
+    validation batch treats them as one hypothesis (ADR 0030)."""
+    body = {k: v for k, v in _behaviour_body(spec).items() if k != "exit"}
+    return "EK-" + hashlib.sha256(canonical_json(body).encode()).hexdigest()[:20]
+
+
 def _near_tolerance(feature: str) -> float:
     """Half of the smallest deliberate threshold step of ``op_tweak_threshold``
     (0.25 on z-like scales, 5 on 0-100 scales): one mutation step is always a
