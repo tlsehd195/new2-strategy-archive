@@ -8,7 +8,7 @@
  "why_this_null": "The e-process below is valid under this conditional-mean null whatever the dependence, volatility clustering or right tail of returns (Waudby-Smith & Ramdas 2010.09686 Prop. 2-3; Ville). It does NOT need i.i.d. blocks or a model of returns. It needs a LOWER bound on X_b, which is why the stop and the margin floor are part of the hypothesis.",
  "blocks": {
   "length": "one calendar month (simulated as 30 days)",
-  "first_block_start": "2026-12-01 SUGGESTED ONLY, not decided (being explained to the user). Engine, members rule and this file must be frozen before it.",
+  "first_block_start": "2026-12-01 (DECIDED 2026-10-22 by 동동, \"그대로 진행\"). Engine, bundle rule and this file must be frozen and committed with sha256 before it.",
   "warmup": "the engine may read any data strictly before the block start; entries only inside the block; every position is closed at or before the block end (the next block starts flat)",
   "no_end_date": "the e-process may be monitored after every block and stopped at any time; the error rate holds for any stopping rule (anytime-valid). A block's X_b is booked once, after the block ends, and is never revised."
  },
@@ -83,7 +83,8 @@
   "V1": "DECIDED 2026-10-22: share forward data, Bonferroni split 7:3 (v2 0.0213, v3 0.0091), ratio confirmed by 동동. First block 2026-12-01 still a suggestion.",
   "V2": "DECIDED 2026-10-22: equal-weight bundle of the top 5 (see pipeline.bundle)",
   "V3": "recommended: plug-in without prior (current e_process.bet_rule); not yet confirmed",
-  "V4": "DECIDED 2026-10-22: liquid 9 symbols of ADR 0024 (see universe)"
+  "V4": "DECIDED 2026-10-22: liquid 9 symbols of ADR 0024 (see universe)",
+  "first_block": "DECIDED 2026-10-22: 2026-12-01"
  },
  "not_allowed": [
   "opening IW1, BTC/ETH validation or locked windows for this design",
