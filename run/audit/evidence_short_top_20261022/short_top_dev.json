@@ -1,0 +1,4691 @@
+{
+ "chance_level": {
+  "best_long_top_sharpe_pooled": 3.0610265914397834,
+  "best_short_top_sharpe_pooled": 1.5126287745183171,
+  "expected_max_sr_ann_if_N_unskilled": {
+   "N=1811": 3.9429209228369544,
+   "N=2558": 4.0500535430472375
+  },
+  "n_pool_unique": 1811,
+  "n_trials_run_sum": 2558,
+  "note": "scaled by the actual spread of Sharpe across all trials in the pool; an upper-ish yardstick for 'best of N with no skill', not a test",
+  "short_top_dsr": [
+   {
+    "dev_sharpe_ann_pooled_bp": 1.5126287745183171,
+    "dsr": {
+     "N=1811": 0.0,
+     "N=2558": 0.0
+    },
+    "id": "S-095f6120fb1aad42"
+   },
+   {
+    "dev_sharpe_ann_pooled_bp": 0.7539674928508288,
+    "dsr": {
+     "N=1811": 0.0,
+     "N=2558": 0.0
+    },
+    "id": "S-0f8f5a5da351a255"
+   },
+   {
+    "dev_sharpe_ann_pooled_bp": 0.7891061101038597,
+    "dsr": {
+     "N=1811": 0.0,
+     "N=2558": 0.0
+    },
+    "id": "S-2861618a74f378d3"
+   },
+   {
+    "dev_sharpe_ann_pooled_bp": 0.7765467991064887,
+    "dsr": {
+     "N=1811": 0.0,
+     "N=2558": 0.0
+    },
+    "id": "S-2f6ddb930f5fa84f"
+   },
+   {
+    "dev_sharpe_ann_pooled_bp": 1.2676168276870827,
+    "dsr": {
+     "N=1811": 0.0,
+     "N=2558": 0.0
+    },
+    "id": "S-31d8ccc131d7c023"
+   },
+   {
+    "dev_sharpe_ann_pooled_bp": 0.7853128536669536,
+    "dsr": {
+     "N=1811": 0.0,
+     "N=2558": 0.0
+    },
+    "id": "S-4c23e5a767bddd81"
+   },
+   {
+    "dev_sharpe_ann_pooled_bp": 1.1700789497193893,
+    "dsr": {
+     "N=1811": 0.0,
+     "N=2558": 0.0
+    },
+    "id": "S-4cb619d1760d7d0d"
+   },
+   {
+    "dev_sharpe_ann_pooled_bp": 1.1498340047539586,
+    "dsr": {
+     "N=1811": 0.0,
+     "N=2558": 0.0
+    },
+    "id": "S-52be6a42783fa11f"
+   },
+   {
+    "dev_sharpe_ann_pooled_bp": 0.7892165601452029,
+    "dsr": {
+     "N=1811": 0.0,
+     "N=2558": 0.0
+    },
+    "id": "S-64c93ca768432d6a"
+   },
+   {
+    "dev_sharpe_ann_pooled_bp": 0.871143440300118,
+    "dsr": {
+     "N=1811": 0.0,
+     "N=2558": 0.0
+    },
+    "id": "S-698a6b54bc33b518"
+   }
+  ],
+  "var_sr_daily_across_trials": 0.003640840167427243
+ },
+ "contexts": [
+  "C2-4249176cda367b00a3ab",
+  "C2-bcec99d22e7f0010f848"
+ ],
+ "cost": {
+  "primary": "archive.cost_model.CandleCostModel@sha256:9afb474b3d1ad38c#public_estimate:PE-371c80b76eeba61b6dd27843",
+  "stress": "archive.cost_model.CandleCostModel@sha256:9afb474b3d1ad38c#assumed:assumed_public_v1:b6478c34e5f1"
+ },
+ "data": "DEV only (BTC/ETH engine DEV windows)",
+ "dev_days": [
+  "2021-01-01",
+  "2025-10-29"
+ ],
+ "dev_years": 4.83013698630137,
+ "long_bundles": {
+  "long_top10": {
+   "H1": {
+    "ann_return_pct": 16.281590359261692,
+    "ann_vol_pct": 8.536946320772508,
+    "days": 881,
+    "mdd_pct": 4.501412118838211,
+    "months": 29,
+    "pos_month_share": 0.7241379310344828,
+    "sharpe_ann": 1.907191371186737,
+    "total_pct": 39.298852346601485,
+    "worst_month_pct": -3.5241130411222676
+   },
+   "H2": {
+    "ann_return_pct": 5.902028662427988,
+    "ann_vol_pct": 4.839319023064693,
+    "days": 882,
+    "mdd_pct": 6.236647984743468,
+    "months": 29,
+    "pos_month_share": 0.5172413793103449,
+    "sharpe_ann": 1.2195990043843588,
+    "total_pct": 14.261888439072557,
+    "worst_month_pct": -2.4246630039189063
+   },
+   "all": {
+    "ann_return_pct": 11.088865789433372,
+    "ann_vol_pct": 6.941304050765414,
+    "days": 1763,
+    "mdd_pct": 7.370364026213565,
+    "months": 58,
+    "pos_month_share": 0.6206896551724138,
+    "sharpe_ann": 1.5975190984769796,
+    "total_pct": 53.56074078567403,
+    "worst_month_pct": -3.5241130411222676
+   },
+   "beta_to_market": 0.02178333667599021,
+   "corr_to_market": 0.223987489246722,
+   "down_trend": {
+    "ann_return_pct": 6.597091831642285,
+    "days": 658,
+    "sharpe_ann": 0.9899615333340047,
+    "total_pct": 11.892839521152393
+   },
+   "members": [
+    "S-852c9b660c650bb9",
+    "S-9bc5bb677faa0dd3",
+    "S-f46972b73316b7a2",
+    "S-1df19a12439b25fd",
+    "S-4b7c7d4624037064",
+    "S-258fb669365d964a",
+    "S-c7f102004029c38c",
+    "S-808166cdc1cd553f",
+    "S-80fe4b122603f292",
+    "S-ad366ea4baba2f6f"
+   ],
+   "n_members": 10,
+   "stress_all": {
+    "ann_return_pct": 5.627781821131283,
+    "ann_vol_pct": 6.810067530628969,
+    "days": 1763,
+    "mdd_pct": 13.464417870684027,
+    "months": 58,
+    "pos_month_share": 0.5517241379310345,
+    "sharpe_ann": 0.8263914852268003,
+    "total_pct": 27.182957125080677,
+    "worst_month_pct": -4.762210685172774
+   },
+   "up_trend": {
+    "ann_return_pct": 13.763605395068247,
+    "days": 1105,
+    "sharpe_ann": 1.938380150001706,
+    "total_pct": 41.66790126452168
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": -9.307313553057629,
+    "days": 176,
+    "sharpe_ann": -2.510328414386078,
+    "total_pct": -4.4879100968168295
+   },
+   "year_2022": {
+    "ann_return_pct": 10.012028517597372,
+    "days": 365,
+    "sharpe_ann": 1.3850532063538776,
+    "total_pct": 10.012028517597372
+   }
+  },
+  "long_top5": {
+   "H1": {
+    "ann_return_pct": 9.63315169045028,
+    "ann_vol_pct": 4.9994643907333005,
+    "days": 881,
+    "mdd_pct": 3.1376200637882476,
+    "months": 29,
+    "pos_month_share": 0.8275862068965517,
+    "sharpe_ann": 1.9268367444132006,
+    "total_pct": 23.25152503914162,
+    "worst_month_pct": -1.0622941717146048
+   },
+   "H2": {
+    "ann_return_pct": 4.315279826610186,
+    "ann_vol_pct": 2.309098525703054,
+    "days": 882,
+    "mdd_pct": 0.4677984298312392,
+    "months": 29,
+    "pos_month_share": 0.4482758620689655,
+    "sharpe_ann": 1.8688158078037433,
+    "total_pct": 10.427607690603244,
+    "worst_month_pct": -0.2440409101051979
+   },
+   "all": {
+    "ann_return_pct": 6.972707570253478,
+    "ann_vol_pct": 3.894673978831276,
+    "days": 1763,
+    "mdd_pct": 3.1376200637882476,
+    "months": 58,
+    "pos_month_share": 0.6379310344827587,
+    "sharpe_ann": 1.7903186783161413,
+    "total_pct": 33.67913272974486,
+    "worst_month_pct": -1.0622941717146048
+   },
+   "beta_to_market": 0.010392227829962878,
+   "corr_to_market": 0.19044868413962354,
+   "down_trend": {
+    "ann_return_pct": 6.268218729112448,
+    "days": 658,
+    "sharpe_ann": 1.3150701047146414,
+    "total_pct": 11.299966914399974
+   },
+   "members": [
+    "S-852c9b660c650bb9",
+    "S-9bc5bb677faa0dd3",
+    "S-f46972b73316b7a2",
+    "S-1df19a12439b25fd",
+    "S-4b7c7d4624037064"
+   ],
+   "n_members": 5,
+   "stress_all": {
+    "ann_return_pct": 3.783304427753899,
+    "ann_vol_pct": 3.7782379777381063,
+    "days": 1763,
+    "mdd_pct": 3.6760413708068533,
+    "months": 58,
+    "pos_month_share": 0.4482758620689655,
+    "sharpe_ann": 1.0013409557697648,
+    "total_pct": 18.273878646931845,
+    "worst_month_pct": -1.3354427268392322
+   },
+   "up_trend": {
+    "ann_return_pct": 7.3922131426252395,
+    "days": 1105,
+    "sharpe_ann": 2.2611850071451154,
+    "total_pct": 22.3791658153449
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": -4.9048449657559585,
+    "days": 176,
+    "sharpe_ann": -0.9138730060465311,
+    "total_pct": -2.365075928693284
+   },
+   "year_2022": {
+    "ann_return_pct": 8.404333259807586,
+    "days": 365,
+    "sharpe_ann": 1.511299430360239,
+    "total_pct": 8.404333259807586
+   }
+  }
+ },
+ "long_top": [
+  {
+   "beta_to_market": 0.0019922309996705237,
+   "corr_to_market": 0.14245447761154692,
+   "dev_cost_share": 0.5371136713691388,
+   "dev_fold_pos_share": 1.0,
+   "dev_mean_bp": 9.535533869146612,
+   "dev_status": "RESEARCH_ONLY",
+   "dev_t": 6.3784822089544155,
+   "direction": "long",
+   "down_trend": {
+    "ann_return_pct": 2.5174143408626892,
+    "days": 658,
+    "sharpe_ann": 3.2068565325761393,
+    "total_pct": 4.538242839144245
+   },
+   "family": "spec:rsi+volume_z:long",
+   "gross": {
+    "ann_return_pct": 5.2574742870183755,
+    "ann_vol_pct": 1.720193451264682,
+    "days": 1763,
+    "mdd_pct": 1.3556789917435488,
+    "months": 58,
+    "pos_month_share": 0.4827586206896552,
+    "sharpe_ann": 3.0563273468766514,
+    "total_pct": 25.394321008255865,
+    "worst_month_pct": -0.10567899174357409
+   },
+   "horizon_bars": 128,
+   "id": "S-852c9b660c650bb9",
+   "primary": {
+    "ann_return_pct": 2.132108593997501,
+    "ann_vol_pct": 0.9981688557103258,
+    "days": 1763,
+    "mdd_pct": 1.535675396938987,
+    "months": 58,
+    "pos_month_share": 0.4827586206896552,
+    "sharpe_ann": 2.1360199547402536,
+    "total_pct": 10.298376578678335,
+    "worst_month_pct": -0.981438246130491
+   },
+   "profile": {
+    "gross_bp_mean": 23.51326019282952,
+    "hold_hours_mean": 0.6273148148148148,
+    "hold_hours_median": 0.0,
+    "net_bp_mean": 9.535533869146612,
+    "top5pct_share_of_profit": 0.05637822609738124,
+    "trades": 108,
+    "trades_by_symbol": {
+     "BTCUSDT": 108
+    },
+    "trades_per_year": 22.359614293817355,
+    "win_share": 0.9907407407407407
+   },
+   "sharpe_H1": 2.7483171253722576,
+   "sharpe_H2": 1.864016615976584,
+   "stress": {
+    "ann_return_pct": -1.1073256198093306,
+    "ann_vol_pct": 0.8446764539268586,
+    "days": 1763,
+    "mdd_pct": 5.348534432120136,
+    "months": 58,
+    "pos_month_share": 0.05172413793103448,
+    "sharpe_ann": -1.3109464750218014,
+    "total_pct": -5.348534432120136,
+    "worst_month_pct": -1.879438319746479
+   },
+   "symbols": [
+    "BTCUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 1.9026686107963298,
+    "days": 1105,
+    "sharpe_ann": 1.720440499685815,
+    "total_pct": 5.760133739534094
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 0.22270548373712695,
+    "days": 176,
+    "sharpe_ann": 1.440091537494626,
+    "total_pct": 0.1073867538020119
+   },
+   "year_2022": {
+    "ann_return_pct": 3.872553530103589,
+    "days": 365,
+    "sharpe_ann": 4.070204497539018,
+    "total_pct": 3.872553530103589
+   }
+  },
+  {
+   "beta_to_market": 0.0022642453998798777,
+   "corr_to_market": 0.1583098734983002,
+   "dev_cost_share": 0.5385730070545316,
+   "dev_fold_pos_share": 1.0,
+   "dev_mean_bp": 9.654334779906646,
+   "dev_status": "RESEARCH_ONLY",
+   "dev_t": 6.982439833282675,
+   "direction": "long",
+   "down_trend": {
+    "ann_return_pct": 2.5787993852375366,
+    "days": 658,
+    "sharpe_ann": 3.135062770965178,
+    "total_pct": 4.648904097222737
+   },
+   "family": "spec:rsi+volume_z:long",
+   "gross": {
+    "ann_return_pct": 5.723299584806227,
+    "ann_vol_pct": 1.7863469129545466,
+    "days": 1763,
+    "mdd_pct": 1.3556789917435488,
+    "months": 58,
+    "pos_month_share": 0.5172413793103449,
+    "sharpe_ann": 3.2039127133150846,
+    "total_pct": 27.644321008255808,
+    "worst_month_pct": -0.10567899174357409
+   },
+   "horizon_bars": 128,
+   "id": "S-9bc5bb677faa0dd3",
+   "primary": {
+    "ann_return_pct": 2.3385613543727355,
+    "ann_vol_pct": 1.0208358616641595,
+    "days": 1763,
+    "mdd_pct": 1.5356753969389878,
+    "months": 58,
+    "pos_month_share": 0.5172413793103449,
+    "sharpe_ann": 2.2908299386744004,
+    "total_pct": 11.295571692490771,
+    "worst_month_pct": -0.981438246130491
+   },
+   "profile": {
+    "gross_bp_mean": 23.627624793381056,
+    "hold_hours_mean": 0.5854700854700855,
+    "hold_hours_median": 0.0,
+    "net_bp_mean": 9.654334779906646,
+    "top5pct_share_of_profit": 0.05199672746378117,
+    "trades": 117,
+    "trades_by_symbol": {
+     "BTCUSDT": 117
+    },
+    "trades_per_year": 24.2229154849688,
+    "win_share": 0.9914529914529915
+   },
+   "sharpe_H1": 2.979314951167532,
+   "sharpe_H2": 1.864016615976584,
+   "stress": {
+    "ann_return_pct": -1.1626760568470198,
+    "ann_vol_pct": 0.8477513313464233,
+    "days": 1763,
+    "mdd_pct": 5.615884625263824,
+    "months": 58,
+    "pos_month_share": 0.05172413793103448,
+    "sharpe_ann": -1.3714824310572578,
+    "total_pct": -5.615884625263824,
+    "worst_month_pct": -1.879438319746479
+   },
+   "symbols": [
+    "BTCUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 2.1955055857672705,
+    "days": 1105,
+    "sharpe_ann": 1.9555973480402529,
+    "total_pct": 6.646667595268038
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 0.22270548373712695,
+    "days": 176,
+    "sharpe_ann": 1.440091537494626,
+    "total_pct": 0.1073867538020119
+   },
+   "year_2022": {
+    "ann_return_pct": 3.983214788182081,
+    "days": 365,
+    "sharpe_ann": 3.956844221835283,
+    "total_pct": 3.983214788182081
+   }
+  },
+  {
+   "beta_to_market": 0.008575191123761686,
+   "corr_to_market": 0.1345131479954445,
+   "dev_cost_share": 0.10415158940143862,
+   "dev_fold_pos_share": 1.0,
+   "dev_mean_bp": 88.88164306498268,
+   "dev_status": "RESEARCH_ONLY",
+   "dev_t": 3.3305095877290447,
+   "direction": "long",
+   "down_trend": {
+    "ann_return_pct": 3.420853008533537,
+    "days": 658,
+    "sharpe_ann": 1.1964604789021824,
+    "total_pct": 6.166907615383747
+   },
+   "family": "spec:breakout_k+volume_z:long",
+   "gross": {
+    "ann_return_pct": 8.50994736493771,
+    "ann_vol_pct": 4.70529947787161,
+    "days": 1763,
+    "mdd_pct": 2.719444283905432,
+    "months": 58,
+    "pos_month_share": 0.46551724137931033,
+    "sharpe_ann": 1.8085878284599834,
+    "total_pct": 41.10421151886352,
+    "worst_month_pct": -1.7643002387739748
+   },
+   "horizon_bars": 32,
+   "id": "S-f46972b73316b7a2",
+   "primary": {
+    "ann_return_pct": 7.176575093760795,
+    "ann_vol_pct": 4.550084875355417,
+    "days": 1763,
+    "mdd_pct": 3.0192329306627084,
+    "months": 58,
+    "pos_month_share": 0.4482758620689655,
+    "sharpe_ann": 1.5772398296636647,
+    "total_pct": 34.66384079534323,
+    "worst_month_pct": -1.9888556962288666
+   },
+   "profile": {
+    "gross_bp_mean": 105.39541415093208,
+    "hold_hours_mean": 8.0,
+    "hold_hours_median": 8.0,
+    "net_bp_mean": 88.88164306498268,
+    "top5pct_share_of_profit": 0.26627887709225095,
+    "trades": 78,
+    "trades_by_symbol": {
+     "BTCUSDT": 36,
+     "ETHUSDT": 42
+    },
+    "trades_per_year": 16.148610323312536,
+    "win_share": 0.5769230769230769
+   },
+   "sharpe_H1": 1.1062559420816305,
+   "sharpe_H2": 1.974333144344547,
+   "stress": {
+    "ann_return_pct": 5.372548126540703,
+    "ann_vol_pct": 4.398616757953462,
+    "days": 1763,
+    "mdd_pct": 3.837405966214293,
+    "months": 58,
+    "pos_month_share": 0.39655172413793105,
+    "sharpe_ann": 1.221417646087535,
+    "total_pct": 25.950143416688373,
+    "worst_month_pct": -2.329242315792094
+   },
+   "symbols": [
+    "BTCUSDT",
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 9.413014127316938,
+    "days": 1105,
+    "sharpe_ann": 1.7744260267777712,
+    "total_pct": 28.496933179959495
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": -0.3228250014108017,
+    "days": 176,
+    "sharpe_ann": -1.440091537494626,
+    "total_pct": -0.1556635623241126
+   },
+   "year_2022": {
+    "ann_return_pct": 2.6913429574396526,
+    "days": 365,
+    "sharpe_ann": 0.8572845274210307,
+    "total_pct": 2.6913429574396526
+   }
+  },
+  {
+   "beta_to_market": 0.008161673367909378,
+   "corr_to_market": 0.13037670211366828,
+   "dev_cost_share": 0.09929469687525357,
+   "dev_fold_pos_share": 1.0,
+   "dev_mean_bp": 94.21542235164092,
+   "dev_status": "RESEARCH_ONLY",
+   "dev_t": 3.0987212756225224,
+   "direction": "long",
+   "down_trend": {
+    "ann_return_pct": 1.7324953748240586,
+    "days": 658,
+    "sharpe_ann": 0.6879027256077301,
+    "total_pct": 3.1232382373540566
+   },
+   "family": "spec:breakout_k+volume_z:long",
+   "gross": {
+    "ann_return_pct": 7.573183407728948,
+    "ann_vol_pct": 4.613398365695417,
+    "days": 1763,
+    "mdd_pct": 2.577357952970175,
+    "months": 58,
+    "pos_month_share": 0.41379310344827586,
+    "sharpe_ann": 1.6415628583133153,
+    "total_pct": 36.579513281715435,
+    "worst_month_pct": -1.622213907838721
+   },
+   "horizon_bars": 32,
+   "id": "S-1df19a12439b25fd",
+   "primary": {
+    "ann_return_pct": 6.436895985397135,
+    "ann_vol_pct": 4.468066671482627,
+    "days": 1763,
+    "mdd_pct": 2.8026708780618392,
+    "months": 58,
+    "pos_month_share": 0.3620689655172414,
+    "sharpe_ann": 1.440644569267628,
+    "total_pct": 31.091089376041495,
+    "worst_month_pct": -1.7722936436279957
+   },
+   "profile": {
+    "gross_bp_mean": 110.84700994459223,
+    "hold_hours_mean": 8.0,
+    "hold_hours_median": 8.0,
+    "net_bp_mean": 94.21542235164092,
+    "top5pct_share_of_profit": 0.29768130111022373,
+    "trades": 66,
+    "trades_by_symbol": {
+     "BTCUSDT": 31,
+     "ETHUSDT": 35
+    },
+    "trades_per_year": 13.664208735110607,
+    "win_share": 0.5757575757575758
+   },
+   "sharpe_H1": 1.3036266870380533,
+   "sharpe_H2": 1.5655147391601159,
+   "stress": {
+    "ann_return_pct": 4.9111212431741,
+    "ann_vol_pct": 4.330557250258726,
+    "days": 1763,
+    "mdd_pct": 3.507885681348103,
+    "months": 58,
+    "pos_month_share": 0.3448275862068966,
+    "sharpe_ann": 1.134062190929513,
+    "total_pct": 23.721388360865575,
+    "worst_month_pct": -1.9997220309259047
+   },
+   "symbols": [
+    "BTCUSDT",
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 9.238249471150153,
+    "days": 1105,
+    "sharpe_ann": 1.7449356900697834,
+    "total_pct": 27.967851138687447
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": -0.3228250014108017,
+    "days": 176,
+    "sharpe_ann": -1.440091537494626,
+    "total_pct": -0.1556635623241126
+   },
+   "year_2022": {
+    "ann_return_pct": 3.4526460830642187,
+    "days": 365,
+    "sharpe_ann": 1.2564300833324191,
+    "total_pct": 3.4526460830642183
+   }
+  },
+  {
+   "beta_to_market": 0.03096779825859292,
+   "corr_to_market": 0.13531223190549865,
+   "dev_cost_share": 0.06457508655949187,
+   "dev_fold_pos_share": 1.0,
+   "dev_mean_bp": 73.01512180736083,
+   "dev_status": "RESEARCH_ONLY",
+   "dev_t": 2.9258799870836056,
+   "direction": "long",
+   "down_trend": {
+    "ann_return_pct": 21.091531536104416,
+    "days": 658,
+    "sharpe_ann": 0.9533640805418985,
+    "total_pct": 38.02254178289508
+   },
+   "family": "spec:ret_z:long",
+   "gross": {
+    "ann_return_pct": 20.065876900518415,
+    "ann_vol_pct": 16.47553582124106,
+    "days": 1763,
+    "mdd_pct": 15.895714403319246,
+    "months": 58,
+    "pos_month_share": 0.39655172413793105,
+    "sharpe_ann": 1.217919533436267,
+    "total_pct": 96.92093417976423,
+    "worst_month_pct": -5.180530733756994
+   },
+   "horizon_bars": 64,
+   "id": "S-4b7c7d4624037064",
+   "primary": {
+    "ann_return_pct": 16.779396823739216,
+    "ann_vol_pct": 16.334795341610906,
+    "days": 1763,
+    "mdd_pct": 16.588440095268595,
+    "months": 58,
+    "pos_month_share": 0.3275862068965517,
+    "sharpe_ann": 1.027218062597683,
+    "total_pct": 81.0467852061705,
+    "worst_month_pct": -5.298019427875893
+   },
+   "profile": {
+    "gross_bp_mean": 87.31615691870655,
+    "hold_hours_mean": 16.0,
+    "hold_hours_median": 16.0,
+    "net_bp_mean": 73.01512180736083,
+    "top5pct_share_of_profit": 0.34188522719208836,
+    "trades": 111,
+    "trades_by_symbol": {
+     "BTCUSDT": 111
+    },
+    "trades_per_year": 22.98071469086784,
+    "win_share": 0.5405405405405406
+   },
+   "sharpe_H1": 1.3476567076209922,
+   "sharpe_H2": 0.6706627364020058,
+   "stress": {
+    "ann_return_pct": 10.902854445711043,
+    "ann_vol_pct": 16.199508424951482,
+    "days": 1763,
+    "mdd_pct": 17.88050824633833,
+    "months": 58,
+    "pos_month_share": 0.27586206896551724,
+    "sharpe_ann": 0.673036129227094,
+    "total_pct": 52.662280514489225,
+    "worst_month_pct": -5.632873403000506
+   },
+   "symbols": [
+    "BTCUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 14.211627918095504,
+    "days": 1105,
+    "sharpe_ann": 1.2252335927066973,
+    "total_pct": 43.02424342327543
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": -24.323985793432442,
+    "days": 176,
+    "sharpe_ann": -0.9065821369222788,
+    "total_pct": -11.728826026422219
+   },
+   "year_2022": {
+    "ann_return_pct": 28.02190894024839,
+    "days": 365,
+    "sharpe_ann": 1.0377489057501248,
+    "total_pct": 28.02190894024839
+   }
+  },
+  {
+   "beta_to_market": 0.029243142017546676,
+   "corr_to_market": 0.16481425483593964,
+   "dev_cost_share": 0.07599265102290471,
+   "dev_fold_pos_share": 0.75,
+   "dev_mean_bp": 52.08229135047352,
+   "dev_status": "RESEARCH_ONLY",
+   "dev_t": 2.9188039436518953,
+   "direction": "long",
+   "down_trend": {
+    "ann_return_pct": 7.0083724143084565,
+    "days": 658,
+    "sharpe_ann": 0.615940736035276,
+    "total_pct": 12.634271366068397
+   },
+   "family": "spec:breakout_k+rsi+volume_z:long",
+   "gross": {
+    "ann_return_pct": 20.084314096410484,
+    "ann_vol_pct": 12.861521245511293,
+    "days": 1763,
+    "mdd_pct": 16.169681901185875,
+    "months": 58,
+    "pos_month_share": 0.6206896551724138,
+    "sharpe_ann": 1.561581535576125,
+    "total_pct": 97.00998836156626,
+    "worst_month_pct": -6.5450284534886425
+   },
+   "horizon_bars": 64,
+   "id": "S-258fb669365d964a",
+   "primary": {
+    "ann_return_pct": 15.095888190636398,
+    "ann_vol_pct": 12.66396460981959,
+    "days": 1763,
+    "mdd_pct": 20.752198767374047,
+    "months": 58,
+    "pos_month_share": 0.5862068965517241,
+    "sharpe_ann": 1.1920349318515233,
+    "total_pct": 72.91520789066298,
+    "worst_month_pct": -7.60735242900055
+   },
+   "profile": {
+    "gross_bp_mean": 69.29284882969019,
+    "hold_hours_mean": 16.0,
+    "hold_hours_median": 16.0,
+    "net_bp_mean": 52.08229135047352,
+    "top5pct_share_of_profit": 0.292137232228074,
+    "trades": 280,
+    "trades_by_symbol": {
+     "BTCUSDT": 110,
+     "ETHUSDT": 170
+    },
+    "trades_per_year": 57.969370391378334,
+    "win_share": 0.5035714285714286
+   },
+   "sharpe_H1": 1.499149163180638,
+   "sharpe_H2": 0.7867564662304968,
+   "stress": {
+    "ann_return_pct": 8.112462090152937,
+    "ann_vol_pct": 12.564593225791914,
+    "days": 1763,
+    "mdd_pct": 29.818200524590697,
+    "months": 58,
+    "pos_month_share": 0.5689655172413793,
+    "sharpe_ann": 0.6456605434308939,
+    "total_pct": 39.18430319161542,
+    "worst_month_pct": -9.553921110742486
+   },
+   "symbols": [
+    "BTCUSDT",
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 19.911802562422626,
+    "days": 1105,
+    "sharpe_ann": 1.4893369818734163,
+    "total_pct": 60.28093652459452
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": -12.761215270494642,
+    "days": 176,
+    "sharpe_ann": -1.8707145579892457,
+    "total_pct": -6.1533531167316635
+   },
+   "year_2022": {
+    "ann_return_pct": 15.345221612007354,
+    "days": 365,
+    "sharpe_ann": 1.1627683531908066,
+    "total_pct": 15.345221612007354
+   }
+  },
+  {
+   "beta_to_market": 0.03170510455841744,
+   "corr_to_market": 0.17981722912319156,
+   "dev_cost_share": 0.07681791482797455,
+   "dev_fold_pos_share": 1.0,
+   "dev_mean_bp": 50.66177865203884,
+   "dev_status": "RESEARCH_ONLY",
+   "dev_t": 2.8734687260677583,
+   "direction": "long",
+   "down_trend": {
+    "ann_return_pct": 9.484489384533973,
+    "days": 658,
+    "sharpe_ann": 0.7903239299900263,
+    "total_pct": 17.09806579458453
+   },
+   "family": "spec:breakout_k+rsi+volume_z:long",
+   "gross": {
+    "ann_return_pct": 19.621335409083105,
+    "ann_vol_pct": 12.763245730099497,
+    "days": 1763,
+    "mdd_pct": 10.275365096235838,
+    "months": 58,
+    "pos_month_share": 0.5862068965517241,
+    "sharpe_ann": 1.537331163562119,
+    "total_pct": 94.773737880037,
+    "worst_month_pct": -6.07051333032414
+   },
+   "horizon_bars": 48,
+   "id": "S-c7f102004029c38c",
+   "primary": {
+    "ann_return_pct": 14.841487311010642,
+    "ann_vol_pct": 12.584568083222194,
+    "days": 1763,
+    "mdd_pct": 14.903963202268166,
+    "months": 58,
+    "pos_month_share": 0.5689655172413793,
+    "sharpe_ann": 1.179340221520783,
+    "total_pct": 71.68641679263496,
+    "worst_month_pct": -7.113034112078825
+   },
+   "profile": {
+    "gross_bp_mean": 66.97790662900142,
+    "hold_hours_mean": 12.0,
+    "hold_hours_median": 12.0,
+    "net_bp_mean": 50.66177865203884,
+    "top5pct_share_of_profit": 0.31270843511345897,
+    "trades": 283,
+    "trades_by_symbol": {
+     "BTCUSDT": 111,
+     "ETHUSDT": 172
+    },
+    "trades_per_year": 58.59047078842882,
+    "win_share": 0.49469964664310956
+   },
+   "sharpe_H1": 1.3675283148804136,
+   "sharpe_H2": 0.9666070522565642,
+   "stress": {
+    "ann_return_pct": 7.761990270937374,
+    "ann_vol_pct": 12.505095017502509,
+    "days": 1763,
+    "mdd_pct": 24.651333866700643,
+    "months": 58,
+    "pos_month_share": 0.5344827586206896,
+    "sharpe_ann": 0.6207062209502172,
+    "total_pct": 37.49147629496598,
+    "worst_month_pct": -8.928930610341737
+   },
+   "symbols": [
+    "BTCUSDT",
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 18.031446257274574,
+    "days": 1105,
+    "sharpe_ann": 1.3953917620677523,
+    "total_pct": 54.58835099805043
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": -5.22894661641585,
+    "days": 176,
+    "sharpe_ann": -1.2746918186477898,
+    "total_pct": -2.5213550807923
+   },
+   "year_2022": {
+    "ann_return_pct": 12.981907306647953,
+    "days": 365,
+    "sharpe_ann": 0.9398565485058649,
+    "total_pct": 12.981907306647953
+   }
+  },
+  {
+   "beta_to_market": 0.031604703759414515,
+   "corr_to_market": 0.16516379129212272,
+   "dev_cost_share": 0.0740737884296538,
+   "dev_fold_pos_share": 0.75,
+   "dev_mean_bp": 52.034650174127,
+   "dev_status": "RESEARCH_ONLY",
+   "dev_t": 2.851171432352764,
+   "direction": "long",
+   "down_trend": {
+    "ann_return_pct": 7.031643829848562,
+    "days": 658,
+    "sharpe_ann": 0.5638453975313958,
+    "total_pct": 12.676223671343436
+   },
+   "family": "spec:breakout_k+volume_z:long",
+   "gross": {
+    "ann_return_pct": 21.322752035425406,
+    "ann_vol_pct": 13.891788420278235,
+    "days": 1763,
+    "mdd_pct": 15.534858219529895,
+    "months": 58,
+    "pos_month_share": 0.603448275862069,
+    "sharpe_ann": 1.5349177075213716,
+    "total_pct": 102.99181325604106,
+    "worst_month_pct": -6.058634513308612
+   },
+   "horizon_bars": 64,
+   "id": "S-808166cdc1cd553f",
+   "primary": {
+    "ann_return_pct": 16.051641802154833,
+    "ann_vol_pct": 13.657691747896447,
+    "days": 1763,
+    "mdd_pct": 20.27713974410444,
+    "months": 58,
+    "pos_month_share": 0.5862068965517241,
+    "sharpe_ann": 1.1752821851926114,
+    "total_pct": 77.53162875944945,
+    "worst_month_pct": -7.201091362307089
+   },
+   "profile": {
+    "gross_bp_mean": 69.12202231949065,
+    "hold_hours_mean": 16.0,
+    "hold_hours_median": 16.0,
+    "net_bp_mean": 52.034650174127,
+    "top5pct_share_of_profit": 0.30194433638125284,
+    "trades": 298,
+    "trades_by_symbol": {
+     "BTCUSDT": 116,
+     "ETHUSDT": 182
+    },
+    "trades_per_year": 61.69597277368123,
+    "win_share": 0.5
+   },
+   "sharpe_H1": 1.6918331971046892,
+   "sharpe_H2": 0.42467959812946277,
+   "stress": {
+    "ann_return_pct": 8.6215557121689,
+    "ann_vol_pct": 13.527592776119423,
+    "days": 1763,
+    "mdd_pct": 29.631118406420516,
+    "months": 58,
+    "pos_month_share": 0.5689655172413793,
+    "sharpe_ann": 0.6373311094482925,
+    "total_pct": 41.6432951248048,
+    "worst_month_pct": -9.270569441736072
+   },
+   "symbols": [
+    "BTCUSDT",
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 21.42282611507567,
+    "days": 1105,
+    "sharpe_ann": 1.4964402309306941,
+    "total_pct": 64.8554050881058
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": -19.766863633627132,
+    "days": 176,
+    "sharpe_ann": -2.3675568065564327,
+    "total_pct": -9.531419176762672
+   },
+   "year_2022": {
+    "ann_return_pct": 17.92240559853154,
+    "days": 365,
+    "sharpe_ann": 1.28704051388678,
+    "total_pct": 17.92240559853154
+   }
+  },
+  {
+   "beta_to_market": 0.03549676393009683,
+   "corr_to_market": 0.1928382994403657,
+   "dev_cost_share": 0.08093146234527336,
+   "dev_fold_pos_share": 1.0,
+   "dev_mean_bp": 45.896404986960256,
+   "dev_status": "RESEARCH_ONLY",
+   "dev_t": 2.6694744190760007,
+   "direction": "long",
+   "down_trend": {
+    "ann_return_pct": 5.793979978292085,
+    "days": 658,
+    "sharpe_ann": 0.452911664646107,
+    "total_pct": 10.445037878674498
+   },
+   "family": "spec:breakout_k+taker_share_z:long",
+   "gross": {
+    "ann_return_pct": 21.18065214009408,
+    "ann_vol_pct": 13.313227796607956,
+    "days": 1763,
+    "mdd_pct": 12.530970450228864,
+    "months": 58,
+    "pos_month_share": 0.6724137931034483,
+    "sharpe_ann": 1.5909479251523542,
+    "total_pct": 102.30545129585168,
+    "worst_month_pct": -5.225128756938357
+   },
+   "horizon_bars": 48,
+   "id": "S-80fe4b122603f292",
+   "primary": {
+    "ann_return_pct": 15.72596190725923,
+    "ann_vol_pct": 13.138200806151744,
+    "days": 1763,
+    "mdd_pct": 17.489800349899113,
+    "months": 58,
+    "pos_month_share": 0.603448275862069,
+    "sharpe_ann": 1.1969646483022096,
+    "total_pct": 75.95855025341923,
+    "worst_month_pct": -5.469274112345818
+   },
+   "profile": {
+    "gross_bp_mean": 61.81598265610373,
+    "hold_hours_mean": 12.0,
+    "hold_hours_median": 12.0,
+    "net_bp_mean": 45.896404986960256,
+    "top5pct_share_of_profit": 0.33691793133449305,
+    "trades": 331,
+    "trades_by_symbol": {
+     "BTCUSDT": 128,
+     "ETHUSDT": 203
+    },
+    "trades_per_year": 68.52807714123652,
+    "win_share": 0.48036253776435045
+   },
+   "sharpe_H1": 1.4507136128965847,
+   "sharpe_H2": 0.8770986459092962,
+   "stress": {
+    "ann_return_pct": 7.205459795269879,
+    "ann_vol_pct": 13.085845224655392,
+    "days": 1763,
+    "mdd_pct": 34.04582709019273,
+    "months": 58,
+    "pos_month_share": 0.4827586206896552,
+    "sharpe_ann": 0.550630064131729,
+    "total_pct": 34.80335786044049,
+    "worst_month_pct": -7.28442183858458
+   },
+   "symbols": [
+    "BTCUSDT",
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 21.640209969938304,
+    "days": 1105,
+    "sharpe_ann": 1.6227191395762435,
+    "total_pct": 65.51351237474474
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": -19.729780449792035,
+    "days": 176,
+    "sharpe_ann": -3.5344001862068497,
+    "total_pct": -9.513537970310681
+   },
+   "year_2022": {
+    "ann_return_pct": 3.460870330566622,
+    "days": 365,
+    "sharpe_ann": 0.2533165003762578,
+    "total_pct": 3.460870330566622
+   }
+  },
+  {
+   "beta_to_market": 0.03782251334461222,
+   "corr_to_market": 0.20280568480382016,
+   "dev_cost_share": 0.07985741049756483,
+   "dev_fold_pos_share": 1.0,
+   "dev_mean_bp": 40.77872596569319,
+   "dev_status": "RESEARCH_ONLY",
+   "dev_t": 2.62828262481617,
+   "direction": "long",
+   "down_trend": {
+    "ann_return_pct": 5.311339063877531,
+    "days": 658,
+    "sharpe_ann": 0.43389225950476773,
+    "total_pct": 9.574961928853192
+   },
+   "family": "spec:breakout_k+rsi:long",
+   "gross": {
+    "ann_return_pct": 20.038686536271342,
+    "ann_vol_pct": 13.487560142797635,
+    "days": 1763,
+    "mdd_pct": 11.008122450198236,
+    "months": 58,
+    "pos_month_share": 0.603448275862069,
+    "sharpe_ann": 1.4857161950801019,
+    "total_pct": 96.7896009957435,
+    "worst_month_pct": -5.835441578519868
+   },
+   "horizon_bars": 48,
+   "id": "S-ad366ea4baba2f6f",
+   "primary": {
+    "ann_return_pct": 14.31014083200524,
+    "ann_vol_pct": 13.311000090437354,
+    "days": 1763,
+    "mdd_pct": 16.050585117395556,
+    "months": 58,
+    "pos_month_share": 0.5689655172413793,
+    "sharpe_ann": 1.0750612827570838,
+    "total_pct": 69.11994051184998,
+    "worst_month_pct": -6.878041132573287
+   },
+   "profile": {
+    "gross_bp_mean": 57.10300943701681,
+    "hold_hours_mean": 12.0,
+    "hold_hours_median": 12.0,
+    "net_bp_mean": 40.77872596569319,
+    "top5pct_share_of_profit": 0.30900823654098497,
+    "trades": 339,
+    "trades_by_symbol": {
+     "BTCUSDT": 128,
+     "ETHUSDT": 211
+    },
+    "trades_per_year": 70.18434486670448,
+    "win_share": 0.48672566371681414
+   },
+   "sharpe_H1": 1.1913074772793024,
+   "sharpe_H2": 0.9813390713879903,
+   "stress": {
+    "ann_return_pct": 5.659828204014244,
+    "ann_vol_pct": 13.264402784176694,
+    "days": 1763,
+    "mdd_pct": 31.744676677140394,
+    "months": 58,
+    "pos_month_share": 0.4827586206896552,
+    "sharpe_ann": 0.4266930291626802,
+    "total_pct": 27.337745544320825,
+    "worst_month_pct": -8.701725628787306
+   },
+   "symbols": [
+    "BTCUSDT",
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 19.66870333284509,
+    "days": 1105,
+    "sharpe_ann": 1.414316640177524,
+    "total_pct": 59.54497858299678
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": -11.062104731466837,
+    "days": 176,
+    "sharpe_ann": -1.9314815115964326,
+    "total_pct": -5.334055980104557
+   },
+   "year_2022": {
+    "ann_return_pct": 8.388214029182315,
+    "days": 365,
+    "sharpe_ann": 0.5767088009453728,
+    "total_pct": 8.388214029182315
+   }
+  }
+ ],
+ "market_5050": {
+  "all": {
+   "ann_return_pct": 52.6380026190751,
+   "ann_vol_pct": 71.3740640175994,
+   "days": 1763,
+   "mdd_pct": 124.0412083285496,
+   "months": 58,
+   "pos_month_share": 0.5517241379310345,
+   "sharpe_ann": 0.7374948217337832,
+   "total_pct": 254.24876333542318,
+   "worst_month_pct": -48.40246216933877
+  },
+  "down_trend": {
+   "ann_return_pct": -13.459901477970254,
+   "days": 658,
+   "sharpe_ann": -0.18206381965009266,
+   "total_pct": -24.264699102751855
+  },
+  "up_trend": {
+   "ann_return_pct": 91.99765953840163,
+   "days": 1105,
+   "sharpe_ann": 1.3187666881481215,
+   "total_pct": 278.5134624381748
+  },
+  "year_2022": {
+   "ann_return_pct": -78.11010511092233,
+   "days": 365,
+   "sharpe_ann": -1.0647670089148629,
+   "total_pct": -78.11010511092233
+  }
+ },
+ "pool": {
+  "longs_pass": 118,
+  "shorts": 979,
+  "shorts_mean_positive": 360,
+  "shorts_pass": 9,
+  "shorts_underpowered": 457,
+  "unique_strategies": 1811
+ },
+ "regime_definition": {
+  "down_trend": "market 50/50 cumulative return over the previous 60 days < 0",
+  "down_trend_days": 658,
+  "worst10pct_cut_pct": -3.823384750312586,
+  "year_2022_days": 365
+ },
+ "regime_switch_top5": {
+  "short_pass_top5": {
+   "best_observed_sharpe_among_configs": 2.0731673034414144,
+   "chance_max_sharpe_ann_unit_variance": {
+    "N=9": 0.978590847602661
+   },
+   "configurations_counted": 9,
+   "corr_short_vs_long_all": -0.022485674307716995,
+   "fixed_mix": {
+    "long100_short0": {
+     "H1": {
+      "ann_return_pct": 9.63315169045028,
+      "ann_vol_pct": 4.9994643907333005,
+      "days": 881,
+      "mdd_pct": 3.1376200637882476,
+      "months": 29,
+      "pos_month_share": 0.8275862068965517,
+      "sharpe_ann": 1.9268367444132006,
+      "total_pct": 23.25152503914162,
+      "worst_month_pct": -1.0622941717146048
+     },
+     "H2": {
+      "ann_return_pct": 4.315279826610186,
+      "ann_vol_pct": 2.309098525703054,
+      "days": 882,
+      "mdd_pct": 0.4677984298312392,
+      "months": 29,
+      "pos_month_share": 0.4482758620689655,
+      "sharpe_ann": 1.8688158078037433,
+      "total_pct": 10.427607690603244,
+      "worst_month_pct": -0.2440409101051979
+     },
+     "all": {
+      "ann_return_pct": 6.972707570253478,
+      "ann_vol_pct": 3.894673978831276,
+      "days": 1763,
+      "mdd_pct": 3.1376200637882476,
+      "months": 58,
+      "pos_month_share": 0.6379310344827587,
+      "sharpe_ann": 1.7903186783161413,
+      "total_pct": 33.67913272974486,
+      "worst_month_pct": -1.0622941717146048
+     }
+    },
+    "long50_short50": {
+     "H1": {
+      "ann_return_pct": 18.4504662712619,
+      "ann_vol_pct": 7.309183462048855,
+      "days": 881,
+      "mdd_pct": 7.4533976098010655,
+      "months": 29,
+      "pos_month_share": 0.8275862068965517,
+      "sharpe_ann": 2.5242855603586127,
+      "total_pct": 44.53386516433342,
+      "worst_month_pct": -3.152842151502379
+     },
+     "H2": {
+      "ann_return_pct": 0.4770015202471185,
+      "ann_vol_pct": 2.5096930905662167,
+      "days": 882,
+      "mdd_pct": 3.8991055768112894,
+      "months": 29,
+      "pos_month_share": 0.5172413793103449,
+      "sharpe_ann": 0.19006368628902798,
+      "total_pct": 1.1526447694738586,
+      "worst_month_pct": -1.4287125252553248
+     },
+     "all": {
+      "ann_return_pct": 9.458636486579518,
+      "ann_vol_pct": 5.482009710229376,
+      "days": 1763,
+      "mdd_pct": 7.4533976098010655,
+      "months": 58,
+      "pos_month_share": 0.6724137931034483,
+      "sharpe_ann": 1.725395792154435,
+      "total_pct": 45.686509933807244,
+      "worst_month_pct": -3.152842151502379
+     }
+    },
+    "long70_short30": {
+     "H1": {
+      "ann_return_pct": 14.92354043893725,
+      "ann_vol_pct": 5.362616458930683,
+      "days": 881,
+      "mdd_pct": 4.736305064184712,
+      "months": 29,
+      "pos_month_share": 0.8275862068965517,
+      "sharpe_ann": 2.782884167314295,
+      "total_pct": 36.02092911425677,
+      "worst_month_pct": -1.9248957745230482
+     },
+     "H2": {
+      "ann_return_pct": 2.012312842792345,
+      "ann_vol_pct": 2.093924625626405,
+      "days": 882,
+      "mdd_pct": 1.7356317196367401,
+      "months": 29,
+      "pos_month_share": 0.6551724137931034,
+      "sharpe_ann": 0.961024488735049,
+      "total_pct": 4.862629937925612,
+      "worst_month_pct": -0.857227515153195
+     },
+     "all": {
+      "ann_return_pct": 8.464264920049104,
+      "ann_vol_pct": 4.082769830490091,
+      "days": 1763,
+      "mdd_pct": 4.736305064184712,
+      "months": 58,
+      "pos_month_share": 0.7413793103448276,
+      "sharpe_ann": 2.0731673034414144,
+      "total_pct": 40.8835590521823,
+      "worst_month_pct": -1.9248957745230482
+     }
+    }
+   },
+   "grid_long_share": [
+    1.0,
+    0.7,
+    0.5,
+    0.3,
+    0.0
+   ],
+   "rules_fixed_before_results": [
+    "trend60",
+    "ma100",
+    "trend60_3state"
+   ],
+   "switch": {
+    "ma100_fitH1_scoreH2": {
+     "ann_return_scored_vs_50_50": [
+      -3.3612767861159485,
+      0.4770015202471185
+     ],
+     "chosen_long_share_per_state": {
+      "down": 0.0,
+      "up": 0.0
+     },
+     "days_per_state_fit": {
+      "down": 420,
+      "up": 361
+     },
+     "fixed_mixes_same_half": {
+      "long100": 1.8688158078037433,
+      "long50": 0.19006368628902798,
+      "long70": 0.961024488735049,
+      "short100": -0.7517278127228233
+     },
+     "scored": {
+      "ann_return_pct": -3.3612767861159485,
+      "ann_vol_pct": 4.471401389209097,
+      "days": 882,
+      "mdd_pct": 13.202940320342156,
+      "months": 29,
+      "pos_month_share": 0.41379310344827586,
+      "sharpe_ann": -0.7517278127228233,
+      "total_pct": -8.122318151655518,
+      "worst_month_pct": -2.8574250505106495
+     }
+    },
+    "ma100_fitH2_scoreH1": {
+     "ann_return_scored_vs_50_50": [
+      11.032235050004218,
+      18.4504662712619
+     ],
+     "chosen_long_share_per_state": {
+      "down": 1.0,
+      "up": 1.0
+     },
+     "days_per_state_fit": {
+      "down": 339,
+      "up": 543
+     },
+     "fixed_mixes_same_half": {
+      "long100": 1.9268367444132006,
+      "long50": 2.5242855603586127,
+      "long70": 2.782884167314295,
+      "short100": 1.964596420748345
+     },
+     "scored": {
+      "ann_return_pct": 11.032235050004218,
+      "ann_vol_pct": 5.371168218708216,
+      "days": 881,
+      "mdd_pct": 3.1376200637882476,
+      "months": 29,
+      "pos_month_share": 0.8275862068965517,
+      "sharpe_ann": 2.0539731024580545,
+      "total_pct": 26.628490627544416,
+      "worst_month_pct": -1.0622941717146048
+     }
+    },
+    "trend60_3state_fitH1_scoreH2": {
+     "ann_return_scored_vs_50_50": [
+      -3.3612767861159485,
+      0.4770015202471185
+     ],
+     "chosen_long_share_per_state": {
+      "down": 0.0,
+      "side": 0.0,
+      "up": 0.0
+     },
+     "days_per_state_fit": {
+      "down": 312,
+      "side": 142,
+      "up": 367
+     },
+     "fixed_mixes_same_half": {
+      "long100": 1.8688158078037433,
+      "long50": 0.19006368628902798,
+      "long70": 0.961024488735049,
+      "short100": -0.7517278127228233
+     },
+     "scored": {
+      "ann_return_pct": -3.3612767861159485,
+      "ann_vol_pct": 4.471401389209097,
+      "days": 882,
+      "mdd_pct": 13.202940320342156,
+      "months": 29,
+      "pos_month_share": 0.41379310344827586,
+      "sharpe_ann": -0.7517278127228233,
+      "total_pct": -8.122318151655518,
+      "worst_month_pct": -2.8574250505106495
+     }
+    },
+    "trend60_3state_fitH2_scoreH1": {
+     "ann_return_scored_vs_50_50": [
+      10.51804199472122,
+      18.4504662712619
+     ],
+     "chosen_long_share_per_state": {
+      "down": 1.0,
+      "side": 1.0,
+      "up": 1.0
+     },
+     "days_per_state_fit": {
+      "down": 258,
+      "side": 226,
+      "up": 398
+     },
+     "fixed_mixes_same_half": {
+      "long100": 1.9268367444132006,
+      "long50": 2.5242855603586127,
+      "long70": 2.782884167314295,
+      "short100": 1.964596420748345
+     },
+     "scored": {
+      "ann_return_pct": 10.51804199472122,
+      "ann_vol_pct": 5.342112595895651,
+      "days": 881,
+      "mdd_pct": 3.1376200637882476,
+      "months": 29,
+      "pos_month_share": 0.8275862068965517,
+      "sharpe_ann": 1.9688918580267731,
+      "total_pct": 25.387383554381884,
+      "worst_month_pct": -1.0622941717146048
+     }
+    },
+    "trend60_fitH1_scoreH2": {
+     "ann_return_scored_vs_50_50": [
+      -3.3612767861159485,
+      0.4770015202471185
+     ],
+     "chosen_long_share_per_state": {
+      "down": 0.0,
+      "up": 0.0
+     },
+     "days_per_state_fit": {
+      "down": 381,
+      "up": 440
+     },
+     "fixed_mixes_same_half": {
+      "long100": 1.8688158078037433,
+      "long50": 0.19006368628902798,
+      "long70": 0.961024488735049,
+      "short100": -0.7517278127228233
+     },
+     "scored": {
+      "ann_return_pct": -3.3612767861159485,
+      "ann_vol_pct": 4.471401389209097,
+      "days": 882,
+      "mdd_pct": 13.202940320342156,
+      "months": 29,
+      "pos_month_share": 0.41379310344827586,
+      "sharpe_ann": -0.7517278127228233,
+      "total_pct": -8.122318151655518,
+      "worst_month_pct": -2.8574250505106495
+     }
+    },
+    "trend60_fitH2_scoreH1": {
+     "ann_return_scored_vs_50_50": [
+      15.742536409749448,
+      18.4504662712619
+     ],
+     "chosen_long_share_per_state": {
+      "down": 0.0,
+      "up": 1.0
+     },
+     "days_per_state_fit": {
+      "down": 336,
+      "up": 546
+     },
+     "fixed_mixes_same_half": {
+      "long100": 1.9268367444132006,
+      "long50": 2.5242855603586127,
+      "long70": 2.782884167314295,
+      "short100": 1.964596420748345
+     },
+     "scored": {
+      "ann_return_pct": 15.742536409749448,
+      "ann_vol_pct": 8.381735606386474,
+      "days": 881,
+      "mdd_pct": 10.655662719568966,
+      "months": 29,
+      "pos_month_share": 0.7586206896551724,
+      "sharpe_ann": 1.8781952985673278,
+      "total_pct": 37.99773856709383,
+      "worst_month_pct": -4.5681961971951415
+     }
+    }
+   }
+  },
+  "short_top5": {
+   "best_observed_sharpe_among_configs": 2.1251215317868586,
+   "chance_max_sharpe_ann_unit_variance": {
+    "N=9": 0.978590847602661
+   },
+   "configurations_counted": 9,
+   "corr_short_vs_long_all": 0.016750846348047264,
+   "fixed_mix": {
+    "long100_short0": {
+     "H1": {
+      "ann_return_pct": 9.63315169045028,
+      "ann_vol_pct": 4.9994643907333005,
+      "days": 881,
+      "mdd_pct": 3.1376200637882476,
+      "months": 29,
+      "pos_month_share": 0.8275862068965517,
+      "sharpe_ann": 1.9268367444132006,
+      "total_pct": 23.25152503914162,
+      "worst_month_pct": -1.0622941717146048
+     },
+     "H2": {
+      "ann_return_pct": 4.315279826610186,
+      "ann_vol_pct": 2.309098525703054,
+      "days": 882,
+      "mdd_pct": 0.4677984298312392,
+      "months": 29,
+      "pos_month_share": 0.4482758620689655,
+      "sharpe_ann": 1.8688158078037433,
+      "total_pct": 10.427607690603244,
+      "worst_month_pct": -0.2440409101051979
+     },
+     "all": {
+      "ann_return_pct": 6.972707570253478,
+      "ann_vol_pct": 3.894673978831276,
+      "days": 1763,
+      "mdd_pct": 3.1376200637882476,
+      "months": 58,
+      "pos_month_share": 0.6379310344827587,
+      "sharpe_ann": 1.7903186783161413,
+      "total_pct": 33.67913272974486,
+      "worst_month_pct": -1.0622941717146048
+     }
+    },
+    "long50_short50": {
+     "H1": {
+      "ann_return_pct": 5.323159064640634,
+      "ann_vol_pct": 2.5260338983958968,
+      "days": 881,
+      "mdd_pct": 1.5688100318941238,
+      "months": 29,
+      "pos_month_share": 0.8275862068965517,
+      "sharpe_ann": 2.107318935039229,
+      "total_pct": 12.84850174232437,
+      "worst_month_pct": -0.5311470858573024
+     },
+     "H2": {
+      "ann_return_pct": 3.208412286697246,
+      "ann_vol_pct": 1.294842415780151,
+      "days": 882,
+      "mdd_pct": 0.2338992149156196,
+      "months": 29,
+      "pos_month_share": 0.5862068965517241,
+      "sharpe_ann": 2.477839965386179,
+      "total_pct": 7.752930511964307,
+      "worst_month_pct": -0.12202045505259895
+     },
+     "all": {
+      "ann_return_pct": 4.265185917649103,
+      "ann_vol_pct": 2.00703152918639,
+      "days": 1763,
+      "mdd_pct": 1.5688100318941238,
+      "months": 58,
+      "pos_month_share": 0.7068965517241379,
+      "sharpe_ann": 2.1251215317868586,
+      "total_pct": 20.60143225428867,
+      "worst_month_pct": -0.5311470858573024
+     }
+    },
+    "long70_short30": {
+     "H1": {
+      "ann_return_pct": 7.047156114964492,
+      "ann_vol_pct": 3.5070630003407595,
+      "days": 881,
+      "mdd_pct": 2.1963340446517705,
+      "months": 29,
+      "pos_month_share": 0.8275862068965517,
+      "sharpe_ann": 2.009418169642166,
+      "total_pct": 17.009711061051277,
+      "worst_month_pct": -0.7436059202002231
+     },
+     "H2": {
+      "ann_return_pct": 3.6511593026624216,
+      "ann_vol_pct": 1.6619842726113534,
+      "days": 882,
+      "mdd_pct": 0.32745890088186735,
+      "months": 29,
+      "pos_month_share": 0.5862068965517241,
+      "sharpe_ann": 2.1968675413068883,
+      "total_pct": 8.822801383419879,
+      "worst_month_pct": -0.17082863707363855
+     },
+     "all": {
+      "ann_return_pct": 5.348194578690853,
+      "ann_vol_pct": 2.7444060459995456,
+      "days": 1763,
+      "mdd_pct": 2.1963340446517705,
+      "months": 58,
+      "pos_month_share": 0.7068965517241379,
+      "sharpe_ann": 1.9487621325156264,
+      "total_pct": 25.83251244447116,
+      "worst_month_pct": -0.7436059202002231
+     }
+    }
+   },
+   "grid_long_share": [
+    1.0,
+    0.7,
+    0.5,
+    0.3,
+    0.0
+   ],
+   "rules_fixed_before_results": [
+    "trend60",
+    "ma100",
+    "trend60_3state"
+   ],
+   "switch": {
+    "ma100_fitH1_scoreH2": {
+     "ann_return_scored_vs_50_50": [
+      4.315279826610186,
+      3.208412286697246
+     ],
+     "chosen_long_share_per_state": {
+      "down": 1.0,
+      "up": 1.0
+     },
+     "days_per_state_fit": {
+      "down": 420,
+      "up": 361
+     },
+     "fixed_mixes_same_half": {
+      "long100": 1.8688158078037433,
+      "long50": 2.477839965386179,
+      "long70": 2.1968675413068883,
+      "short100": 1.951876658052037
+     },
+     "scored": {
+      "ann_return_pct": 4.315279826610186,
+      "ann_vol_pct": 2.309098525703054,
+      "days": 882,
+      "mdd_pct": 0.4677984298312392,
+      "months": 29,
+      "pos_month_share": 0.4482758620689655,
+      "sharpe_ann": 1.8688158078037433,
+      "total_pct": 10.427607690603244,
+      "worst_month_pct": -0.2440409101051979
+     }
+    },
+    "ma100_fitH2_scoreH1": {
+     "ann_return_scored_vs_50_50": [
+      8.942486778534878,
+      5.323159064640634
+     ],
+     "chosen_long_share_per_state": {
+      "down": 1.0,
+      "up": 1.0
+     },
+     "days_per_state_fit": {
+      "down": 339,
+      "up": 543
+     },
+     "fixed_mixes_same_half": {
+      "long100": 1.9268367444132006,
+      "long50": 2.107318935039229,
+      "long70": 2.009418169642166,
+      "short100": 1.4458914747656182
+     },
+     "scored": {
+      "ann_return_pct": 8.942486778534878,
+      "ann_vol_pct": 4.903290355443422,
+      "days": 881,
+      "mdd_pct": 3.1376200637882476,
+      "months": 29,
+      "pos_month_share": 0.8275862068965517,
+      "sharpe_ann": 1.8237726363904418,
+      "total_pct": 21.584468087367746,
+      "worst_month_pct": -1.0622941717146048
+     }
+    },
+    "trend60_3state_fitH1_scoreH2": {
+     "ann_return_scored_vs_50_50": [
+      4.315279826610186,
+      3.208412286697246
+     ],
+     "chosen_long_share_per_state": {
+      "down": 1.0,
+      "side": 1.0,
+      "up": 1.0
+     },
+     "days_per_state_fit": {
+      "down": 312,
+      "side": 142,
+      "up": 367
+     },
+     "fixed_mixes_same_half": {
+      "long100": 1.8688158078037433,
+      "long50": 2.477839965386179,
+      "long70": 2.1968675413068883,
+      "short100": 1.951876658052037
+     },
+     "scored": {
+      "ann_return_pct": 4.315279826610186,
+      "ann_vol_pct": 2.309098525703054,
+      "days": 882,
+      "mdd_pct": 0.4677984298312392,
+      "months": 29,
+      "pos_month_share": 0.4482758620689655,
+      "sharpe_ann": 1.8688158078037433,
+      "total_pct": 10.427607690603244,
+      "worst_month_pct": -0.2440409101051979
+     }
+    },
+    "trend60_3state_fitH2_scoreH1": {
+     "ann_return_scored_vs_50_50": [
+      8.914873371995682,
+      5.323159064640634
+     ],
+     "chosen_long_share_per_state": {
+      "down": 1.0,
+      "side": 1.0,
+      "up": 1.0
+     },
+     "days_per_state_fit": {
+      "down": 258,
+      "side": 226,
+      "up": 398
+     },
+     "fixed_mixes_same_half": {
+      "long100": 1.9268367444132006,
+      "long50": 2.107318935039229,
+      "long70": 2.009418169642166,
+      "short100": 1.4458914747656182
+     },
+     "scored": {
+      "ann_return_pct": 8.914873371995682,
+      "ann_vol_pct": 4.9060043957976465,
+      "days": 881,
+      "mdd_pct": 3.1376200637882476,
+      "months": 29,
+      "pos_month_share": 0.8275862068965517,
+      "sharpe_ann": 1.817135218963914,
+      "total_pct": 21.517817645830675,
+      "worst_month_pct": -1.0622941717146048
+     }
+    },
+    "trend60_fitH1_scoreH2": {
+     "ann_return_scored_vs_50_50": [
+      4.315279826610186,
+      3.208412286697246
+     ],
+     "chosen_long_share_per_state": {
+      "down": 1.0,
+      "up": 1.0
+     },
+     "days_per_state_fit": {
+      "down": 381,
+      "up": 440
+     },
+     "fixed_mixes_same_half": {
+      "long100": 1.8688158078037433,
+      "long50": 2.477839965386179,
+      "long70": 2.1968675413068883,
+      "short100": 1.951876658052037
+     },
+     "scored": {
+      "ann_return_pct": 4.315279826610186,
+      "ann_vol_pct": 2.309098525703054,
+      "days": 882,
+      "mdd_pct": 0.4677984298312392,
+      "months": 29,
+      "pos_month_share": 0.4482758620689655,
+      "sharpe_ann": 1.8688158078037433,
+      "total_pct": 10.427607690603244,
+      "worst_month_pct": -0.2440409101051979
+     }
+    },
+    "trend60_fitH2_scoreH1": {
+     "ann_return_scored_vs_50_50": [
+      4.188804865557118,
+      5.323159064640634
+     ],
+     "chosen_long_share_per_state": {
+      "down": 0.0,
+      "up": 1.0
+     },
+     "days_per_state_fit": {
+      "down": 336,
+      "up": 546
+     },
+     "fixed_mixes_same_half": {
+      "long100": 1.9268367444132006,
+      "long50": 2.107318935039229,
+      "long70": 2.009418169642166,
+      "short100": 1.4458914747656182
+     },
+     "scored": {
+      "ann_return_pct": 4.188804865557118,
+      "ann_vol_pct": 2.522571578530546,
+      "days": 881,
+      "mdd_pct": 1.1402682238587207,
+      "months": 29,
+      "pos_month_share": 0.6206896551724138,
+      "sharpe_ann": 1.6605296361886346,
+      "total_pct": 10.11051256590636,
+      "worst_month_pct": -0.6028326999711817
+     }
+    }
+   }
+  }
+ },
+ "short_bundles": {
+  "short_all_pass": {
+   "H1": {
+    "ann_return_pct": 26.407452861489624,
+    "ann_vol_pct": 13.42114848050109,
+    "days": 881,
+    "mdd_pct": 12.765134666518023,
+    "months": 29,
+    "pos_month_share": 0.5517241379310345,
+    "sharpe_ann": 1.9676000827988511,
+    "total_pct": 63.73963279718457,
+    "worst_month_pct": -5.253019341670733
+   },
+   "H2": {
+    "ann_return_pct": -1.4847290934934,
+    "ann_vol_pct": 3.419926154366502,
+    "days": 882,
+    "mdd_pct": 7.593596469680472,
+    "months": 29,
+    "pos_month_share": 0.4827586206896552,
+    "sharpe_ann": -0.43414068797881017,
+    "total_pct": -3.5877563300306314,
+    "worst_month_pct": -3.292258874531307
+   },
+   "all": {
+    "ann_return_pct": 12.453451452360286,
+    "ann_vol_pct": 9.815421177661609,
+    "days": 1763,
+    "mdd_pct": 19.270206902338188,
+    "months": 58,
+    "pos_month_share": 0.5172413793103449,
+    "sharpe_ann": 1.268763838754309,
+    "total_pct": 60.15187646715394,
+    "worst_month_pct": -5.253019341670733
+   },
+   "beta_to_market": -0.029480464547638533,
+   "corr_to_market": -0.21437088901293638,
+   "down_trend": {
+    "ann_return_pct": 22.842595346367702,
+    "days": 658,
+    "sharpe_ann": 2.36217522352985,
+    "total_pct": 41.17925407646561
+   },
+   "members": [
+    "S-057a2b85f4a068b0",
+    "S-b7f33b3bfa3371f6",
+    "S-3f8ae214c522f362",
+    "S-4d4ec0ad8481a2a2",
+    "S-f8b1648d499419f6",
+    "S-a7914e25d91b1d4a",
+    "S-406848034defb0ef",
+    "S-171eadfd225596ed",
+    "S-3ad048443f813d3e"
+   ],
+   "n_members": 9,
+   "stress_all": {
+    "ann_return_pct": 4.29830436750108,
+    "ann_vol_pct": 9.800090151928309,
+    "days": 1763,
+    "mdd_pct": 42.31073896657941,
+    "months": 58,
+    "pos_month_share": 0.3275862068965517,
+    "sharpe_ann": 0.43859845173519424,
+    "total_pct": 20.76139890384766,
+    "worst_month_pct": -6.43095036206373
+   },
+   "up_trend": {
+    "ann_return_pct": 6.266974816833692,
+    "days": 1105,
+    "sharpe_ann": 0.6335998219354655,
+    "total_pct": 18.9726223906883
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 103.16325972716854,
+    "days": 176,
+    "sharpe_ann": 6.64480508344596,
+    "total_pct": 49.74447592323743
+   },
+   "year_2022": {
+    "ann_return_pct": 29.691278776217196,
+    "days": 365,
+    "sharpe_ann": 2.2761770396393595,
+    "total_pct": 29.691278776217196
+   }
+  },
+  "short_pass_top3": {
+   "H1": {
+    "ann_return_pct": 28.292104429876108,
+    "ann_vol_pct": 15.307535001044435,
+    "days": 881,
+    "mdd_pct": 14.434457431935257,
+    "months": 29,
+    "pos_month_share": 0.6896551724137931,
+    "sharpe_ann": 1.848246920744962,
+    "total_pct": 68.28861370608453,
+    "worst_month_pct": -5.8658053421477225
+   },
+   "H2": {
+    "ann_return_pct": -3.798756218551606,
+    "ann_vol_pct": 4.813548242974136,
+    "days": 882,
+    "mdd_pct": 13.090108231488449,
+    "months": 29,
+    "pos_month_share": 0.41379310344827586,
+    "sharpe_ann": -0.7891800449068476,
+    "total_pct": -9.179460232226075,
+    "worst_month_pct": -3.049635381264344
+   },
+   "all": {
+    "ann_return_pct": 12.237572897310455,
+    "ann_vol_pct": 11.371816485832747,
+    "days": 1763,
+    "mdd_pct": 21.93889058268028,
+    "months": 58,
+    "pos_month_share": 0.5517241379310345,
+    "sharpe_ann": 1.0761317607047463,
+    "total_pct": 59.10915347385842,
+    "worst_month_pct": -5.8658053421477225
+   },
+   "beta_to_market": -0.03340780206086174,
+   "corr_to_market": -0.20968071424207685,
+   "down_trend": {
+    "ann_return_pct": 8.665281203576015,
+    "days": 658,
+    "sharpe_ann": 0.9237400083844647,
+    "total_pct": 15.62124666288498
+   },
+   "members": [
+    "S-057a2b85f4a068b0",
+    "S-b7f33b3bfa3371f6",
+    "S-3f8ae214c522f362"
+   ],
+   "n_members": 3,
+   "stress_all": {
+    "ann_return_pct": 3.006481761530217,
+    "ann_vol_pct": 11.316296404553597,
+    "days": 1763,
+    "mdd_pct": 49.116448637184384,
+    "months": 58,
+    "pos_month_share": 0.3793103448275862,
+    "sharpe_ann": 0.265677183952201,
+    "total_pct": 14.52171875500757,
+    "worst_month_pct": -7.160581451456691
+   },
+   "up_trend": {
+    "ann_return_pct": 14.364783697742368,
+    "days": 1105,
+    "sharpe_ann": 1.157573722157144,
+    "total_pct": 43.48790681097347
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 97.10598514469618,
+    "days": 176,
+    "sharpe_ann": 4.80602035410547,
+    "total_pct": 46.82370790538775
+   },
+   "year_2022": {
+    "ann_return_pct": 7.597637184711823,
+    "days": 365,
+    "sharpe_ann": 0.5939550580897668,
+    "total_pct": 7.597637184711823
+   }
+  },
+  "short_pass_top5": {
+   "H1": {
+    "ann_return_pct": 27.26778085207352,
+    "ann_vol_pct": 13.879583900334502,
+    "days": 881,
+    "mdd_pct": 14.246128973841842,
+    "months": 29,
+    "pos_month_share": 0.6896551724137931,
+    "sharpe_ann": 1.964596420748345,
+    "total_pct": 65.81620528952543,
+    "worst_month_pct": -6.222708093950704
+   },
+   "H2": {
+    "ann_return_pct": -3.3612767861159485,
+    "ann_vol_pct": 4.471401389209097,
+    "days": 882,
+    "mdd_pct": 13.202940320342156,
+    "months": 29,
+    "pos_month_share": 0.41379310344827586,
+    "sharpe_ann": -0.7517278127228233,
+    "total_pct": -8.122318151655518,
+    "worst_month_pct": -2.8574250505106495
+   },
+   "all": {
+    "ann_return_pct": 11.944565402905559,
+    "ann_vol_pct": 10.336911213619032,
+    "days": 1763,
+    "mdd_pct": 25.568211890785108,
+    "months": 58,
+    "pos_month_share": 0.5517241379310345,
+    "sharpe_ann": 1.1555255874857875,
+    "total_pct": 57.69388713786992,
+    "worst_month_pct": -6.222708093950704
+   },
+   "beta_to_market": -0.033428769154361396,
+   "corr_to_market": -0.23081818740103155,
+   "down_trend": {
+    "ann_return_pct": 11.86730803836359,
+    "days": 658,
+    "sharpe_ann": 1.435112298007292,
+    "total_pct": 21.393667641762306
+   },
+   "members": [
+    "S-057a2b85f4a068b0",
+    "S-b7f33b3bfa3371f6",
+    "S-3f8ae214c522f362",
+    "S-4d4ec0ad8481a2a2",
+    "S-f8b1648d499419f6"
+   ],
+   "n_members": 5,
+   "stress_all": {
+    "ann_return_pct": 2.448199506405212,
+    "ann_vol_pct": 10.304807975590032,
+    "days": 1763,
+    "mdd_pct": 53.260974699949486,
+    "months": 58,
+    "pos_month_share": 0.3620689655172414,
+    "sharpe_ann": 0.2375783723679754,
+    "total_pct": 11.82513898573259,
+    "worst_month_pct": -7.4769694271194655
+   },
+   "up_trend": {
+    "ann_return_pct": 11.99057024079571,
+    "days": 1105,
+    "sharpe_ann": 1.052278050147959,
+    "total_pct": 36.300219496107566
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 105.10444801850339,
+    "days": 176,
+    "sharpe_ann": 5.581158296201387,
+    "total_pct": 50.68050096234684
+   },
+   "year_2022": {
+    "ann_return_pct": 8.583192376501499,
+    "days": 365,
+    "sharpe_ann": 0.8032574327212475,
+    "total_pct": 8.583192376501499
+   }
+  },
+  "short_top10": {
+   "H1": {
+    "ann_return_pct": 0.9812800922523869,
+    "ann_vol_pct": 0.6492802084053577,
+    "days": 881,
+    "mdd_pct": 0.0,
+    "months": 29,
+    "pos_month_share": 0.3448275862068966,
+    "sharpe_ann": 1.511335290293887,
+    "total_pct": 2.3685144144502823,
+    "worst_month_pct": 0.0
+   },
+   "H2": {
+    "ann_return_pct": 2.504870865567778,
+    "ann_vol_pct": 1.158291859555466,
+    "days": 882,
+    "mdd_pct": 0.0,
+    "months": 29,
+    "pos_month_share": 0.3103448275862069,
+    "sharpe_ann": 2.162555874759499,
+    "total_pct": 6.052866036796658,
+    "worst_month_pct": 0.0
+   },
+   "all": {
+    "ann_return_pct": 1.7435075806608809,
+    "ann_vol_pct": 0.9396563254764854,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.3275862068965517,
+    "sharpe_ann": 1.8554736805254566,
+    "total_pct": 8.421380451246941,
+    "worst_month_pct": 0.0
+   },
+   "beta_to_market": -9.25198016997163e-05,
+   "corr_to_market": -0.007027584522524883,
+   "down_trend": {
+    "ann_return_pct": 1.8327855128670016,
+    "days": 658,
+    "sharpe_ann": 1.7355265031963178,
+    "total_pct": 3.3040352533328416
+   },
+   "members": [
+    "S-095f6120fb1aad42",
+    "S-0f8f5a5da351a255",
+    "S-2861618a74f378d3",
+    "S-2f6ddb930f5fa84f",
+    "S-31d8ccc131d7c023",
+    "S-4c23e5a767bddd81",
+    "S-4cb619d1760d7d0d",
+    "S-52be6a42783fa11f",
+    "S-64c93ca768432d6a",
+    "S-698a6b54bc33b518"
+   ],
+   "n_members": 10,
+   "stress_all": {
+    "ann_return_pct": 1.4532981920792765,
+    "ann_vol_pct": 0.869608637501159,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.3275862068965517,
+    "sharpe_ann": 1.6712094721774648,
+    "total_pct": 7.019629349687028,
+    "worst_month_pct": 0.0
+   },
+   "up_trend": {
+    "ann_return_pct": 1.6903447938811273,
+    "days": 1105,
+    "sharpe_ann": 1.9577120390569895,
+    "total_pct": 5.117345197914098
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 1.159009380118204,
+    "days": 176,
+    "sharpe_ann": 2.065584878955309,
+    "total_pct": 0.5588647969885038
+   },
+   "year_2022": {
+    "ann_return_pct": 1.514586091839069,
+    "days": 365,
+    "sharpe_ann": 1.6577876976821408,
+    "total_pct": 1.514586091839069
+   }
+  },
+  "short_top3": {
+   "H1": {
+    "ann_return_pct": 0.9096843578742017,
+    "ann_vol_pct": 0.5454862344076724,
+    "days": 881,
+    "mdd_pct": 0.0,
+    "months": 29,
+    "pos_month_share": 0.2413793103448276,
+    "sharpe_ann": 1.6676577711663085,
+    "total_pct": 2.1957038884580045,
+    "worst_month_pct": 0.0
+   },
+   "H2": {
+    "ann_return_pct": 2.210519426723907,
+    "ann_vol_pct": 1.569861929653947,
+    "days": 882,
+    "mdd_pct": 0.0,
+    "months": 29,
+    "pos_month_share": 0.20689655172413793,
+    "sharpe_ann": 1.4080979893634233,
+    "total_pct": 5.341583929782153,
+    "worst_month_pct": 0.0
+   },
+   "all": {
+    "ann_return_pct": 1.5604708188642415,
+    "ann_vol_pct": 1.1755856671163067,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.22413793103448276,
+    "sharpe_ann": 1.3273986426629816,
+    "total_pct": 7.5372878182401575,
+    "worst_month_pct": 0.0
+   },
+   "beta_to_market": -0.00030835217515673657,
+   "corr_to_market": -0.018721177456670655,
+   "down_trend": {
+    "ann_return_pct": 1.5957166442401984,
+    "days": 658,
+    "sharpe_ann": 1.9763779622222102,
+    "total_pct": 2.876661786054933
+   },
+   "members": [
+    "S-095f6120fb1aad42",
+    "S-0f8f5a5da351a255",
+    "S-2861618a74f378d3"
+   ],
+   "n_members": 3,
+   "stress_all": {
+    "ann_return_pct": 1.2355757713801938,
+    "ann_vol_pct": 1.0736640827837483,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.22413793103448276,
+    "sharpe_ann": 1.150802929140228,
+    "total_pct": 5.968000232721318,
+    "worst_month_pct": 0.0
+   },
+   "up_trend": {
+    "ann_return_pct": 1.5394828070114088,
+    "days": 1105,
+    "sharpe_ann": 1.1418470756149544,
+    "total_pct": 4.660626032185224
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 2.288283139889036,
+    "days": 176,
+    "sharpe_ann": 2.6355251259568244,
+    "total_pct": 1.1033913222478642
+   },
+   "year_2022": {
+    "ann_return_pct": 1.0921278895106317,
+    "days": 365,
+    "sharpe_ann": 1.8404278036917756,
+    "total_pct": 1.0921278895106317
+   }
+  },
+  "short_top5": {
+   "H1": {
+    "ann_return_pct": 1.013166438830989,
+    "ann_vol_pct": 0.7007209438005886,
+    "days": 881,
+    "mdd_pct": 0.0,
+    "months": 29,
+    "pos_month_share": 0.2413793103448276,
+    "sharpe_ann": 1.4458914747656182,
+    "total_pct": 2.4454784455071263,
+    "worst_month_pct": 0.0
+   },
+   "H2": {
+    "ann_return_pct": 2.101544746784306,
+    "ann_vol_pct": 1.0766790709417247,
+    "days": 882,
+    "mdd_pct": 0.0,
+    "months": 29,
+    "pos_month_share": 0.3103448275862069,
+    "sharpe_ann": 1.951876658052037,
+    "total_pct": 5.078253333325364,
+    "worst_month_pct": 0.0
+   },
+   "all": {
+    "ann_return_pct": 1.55766426504473,
+    "ann_vol_pct": 0.9086566859637814,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.27586206896551724,
+    "sharpe_ann": 1.7142494950032403,
+    "total_pct": 7.523731778832492,
+    "worst_month_pct": 0.0
+   },
+   "beta_to_market": -0.00012337003160588399,
+   "corr_to_market": -0.009690591253782514,
+   "down_trend": {
+    "ann_return_pct": 1.5831753984556667,
+    "days": 658,
+    "sharpe_ann": 1.8315351564161793,
+    "total_pct": 2.854053184065284
+   },
+   "members": [
+    "S-095f6120fb1aad42",
+    "S-0f8f5a5da351a255",
+    "S-2861618a74f378d3",
+    "S-2f6ddb930f5fa84f",
+    "S-31d8ccc131d7c023"
+   ],
+   "n_members": 5,
+   "stress_all": {
+    "ann_return_pct": 1.2268572577973076,
+    "ann_vol_pct": 0.8342669060705877,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.27586206896551724,
+    "sharpe_ann": 1.4705812358970671,
+    "total_pct": 5.9258886177990515,
+    "worst_month_pct": 0.0
+   },
+   "up_trend": {
+    "ann_return_pct": 1.5424730199909775,
+    "days": 1105,
+    "sharpe_ann": 1.650763303735325,
+    "total_pct": 4.669678594767206
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 2.318018760236408,
+    "days": 176,
+    "sharpe_ann": 2.065584878955309,
+    "total_pct": 1.1177295939770076
+   },
+   "year_2022": {
+    "ann_return_pct": 1.3276380455104138,
+    "days": 365,
+    "sharpe_ann": 1.748682913477697,
+    "total_pct": 1.3276380455104138
+   }
+  }
+ },
+ "short_long_pairs": {
+  "short_all_pass__long_top10": {
+   "corr_daily": -0.06968841318094261,
+   "corr_down_trend_days": 0.018110193943004223,
+   "long_alone_all": {
+    "ann_return_pct": 11.088865789433372,
+    "ann_vol_pct": 6.941304050765414,
+    "days": 1763,
+    "mdd_pct": 7.370364026213565,
+    "months": 58,
+    "pos_month_share": 0.6206896551724138,
+    "sharpe_ann": 1.5975190984769796,
+    "total_pct": 53.56074078567403,
+    "worst_month_pct": -3.5241130411222676
+   },
+   "mix50_all": {
+    "ann_return_pct": 11.771158620896829,
+    "ann_vol_pct": 5.810081703097381,
+    "days": 1763,
+    "mdd_pct": 6.080032508627532,
+    "months": 58,
+    "pos_month_share": 0.6379310344827587,
+    "sharpe_ann": 2.0259884838833795,
+    "total_pct": 56.85630862641399,
+    "worst_month_pct": -2.4192935299715352
+   },
+   "mix50_down_trend": {
+    "ann_return_pct": 14.719843589004995,
+    "days": 658,
+    "sharpe_ann": 2.4858474970461804,
+    "total_pct": 26.536046798809004
+   },
+   "mix50_stress_all": {
+    "ann_return_pct": 4.963043094316181,
+    "ann_vol_pct": 5.793154863418082,
+    "days": 1763,
+    "mdd_pct": 22.820240052000987,
+    "months": 58,
+    "pos_month_share": 0.5172413793103449,
+    "sharpe_ann": 0.8567081687486395,
+    "total_pct": 23.9721780144642,
+    "worst_month_pct": -3.318004766343123
+   },
+   "short_alone_all": {
+    "ann_return_pct": 12.453451452360286,
+    "ann_vol_pct": 9.815421177661609,
+    "days": 1763,
+    "mdd_pct": 19.270206902338188,
+    "months": 58,
+    "pos_month_share": 0.5172413793103449,
+    "sharpe_ann": 1.268763838754309,
+    "total_pct": 60.15187646715394,
+    "worst_month_pct": -5.253019341670733
+   }
+  },
+  "short_all_pass__long_top5": {
+   "corr_daily": -0.0008016198881214144,
+   "corr_down_trend_days": 0.03552341753277186,
+   "long_alone_all": {
+    "ann_return_pct": 6.972707570253478,
+    "ann_vol_pct": 3.894673978831276,
+    "days": 1763,
+    "mdd_pct": 3.1376200637882476,
+    "months": 58,
+    "pos_month_share": 0.6379310344827587,
+    "sharpe_ann": 1.7903186783161413,
+    "total_pct": 33.67913272974486,
+    "worst_month_pct": -1.0622941717146048
+   },
+   "mix50_all": {
+    "ann_return_pct": 9.71307951130688,
+    "ann_vol_pct": 5.278486759048944,
+    "days": 1763,
+    "mdd_pct": 5.885080314217838,
+    "months": 58,
+    "pos_month_share": 0.603448275862069,
+    "sharpe_ann": 1.8401257698819997,
+    "total_pct": 46.91550459844936,
+    "worst_month_pct": -1.9834603708713676
+   },
+   "mix50_down_trend": {
+    "ann_return_pct": 14.555407037740077,
+    "days": 658,
+    "sharpe_ann": 2.6629325060471225,
+    "total_pct": 26.239610495432796
+   },
+   "mix50_stress_all": {
+    "ann_return_pct": 4.04080439762749,
+    "ann_vol_pct": 5.266907318610003,
+    "days": 1763,
+    "mdd_pct": 18.70733135525469,
+    "months": 58,
+    "pos_month_share": 0.41379310344827586,
+    "sharpe_ann": 0.7672062850526681,
+    "total_pct": 19.51763877538974,
+    "worst_month_pct": -2.9733397045055763
+   },
+   "short_alone_all": {
+    "ann_return_pct": 12.453451452360286,
+    "ann_vol_pct": 9.815421177661609,
+    "days": 1763,
+    "mdd_pct": 19.270206902338188,
+    "months": 58,
+    "pos_month_share": 0.5172413793103449,
+    "sharpe_ann": 1.268763838754309,
+    "total_pct": 60.15187646715394,
+    "worst_month_pct": -5.253019341670733
+   }
+  },
+  "short_pass_top3__long_top10": {
+   "corr_daily": -0.03975518854612977,
+   "corr_down_trend_days": -0.035037008949575205,
+   "long_alone_all": {
+    "ann_return_pct": 11.088865789433372,
+    "ann_vol_pct": 6.941304050765414,
+    "days": 1763,
+    "mdd_pct": 7.370364026213565,
+    "months": 58,
+    "pos_month_share": 0.6206896551724138,
+    "sharpe_ann": 1.5975190984769796,
+    "total_pct": 53.56074078567403,
+    "worst_month_pct": -3.5241130411222676
+   },
+   "mix50_all": {
+    "ann_return_pct": 11.663219343371916,
+    "ann_vol_pct": 6.54262450675014,
+    "days": 1763,
+    "mdd_pct": 7.401272149585097,
+    "months": 58,
+    "pos_month_share": 0.6551724137931034,
+    "sharpe_ann": 1.7826514927364037,
+    "total_pct": 56.33494712976621,
+    "worst_month_pct": -3.7212904350945917
+   },
+   "mix50_down_trend": {
+    "ann_return_pct": 7.631186517609149,
+    "days": 658,
+    "sharpe_ann": 1.348885180638115,
+    "total_pct": 13.757043092018685
+   },
+   "mix50_stress_all": {
+    "ann_return_pct": 4.31713179133075,
+    "ann_vol_pct": 6.499141631319188,
+    "days": 1763,
+    "mdd_pct": 25.589705556668346,
+    "months": 58,
+    "pos_month_share": 0.46551724137931033,
+    "sharpe_ann": 0.6642618419833487,
+    "total_pct": 20.852337940044112,
+    "worst_month_pct": -4.666507390162507
+   },
+   "short_alone_all": {
+    "ann_return_pct": 12.237572897310455,
+    "ann_vol_pct": 11.371816485832747,
+    "days": 1763,
+    "mdd_pct": 21.93889058268028,
+    "months": 58,
+    "pos_month_share": 0.5517241379310345,
+    "sharpe_ann": 1.0761317607047463,
+    "total_pct": 59.10915347385842,
+    "worst_month_pct": -5.8658053421477225
+   }
+  },
+  "short_pass_top3__long_top5": {
+   "corr_daily": -0.010713830176550632,
+   "corr_down_trend_days": -0.019045096479627925,
+   "long_alone_all": {
+    "ann_return_pct": 6.972707570253478,
+    "ann_vol_pct": 3.894673978831276,
+    "days": 1763,
+    "mdd_pct": 3.1376200637882476,
+    "months": 58,
+    "pos_month_share": 0.6379310344827587,
+    "sharpe_ann": 1.7903186783161413,
+    "total_pct": 33.67913272974486,
+    "worst_month_pct": -1.0622941717146048
+   },
+   "mix50_all": {
+    "ann_return_pct": 9.605140233781967,
+    "ann_vol_pct": 5.9903604825814,
+    "days": 1763,
+    "mdd_pct": 7.570348452148657,
+    "months": 58,
+    "pos_month_share": 0.6724137931034483,
+    "sharpe_ann": 1.6034327586313912,
+    "total_pct": 46.3941431018016,
+    "worst_month_pct": -2.974390775600887
+   },
+   "mix50_down_trend": {
+    "ann_return_pct": 7.4667499663442305,
+    "days": 658,
+    "sharpe_ann": 1.4302875674271462,
+    "total_pct": 13.460606788642476
+   },
+   "mix50_stress_all": {
+    "ann_return_pct": 3.3948930946420584,
+    "ann_vol_pct": 5.954705333291888,
+    "days": 1763,
+    "mdd_pct": 22.110186190557165,
+    "months": 58,
+    "pos_month_share": 0.4482758620689655,
+    "sharpe_ann": 0.5701194105544914,
+    "total_pct": 16.39779870096974,
+    "worst_month_pct": -3.8575915643716256
+   },
+   "short_alone_all": {
+    "ann_return_pct": 12.237572897310455,
+    "ann_vol_pct": 11.371816485832747,
+    "days": 1763,
+    "mdd_pct": 21.93889058268028,
+    "months": 58,
+    "pos_month_share": 0.5517241379310345,
+    "sharpe_ann": 1.0761317607047463,
+    "total_pct": 59.10915347385842,
+    "worst_month_pct": -5.8658053421477225
+   }
+  },
+  "short_pass_top5__long_top10": {
+   "corr_daily": -0.07739998859694479,
+   "corr_down_trend_days": -0.0686360520771748,
+   "long_alone_all": {
+    "ann_return_pct": 11.088865789433372,
+    "ann_vol_pct": 6.941304050765414,
+    "days": 1763,
+    "mdd_pct": 7.370364026213565,
+    "months": 58,
+    "pos_month_share": 0.6206896551724138,
+    "sharpe_ann": 1.5975190984769796,
+    "total_pct": 53.56074078567403,
+    "worst_month_pct": -3.5241130411222676
+   },
+   "mix50_all": {
+    "ann_return_pct": 11.516715596169465,
+    "ann_vol_pct": 5.998464023360588,
+    "days": 1763,
+    "mdd_pct": 7.520968709904565,
+    "months": 58,
+    "pos_month_share": 0.6379310344827587,
+    "sharpe_ann": 1.9199440975753863,
+    "total_pct": 55.627313961771875,
+    "worst_month_pct": -3.899741810996083
+   },
+   "mix50_down_trend": {
+    "ann_return_pct": 9.232199935002937,
+    "days": 658,
+    "sharpe_ann": 1.800015482725134,
+    "total_pct": 16.643253581457348
+   },
+   "mix50_stress_all": {
+    "ann_return_pct": 4.037990663768248,
+    "ann_vol_pct": 5.971063454989745,
+    "days": 1763,
+    "mdd_pct": 27.927718527354592,
+    "months": 58,
+    "pos_month_share": 0.46551724137931033,
+    "sharpe_ann": 0.6762598813773923,
+    "total_pct": 19.50404805540663,
+    "worst_month_pct": -4.824701377993893
+   },
+   "short_alone_all": {
+    "ann_return_pct": 11.944565402905559,
+    "ann_vol_pct": 10.336911213619032,
+    "days": 1763,
+    "mdd_pct": 25.568211890785108,
+    "months": 58,
+    "pos_month_share": 0.5517241379310345,
+    "sharpe_ann": 1.1555255874857875,
+    "total_pct": 57.69388713786992,
+    "worst_month_pct": -6.222708093950704
+   }
+  },
+  "short_pass_top5__long_top5": {
+   "corr_daily": -0.022485674307716995,
+   "corr_down_trend_days": -0.029413140826333777,
+   "long_alone_all": {
+    "ann_return_pct": 6.972707570253478,
+    "ann_vol_pct": 3.894673978831276,
+    "days": 1763,
+    "mdd_pct": 3.1376200637882476,
+    "months": 58,
+    "pos_month_share": 0.6379310344827587,
+    "sharpe_ann": 1.7903186783161413,
+    "total_pct": 33.67913272974486,
+    "worst_month_pct": -1.0622941717146048
+   },
+   "mix50_all": {
+    "ann_return_pct": 9.458636486579518,
+    "ann_vol_pct": 5.482009710229376,
+    "days": 1763,
+    "mdd_pct": 7.4533976098010655,
+    "months": 58,
+    "pos_month_share": 0.6724137931034483,
+    "sharpe_ann": 1.725395792154435,
+    "total_pct": 45.686509933807244,
+    "worst_month_pct": -3.152842151502379
+   },
+   "mix50_down_trend": {
+    "ann_return_pct": 9.067763383738018,
+    "days": 658,
+    "sharpe_ann": 1.9247316400152066,
+    "total_pct": 16.34681727808114
+   },
+   "mix50_stress_all": {
+    "ann_return_pct": 3.115751967079556,
+    "ann_vol_pct": 5.460381217947821,
+    "days": 1763,
+    "mdd_pct": 24.083569341267324,
+    "months": 58,
+    "pos_month_share": 0.39655172413793105,
+    "sharpe_ann": 0.5706107033037066,
+    "total_pct": 15.049508816332205,
+    "worst_month_pct": -4.015785552203013
+   },
+   "short_alone_all": {
+    "ann_return_pct": 11.944565402905559,
+    "ann_vol_pct": 10.336911213619032,
+    "days": 1763,
+    "mdd_pct": 25.568211890785108,
+    "months": 58,
+    "pos_month_share": 0.5517241379310345,
+    "sharpe_ann": 1.1555255874857875,
+    "total_pct": 57.69388713786992,
+    "worst_month_pct": -6.222708093950704
+   }
+  },
+  "short_top10__long_top10": {
+   "corr_daily": 0.016208604189056588,
+   "corr_down_trend_days": 0.007454627103782574,
+   "long_alone_all": {
+    "ann_return_pct": 11.088865789433372,
+    "ann_vol_pct": 6.941304050765414,
+    "days": 1763,
+    "mdd_pct": 7.370364026213565,
+    "months": 58,
+    "pos_month_share": 0.6206896551724138,
+    "sharpe_ann": 1.5975190984769796,
+    "total_pct": 53.56074078567403,
+    "worst_month_pct": -3.5241130411222676
+   },
+   "mix50_all": {
+    "ann_return_pct": 6.416186685047127,
+    "ann_vol_pct": 3.5098466932392247,
+    "days": 1763,
+    "mdd_pct": 3.633613602110298,
+    "months": 58,
+    "pos_month_share": 0.6379310344827587,
+    "sharpe_ann": 1.8280532586811222,
+    "total_pct": 30.991060618460494,
+    "worst_month_pct": -1.7620565205611338
+   },
+   "mix50_down_trend": {
+    "ann_return_pct": 4.214938672254643,
+    "days": 658,
+    "sharpe_ann": 1.2479619660537613,
+    "total_pct": 7.598437387242617
+   },
+   "mix50_stress_all": {
+    "ann_return_pct": 3.5405400066052795,
+    "ann_vol_pct": 3.438155169111742,
+    "days": 1763,
+    "mdd_pct": 6.704178946589279,
+    "months": 58,
+    "pos_month_share": 0.5862068965517241,
+    "sharpe_ann": 1.0297790042792014,
+    "total_pct": 17.101293237383853,
+    "worst_month_pct": -2.381105342586387
+   },
+   "short_alone_all": {
+    "ann_return_pct": 1.7435075806608809,
+    "ann_vol_pct": 0.9396563254764854,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.3275862068965517,
+    "sharpe_ann": 1.8554736805254566,
+    "total_pct": 8.421380451246941,
+    "worst_month_pct": 0.0
+   }
+  },
+  "short_top10__long_top5": {
+   "corr_daily": 0.025830543375280464,
+   "corr_down_trend_days": 0.0015967106389613024,
+   "long_alone_all": {
+    "ann_return_pct": 6.972707570253478,
+    "ann_vol_pct": 3.894673978831276,
+    "days": 1763,
+    "mdd_pct": 3.1376200637882476,
+    "months": 58,
+    "pos_month_share": 0.6379310344827587,
+    "sharpe_ann": 1.7903186783161413,
+    "total_pct": 33.67913272974486,
+    "worst_month_pct": -1.0622941717146048
+   },
+   "mix50_all": {
+    "ann_return_pct": 4.358107575457179,
+    "ann_vol_pct": 2.0149752584018032,
+    "days": 1763,
+    "mdd_pct": 1.5688100318941238,
+    "months": 58,
+    "pos_month_share": 0.7068965517241379,
+    "sharpe_ann": 2.1628591007682414,
+    "total_pct": 21.050256590495895,
+    "worst_month_pct": -0.5311470858573024
+   },
+   "mix50_down_trend": {
+    "ann_return_pct": 4.050502120989725,
+    "days": 658,
+    "sharpe_ann": 1.6587898949740778,
+    "total_pct": 7.302001083866408
+   },
+   "mix50_stress_all": {
+    "ann_return_pct": 2.6183013099165877,
+    "ann_vol_pct": 1.946530524602159,
+    "days": 1763,
+    "mdd_pct": 1.8380206854034267,
+    "months": 58,
+    "pos_month_share": 0.603448275862069,
+    "sharpe_ann": 1.3451118679229181,
+    "total_pct": 12.646753998309435,
+    "worst_month_pct": -0.6677213634196161
+   },
+   "short_alone_all": {
+    "ann_return_pct": 1.7435075806608809,
+    "ann_vol_pct": 0.9396563254764854,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.3275862068965517,
+    "sharpe_ann": 1.8554736805254566,
+    "total_pct": 8.421380451246941,
+    "worst_month_pct": 0.0
+   }
+  },
+  "short_top3__long_top10": {
+   "corr_daily": 0.005617151677149636,
+   "corr_down_trend_days": 0.04112239182705605,
+   "long_alone_all": {
+    "ann_return_pct": 11.088865789433372,
+    "ann_vol_pct": 6.941304050765414,
+    "days": 1763,
+    "mdd_pct": 7.370364026213565,
+    "months": 58,
+    "pos_month_share": 0.6206896551724138,
+    "sharpe_ann": 1.5975190984769796,
+    "total_pct": 53.56074078567403,
+    "worst_month_pct": -3.5241130411222676
+   },
+   "mix50_all": {
+    "ann_return_pct": 6.324668304148807,
+    "ann_vol_pct": 3.5233285610773906,
+    "days": 1763,
+    "mdd_pct": 3.6851820131067825,
+    "months": 58,
+    "pos_month_share": 0.6379310344827587,
+    "sharpe_ann": 1.7950833124160301,
+    "total_pct": 30.549014301957094,
+    "worst_month_pct": -1.7620565205611338
+   },
+   "mix50_down_trend": {
+    "ann_return_pct": 4.0964042379412415,
+    "days": 658,
+    "sharpe_ann": 1.214540856355084,
+    "total_pct": 7.384750653603663
+   },
+   "mix50_stress_all": {
+    "ann_return_pct": 3.431678796255738,
+    "ann_vol_pct": 3.4494272599111326,
+    "days": 1763,
+    "mdd_pct": 6.732208935342015,
+    "months": 58,
+    "pos_month_share": 0.5862068965517241,
+    "sharpe_ann": 0.9948546635954131,
+    "total_pct": 16.575478678900993,
+    "worst_month_pct": -2.381105342586387
+   },
+   "short_alone_all": {
+    "ann_return_pct": 1.5604708188642415,
+    "ann_vol_pct": 1.1755856671163067,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.22413793103448276,
+    "sharpe_ann": 1.3273986426629816,
+    "total_pct": 7.5372878182401575,
+    "worst_month_pct": 0.0
+   }
+  },
+  "short_top3__long_top5": {
+   "corr_daily": 0.001782466652261669,
+   "corr_down_trend_days": 0.019341673267145667,
+   "long_alone_all": {
+    "ann_return_pct": 6.972707570253478,
+    "ann_vol_pct": 3.894673978831276,
+    "days": 1763,
+    "mdd_pct": 3.1376200637882476,
+    "months": 58,
+    "pos_month_share": 0.6379310344827587,
+    "sharpe_ann": 1.7903186783161413,
+    "total_pct": 33.67913272974486,
+    "worst_month_pct": -1.0622941717146048
+   },
+   "mix50_all": {
+    "ann_return_pct": 4.2665891945588585,
+    "ann_vol_pct": 2.0351172687902768,
+    "days": 1763,
+    "mdd_pct": 1.5688100318941238,
+    "months": 58,
+    "pos_month_share": 0.7068965517241379,
+    "sharpe_ann": 2.096483214991843,
+    "total_pct": 20.6082102739925,
+    "worst_month_pct": -0.5311470858573024
+   },
+   "mix50_down_trend": {
+    "ann_return_pct": 3.931967686676323,
+    "days": 658,
+    "sharpe_ann": 1.6215223076947274,
+    "total_pct": 7.088314350227454
+   },
+   "mix50_stress_all": {
+    "ann_return_pct": 2.5094400995670467,
+    "ann_vol_pct": 1.9643515572405024,
+    "days": 1763,
+    "mdd_pct": 1.8380206854034267,
+    "months": 58,
+    "pos_month_share": 0.5517241379310345,
+    "sharpe_ann": 1.2774903200587364,
+    "total_pct": 12.12093943982658,
+    "worst_month_pct": -0.6677213634196161
+   },
+   "short_alone_all": {
+    "ann_return_pct": 1.5604708188642415,
+    "ann_vol_pct": 1.1755856671163067,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.22413793103448276,
+    "sharpe_ann": 1.3273986426629816,
+    "total_pct": 7.5372878182401575,
+    "worst_month_pct": 0.0
+   }
+  },
+  "short_top5__long_top10": {
+   "corr_daily": 0.016199720252647532,
+   "corr_down_trend_days": 0.021079930509635855,
+   "long_alone_all": {
+    "ann_return_pct": 11.088865789433372,
+    "ann_vol_pct": 6.941304050765414,
+    "days": 1763,
+    "mdd_pct": 7.370364026213565,
+    "months": 58,
+    "pos_month_share": 0.6206896551724138,
+    "sharpe_ann": 1.5975190984769796,
+    "total_pct": 53.56074078567403,
+    "worst_month_pct": -3.5241130411222676
+   },
+   "mix50_all": {
+    "ann_return_pct": 6.323265027239052,
+    "ann_vol_pct": 3.50755294574773,
+    "days": 1763,
+    "mdd_pct": 3.633613602110298,
+    "months": 58,
+    "pos_month_share": 0.6379310344827587,
+    "sharpe_ann": 1.8027568293459004,
+    "total_pct": 30.542236282253267,
+    "worst_month_pct": -1.7620565205611338
+   },
+   "mix50_down_trend": {
+    "ann_return_pct": 4.090133615048976,
+    "days": 658,
+    "sharpe_ann": 1.214074731426298,
+    "total_pct": 7.3734463526088385
+   },
+   "mix50_stress_all": {
+    "ann_return_pct": 3.4273195394642952,
+    "ann_vol_pct": 3.435622620840018,
+    "days": 1763,
+    "mdd_pct": 6.710930897649122,
+    "months": 58,
+    "pos_month_share": 0.5862068965517241,
+    "sharpe_ann": 0.9975832382388689,
+    "total_pct": 16.554422871439858,
+    "worst_month_pct": -2.381105342586387
+   },
+   "short_alone_all": {
+    "ann_return_pct": 1.55766426504473,
+    "ann_vol_pct": 0.9086566859637814,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.27586206896551724,
+    "sharpe_ann": 1.7142494950032403,
+    "total_pct": 7.523731778832492,
+    "worst_month_pct": 0.0
+   }
+  },
+  "short_top5__long_top5": {
+   "corr_daily": 0.016750846348047264,
+   "corr_down_trend_days": 0.008227536579111207,
+   "long_alone_all": {
+    "ann_return_pct": 6.972707570253478,
+    "ann_vol_pct": 3.894673978831276,
+    "days": 1763,
+    "mdd_pct": 3.1376200637882476,
+    "months": 58,
+    "pos_month_share": 0.6379310344827587,
+    "sharpe_ann": 1.7903186783161413,
+    "total_pct": 33.67913272974486,
+    "worst_month_pct": -1.0622941717146048
+   },
+   "mix50_all": {
+    "ann_return_pct": 4.265185917649103,
+    "ann_vol_pct": 2.00703152918639,
+    "days": 1763,
+    "mdd_pct": 1.5688100318941238,
+    "months": 58,
+    "pos_month_share": 0.7068965517241379,
+    "sharpe_ann": 2.1251215317868586,
+    "total_pct": 20.60143225428867,
+    "worst_month_pct": -0.5311470858573024
+   },
+   "mix50_down_trend": {
+    "ann_return_pct": 3.925697063784057,
+    "days": 658,
+    "sharpe_ann": 1.6184469638709593,
+    "total_pct": 7.077010049232629
+   },
+   "mix50_stress_all": {
+    "ann_return_pct": 2.5050808427756035,
+    "ann_vol_pct": 1.9386890521317162,
+    "days": 1763,
+    "mdd_pct": 1.8380206854034267,
+    "months": 58,
+    "pos_month_share": 0.5517241379310345,
+    "sharpe_ann": 1.2921519518672178,
+    "total_pct": 12.099883632365447,
+    "worst_month_pct": -0.6677213634196161
+   },
+   "short_alone_all": {
+    "ann_return_pct": 1.55766426504473,
+    "ann_vol_pct": 0.9086566859637814,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.27586206896551724,
+    "sharpe_ann": 1.7142494950032403,
+    "total_pct": 7.523731778832492,
+    "worst_month_pct": 0.0
+   }
+  }
+ },
+ "short_pass_top": [
+  {
+   "beta_to_market": -0.021026087728322183,
+   "corr_to_market": -0.12181183525957678,
+   "dev_cost_share": 0.059188735198190415,
+   "dev_fold_pos_share": 0.5,
+   "dev_mean_bp": 56.92571251229652,
+   "dev_status": "RESEARCH_ONLY",
+   "dev_t": 1.9254534015025542,
+   "direction": "short",
+   "down_trend": {
+    "ann_return_pct": 2.7514333354471736,
+    "days": 658,
+    "sharpe_ann": 0.3154976779688495,
+    "total_pct": 4.960118177326685
+   },
+   "family": "spec:funding_z+taker_share_z:short",
+   "gross": {
+    "ann_return_pct": 13.834830829200987,
+    "ann_vol_pct": 12.38068989962461,
+    "days": 1763,
+    "mdd_pct": 14.566146798848251,
+    "months": 58,
+    "pos_month_share": 0.3103448275862069,
+    "sharpe_ann": 1.1174523343501614,
+    "total_pct": 66.82412808734618,
+    "worst_month_pct": -5.898858391806039
+   },
+   "horizon_bars": 64,
+   "id": "S-057a2b85f4a068b0",
+   "primary": {
+    "ann_return_pct": 11.667672272443758,
+    "ann_vol_pct": 12.319963231511554,
+    "days": 1763,
+    "mdd_pct": 16.825558178760055,
+    "months": 58,
+    "pos_month_share": 0.29310344827586204,
+    "sharpe_ann": 0.9470541472559438,
+    "total_pct": 56.356455387173575,
+    "worst_month_pct": -6.513260074063199
+   },
+   "profile": {
+    "gross_bp_mean": 67.49911928014761,
+    "hold_hours_mean": 16.0,
+    "hold_hours_median": 16.0,
+    "net_bp_mean": 56.92571251229652,
+    "top5pct_share_of_profit": 0.31860830310312444,
+    "trades": 99,
+    "trades_by_symbol": {
+     "BTCUSDT": 99
+    },
+    "trades_per_year": 20.496313102665912,
+    "win_share": 0.5555555555555556
+   },
+   "sharpe_H1": 1.411223536982791,
+   "sharpe_H2": -0.4773390776878545,
+   "stress": {
+    "ann_return_pct": 5.930615606832816,
+    "ann_vol_pct": 12.225765647309782,
+    "days": 1763,
+    "mdd_pct": 28.907263908489167,
+    "months": 58,
+    "pos_month_share": 0.20689655172413793,
+    "sharpe_ann": 0.4850915499216868,
+    "total_pct": 28.645685794099325,
+    "worst_month_pct": -7.683226253919142
+   },
+   "symbols": [
+    "BTCUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 16.977070662076116,
+    "days": 1105,
+    "sharpe_ann": 1.2102496176737745,
+    "total_pct": 51.39633720984687
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 52.577628911413846,
+    "days": 176,
+    "sharpe_ann": 3.206968350762537,
+    "total_pct": 25.35250051618859
+   },
+   "year_2022": {
+    "ann_return_pct": 5.83681612851256,
+    "days": 365,
+    "sharpe_ann": 0.38353324369497155,
+    "total_pct": 5.83681612851256
+   }
+  },
+  {
+   "beta_to_market": -0.0393152323929052,
+   "corr_to_market": -0.20604615404142454,
+   "dev_cost_share": 0.05232869283262584,
+   "dev_fold_pos_share": 0.5,
+   "dev_mean_bp": 38.76771659296336,
+   "dev_status": "RESEARCH_ONLY",
+   "dev_t": 1.7992461733737093,
+   "direction": "short",
+   "down_trend": {
+    "ann_return_pct": 11.622205137640435,
+    "days": 658,
+    "sharpe_ann": 1.0090193029818704,
+    "total_pct": 20.951810905664125
+   },
+   "family": "spec:funding_z+taker_share_z:short",
+   "gross": {
+    "ann_return_pct": 17.302328471385355,
+    "ann_vol_pct": 13.682418778218274,
+    "days": 1763,
+    "mdd_pct": 14.43673380132526,
+    "months": 58,
+    "pos_month_share": 0.6206896551724138,
+    "sharpe_ann": 1.264566503323944,
+    "total_pct": 83.57261669877363,
+    "worst_month_pct": -7.459174445719685
+   },
+   "horizon_bars": 64,
+   "id": "S-b7f33b3bfa3371f6",
+   "primary": {
+    "ann_return_pct": 13.524171808047242,
+    "ann_vol_pct": 13.61873472830686,
+    "days": 1763,
+    "mdd_pct": 23.57312439970689,
+    "months": 58,
+    "pos_month_share": 0.5517241379310345,
+    "sharpe_ann": 0.9930564092666356,
+    "total_pct": 65.32360245914326,
+    "worst_month_pct": -8.005002060074878
+   },
+   "profile": {
+    "gross_bp_mean": 49.597992106097124,
+    "hold_hours_mean": 16.0,
+    "hold_hours_median": 16.0,
+    "net_bp_mean": 38.76771659296336,
+    "top5pct_share_of_profit": 0.3791320324393063,
+    "trades": 337,
+    "trades_by_symbol": {
+     "BTCUSDT": 99,
+     "ETHUSDT": 238
+    },
+    "trades_per_year": 69.77027793533749,
+    "win_share": 0.486646884272997
+   },
+   "sharpe_H1": 1.8136135478603503,
+   "sharpe_H2": -0.6691976091256644,
+   "stress": {
+    "ann_return_pct": 1.9017933110154732,
+    "ann_vol_pct": 13.56595359403674,
+    "days": 1763,
+    "mdd_pct": 58.499115355160356,
+    "months": 58,
+    "pos_month_share": 0.39655172413793105,
+    "sharpe_ann": 0.14018869354318406,
+    "total_pct": 9.185922211836385,
+    "worst_month_pct": -9.203276507907773
+   },
+   "symbols": [
+    "BTCUSDT",
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 14.656745626262339,
+    "days": 1105,
+    "sharpe_ann": 0.9948518837844452,
+    "total_pct": 44.371791553479135
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 121.39747340684993,
+    "days": 176,
+    "sharpe_ann": 4.509286634571671,
+    "total_pct": 58.53686388933038
+   },
+   "year_2022": {
+    "ann_return_pct": 8.478047712811456,
+    "days": 365,
+    "sharpe_ann": 0.6206901621322463,
+    "total_pct": 8.478047712811456
+   }
+  },
+  {
+   "beta_to_market": -0.03988208606135783,
+   "corr_to_market": -0.21646852212580092,
+   "dev_cost_share": 0.05417458613638915,
+   "dev_fold_pos_share": 0.5,
+   "dev_mean_bp": 38.51031320087096,
+   "dev_status": "RESEARCH_ONLY",
+   "dev_t": 1.5571236538105289,
+   "direction": "short",
+   "down_trend": {
+    "ann_return_pct": 11.622205137640435,
+    "days": 658,
+    "sharpe_ann": 1.0090193029818704,
+    "total_pct": 20.951810905664125
+   },
+   "family": "spec:taker_share_z:short",
+   "gross": {
+    "ann_return_pct": 14.9463934876247,
+    "ann_vol_pct": 13.20438835380624,
+    "days": 1763,
+    "mdd_pct": 18.695711584693726,
+    "months": 58,
+    "pos_month_share": 0.603448275862069,
+    "sharpe_ann": 1.1319262268832253,
+    "total_pct": 72.19312799638996,
+    "worst_month_pct": -7.459174445719685
+   },
+   "horizon_bars": 64,
+   "id": "S-3f8ae214c522f362",
+   "primary": {
+    "ann_return_pct": 11.520874611440368,
+    "ann_vol_pct": 13.149933005245392,
+    "days": 1763,
+    "mdd_pct": 29.174411488399308,
+    "months": 58,
+    "pos_month_share": 0.5344827586206896,
+    "sharpe_ann": 0.8761166012666977,
+    "total_pct": 55.64740257525849,
+    "worst_month_pct": -8.005002060074878
+   },
+   "profile": {
+    "gross_bp_mean": 49.96064221203459,
+    "hold_hours_mean": 16.0,
+    "hold_hours_median": 16.0,
+    "net_bp_mean": 38.51031320087096,
+    "top5pct_share_of_profit": 0.40162885708964363,
+    "trades": 289,
+    "trades_by_symbol": {
+     "BTCUSDT": 89,
+     "ETHUSDT": 200
+    },
+    "trades_per_year": 59.83267158252978,
+    "win_share": 0.4844290657439446
+   },
+   "sharpe_H1": 1.6464734187945194,
+   "sharpe_H2": -0.7806161099328723,
+   "stress": {
+    "ann_return_pct": 1.1870363667423627,
+    "ann_vol_pct": 13.11224325766117,
+    "days": 1763,
+    "mdd_pct": 59.942966647903596,
+    "months": 58,
+    "pos_month_share": 0.39655172413793105,
+    "sharpe_ann": 0.09052885485851596,
+    "total_pct": 5.733548259087069,
+    "worst_month_pct": -9.203276507907773
+   },
+   "symbols": [
+    "BTCUSDT",
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 11.460534804888649,
+    "days": 1105,
+    "sharpe_ann": 0.8164672846982763,
+    "total_pct": 34.69559166959441
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 117.34285311582478,
+    "days": 176,
+    "sharpe_ann": 4.385057296825638,
+    "total_pct": 56.58175931064427
+   },
+   "year_2022": {
+    "ann_return_pct": 8.478047712811456,
+    "days": 365,
+    "sharpe_ann": 0.6206901621322463,
+    "total_pct": 8.478047712811456
+   }
+  },
+  {
+   "beta_to_market": -0.026565739285176988,
+   "corr_to_market": -0.11349623204322211,
+   "dev_cost_share": 0.03022869509709978,
+   "dev_fold_pos_share": 0.5,
+   "dev_mean_bp": 46.99257064001398,
+   "dev_status": "RESEARCH_ONLY",
+   "dev_t": 1.4203129873485354,
+   "direction": "short",
+   "down_trend": {
+    "ann_return_pct": 20.55773824226746,
+    "days": 658,
+    "sharpe_ann": 1.547764836420297,
+    "total_pct": 37.060251406608195
+   },
+   "family": "spec:taker_share_z:short",
+   "gross": {
+    "ann_return_pct": 15.51608166952249,
+    "ann_vol_pct": 16.764236011672207,
+    "days": 1763,
+    "mdd_pct": 36.177376988007225,
+    "months": 58,
+    "pos_month_share": 0.5689655172413793,
+    "sharpe_ann": 0.9255466016297622,
+    "total_pct": 74.94479995443328,
+    "worst_month_pct": -9.496935327764934
+   },
+   "horizon_bars": 128,
+   "id": "S-4d4ec0ad8481a2a2",
+   "primary": {
+    "ann_return_pct": 12.988261405906304,
+    "ann_vol_pct": 16.706323569341006,
+    "days": 1763,
+    "mdd_pct": 44.2809259007716,
+    "months": 58,
+    "pos_month_share": 0.5689655172413793,
+    "sharpe_ann": 0.7774458187642198,
+    "total_pct": 62.73508180441864,
+    "worst_month_pct": -10.076487654494661
+   },
+   "profile": {
+    "gross_bp_mean": 56.138426932159774,
+    "hold_hours_mean": 32.0,
+    "hold_hours_median": 32.0,
+    "net_bp_mean": 46.99257064001398,
+    "top5pct_share_of_profit": 0.37026892207466244,
+    "trades": 267,
+    "trades_by_symbol": {
+     "BTCUSDT": 79,
+     "ETHUSDT": 188
+    },
+    "trades_per_year": 55.27793533749291,
+    "win_share": 0.50187265917603
+   },
+   "sharpe_H1": 1.5936863186534265,
+   "sharpe_H2": -0.7663410648669461,
+   "stress": {
+    "ann_return_pct": 3.4119934583547895,
+    "ann_vol_pct": 16.683643007137047,
+    "days": 1763,
+    "mdd_pct": 71.85865708191866,
+    "months": 58,
+    "pos_month_share": 0.3793103448275862,
+    "sharpe_ann": 0.2045112962975282,
+    "total_pct": 16.48039580021783,
+    "worst_month_pct": -11.435571149028872
+   },
+   "symbols": [
+    "BTCUSDT",
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 8.48082633049848,
+    "days": 1105,
+    "sharpe_ann": 0.45972582252490424,
+    "total_pct": 25.67483039781047
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 97.61858098780841,
+    "days": 176,
+    "sharpe_ann": 3.6723469437625273,
+    "total_pct": 47.07087740781994
+   },
+   "year_2022": {
+    "ann_return_pct": 19.882141468586646,
+    "days": 365,
+    "sharpe_ann": 1.1067435436929276,
+    "total_pct": 19.882141468586646
+   }
+  },
+  {
+   "beta_to_market": -0.04035470030404476,
+   "corr_to_market": -0.21021999994667226,
+   "dev_cost_share": 0.05132012899988935,
+   "dev_fold_pos_share": 0.5,
+   "dev_mean_bp": 34.45330495612478,
+   "dev_status": "RESEARCH_ONLY",
+   "dev_t": 1.3972639566236684,
+   "direction": "short",
+   "down_trend": {
+    "ann_return_pct": 12.782958338822434,
+    "days": 658,
+    "sharpe_ann": 0.9755988758954525,
+    "total_pct": 23.044346813548387
+   },
+   "family": "spec:taker_share_z:short",
+   "gross": {
+    "ann_return_pct": 13.350926316574013,
+    "ann_vol_pct": 13.750930951647408,
+    "days": 1763,
+    "mdd_pct": 23.532889100749507,
+    "months": 58,
+    "pos_month_share": 0.5,
+    "sharpe_ann": 0.9709107233190291,
+    "total_pct": 64.48680300306846,
+    "worst_month_pct": -7.744496257365318
+   },
+   "horizon_bars": 64,
+   "id": "S-f8b1648d499419f6",
+   "primary": {
+    "ann_return_pct": 10.021846916690127,
+    "ann_vol_pct": 13.701260411200577,
+    "days": 1763,
+    "mdd_pct": 31.466973228724335,
+    "months": 58,
+    "pos_month_share": 0.4827586206896552,
+    "sharpe_ann": 0.7314543783502876,
+    "total_pct": 48.406893463355324,
+    "worst_month_pct": -8.056176278884845
+   },
+   "profile": {
+    "gross_bp_mean": 45.898080429230205,
+    "hold_hours_mean": 16.0,
+    "hold_hours_median": 16.0,
+    "net_bp_mean": 34.45330495612478,
+    "top5pct_share_of_profit": 0.4214125063584069,
+    "trades": 281,
+    "trades_by_symbol": {
+     "BTCUSDT": 94,
+     "ETHUSDT": 187
+    },
+    "trades_per_year": 58.17640385706183,
+    "win_share": 0.49110320284697506
+   },
+   "sharpe_H1": 0.9871858552648635,
+   "sharpe_H2": 0.32277095726827454,
+   "stress": {
+    "ann_return_pct": -0.19044121091938526,
+    "ann_vol_pct": 13.697710412473318,
+    "days": 1763,
+    "mdd_pct": 57.19907358051131,
+    "months": 58,
+    "pos_month_share": 0.29310344827586204,
+    "sharpe_ann": -0.01390314185252208,
+    "total_pct": -0.9198571365777368,
+    "worst_month_pct": -8.709395583281324
+   },
+   "symbols": [
+    "BTCUSDT",
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 8.37767378025297,
+    "days": 1105,
+    "sharpe_ann": 0.596244980893406,
+    "total_pct": 25.362546649806934
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 136.58570367062,
+    "days": 176,
+    "sharpe_ann": 4.8871758015404785,
+    "total_pct": 65.860503687751
+   },
+   "year_2022": {
+    "ann_return_pct": 0.24090885978538554,
+    "days": 365,
+    "sharpe_ann": 0.017388146367419734,
+    "total_pct": 0.24090885978538554
+   }
+  },
+  {
+   "beta_to_market": -0.002492155024354745,
+   "corr_to_market": -0.005254524097093626,
+   "dev_cost_share": -0.01861035390461096,
+   "dev_fold_pos_share": 0.75,
+   "dev_mean_bp": 156.69377893954606,
+   "dev_status": "RESEARCH_ONLY",
+   "dev_t": 1.3851699298464393,
+   "direction": "short",
+   "down_trend": {
+    "ann_return_pct": 58.8358215148892,
+    "days": 658,
+    "sharpe_ann": 1.418937349034288,
+    "total_pct": 106.0656727583482
+   },
+   "family": "spec:vol_ratio:short",
+   "gross": {
+    "ann_return_pct": 17.196165278794872,
+    "ann_vol_pct": 34.12872142267681,
+    "days": 1763,
+    "mdd_pct": 53.00491142529839,
+    "months": 58,
+    "pos_month_share": 0.3275862068965517,
+    "sharpe_ann": 0.5038619837474746,
+    "total_pct": 83.05983393565857,
+    "worst_month_pct": -23.794106578577942
+   },
+   "horizon_bars": 768,
+   "id": "S-a7914e25d91b1d4a",
+   "primary": {
+    "ann_return_pct": 18.815696540840555,
+    "ann_vol_pct": 33.85182539146859,
+    "days": 1763,
+    "mdd_pct": 47.009303145344084,
+    "months": 58,
+    "pos_month_share": 0.3275862068965517,
+    "sharpe_ann": 0.5558251681630891,
+    "total_pct": 90.88239178493671,
+    "worst_month_pct": -23.75402414418995
+   },
+   "profile": {
+    "gross_bp_mean": 143.20661023389397,
+    "hold_hours_mean": 192.0,
+    "hold_hours_median": 192.0,
+    "net_bp_mean": 156.69377893954606,
+    "top5pct_share_of_profit": 0.3160222429712698,
+    "trades": 58,
+    "trades_by_symbol": {
+     "BTCUSDT": 58
+    },
+    "trades_per_year": 12.007941009642655,
+    "win_share": 0.5862068965517241
+   },
+   "sharpe_H1": 0.7594339153959142,
+   "sharpe_H2": 0.36521436212810054,
+   "stress": {
+    "ann_return_pct": 16.51910904455633,
+    "ann_vol_pct": 33.76042272892663,
+    "days": 1763,
+    "mdd_pct": 47.9866407653676,
+    "months": 58,
+    "pos_month_share": 0.3275862068965517,
+    "sharpe_ann": 0.4893039751662356,
+    "total_pct": 79.78955957685703,
+    "worst_month_pct": -24.01890638177098
+   },
+   "symbols": [
+    "BTCUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": -5.015291905244515,
+    "days": 1105,
+    "sharpe_ann": -0.17714134546798158,
+    "total_pct": -15.18328097341148
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 48.196584310838524,
+    "days": 176,
+    "sharpe_ann": 1.3849105768077192,
+    "total_pct": 23.23999681837693
+   },
+   "year_2022": {
+    "ann_return_pct": 84.8973890682801,
+    "days": 365,
+    "sharpe_ann": 1.50627634115851,
+    "total_pct": 84.8973890682801
+   }
+  },
+  {
+   "beta_to_market": -0.019777496139448375,
+   "corr_to_market": -0.12140749380050082,
+   "dev_cost_share": 0.0636193655308724,
+   "dev_fold_pos_share": 0.5,
+   "dev_mean_bp": 39.31938923937542,
+   "dev_status": "RESEARCH_ONLY",
+   "dev_t": 1.2279819672518484,
+   "direction": "short",
+   "down_trend": {
+    "ann_return_pct": 2.7514333354471736,
+    "days": 658,
+    "sharpe_ann": 0.3154976779688495,
+    "total_pct": 4.960118177326685
+   },
+   "family": "spec:taker_share_z:short",
+   "gross": {
+    "ann_return_pct": 9.259886309939645,
+    "ann_vol_pct": 11.665670451561464,
+    "days": 1763,
+    "mdd_pct": 19.45427925362759,
+    "months": 58,
+    "pos_month_share": 0.27586206896551724,
+    "sharpe_ann": 0.7937723209642183,
+    "total_pct": 44.726519354585186,
+    "worst_month_pct": -5.898858391806039
+   },
+   "horizon_bars": 64,
+   "id": "S-406848034defb0ef",
+   "primary": {
+    "ann_return_pct": 7.244982186279696,
+    "ann_vol_pct": 11.626961659256242,
+    "days": 1763,
+    "mdd_pct": 24.238336967622367,
+    "months": 58,
+    "pos_month_share": 0.25862068965517243,
+    "sharpe_ann": 0.6231191259250393,
+    "total_pct": 34.994256423044106,
+    "worst_month_pct": -6.513260074063199
+   },
+   "profile": {
+    "gross_bp_mean": 50.254516128747404,
+    "hold_hours_mean": 16.0,
+    "hold_hours_median": 16.0,
+    "net_bp_mean": 39.31938923937542,
+    "top5pct_share_of_profit": 0.38810437640747175,
+    "trades": 89,
+    "trades_by_symbol": {
+     "BTCUSDT": 89
+    },
+    "trades_per_year": 18.42597844583097,
+    "win_share": 0.5280898876404494
+   },
+   "sharpe_H1": 0.9526078672293751,
+   "sharpe_H2": -0.4773390776878545,
+   "stress": {
+    "ann_return_pct": 1.9238484803892049,
+    "ann_vol_pct": 11.585901680410128,
+    "days": 1763,
+    "mdd_pct": 38.091292350387086,
+    "months": 58,
+    "pos_month_share": 0.1724137931034483,
+    "sharpe_ann": 0.16605082051076947,
+    "total_pct": 9.292451701167572,
+    "worst_month_pct": -7.683226253919142
+   },
+   "symbols": [
+    "BTCUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 9.920778696549199,
+    "days": 1105,
+    "sharpe_ann": 0.7598932523113405,
+    "total_pct": 30.034138245717436
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 40.19989145091651,
+    "days": 176,
+    "sharpe_ann": 2.6439620847845946,
+    "total_pct": 19.38405724756522
+   },
+   "year_2022": {
+    "ann_return_pct": 5.83681612851256,
+    "days": 365,
+    "sharpe_ann": 0.38353324369497155,
+    "total_pct": 5.83681612851256
+   }
+  },
+  {
+   "beta_to_market": -0.04576565218489348,
+   "corr_to_market": -0.24713555803957996,
+   "dev_cost_share": 0.051358408858823965,
+   "dev_fold_pos_share": 0.75,
+   "dev_mean_bp": 23.011693347396132,
+   "dev_status": "RESEARCH_ONLY",
+   "dev_t": 1.1217412444167825,
+   "direction": "short",
+   "down_trend": {
+    "ann_return_pct": 14.08836872538917,
+    "days": 658,
+    "sharpe_ann": 1.1481221611824233,
+    "total_pct": 25.397661976181023
+   },
+   "family": "spec:taker_share_z:short",
+   "gross": {
+    "ann_return_pct": 10.317897500774748,
+    "ann_vol_pct": 13.26270320831022,
+    "days": 1763,
+    "mdd_pct": 12.124730932127047,
+    "months": 58,
+    "pos_month_share": 0.5344827586206896,
+    "sharpe_ann": 0.7779633864014766,
+    "total_pct": 49.83685833935854,
+    "worst_month_pct": -7.592119392460639
+   },
+   "horizon_bars": 64,
+   "id": "S-171eadfd225596ed",
+   "primary": {
+    "ann_return_pct": 6.908076406187978,
+    "ann_vol_pct": 13.217363841785295,
+    "days": 1763,
+    "mdd_pct": 15.874691359546688,
+    "months": 58,
+    "pos_month_share": 0.5,
+    "sharpe_ann": 0.5226516035178532,
+    "total_pct": 33.366955353724364,
+    "worst_month_pct": -8.202217399485978
+   },
+   "profile": {
+    "gross_bp_mean": 34.37024713059212,
+    "hold_hours_mean": 16.0,
+    "hold_hours_median": 16.0,
+    "net_bp_mean": 23.011693347396132,
+    "top5pct_share_of_profit": 0.3914250629501746,
+    "trades": 290,
+    "trades_by_symbol": {
+     "BTCUSDT": 86,
+     "ETHUSDT": 204
+    },
+    "trades_per_year": 60.03970504821327,
+    "win_share": 0.5
+   },
+   "sharpe_H1": 0.6556004111550645,
+   "sharpe_H2": 0.3515885425191771,
+   "stress": {
+    "ann_return_pct": -3.1961501088560538,
+    "ann_vol_pct": 13.250309296962856,
+    "days": 1763,
+    "mdd_pct": 44.80984892245368,
+    "months": 58,
+    "pos_month_share": 0.3793103448275862,
+    "sharpe_ann": -0.24121324545900621,
+    "total_pct": -15.43784285455677,
+    "worst_month_pct": -9.52597368927437
+   },
+   "symbols": [
+    "BTCUSDT",
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 2.6323910251613847,
+    "days": 1105,
+    "sharpe_ann": 0.19143753961091878,
+    "total_pct": 7.96929337754337
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 122.0776531914415,
+    "days": 176,
+    "sharpe_ann": 4.649307054479754,
+    "total_pct": 58.86484099094165
+   },
+   "year_2022": {
+    "ann_return_pct": 9.573580057394327,
+    "days": 365,
+    "sharpe_ann": 0.6915994275846296,
+    "total_pct": 9.573580057394327
+   }
+  },
+  {
+   "beta_to_market": -0.030145031808243225,
+   "corr_to_market": -0.05169728623084314,
+   "dev_cost_share": -0.002497454483185489,
+   "dev_fold_pos_share": 0.75,
+   "dev_mean_bp": 49.81587710283548,
+   "dev_status": "RESEARCH_ONLY",
+   "dev_t": 1.0987671776630275,
+   "direction": "short",
+   "down_trend": {
+    "ann_return_pct": 70.57119434976586,
+    "days": 658,
+    "sharpe_ann": 1.5365304732260563,
+    "total_pct": 127.22149556752312
+   },
+   "family": "spec:vol_ratio:short",
+   "gross": {
+    "ann_return_pct": 18.924155240695594,
+    "ann_vol_pct": 41.79138072439952,
+    "days": 1763,
+    "mdd_pct": 65.48406165418001,
+    "months": 58,
+    "pos_month_share": 0.3275862068965517,
+    "sharpe_ann": 0.45282436025491,
+    "total_pct": 91.4062621625927,
+    "worst_month_pct": -41.433876011844355
+   },
+   "horizon_bars": 384,
+   "id": "S-3ad048443f813d3e",
+   "primary": {
+    "ann_return_pct": 19.389480923406524,
+    "ann_vol_pct": 41.61869194616391,
+    "days": 1763,
+    "mdd_pct": 65.2390064027708,
+    "months": 58,
+    "pos_month_share": 0.3275862068965517,
+    "sharpe_ann": 0.4658839578256782,
+    "total_pct": 93.65384895333072,
+    "worst_month_pct": -40.94958343851155
+   },
+   "profile": {
+    "gross_bp_mean": 48.62035221414504,
+    "hold_hours_mean": 96.0,
+    "hold_hours_median": 96.0,
+    "net_bp_mean": 49.81587710283548,
+    "top5pct_share_of_profit": 0.31992926363602414,
+    "trades": 188,
+    "trades_by_symbol": {
+     "BTCUSDT": 188
+    },
+    "trades_per_year": 38.92229154849688,
+    "win_share": 0.5319148936170213
+   },
+   "sharpe_H1": 0.6644359821875807,
+   "sharpe_H2": 0.049135498881488375,
+   "stress": {
+    "ann_return_pct": 11.196934359394191,
+    "ann_vol_pct": 41.58295139596945,
+    "days": 1763,
+    "mdd_pct": 70.53408773876873,
+    "months": 58,
+    "pos_month_share": 0.3103448275862069,
+    "sharpe_ann": 0.26926742771989687,
+    "total_pct": 54.082726782498504,
+    "worst_month_pct": -42.281726494769735
+   },
+   "symbols": [
+    "BTCUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": -11.087955668941385,
+    "days": 1105,
+    "sharpe_ann": -0.286071017161029,
+    "total_pct": -33.56764661419241
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 192.47296849880343,
+    "days": 176,
+    "sharpe_ann": 3.5951942920226747,
+    "total_pct": 92.80888344051891
+   },
+   "year_2022": {
+    "ann_return_pct": 123.99776184926029,
+    "days": 365,
+    "sharpe_ann": 2.089982799586766,
+    "total_pct": 123.99776184926029
+   }
+  }
+ ],
+ "short_top": [
+  {
+   "beta_to_market": -0.0006677734259147265,
+   "corr_to_market": -0.051340318926523694,
+   "dev_cost_share": 0.17785417984879526,
+   "dev_fold_pos_share": 1.0,
+   "dev_mean_bp": 61.66093651133996,
+   "dev_status": "INCONCLUSIVE",
+   "dev_t": 109.22753789404194,
+   "direction": "short",
+   "down_trend": {
+    "ann_return_pct": 2.373957623188508,
+    "days": 658,
+    "sharpe_ann": 1.979548808990522,
+    "total_pct": 4.279627715227502
+   },
+   "family": "spec:taker_share_z:short",
+   "gross": {
+    "ann_return_pct": 1.708026091888815,
+    "ann_vol_pct": 1.1286050284737308,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.1724137931034483,
+    "sharpe_ann": 1.5133957839959868,
+    "total_pct": 8.249999999999945,
+    "worst_month_pct": 0.0
+   },
+   "horizon_bars": 32,
+   "id": "S-095f6120fb1aad42",
+   "primary": {
+    "ann_return_pct": 1.4042465121555867,
+    "ann_vol_pct": 0.9283484062243744,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.1724137931034483,
+    "sharpe_ann": 1.5126287746501408,
+    "total_pct": 6.782703016247396,
+    "worst_month_pct": 0.0
+   },
+   "profile": {
+    "gross_bp_mean": 74.99999999999952,
+    "hold_hours_mean": 2.659090909090909,
+    "hold_hours_median": 1.75,
+    "net_bp_mean": 61.66093651133996,
+    "top5pct_share_of_profit": 0.09990583455300531,
+    "trades": 11,
+    "trades_by_symbol": {
+     "ETHUSDT": 11
+    },
+    "trades_per_year": 2.2773681225184346,
+    "win_share": 1.0
+   },
+   "sharpe_H1": 1.5811052568119917,
+   "sharpe_H2": 1.4403476971703975,
+   "stress": {
+    "ann_return_pct": 0.6467844411300304,
+    "ann_vol_pct": 0.4591944698683397,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.1724137931034483,
+    "sharpe_ann": 1.4085196655688743,
+    "total_pct": 3.124057451266421,
+    "worst_month_pct": 0.0
+   },
+   "symbols": [
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 0.826807678617431,
+    "days": 1105,
+    "sharpe_ann": 1.1497080616974185,
+    "total_pct": 2.503075301019894
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 3.785721300651289,
+    "days": 176,
+    "sharpe_ann": 2.508686842358667,
+    "total_pct": 1.8254436956565117
+   },
+   "year_2022": {
+    "ann_return_pct": 1.8411291018100606,
+    "days": 365,
+    "sharpe_ann": 1.7367749951735607,
+    "total_pct": 1.8411291018100608
+   }
+  },
+  {
+   "beta_to_market": 0.00039624049509070835,
+   "corr_to_market": 0.008967430848228215,
+   "dev_cost_share": -0.05357275897806367,
+   "dev_fold_pos_share": 0.25,
+   "dev_mean_bp": 382.6267598511927,
+   "dev_status": "INCONCLUSIVE",
+   "dev_t": 7.469639003267293,
+   "direction": "short",
+   "down_trend": {
+    "ann_return_pct": 0.0,
+    "days": 658,
+    "sharpe_ann": null,
+    "total_pct": 0.0
+   },
+   "family": "spec:breakout_k+funding_z:short",
+   "gross": {
+    "ann_return_pct": 2.2556546801402573,
+    "ann_vol_pct": 3.0338530882759227,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.05172413793103448,
+    "sharpe_ann": 0.7434950257997166,
+    "total_pct": 10.895121098869243,
+    "worst_month_pct": 0.0
+   },
+   "horizon_bars": 256,
+   "id": "S-0f8f5a5da351a255",
+   "primary": {
+    "ann_return_pct": 2.376496324657152,
+    "ann_vol_pct": 3.1537789297318435,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.05172413793103448,
+    "sharpe_ann": 0.7535392865533598,
+    "total_pct": 11.478802795535781,
+    "worst_month_pct": 0.0
+   },
+   "profile": {
+    "gross_bp_mean": 363.17070329564143,
+    "hold_hours_mean": 64.0,
+    "hold_hours_median": 64.0,
+    "net_bp_mean": 382.6267598511927,
+    "top5pct_share_of_profit": 0.4504428032531159,
+    "trades": 3,
+    "trades_by_symbol": {
+     "ETHUSDT": 3
+    },
+    "trades_per_year": 0.6211003970504821,
+    "win_share": 1.0
+   },
+   "sharpe_H1": null,
+   "sharpe_H2": 1.0658903019673662,
+   "stress": {
+    "ann_return_pct": 2.2201325076424325,
+    "ann_vol_pct": 2.965854113891989,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.05172413793103448,
+    "sharpe_ann": 0.7485642996543173,
+    "total_pct": 10.723544139653722,
+    "worst_month_pct": 0.0
+   },
+   "symbols": [
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 3.791640742416796,
+    "days": 1105,
+    "sharpe_ann": 0.9520919295748104,
+    "total_pct": 11.47880279553578
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 0.0,
+    "days": 176,
+    "sharpe_ann": null,
+    "total_pct": 0.0
+   },
+   "year_2022": {
+    "ann_return_pct": 0.0,
+    "days": 365,
+    "sharpe_ann": null,
+    "total_pct": 0.0
+   }
+  },
+  {
+   "beta_to_market": -0.0006535235946461916,
+   "corr_to_market": -0.04083206529920299,
+   "dev_cost_share": 0.03325385712504439,
+   "dev_fold_pos_share": 0.75,
+   "dev_mean_bp": 290.02384286248656,
+   "dev_status": "INCONCLUSIVE",
+   "dev_t": 109.17439203735886,
+   "direction": "short",
+   "down_trend": {
+    "ann_return_pct": 2.413192309532088,
+    "days": 658,
+    "sharpe_ann": 1.291795032798619,
+    "total_pct": 4.350357642937299
+   },
+   "family": "spec:ret_z+taker_share_z:short",
+   "gross": {
+    "ann_return_pct": 0.9316505955757229,
+    "ann_vol_pct": 1.1814777421175273,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.05172413793103448,
+    "sharpe_ann": 0.7885468869738953,
+    "total_pct": 4.499999999999998,
+    "worst_month_pct": 0.0
+   },
+   "horizon_bars": 384,
+   "id": "S-2861618a74f378d3",
+   "primary": {
+    "ann_return_pct": 0.9006696197799852,
+    "ann_vol_pct": 1.142353063443975,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.05172413793103448,
+    "sharpe_ann": 0.7884336713420623,
+    "total_pct": 4.350357642937299,
+    "worst_month_pct": 0.0
+   },
+   "profile": {
+    "gross_bp_mean": 299.99999999999994,
+    "hold_hours_mean": 33.333333333333336,
+    "hold_hours_median": 5.5,
+    "net_bp_mean": 290.02384286248656,
+    "top5pct_share_of_profit": 0.3412892439998593,
+    "trades": 3,
+    "trades_by_symbol": {
+     "BTCUSDT": 1,
+     "ETHUSDT": 2
+    },
+    "trades_per_year": 0.6211003970504821,
+    "win_share": 1.0
+   },
+   "sharpe_H1": 0.9106634369752643,
+   "sharpe_H2": 0.6432979088622046,
+   "stress": {
+    "ann_return_pct": 0.8398103653681188,
+    "ann_vol_pct": 1.0650144653630538,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.05172413793103448,
+    "sharpe_ann": 0.7885436232848115,
+    "total_pct": 4.056399107243818,
+    "worst_month_pct": 0.0
+   },
+   "symbols": [
+    "BTCUSDT",
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 0.0,
+    "days": 1105,
+    "sharpe_ann": null,
+    "total_pct": 0.0
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 3.0791281190158206,
+    "days": 176,
+    "sharpe_ann": 1.440091537494626,
+    "total_pct": 1.4847302710870807
+   },
+   "year_2022": {
+    "ann_return_pct": 1.4352545667218346,
+    "days": 365,
+    "sharpe_ann": 1.0,
+    "total_pct": 1.4352545667218346
+   }
+  },
+  {
+   "beta_to_market": -0.0002917835492655854,
+   "corr_to_market": -0.008513329392169039,
+   "dev_cost_share": 0.009244979368644766,
+   "dev_fold_pos_share": 0.75,
+   "dev_mean_bp": 611.177547384761,
+   "dev_status": "INCONCLUSIVE",
+   "dev_t": 10.08300654739152,
+   "direction": "short",
+   "down_trend": {
+    "ann_return_pct": 3.128727059557736,
+    "days": 658,
+    "sharpe_ann": 1.0351162150412583,
+    "total_pct": 5.640280562161617
+   },
+   "family": "spec:ret_z+taker_share_z:short",
+   "gross": {
+    "ann_return_pct": 1.9157239148135452,
+    "ann_vol_pct": 2.470045070435968,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.05172413793103448,
+    "sharpe_ann": 0.775582574481289,
+    "total_pct": 9.25320893648296,
+    "worst_month_pct": 0.0
+   },
+   "horizon_bars": 384,
+   "id": "S-2f6ddb930f5fa84f",
+   "primary": {
+    "ann_return_pct": 1.8980130867450746,
+    "ann_vol_pct": 2.4462553679317036,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.05172413793103448,
+    "sharpe_ann": 0.7758850983533394,
+    "total_pct": 9.167663210771416,
+    "worst_month_pct": 0.0
+   },
+   "profile": {
+    "gross_bp_mean": 616.8805957655306,
+    "hold_hours_mean": 96.0,
+    "hold_hours_median": 96.0,
+    "net_bp_mean": 611.177547384761,
+    "top5pct_share_of_profit": 0.3847635507012681,
+    "trades": 3,
+    "trades_by_symbol": {
+     "BTCUSDT": 1,
+     "ETHUSDT": 2
+    },
+    "trades_per_year": 0.6211003970504821,
+    "win_share": 1.0
+   },
+   "sharpe_H1": 0.8944091077452933,
+   "sharpe_H2": 0.6432979088622046,
+   "stress": {
+    "ann_return_pct": 1.8360819077515522,
+    "ann_vol_pct": 2.3731994698590397,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.05172413793103448,
+    "sharpe_ann": 0.7736736549417017,
+    "total_pct": 8.868527132509554,
+    "worst_month_pct": 0.0
+   },
+   "symbols": [
+    "BTCUSDT",
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 1.1651535445634176,
+    "days": 1105,
+    "sharpe_ann": 0.5747318871277702,
+    "total_pct": 3.527382648609798
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 4.725244381514928,
+    "days": 176,
+    "sharpe_ann": 1.440091537494626,
+    "total_pct": 2.278474003141445
+   },
+   "year_2022": {
+    "ann_return_pct": 3.3618065590201724,
+    "days": 365,
+    "sharpe_ann": 0.9999999999999999,
+    "total_pct": 3.3618065590201724
+   }
+  },
+  {
+   "beta_to_market": 0.0005999899167063752,
+   "corr_to_market": 0.04489105729798695,
+   "dev_cost_share": 0.22144903617726158,
+   "dev_fold_pos_share": 0.5,
+   "dev_mean_bp": 38.92754819113707,
+   "dev_status": "INCONCLUSIVE",
+   "dev_t": 26.969061446253882,
+   "direction": "short",
+   "down_trend": {
+    "ann_return_pct": 0.0,
+    "days": 658,
+    "sharpe_ann": null,
+    "total_pct": 0.0
+   },
+   "family": "spec:funding_z:short",
+   "gross": {
+    "ann_return_pct": 1.5527509926262113,
+    "ann_vol_pct": 1.264440845306721,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.08620689655172414,
+    "sharpe_ann": 1.2280139465516502,
+    "total_pct": 7.500000000000028,
+    "worst_month_pct": 0.0
+   },
+   "horizon_bars": 192,
+   "id": "S-31d8ccc131d7c023",
+   "primary": {
+    "ann_return_pct": 1.2088957818858503,
+    "ann_vol_pct": 0.9539476524389032,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.08620689655172414,
+    "sharpe_ann": 1.2672558906090243,
+    "total_pct": 5.83913222867056,
+    "worst_month_pct": 0.0
+   },
+   "profile": {
+    "gross_bp_mean": 50.00000000000019,
+    "hold_hours_mean": 5.333333333333333,
+    "hold_hours_median": 0.5,
+    "net_bp_mean": 38.92754819113707,
+    "top5pct_share_of_profit": 0.0922662146958743,
+    "trades": 15,
+    "trades_by_symbol": {
+     "ETHUSDT": 15
+    },
+    "trades_per_year": 3.1055019852524106,
+    "win_share": 1.0
+   },
+   "sharpe_H1": null,
+   "sharpe_H2": 1.7951056863975652,
+   "stress": {
+    "ann_return_pct": 0.5914770670944045,
+    "ann_vol_pct": 0.5023631030953072,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.08620689655172414,
+    "sharpe_ann": 1.177389548416319,
+    "total_pct": 2.8569152583217403,
+    "worst_month_pct": 0.0
+   },
+   "symbols": [
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 1.928763134357244,
+    "days": 1105,
+    "sharpe_ann": 1.6025291245410658,
+    "total_pct": 5.83913222867056
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 0.0,
+    "days": 176,
+    "sharpe_ann": null,
+    "total_pct": 0.0
+   },
+   "year_2022": {
+    "ann_return_pct": 0.0,
+    "days": 365,
+    "sharpe_ann": null,
+    "total_pct": 0.0
+   }
+  },
+  {
+   "beta_to_market": -0.0019191424434174542,
+   "corr_to_market": -0.01799001175677886,
+   "dev_cost_share": -0.0063110891669971485,
+   "dev_fold_pos_share": 0.75,
+   "dev_mean_bp": 961.8931929135339,
+   "dev_status": "INCONCLUSIVE",
+   "dev_t": 21.821421978787132,
+   "direction": "short",
+   "down_trend": {
+    "ann_return_pct": 10.112611343187712,
+    "days": 658,
+    "sharpe_ann": 1.0501669254078239,
+    "total_pct": 18.230406202239767
+   },
+   "family": "spec:taker_share_z:short",
+   "gross": {
+    "ann_return_pct": 5.936854422754038,
+    "ann_vol_pct": 7.555716944657199,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.05172413793103448,
+    "sharpe_ann": 0.7857433604566285,
+    "total_pct": 28.67582012963115,
+    "worst_month_pct": 0.0
+   },
+   "horizon_bars": 384,
+   "id": "S-4c23e5a767bddd81",
+   "primary": {
+    "ann_return_pct": 5.974322440387519,
+    "ann_vol_pct": 7.614058148892251,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.05172413793103448,
+    "sharpe_ann": 0.7846436582910399,
+    "total_pct": 28.85679578740602,
+    "worst_month_pct": 0.0
+   },
+   "profile": {
+    "gross_bp_mean": 955.8606709877049,
+    "hold_hours_mean": 96.0,
+    "hold_hours_median": 96.0,
+    "net_bp_mean": 961.8931929135339,
+    "top5pct_share_of_profit": 0.3682456522010642,
+    "trades": 3,
+    "trades_by_symbol": {
+     "ETHUSDT": 3
+    },
+    "trades_per_year": 0.6211003970504821,
+    "win_share": 1.0
+   },
+   "sharpe_H1": 0.6436629006129106,
+   "sharpe_H2": 0.9097115331012889,
+   "stress": {
+    "ann_return_pct": 5.739725987427285,
+    "ann_vol_pct": 7.330897315159675,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.05172413793103448,
+    "sharpe_ann": 0.7829499910683535,
+    "total_pct": 27.723662783107677,
+    "worst_month_pct": 0.0
+   },
+   "symbols": [
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 3.5100743878603455,
+    "days": 1105,
+    "sharpe_ann": 0.5747318871277701,
+    "total_pct": 10.626389585166251
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 0.0,
+    "days": 176,
+    "sharpe_ann": null,
+    "total_pct": 0.0
+   },
+   "year_2022": {
+    "ann_return_pct": 8.32739787254276,
+    "days": 365,
+    "sharpe_ann": 1.0,
+    "total_pct": 8.32739787254276
+   }
+  },
+  {
+   "beta_to_market": 0.0007974494451174908,
+   "corr_to_market": 0.045691945358242246,
+   "dev_cost_share": 0.14689790915494094,
+   "dev_fold_pos_share": 0.5,
+   "dev_mean_bp": 63.98265681337902,
+   "dev_status": "INCONCLUSIVE",
+   "dev_t": 31.4572482604464,
+   "direction": "short",
+   "down_trend": {
+    "ann_return_pct": 0.0,
+    "days": 658,
+    "sharpe_ann": null,
+    "total_pct": 0.0
+   },
+   "family": "spec:funding_z+ret_z:short",
+   "gross": {
+    "ann_return_pct": 1.708026091888815,
+    "ann_vol_pct": 1.485236900953308,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.08620689655172414,
+    "sharpe_ann": 1.1500024614204698,
+    "total_pct": 8.249999999999947,
+    "worst_month_pct": 0.0
+   },
+   "horizon_bars": 192,
+   "id": "S-4cb619d1760d7d0d",
+   "primary": {
+    "ann_return_pct": 1.457120630208263,
+    "ann_vol_pct": 1.2456726738238508,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.08620689655172414,
+    "sharpe_ann": 1.1697460021622925,
+    "total_pct": 7.038092249471692,
+    "worst_month_pct": 0.0
+   },
+   "profile": {
+    "gross_bp_mean": 74.99999999999952,
+    "hold_hours_mean": 7.159090909090909,
+    "hold_hours_median": 0.5,
+    "net_bp_mean": 63.98265681337902,
+    "top5pct_share_of_profit": 0.1120693790149339,
+    "trades": 11,
+    "trades_by_symbol": {
+     "ETHUSDT": 11
+    },
+    "trades_per_year": 2.2773681225184346,
+    "win_share": 1.0
+   },
+   "sharpe_H1": null,
+   "sharpe_H2": 1.6564388321833072,
+   "stress": {
+    "ann_return_pct": 1.0158247664919438,
+    "ann_vol_pct": 0.8834788236246879,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.08620689655172414,
+    "sharpe_ann": 1.14980092258949,
+    "total_pct": 4.9065727762336895,
+    "worst_month_pct": 0.0
+   },
+   "symbols": [
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 2.324799702314179,
+    "days": 1105,
+    "sharpe_ann": 1.4789338368070533,
+    "total_pct": 7.038092249471692
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 0.0,
+    "days": 176,
+    "sharpe_ann": null,
+    "total_pct": 0.0
+   },
+   "year_2022": {
+    "ann_return_pct": 0.0,
+    "days": 365,
+    "sharpe_ann": null,
+    "total_pct": 0.0
+   }
+  },
+  {
+   "beta_to_market": 0.0011154380306086745,
+   "corr_to_market": 0.07056025325077467,
+   "dev_cost_share": 0.1649512231400109,
+   "dev_fold_pos_share": 0.5,
+   "dev_mean_bp": 62.62865826449905,
+   "dev_status": "INCONCLUSIVE",
+   "dev_t": 99.06927083376685,
+   "direction": "short",
+   "down_trend": {
+    "ann_return_pct": 0.0,
+    "days": 658,
+    "sharpe_ann": null,
+    "total_pct": 0.0
+   },
+   "family": "spec:funding_z:short",
+   "gross": {
+    "ann_return_pct": 1.552750992626202,
+    "ann_vol_pct": 1.362992794293442,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.08620689655172414,
+    "sharpe_ann": 1.1392217179190063,
+    "total_pct": 7.499999999999984,
+    "worst_month_pct": 0.0
+   },
+   "horizon_bars": 256,
+   "id": "S-52be6a42783fa11f",
+   "primary": {
+    "ann_return_pct": 1.2966228171606442,
+    "ann_vol_pct": 1.1283029997267542,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.08620689655172414,
+    "sharpe_ann": 1.149179624156501,
+    "total_pct": 6.262865826449905,
+    "worst_month_pct": 0.0
+   },
+   "profile": {
+    "gross_bp_mean": 74.99999999999986,
+    "hold_hours_mean": 4.7,
+    "hold_hours_median": 0.5,
+    "net_bp_mean": 62.62865826449905,
+    "top5pct_share_of_profit": 0.1125703808661595,
+    "trades": 10,
+    "trades_by_symbol": {
+     "ETHUSDT": 10
+    },
+    "trades_per_year": 2.0703346568349406,
+    "win_share": 1.0
+   },
+   "sharpe_H1": null,
+   "sharpe_H2": 1.627208817273838,
+   "stress": {
+    "ann_return_pct": 0.9140352812074034,
+    "ann_vol_pct": 0.8030774745341955,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.08620689655172414,
+    "sharpe_ann": 1.138165756345695,
+    "total_pct": 4.414915618544253,
+    "worst_month_pct": 0.0
+   },
+   "symbols": [
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 2.068729435886168,
+    "days": 1105,
+    "sharpe_ann": 1.4528746646676176,
+    "total_pct": 6.2628658264499055
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 0.0,
+    "days": 176,
+    "sharpe_ann": null,
+    "total_pct": 0.0
+   },
+   "year_2022": {
+    "ann_return_pct": 0.0,
+    "days": 365,
+    "sharpe_ann": null,
+    "total_pct": 0.0
+   }
+  },
+  {
+   "beta_to_market": -2.7113215129447665e-05,
+   "corr_to_market": -0.013657467819937576,
+   "dev_cost_share": 0.28042611898369363,
+   "dev_fold_pos_share": 0.75,
+   "dev_mean_bp": 35.978694050815356,
+   "dev_status": "INCONCLUSIVE",
+   "dev_t": 721.7296368707784,
+   "direction": "short",
+   "down_trend": {
+    "ann_return_pct": 0.29936679320397275,
+    "days": 658,
+    "sharpe_ann": 1.291976361992534,
+    "total_pct": 0.5396804107622303
+   },
+   "family": "spec:ret_z+taker_share_z:short",
+   "gross": {
+    "ann_return_pct": 0.15527509926262067,
+    "ann_vol_pct": 0.1969129570195881,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.05172413793103448,
+    "sharpe_ann": 0.7885468869738953,
+    "total_pct": 0.7500000000000007,
+    "worst_month_pct": 0.0
+   },
+   "horizon_bars": 384,
+   "id": "S-64c93ca768432d6a",
+   "primary": {
+    "ann_return_pct": 0.11173190580159617,
+    "ann_vol_pct": 0.14169393462140242,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.05172413793103448,
+    "sharpe_ann": 0.7885440269559668,
+    "total_pct": 0.5396804107622303,
+    "worst_month_pct": 0.0
+   },
+   "profile": {
+    "gross_bp_mean": 50.000000000000036,
+    "hold_hours_mean": 0.4166666666666667,
+    "hold_hours_median": 0.5,
+    "net_bp_mean": 35.978694050815356,
+    "top5pct_share_of_profit": 0.3340362457129934,
+    "trades": 3,
+    "trades_by_symbol": {
+     "BTCUSDT": 1,
+     "ETHUSDT": 2
+    },
+    "trades_per_year": 0.6211003970504821,
+    "win_share": 1.0
+   },
+   "sharpe_H1": 0.9107904597434788,
+   "sharpe_H2": 0.6432979088622046,
+   "stress": {
+    "ann_return_pct": 0.037010506156607365,
+    "ann_vol_pct": 0.060459988554791094,
+    "days": 1763,
+    "mdd_pct": 0.008643534399807784,
+    "months": 58,
+    "pos_month_share": 0.034482758620689655,
+    "sharpe_ann": 0.6121487456628786,
+    "total_pct": 0.1787658146687638,
+    "worst_month_pct": -0.008643534399807784
+   },
+   "symbols": [
+    "BTCUSDT",
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 0.0,
+    "days": 1105,
+    "sharpe_ann": null,
+    "total_pct": 0.0
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 0.0,
+    "days": 176,
+    "sharpe_ann": null,
+    "total_pct": 0.0
+   },
+   "year_2022": {
+    "ann_return_pct": 0.1802728182958616,
+    "days": 365,
+    "sharpe_ann": 1.0,
+    "total_pct": 0.1802728182958616
+   }
+  },
+  {
+   "beta_to_market": -0.0002749796761470065,
+   "corr_to_market": -0.02118753669270416,
+   "dev_cost_share": 0.04613486733576799,
+   "dev_fold_pos_share": 0.75,
+   "dev_mean_bp": 194.88556721085482,
+   "dev_status": "INCONCLUSIVE",
+   "dev_t": 7.531073037474618,
+   "direction": "short",
+   "down_trend": {
+    "ann_return_pct": 0.0,
+    "days": 658,
+    "sharpe_ann": null,
+    "total_pct": 0.0
+   },
+   "family": "spec:funding_z+taker_share_z:short",
+   "gross": {
+    "ann_return_pct": 0.8459861464620604,
+    "ann_vol_pct": 0.9692127491743696,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.06896551724137931,
+    "sharpe_ann": 0.8728590778265343,
+    "total_pct": 4.086228975924966,
+    "worst_month_pct": 0.0
+   },
+   "horizon_bars": 64,
+   "id": "S-698a6b54bc33b518",
+   "primary": {
+    "ann_return_pct": 0.8069566878271358,
+    "ann_vol_pct": 0.9263189625820669,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.06896551724137931,
+    "sharpe_ann": 0.871143440244152,
+    "total_pct": 3.8977113442170968,
+    "worst_month_pct": 0.0
+   },
+   "profile": {
+    "gross_bp_mean": 204.3114487962483,
+    "hold_hours_mean": 16.0,
+    "hold_hours_median": 16.0,
+    "net_bp_mean": 194.88556721085482,
+    "top5pct_share_of_profit": 0.33902641458664184,
+    "trades": 4,
+    "trades_by_symbol": {
+     "BTCUSDT": 1,
+     "ETHUSDT": 3
+    },
+    "trades_per_year": 0.8281338627339762,
+    "win_share": 1.0
+   },
+   "sharpe_H1": 1.0517403334788888,
+   "sharpe_H2": 0.6432979088622045,
+   "stress": {
+    "ann_return_pct": 0.6920990905229875,
+    "ann_vol_pct": 0.8014853951394384,
+    "days": 1763,
+    "mdd_pct": 0.0,
+    "months": 58,
+    "pos_month_share": 0.06896551724137931,
+    "sharpe_ann": 0.8635205266623474,
+    "total_pct": 3.3429334153206214,
+    "worst_month_pct": 0.0
+   },
+   "symbols": [
+    "BTCUSDT",
+    "ETHUSDT"
+   ],
+   "up_trend": {
+    "ann_return_pct": 1.2874793127956925,
+    "days": 1105,
+    "sharpe_ann": 1.100855852211089,
+    "total_pct": 3.8977113442170968
+   },
+   "worst10pct_market_days": {
+    "ann_return_pct": 0.0,
+    "days": 176,
+    "sharpe_ann": null,
+    "total_pct": 0.0
+   },
+   "year_2022": {
+    "ann_return_pct": 0.0,
+    "days": 365,
+    "sharpe_ann": null,
+    "total_pct": 0.0
+   }
+  }
+ ],
+ "use": "diagnostic only (members selected on DEV; never a gate)",
+ "version": "short-top-dev-v1"
+}
