@@ -195,7 +195,6 @@ def regime_labels(rule: str, mkt: Sequence[float]) -> list:
 
 
 def regime_switch(short_y, long_y, mkt, days, halves) -> dict:
-    n = len(days)
     configs = 0
     res = {"rules_fixed_before_results": list(SWITCH_RULES), "grid_long_share": list(GRID),
            "fixed_mix": {}, "switch": {}}
@@ -265,7 +264,7 @@ def build(data_dir: Path, state_dirs: Sequence[Path], *, top_n: int = 10) -> dic
     stress = CostContext.from_assumed_profile("assumed_public_v1")
     pipe = EvolutionPipeline(Path(state_dirs[0]), provider, primary)
     daily = {"primary": {}, "stress": {}, "gross": {}}
-    prof, dev_span = {}, {}
+    dev_span = {}
     ev_cache = {}
     for sid in members:
         spec = canonicalize_spec(pool[sid]["spec"])
@@ -392,7 +391,6 @@ def build(data_dir: Path, state_dirs: Sequence[Path], *, top_n: int = 10) -> dic
     var_sr = (sum((v - sum(sr_d) / len(sr_d)) ** 2 for v in sr_d) / (len(sr_d) - 1)) if len(sr_d) > 1 else 0.0
     n_pool = len(pool)
     trials_list = sorted({n_pool, loaded["trials_by_run_sum"]})
-    n_years_pool = {sid: len(v[1]) / DAYS_PER_YEAR for sid, v in sr_all.items()}
     chance = {"n_pool_unique": n_pool, "n_trials_run_sum": loaded["trials_by_run_sum"],
               "var_sr_daily_across_trials": var_sr,
               "expected_max_sr_ann_if_N_unskilled": {
