@@ -1,0 +1,2222 @@
+{
+ "S-181c15b4139efdd3": {
+  "base_net_bp": 97.25866254543182,
+  "basis": {
+   "claim": "modelled cost under an assumption \u2014 not observed execution cost",
+   "cost_status": "ESTIMATED_FROM_PUBLIC_DATA",
+   "cost_version": "archive.cost_model.CandleCostModel@sha256:9afb474b3d1ad38c#public_estimate:PE-371c80b76eeba61b6dd27843"
+  },
+  "breakeven_cost_multiplier": 7.9439056277090305,
+  "first_scenario_net_not_positive": null,
+  "gate": false,
+  "monotone_issues": [],
+  "note": "DEV diagnostic only; optimistic_bound row is never a pass criterion",
+  "scenarios": {
+   "all_x2": {
+    "cost_bp": 28.012668305090404,
+    "funding_bp": 8.461245333333332,
+    "gross_bp": 119.72624203131036,
+    "n": 150,
+    "n_high_vol": 73,
+    "n_low_vol": 77,
+    "net_bp": 83.25232839288661,
+    "net_bp_high_vol": 130.7198865306234,
+    "net_bp_low_vol": 38.25061743113616,
+    "net_t": 2.2708901535006647,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.001,
+     "half_spread": 0.00038402427377674813,
+     "impact_coefficient": 0.0020026591913120486,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "base": {
+    "cost_bp": 14.006334152545202,
+    "funding_bp": 8.461245333333332,
+    "gross_bp": 119.72624203131036,
+    "n": 150,
+    "n_high_vol": 73,
+    "n_low_vol": 77,
+    "net_bp": 97.25866254543182,
+    "net_bp_high_vol": 144.70950873536862,
+    "net_bp_low_vol": 52.272795378348896,
+    "net_t": 2.65286588866455,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "fee_x1.5": {
+    "cost_bp": 19.006334152545204,
+    "funding_bp": 8.461245333333332,
+    "gross_bp": 119.72624203131036,
+    "n": 150,
+    "n_high_vol": 73,
+    "n_low_vol": 77,
+    "net_bp": 92.25866254543182,
+    "net_bp_high_vol": 139.70950873536862,
+    "net_bp_low_vol": 47.272795378348896,
+    "net_t": 2.5164839037989184,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.00075,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "fee_x2": {
+    "cost_bp": 24.0063341525452,
+    "funding_bp": 8.461245333333332,
+    "gross_bp": 119.72624203131036,
+    "n": 150,
+    "n_high_vol": 73,
+    "n_low_vol": 77,
+    "net_bp": 87.25866254543182,
+    "net_bp_high_vol": 134.70950873536862,
+    "net_bp_low_vol": 42.2727953783489,
+    "net_t": 2.3801019189332857,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.001,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "impact_x2": {
+    "cost_bp": 14.172425567322922,
+    "funding_bp": 8.461245333333332,
+    "gross_bp": 119.72624203131036,
+    "n": 150,
+    "n_high_vol": 73,
+    "n_low_vol": 77,
+    "net_bp": 97.09257113065411,
+    "net_bp_high_vol": 144.56012926839088,
+    "net_bp_low_vol": 52.090860168903646,
+    "net_t": 2.6484131797268096,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0020026591913120486,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "maker_fee_optimistic_bound": {
+    "cost_bp": 8.006334152545202,
+    "funding_bp": 8.461245333333332,
+    "gross_bp": 119.72624203131036,
+    "n": 150,
+    "n_high_vol": 73,
+    "n_low_vol": 77,
+    "net_bp": 103.25866254543182,
+    "net_bp_high_vol": 150.70950873536862,
+    "net_bp_low_vol": 58.2727953783489,
+    "net_t": 2.8165242705033102,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0002,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "size_x25": {
+    "cost_bp": 14.670699811656084,
+    "funding_bp": 8.461245333333332,
+    "gross_bp": 119.72624203131036,
+    "n": 150,
+    "n_high_vol": 73,
+    "n_low_vol": 77,
+    "net_bp": 96.59429688632095,
+    "net_bp_high_vol": 144.1119908674577,
+    "net_bp_low_vol": 51.545054540567904,
+    "net_t": 2.6350526058649972,
+    "order_value": 250000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "size_x5": {
+    "cost_bp": 14.211634431689578,
+    "funding_bp": 8.461245333333332,
+    "gross_bp": 119.72624203131036,
+    "n": 150,
+    "n_high_vol": 73,
+    "n_low_vol": 77,
+    "net_bp": 97.05336226628745,
+    "net_bp_high_vol": 144.52486555974144,
+    "net_bp_low_vol": 52.04791109197391,
+    "net_t": 2.647361978136837,
+    "order_value": 50000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "spread_x2": {
+    "cost_bp": 17.846576890312683,
+    "funding_bp": 8.461245333333332,
+    "gross_bp": 119.72624203131036,
+    "n": 150,
+    "n_high_vol": 73,
+    "n_low_vol": 77,
+    "net_bp": 93.41841980766434,
+    "net_bp_high_vol": 140.86926599760113,
+    "net_bp_low_vol": 48.43255264058141,
+    "net_t": 2.548117903276039,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00038402427377674813,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "spread_x3": {
+    "cost_bp": 21.686819628080162,
+    "funding_bp": 8.461245333333332,
+    "gross_bp": 119.72624203131036,
+    "n": 150,
+    "n_high_vol": 73,
+    "n_low_vol": 77,
+    "net_bp": 89.57817706989685,
+    "net_bp_high_vol": 137.02902325983365,
+    "net_bp_low_vol": 44.59230990281393,
+    "net_t": 2.4433699178875266,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.0005760364106651222,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   }
+  },
+  "schema": "cost_sensitivity_v1",
+  "stage": "dev",
+  "strategy_family": "spec:breakout_k+ret_z:long",
+  "symbols": [
+   "BTCUSDT",
+   "ETHUSDT"
+  ]
+ },
+ "S-209ce2dd7db8d919": {
+  "base_net_bp": 40.14574527546103,
+  "basis": {
+   "claim": "modelled cost under an assumption \u2014 not observed execution cost",
+   "cost_status": "ESTIMATED_FROM_PUBLIC_DATA",
+   "cost_version": "archive.cost_model.CandleCostModel@sha256:9afb474b3d1ad38c#public_estimate:PE-371c80b76eeba61b6dd27843"
+  },
+  "breakeven_cost_multiplier": 3.861681600573569,
+  "first_scenario_net_not_positive": null,
+  "gate": false,
+  "monotone_issues": [],
+  "note": "DEV diagnostic only; optimistic_bound row is never a pass criterion",
+  "scenarios": {
+   "all_x2": {
+    "cost_bp": 28.05745074323754,
+    "funding_bp": 2.7355170731707315,
+    "gross_bp": 56.90998772025054,
+    "n": 328,
+    "n_high_vol": 164,
+    "n_low_vol": 164,
+    "net_bp": 26.117019903842262,
+    "net_bp_high_vol": 95.25051431624006,
+    "net_bp_low_vol": -43.01647450855553,
+    "net_t": 1.5956543370641205,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.001,
+     "half_spread": 0.00038402427377674813,
+     "impact_coefficient": 0.0020026591913120486,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "base": {
+    "cost_bp": 14.02872537161877,
+    "funding_bp": 2.7355170731707315,
+    "gross_bp": 56.90998772025054,
+    "n": 328,
+    "n_high_vol": 164,
+    "n_low_vol": 164,
+    "net_bp": 40.14574527546103,
+    "net_bp_high_vol": 109.25322600650162,
+    "net_bp_low_vol": -28.961735455579547,
+    "net_t": 2.4529397664765016,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "fee_x1.5": {
+    "cost_bp": 19.02872537161877,
+    "funding_bp": 2.7355170731707315,
+    "gross_bp": 56.90998772025054,
+    "n": 328,
+    "n_high_vol": 164,
+    "n_low_vol": 164,
+    "net_bp": 35.14574527546103,
+    "net_bp_high_vol": 104.25322600650162,
+    "net_bp_low_vol": -33.96173545557954,
+    "net_t": 2.14743544096883,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.00075,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "fee_x2": {
+    "cost_bp": 24.028725371618766,
+    "funding_bp": 2.7355170731707315,
+    "gross_bp": 56.90998772025054,
+    "n": 328,
+    "n_high_vol": 164,
+    "n_low_vol": 164,
+    "net_bp": 30.14574527546104,
+    "net_bp_high_vol": 99.25322600650162,
+    "net_bp_low_vol": -38.96173545557954,
+    "net_t": 1.8419311154611593,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.001,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "impact_x2": {
+    "cost_bp": 14.21720800547006,
+    "funding_bp": 2.7355170731707315,
+    "gross_bp": 56.90998772025054,
+    "n": 328,
+    "n_high_vol": 164,
+    "n_low_vol": 164,
+    "net_bp": 39.957262641609745,
+    "net_bp_high_vol": 109.09075705400753,
+    "net_bp_low_vol": -29.176231770788046,
+    "net_t": 2.441242517945734,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0020026591913120486,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "maker_fee_optimistic_bound": {
+    "cost_bp": 8.02872537161877,
+    "funding_bp": 2.7355170731707315,
+    "gross_bp": 56.90998772025054,
+    "n": 328,
+    "n_high_vol": 164,
+    "n_low_vol": 164,
+    "net_bp": 46.14574527546103,
+    "net_bp_high_vol": 115.25322600650162,
+    "net_bp_low_vol": -22.961735455579543,
+    "net_t": 2.819544957085707,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0002,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "size_x25": {
+    "cost_bp": 14.78265590702392,
+    "funding_bp": 2.7355170731707315,
+    "gross_bp": 56.90998772025054,
+    "n": 328,
+    "n_high_vol": 164,
+    "n_low_vol": 164,
+    "net_bp": 39.391814740055885,
+    "net_bp_high_vol": 108.60335019652531,
+    "net_bp_low_vol": -29.819720716413553,
+    "net_t": 2.406158446338757,
+    "order_value": 250000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "size_x5": {
+    "cost_bp": 14.261702719637164,
+    "funding_bp": 2.7355170731707315,
+    "gross_bp": 56.90998772025054,
+    "n": 328,
+    "n_high_vol": 164,
+    "n_low_vol": 164,
+    "net_bp": 39.91276792744264,
+    "net_bp_high_vol": 109.05240333698575,
+    "net_bp_low_vol": -29.226867482100477,
+    "net_t": 2.438481357882281,
+    "order_value": 50000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "spread_x2": {
+    "cost_bp": 17.868968109386252,
+    "funding_bp": 2.7355170731707315,
+    "gross_bp": 56.90998772025054,
+    "n": 328,
+    "n_high_vol": 164,
+    "n_low_vol": 164,
+    "net_bp": 36.305502537693556,
+    "net_bp_high_vol": 105.41298326873414,
+    "net_bp_low_vol": -32.801978193347026,
+    "net_t": 2.2182976129990246,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00038402427377674813,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "spread_x3": {
+    "cost_bp": 21.70921084715373,
+    "funding_bp": 2.7355170731707315,
+    "gross_bp": 56.90998772025054,
+    "n": 328,
+    "n_high_vol": 164,
+    "n_low_vol": 164,
+    "net_bp": 32.46525979992607,
+    "net_bp_high_vol": 101.57274053096666,
+    "net_bp_low_vol": -36.64222093111451,
+    "net_t": 1.9836554595215472,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.0005760364106651222,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   }
+  },
+  "schema": "cost_sensitivity_v1",
+  "stage": "dev",
+  "strategy_family": "spec:breakout_k+taker_share_z:long",
+  "symbols": [
+   "BTCUSDT",
+   "ETHUSDT"
+  ]
+ },
+ "S-391396a9487de780": {
+  "base_net_bp": 39.36449580600478,
+  "basis": {
+   "claim": "modelled cost under an assumption \u2014 not observed execution cost",
+   "cost_status": "ESTIMATED_FROM_PUBLIC_DATA",
+   "cost_version": "archive.cost_model.CandleCostModel@sha256:9afb474b3d1ad38c#public_estimate:PE-371c80b76eeba61b6dd27843"
+  },
+  "breakeven_cost_multiplier": 3.805847636857746,
+  "first_scenario_net_not_positive": null,
+  "gate": false,
+  "monotone_issues": [],
+  "note": "DEV diagnostic only; optimistic_bound row is never a pass criterion",
+  "scenarios": {
+   "all_x2": {
+    "cost_bp": 28.05889763144009,
+    "funding_bp": 2.0794716621253406,
+    "gross_bp": 55.47341628385018,
+    "n": 367,
+    "n_high_vol": 182,
+    "n_low_vol": 185,
+    "net_bp": 25.335046990284745,
+    "net_bp_high_vol": 83.4388826727357,
+    "net_bp_low_vol": -31.82656432974809,
+    "net_t": 1.7895939164155619,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.001,
+     "half_spread": 0.00038402427377674813,
+     "impact_coefficient": 0.0020026591913120486,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "base": {
+    "cost_bp": 14.029448815720045,
+    "funding_bp": 2.0794716621253406,
+    "gross_bp": 55.47341628385018,
+    "n": 367,
+    "n_high_vol": 182,
+    "n_low_vol": 185,
+    "net_bp": 39.36449580600478,
+    "net_bp_high_vol": 97.44211190548047,
+    "net_bp_low_vol": -17.771321113479384,
+    "net_t": 2.7808997690312824,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "fee_x1.5": {
+    "cost_bp": 19.029448815720045,
+    "funding_bp": 2.0794716621253406,
+    "gross_bp": 55.47341628385018,
+    "n": 367,
+    "n_high_vol": 182,
+    "n_low_vol": 185,
+    "net_bp": 34.36449580600478,
+    "net_bp_high_vol": 92.44211190548047,
+    "net_bp_low_vol": -22.771321113479388,
+    "net_t": 2.4276754088443706,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.00075,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "fee_x2": {
+    "cost_bp": 24.02944881572004,
+    "funding_bp": 2.0794716621253406,
+    "gross_bp": 55.47341628385018,
+    "n": 367,
+    "n_high_vol": 182,
+    "n_low_vol": 185,
+    "net_bp": 29.36449580600479,
+    "net_bp_high_vol": 87.44211190548046,
+    "net_bp_low_vol": -27.771321113479384,
+    "net_t": 2.0744510486574597,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.001,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "impact_x2": {
+    "cost_bp": 14.21865489367261,
+    "funding_bp": 2.0794716621253406,
+    "gross_bp": 55.47341628385018,
+    "n": 367,
+    "n_high_vol": 182,
+    "n_low_vol": 185,
+    "net_bp": 39.17528972805222,
+    "net_bp_high_vol": 97.27912541050318,
+    "net_bp_low_vol": -17.986321591980612,
+    "net_t": 2.767228345699285,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0020026591913120486,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "maker_fee_optimistic_bound": {
+    "cost_bp": 8.029448815720045,
+    "funding_bp": 2.0794716621253406,
+    "gross_bp": 55.47341628385018,
+    "n": 367,
+    "n_high_vol": 182,
+    "n_low_vol": 185,
+    "net_bp": 45.36449580600479,
+    "net_bp_high_vol": 103.44211190548047,
+    "net_bp_low_vol": -11.771321113479386,
+    "net_t": 3.2047690012555767,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0002,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "size_x25": {
+    "cost_bp": 14.7862731275303,
+    "funding_bp": 2.0794716621253406,
+    "gross_bp": 55.47341628385018,
+    "n": 367,
+    "n_high_vol": 182,
+    "n_low_vol": 185,
+    "net_bp": 38.607671494194534,
+    "net_bp_high_vol": 96.79016592557136,
+    "net_bp_low_vol": -18.63132302748429,
+    "net_t": 2.7262279545479378,
+    "order_value": 250000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "size_x5": {
+    "cost_bp": 14.26332038982554,
+    "funding_bp": 2.0794716621253406,
+    "gross_bp": 55.47341628385018,
+    "n": 367,
+    "n_high_vol": 182,
+    "n_low_vol": 185,
+    "net_bp": 39.1306242318993,
+    "net_bp_high_vol": 97.24064951827411,
+    "net_bp_low_vol": -18.037076320101885,
+    "net_t": 2.7640012965840697,
+    "order_value": 50000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "spread_x2": {
+    "cost_bp": 17.869691553487527,
+    "funding_bp": 2.0794716621253406,
+    "gross_bp": 55.47341628385018,
+    "n": 367,
+    "n_high_vol": 182,
+    "n_low_vol": 185,
+    "net_bp": 35.52425306823731,
+    "net_bp_high_vol": 93.60186916771298,
+    "net_bp_low_vol": -21.611563851246867,
+    "net_t": 2.509606312229212,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00038402427377674813,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "spread_x3": {
+    "cost_bp": 21.70993429125501,
+    "funding_bp": 2.0794716621253406,
+    "gross_bp": 55.47341628385018,
+    "n": 367,
+    "n_high_vol": 182,
+    "n_low_vol": 185,
+    "net_bp": 31.684010330469828,
+    "net_bp_high_vol": 89.7616264299455,
+    "net_bp_low_vol": -25.451806589014346,
+    "net_t": 2.2383128554271416,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.0005760364106651222,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   }
+  },
+  "schema": "cost_sensitivity_v1",
+  "stage": "dev",
+  "strategy_family": "spec:breakout_k:long",
+  "symbols": [
+   "BTCUSDT",
+   "ETHUSDT"
+  ]
+ },
+ "S-5a47c0baf0100e04": {
+  "base_net_bp": 55.077538154185675,
+  "basis": {
+   "claim": "modelled cost under an assumption \u2014 not observed execution cost",
+   "cost_status": "ESTIMATED_FROM_PUBLIC_DATA",
+   "cost_version": "archive.cost_model.CandleCostModel@sha256:9afb474b3d1ad38c#public_estimate:PE-371c80b76eeba61b6dd27843"
+  },
+  "breakeven_cost_multiplier": 4.923665707493994,
+  "first_scenario_net_not_positive": null,
+  "gate": false,
+  "monotone_issues": [],
+  "note": "DEV diagnostic only; optimistic_bound row is never a pass criterion",
+  "scenarios": {
+   "all_x2": {
+    "cost_bp": 28.074531451030847,
+    "funding_bp": 5.398500643086817,
+    "gross_bp": 74.5133045227879,
+    "n": 311,
+    "n_high_vol": 157,
+    "n_low_vol": 154,
+    "net_bp": 41.04027242867025,
+    "net_bp_high_vol": 115.4723582600338,
+    "net_bp_low_vol": -34.84178910070689,
+    "net_t": 1.826145266991186,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.001,
+     "half_spread": 0.00038402427377674813,
+     "impact_coefficient": 0.0020026591913120486,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "base": {
+    "cost_bp": 14.037265725515423,
+    "funding_bp": 5.398500643086817,
+    "gross_bp": 74.5133045227879,
+    "n": 311,
+    "n_high_vol": 157,
+    "n_low_vol": 154,
+    "net_bp": 55.077538154185675,
+    "net_bp_high_vol": 129.48335866763017,
+    "net_bp_low_vol": -20.777746395235006,
+    "net_t": 2.4508023515521438,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "fee_x1.5": {
+    "cost_bp": 19.037265725515425,
+    "funding_bp": 5.398500643086817,
+    "gross_bp": 74.5133045227879,
+    "n": 311,
+    "n_high_vol": 157,
+    "n_low_vol": 154,
+    "net_bp": 50.077538154185675,
+    "net_bp_high_vol": 124.48335866763017,
+    "net_bp_low_vol": -25.777746395235006,
+    "net_t": 2.2283157958993387,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.00075,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "fee_x2": {
+    "cost_bp": 24.03726572551542,
+    "funding_bp": 5.398500643086817,
+    "gross_bp": 74.5133045227879,
+    "n": 311,
+    "n_high_vol": 157,
+    "n_low_vol": 154,
+    "net_bp": 45.077538154185675,
+    "net_bp_high_vol": 119.48335866763017,
+    "net_bp_low_vol": -30.777746395235006,
+    "net_t": 2.0058292402465336,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.001,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "impact_x2": {
+    "cost_bp": 14.234288713263364,
+    "funding_bp": 5.398500643086817,
+    "gross_bp": 74.5133045227879,
+    "n": 311,
+    "n_high_vol": 157,
+    "n_low_vol": 154,
+    "net_bp": 54.88051516643773,
+    "net_bp_high_vol": 129.3126009978013,
+    "net_bp_low_vol": -21.00154636293941,
+    "net_t": 2.4419865437154336,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0020026591913120486,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "maker_fee_optimistic_bound": {
+    "cost_bp": 8.037265725515422,
+    "funding_bp": 5.398500643086817,
+    "gross_bp": 74.5133045227879,
+    "n": 311,
+    "n_high_vol": 157,
+    "n_low_vol": 154,
+    "net_bp": 61.077538154185675,
+    "net_bp_high_vol": 135.48335866763017,
+    "net_bp_low_vol": -14.777746395235008,
+    "net_t": 2.7177862183355095,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0002,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "size_x25": {
+    "cost_bp": 14.818063831777168,
+    "funding_bp": 5.410138064516129,
+    "gross_bp": 74.77068514714529,
+    "n": 310,
+    "n_high_vol": 157,
+    "n_low_vol": 152,
+    "net_bp": 54.54248325085199,
+    "net_bp_high_vol": 128.8003279883147,
+    "net_bp_low_vol": -21.210310894027007,
+    "net_t": 2.4201994841036765,
+    "order_value": 250000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 2
+   },
+   "size_x5": {
+    "cost_bp": 14.280799531501986,
+    "funding_bp": 5.398500643086817,
+    "gross_bp": 74.5133045227879,
+    "n": 311,
+    "n_high_vol": 157,
+    "n_low_vol": 154,
+    "net_bp": 54.8340043481991,
+    "net_bp_high_vol": 129.2722905800422,
+    "net_bp_low_vol": -21.054378368679906,
+    "net_t": 2.4399054143215038,
+    "order_value": 50000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "spread_x2": {
+    "cost_bp": 17.877508463282904,
+    "funding_bp": 5.398500643086817,
+    "gross_bp": 74.5133045227879,
+    "n": 311,
+    "n_high_vol": 157,
+    "n_low_vol": 154,
+    "net_bp": 51.23729541641819,
+    "net_bp_high_vol": 125.64311592986269,
+    "net_bp_low_vol": -24.617989133002492,
+    "net_t": 2.279921875632827,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00038402427377674813,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "spread_x3": {
+    "cost_bp": 21.717751201050383,
+    "funding_bp": 5.398500643086817,
+    "gross_bp": 74.5133045227879,
+    "n": 311,
+    "n_high_vol": 157,
+    "n_low_vol": 154,
+    "net_bp": 47.39705267865071,
+    "net_bp_high_vol": 121.8028731920952,
+    "net_bp_low_vol": -28.458231870769968,
+    "net_t": 2.10904139971351,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.0005760364106651222,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   }
+  },
+  "schema": "cost_sensitivity_v1",
+  "stage": "dev",
+  "strategy_family": "spec:breakout_k+taker_share_z:long",
+  "symbols": [
+   "BTCUSDT",
+   "ETHUSDT"
+  ]
+ },
+ "S-80fe4b122603f292": {
+  "base_net_bp": 45.896404986960256,
+  "basis": {
+   "claim": "modelled cost under an assumption \u2014 not observed execution cost",
+   "cost_status": "ESTIMATED_FROM_PUBLIC_DATA",
+   "cost_version": "archive.cost_model.CandleCostModel@sha256:9afb474b3d1ad38c#public_estimate:PE-371c80b76eeba61b6dd27843"
+  },
+  "breakeven_cost_multiplier": 4.271430512606872,
+  "first_scenario_net_not_positive": null,
+  "gate": false,
+  "monotone_issues": [],
+  "note": "DEV diagnostic only; optimistic_bound row is never a pass criterion",
+  "scenarios": {
+   "all_x2": {
+    "cost_bp": 28.05892089719934,
+    "funding_bp": 1.8901172205438068,
+    "gross_bp": 61.81598265610373,
+    "n": 331,
+    "n_high_vol": 165,
+    "n_low_vol": 166,
+    "net_bp": 31.86694453836059,
+    "net_bp_high_vol": 108.62938460925155,
+    "net_bp_low_vol": -44.43307119475392,
+    "net_t": 2.095541896036835,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.001,
+     "half_spread": 0.00038402427377674813,
+     "impact_coefficient": 0.0020026591913120486,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "base": {
+    "cost_bp": 14.02946044859967,
+    "funding_bp": 1.8901172205438068,
+    "gross_bp": 61.81598265610373,
+    "n": 331,
+    "n_high_vol": 165,
+    "n_low_vol": 166,
+    "net_bp": 45.896404986960256,
+    "net_bp_high_vol": 122.63104858788203,
+    "net_bp_low_vol": -30.375981724799335,
+    "net_t": 3.0184585229929195,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "fee_x1.5": {
+    "cost_bp": 19.029460448599668,
+    "funding_bp": 1.8901172205438068,
+    "gross_bp": 61.81598265610373,
+    "n": 331,
+    "n_high_vol": 165,
+    "n_low_vol": 166,
+    "net_bp": 40.896404986960256,
+    "net_bp_high_vol": 117.63104858788203,
+    "net_bp_low_vol": -35.37598172479934,
+    "net_t": 2.6896246498550886,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.00075,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "fee_x2": {
+    "cost_bp": 24.029460448599668,
+    "funding_bp": 1.8901172205438068,
+    "gross_bp": 61.81598265610373,
+    "n": 331,
+    "n_high_vol": 165,
+    "n_low_vol": 166,
+    "net_bp": 35.896404986960256,
+    "net_bp_high_vol": 112.63104858788203,
+    "net_bp_low_vol": -40.37598172479934,
+    "net_t": 2.360790776717258,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.001,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "impact_x2": {
+    "cost_bp": 14.218678159431859,
+    "funding_bp": 1.8901172205438068,
+    "gross_bp": 61.81598265610373,
+    "n": 331,
+    "n_high_vol": 165,
+    "n_low_vol": 166,
+    "net_bp": 45.70718727612807,
+    "net_bp_high_vol": 122.46962734701903,
+    "net_bp_low_vol": -30.592828456986442,
+    "net_t": 3.005663934043914,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0020026591913120486,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "maker_fee_optimistic_bound": {
+    "cost_bp": 8.02946044859967,
+    "funding_bp": 1.8901172205438068,
+    "gross_bp": 61.81598265610373,
+    "n": 331,
+    "n_high_vol": 165,
+    "n_low_vol": 166,
+    "net_bp": 51.89640498696026,
+    "net_bp_high_vol": 128.63104858788205,
+    "net_bp_low_vol": -24.375981724799335,
+    "net_t": 3.4130591707583173,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0002,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "size_x25": {
+    "cost_bp": 14.786331291928423,
+    "funding_bp": 1.8901172205438068,
+    "gross_bp": 61.81598265610373,
+    "n": 331,
+    "n_high_vol": 165,
+    "n_low_vol": 166,
+    "net_bp": 45.1395341436315,
+    "net_bp_high_vol": 121.98536362443002,
+    "net_bp_low_vol": -31.24336865354775,
+    "net_t": 2.96729387963721,
+    "order_value": 250000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "size_x5": {
+    "cost_bp": 14.263346401735152,
+    "funding_bp": 1.8901172205438068,
+    "gross_bp": 61.81598265610373,
+    "n": 331,
+    "n_high_vol": 165,
+    "n_low_vol": 166,
+    "net_bp": 45.66251903382477,
+    "net_bp_high_vol": 122.43152096116299,
+    "net_bp_low_vol": -30.64401902648129,
+    "net_t": 3.002643873608301,
+    "order_value": 50000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "spread_x2": {
+    "cost_bp": 17.869703186367154,
+    "funding_bp": 1.8901172205438068,
+    "gross_bp": 61.81598265610373,
+    "n": 331,
+    "n_high_vol": 165,
+    "n_low_vol": 166,
+    "net_bp": 42.056162249192774,
+    "net_bp_high_vol": 118.79080585011455,
+    "net_bp_low_vol": -34.216224462566814,
+    "net_t": 2.765898144343018,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00038402427377674813,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "spread_x3": {
+    "cost_bp": 21.709945924134633,
+    "funding_bp": 1.8901172205438068,
+    "gross_bp": 61.81598265610373,
+    "n": 331,
+    "n_high_vol": 165,
+    "n_low_vol": 166,
+    "net_bp": 38.2159195114253,
+    "net_bp_high_vol": 114.95056311234708,
+    "net_bp_low_vol": -38.056467200334296,
+    "net_t": 2.513337765693117,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.0005760364106651222,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   }
+  },
+  "schema": "cost_sensitivity_v1",
+  "stage": "dev",
+  "strategy_family": "spec:breakout_k+taker_share_z:long",
+  "symbols": [
+   "BTCUSDT",
+   "ETHUSDT"
+  ]
+ },
+ "S-9d752d63324074cc": {
+  "base_net_bp": 24.904394077032663,
+  "basis": {
+   "claim": "modelled cost under an assumption \u2014 not observed execution cost",
+   "cost_status": "ESTIMATED_FROM_PUBLIC_DATA",
+   "cost_version": "archive.cost_model.CandleCostModel@sha256:9afb474b3d1ad38c#public_estimate:PE-371c80b76eeba61b6dd27843"
+  },
+  "breakeven_cost_multiplier": 2.7756277993833662,
+  "first_scenario_net_not_positive": null,
+  "gate": false,
+  "monotone_issues": [],
+  "note": "DEV diagnostic only; optimistic_bound row is never a pass criterion",
+  "scenarios": {
+   "all_x2": {
+    "cost_bp": 28.051367618463036,
+    "funding_bp": 1.4679142284569138,
+    "gross_bp": 40.3979921147211,
+    "n": 499,
+    "n_high_vol": 248,
+    "n_low_vol": 251,
+    "net_bp": 10.878710267801143,
+    "net_bp_high_vol": 36.1810952157423,
+    "net_bp_low_vol": -14.121255736539124,
+    "net_t": 1.0615816425698017,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.001,
+     "half_spread": 0.00038402427377674813,
+     "impact_coefficient": 0.0020026591913120486,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "base": {
+    "cost_bp": 14.025683809231518,
+    "funding_bp": 1.4679142284569138,
+    "gross_bp": 40.3979921147211,
+    "n": 499,
+    "n_high_vol": 248,
+    "n_low_vol": 251,
+    "net_bp": 24.904394077032663,
+    "net_bp_high_vol": 50.1803286037192,
+    "net_bp_low_vol": -0.06943764654606475,
+    "net_t": 2.430494450929368,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "fee_x1.5": {
+    "cost_bp": 19.02568380923152,
+    "funding_bp": 1.4679142284569138,
+    "gross_bp": 40.3979921147211,
+    "n": 499,
+    "n_high_vol": 248,
+    "n_low_vol": 251,
+    "net_bp": 19.904394077032663,
+    "net_bp_high_vol": 45.1803286037192,
+    "net_bp_low_vol": -5.069437646546064,
+    "net_t": 1.9425294670370636,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.00075,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "fee_x2": {
+    "cost_bp": 24.02568380923152,
+    "funding_bp": 1.4679142284569138,
+    "gross_bp": 40.3979921147211,
+    "n": 499,
+    "n_high_vol": 248,
+    "n_low_vol": 251,
+    "net_bp": 14.904394077032665,
+    "net_bp_high_vol": 40.1803286037192,
+    "net_bp_low_vol": -10.069437646546064,
+    "net_t": 1.4545644831447597,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.001,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "impact_x2": {
+    "cost_bp": 14.211124880695557,
+    "funding_bp": 1.4679142284569138,
+    "gross_bp": 40.3979921147211,
+    "n": 499,
+    "n_high_vol": 248,
+    "n_low_vol": 251,
+    "net_bp": 24.718953005568626,
+    "net_bp_high_vol": 50.021337953509786,
+    "net_bp_low_vol": -0.2810129987716434,
+    "net_t": 2.412159721904357,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0020026591913120486,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "maker_fee_optimistic_bound": {
+    "cost_bp": 8.025683809231518,
+    "funding_bp": 1.4679142284569138,
+    "gross_bp": 40.3979921147211,
+    "n": 499,
+    "n_high_vol": 248,
+    "n_low_vol": 251,
+    "net_bp": 30.904394077032666,
+    "net_bp_high_vol": 56.1803286037192,
+    "net_bp_low_vol": 5.930562353453936,
+    "net_t": 3.016052431600133,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0002,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "size_x25": {
+    "cost_bp": 14.76744809508767,
+    "funding_bp": 1.4679142284569138,
+    "gross_bp": 40.3979921147211,
+    "n": 499,
+    "n_high_vol": 248,
+    "n_low_vol": 251,
+    "net_bp": 24.162629791176514,
+    "net_bp_high_vol": 49.544366002881546,
+    "net_bp_low_vol": -0.9157390554483792,
+    "net_t": 2.3571726037312266,
+    "order_value": 250000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "size_x5": {
+    "cost_bp": 14.254901579381466,
+    "funding_bp": 1.4679142284569138,
+    "gross_bp": 40.3979921147211,
+    "n": 499,
+    "n_high_vol": 248,
+    "n_low_vol": 251,
+    "net_bp": 24.675176306882715,
+    "net_bp_high_vol": 49.98380535227347,
+    "net_bp_low_vol": -0.3309591642603414,
+    "net_t": 2.4078318922684963,
+    "order_value": 50000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "spread_x2": {
+    "cost_bp": 17.865926546999003,
+    "funding_bp": 1.4679142284569138,
+    "gross_bp": 40.3979921147211,
+    "n": 499,
+    "n_high_vol": 248,
+    "n_low_vol": 251,
+    "net_bp": 21.06415133926518,
+    "net_bp_high_vol": 46.340085865951714,
+    "net_bp_low_vol": -3.9096803843135466,
+    "net_t": 2.0557136537939185,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00038402427377674813,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "spread_x3": {
+    "cost_bp": 21.70616928476648,
+    "funding_bp": 1.4679142284569138,
+    "gross_bp": 40.3979921147211,
+    "n": 499,
+    "n_high_vol": 248,
+    "n_low_vol": 251,
+    "net_bp": 17.2239086014977,
+    "net_bp_high_vol": 42.49984312818424,
+    "net_bp_low_vol": -7.749923122081026,
+    "net_t": 1.6809328566584691,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.0005760364106651222,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   }
+  },
+  "schema": "cost_sensitivity_v1",
+  "stage": "dev",
+  "strategy_family": "spec:breakout_k:long",
+  "symbols": [
+   "BTCUSDT",
+   "ETHUSDT"
+  ]
+ },
+ "S-af5b9301777d21a5": {
+  "base_net_bp": 34.04802899490663,
+  "basis": {
+   "claim": "modelled cost under an assumption \u2014 not observed execution cost",
+   "cost_status": "ESTIMATED_FROM_PUBLIC_DATA",
+   "cost_version": "archive.cost_model.CandleCostModel@sha256:9afb474b3d1ad38c#public_estimate:PE-371c80b76eeba61b6dd27843"
+  },
+  "breakeven_cost_multiplier": 3.4268696354865034,
+  "first_scenario_net_not_positive": null,
+  "gate": false,
+  "monotone_issues": [],
+  "note": "DEV diagnostic only; optimistic_bound row is never a pass criterion",
+  "scenarios": {
+   "all_x2": {
+    "cost_bp": 28.059215457678405,
+    "funding_bp": 2.896149175824176,
+    "gross_bp": 50.973785899570004,
+    "n": 364,
+    "n_high_vol": 180,
+    "n_low_vol": 184,
+    "net_bp": 20.018421266067424,
+    "net_bp_high_vol": 75.15117362476862,
+    "net_bp_low_vol": -33.915792997879386,
+    "net_t": 1.2904128186761712,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.001,
+     "half_spread": 0.00038402427377674813,
+     "impact_coefficient": 0.0020026591913120486,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "base": {
+    "cost_bp": 14.029607728839203,
+    "funding_bp": 2.896149175824176,
+    "gross_bp": 50.973785899570004,
+    "n": 364,
+    "n_high_vol": 180,
+    "n_low_vol": 184,
+    "net_bp": 34.04802899490663,
+    "net_bp_high_vol": 89.15599295074745,
+    "net_bp_low_vol": -19.861935744502873,
+    "net_t": 2.194914753583261,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "fee_x1.5": {
+    "cost_bp": 19.029607728839203,
+    "funding_bp": 2.896149175824176,
+    "gross_bp": 50.973785899570004,
+    "n": 364,
+    "n_high_vol": 180,
+    "n_low_vol": 184,
+    "net_bp": 29.048028994906627,
+    "net_bp_high_vol": 84.15599295074745,
+    "net_bp_low_vol": -24.861935744502876,
+    "net_t": 1.872588495885406,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.00075,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "fee_x2": {
+    "cost_bp": 24.029607728839196,
+    "funding_bp": 2.896149175824176,
+    "gross_bp": 50.973785899570004,
+    "n": 364,
+    "n_high_vol": 180,
+    "n_low_vol": 184,
+    "net_bp": 24.048028994906627,
+    "net_bp_high_vol": 79.15599295074745,
+    "net_bp_low_vol": -29.86193574450287,
+    "net_t": 1.5502622381875513,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.001,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "impact_x2": {
+    "cost_bp": 14.218972719910921,
+    "funding_bp": 2.896149175824176,
+    "gross_bp": 50.973785899570004,
+    "n": 364,
+    "n_high_vol": 180,
+    "n_low_vol": 184,
+    "net_bp": 33.85866400383491,
+    "net_bp_high_vol": 88.9914163625361,
+    "net_bp_low_vol": -20.075550260111903,
+    "net_t": 2.1825724153311894,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0020026591913120486,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "maker_fee_optimistic_bound": {
+    "cost_bp": 8.029607728839201,
+    "funding_bp": 2.896149175824176,
+    "gross_bp": 50.973785899570004,
+    "n": 364,
+    "n_high_vol": 180,
+    "n_low_vol": 184,
+    "net_bp": 40.04802899490663,
+    "net_bp_high_vol": 95.15599295074745,
+    "net_bp_low_vol": -13.861935744502873,
+    "net_t": 2.5817062628206866,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0002,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "size_x25": {
+    "cost_bp": 14.787067693126076,
+    "funding_bp": 2.896149175824176,
+    "gross_bp": 50.973785899570004,
+    "n": 364,
+    "n_high_vol": 180,
+    "n_low_vol": 184,
+    "net_bp": 33.29056903061975,
+    "net_bp_high_vol": 88.49768659790202,
+    "net_bp_low_vol": -20.716393806938992,
+    "net_t": 2.1455520157561017,
+    "order_value": 250000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "size_x5": {
+    "cost_bp": 14.263675730362488,
+    "funding_bp": 2.896149175824176,
+    "gross_bp": 50.973785899570004,
+    "n": 364,
+    "n_high_vol": 180,
+    "n_low_vol": 184,
+    "net_bp": 33.81396099338334,
+    "net_bp_high_vol": 88.95256510021322,
+    "net_bp_low_vol": -20.125977806776326,
+    "net_t": 2.179658944395992,
+    "order_value": 50000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "spread_x2": {
+    "cost_bp": 17.869850466606685,
+    "funding_bp": 2.896149175824176,
+    "gross_bp": 50.973785899570004,
+    "n": 364,
+    "n_high_vol": 180,
+    "n_low_vol": 184,
+    "net_bp": 30.207786257139144,
+    "net_bp_high_vol": 85.31575021297996,
+    "net_bp_low_vol": -23.702178482270355,
+    "net_t": 1.9473525395200695,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00038402427377674813,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "spread_x3": {
+    "cost_bp": 21.71009320437416,
+    "funding_bp": 2.896149175824176,
+    "gross_bp": 50.973785899570004,
+    "n": 364,
+    "n_high_vol": 180,
+    "n_low_vol": 184,
+    "net_bp": 26.36754351937166,
+    "net_bp_high_vol": 81.47550747521248,
+    "net_bp_low_vol": -27.542421220037834,
+    "net_t": 1.699790325456878,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.0005760364106651222,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   }
+  },
+  "schema": "cost_sensitivity_v1",
+  "stage": "dev",
+  "strategy_family": "spec:breakout_k:long",
+  "symbols": [
+   "BTCUSDT",
+   "ETHUSDT"
+  ]
+ },
+ "S-c515b31a298bdaf1": {
+  "base_net_bp": 48.013206741251736,
+  "basis": {
+   "claim": "modelled cost under an assumption \u2014 not observed execution cost",
+   "cost_status": "ESTIMATED_FROM_PUBLIC_DATA",
+   "cost_version": "archive.cost_model.CandleCostModel@sha256:9afb474b3d1ad38c#public_estimate:PE-371c80b76eeba61b6dd27843"
+  },
+  "breakeven_cost_multiplier": 4.42607256539499,
+  "first_scenario_net_not_positive": null,
+  "gate": false,
+  "monotone_issues": [],
+  "note": "DEV diagnostic only; optimistic_bound row is never a pass criterion",
+  "scenarios": {
+   "all_x2": {
+    "cost_bp": 28.028131818460956,
+    "funding_bp": 4.040054205607477,
+    "gross_bp": 66.0673268560897,
+    "n": 321,
+    "n_high_vol": 162,
+    "n_low_vol": 159,
+    "net_bp": 33.99914083202126,
+    "net_bp_high_vol": 108.02405440766873,
+    "net_bp_low_vol": -41.422469226185605,
+    "net_t": 1.6260429297313674,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.001,
+     "half_spread": 0.00038402427377674813,
+     "impact_coefficient": 0.0020026591913120486,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "base": {
+    "cost_bp": 14.014065909230478,
+    "funding_bp": 4.040054205607477,
+    "gross_bp": 66.0673268560897,
+    "n": 321,
+    "n_high_vol": 162,
+    "n_low_vol": 159,
+    "net_bp": 48.013206741251736,
+    "net_bp_high_vol": 122.01995083947313,
+    "net_bp_low_vol": -27.389891019200245,
+    "net_t": 2.2963483641862377,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "fee_x1.5": {
+    "cost_bp": 19.014065909230478,
+    "funding_bp": 4.040054205607477,
+    "gross_bp": 66.0673268560897,
+    "n": 321,
+    "n_high_vol": 162,
+    "n_low_vol": 159,
+    "net_bp": 43.013206741251736,
+    "net_bp_high_vol": 117.01995083947313,
+    "net_bp_low_vol": -32.38989101920025,
+    "net_t": 2.0572112058871155,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.00075,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "fee_x2": {
+    "cost_bp": 24.014065909230474,
+    "funding_bp": 4.040054205607477,
+    "gross_bp": 66.0673268560897,
+    "n": 321,
+    "n_high_vol": 162,
+    "n_low_vol": 159,
+    "net_bp": 38.013206741251736,
+    "net_bp_high_vol": 112.01995083947313,
+    "net_bp_low_vol": -37.38989101920024,
+    "net_t": 1.8180740475879937,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.001,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "impact_x2": {
+    "cost_bp": 14.187889080693473,
+    "funding_bp": 4.040054205607477,
+    "gross_bp": 66.0673268560897,
+    "n": 321,
+    "n_high_vol": 162,
+    "n_low_vol": 159,
+    "net_bp": 47.83938356978874,
+    "net_bp_high_vol": 121.86429714543623,
+    "net_bp_low_vol": -27.582226488418126,
+    "net_t": 2.287966387171124,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0020026591913120486,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "maker_fee_optimistic_bound": {
+    "cost_bp": 8.014065909230476,
+    "funding_bp": 4.040054205607477,
+    "gross_bp": 66.0673268560897,
+    "n": 321,
+    "n_high_vol": 162,
+    "n_low_vol": 159,
+    "net_bp": 54.013206741251736,
+    "net_bp_high_vol": 128.01995083947313,
+    "net_bp_low_vol": -21.389891019200245,
+    "net_t": 2.583312954145184,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0002,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "size_x25": {
+    "cost_bp": 14.702453893920582,
+    "funding_bp": 4.04919375,
+    "gross_bp": 66.49504029616747,
+    "n": 320,
+    "n_high_vol": 162,
+    "n_low_vol": 158,
+    "net_bp": 47.74339265224689,
+    "net_bp_high_vol": 121.39733606332551,
+    "net_bp_low_vol": -27.77520755404891,
+    "net_t": 2.278835061320254,
+    "order_value": 250000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 1
+   },
+   "size_x5": {
+    "cost_bp": 14.22892316522334,
+    "funding_bp": 4.040054205607477,
+    "gross_bp": 66.0673268560897,
+    "n": 321,
+    "n_high_vol": 162,
+    "n_low_vol": 159,
+    "net_bp": 47.798349485258875,
+    "net_bp_high_vol": 121.82755229269455,
+    "net_bp_low_vol": -27.627630733637865,
+    "net_t": 2.2859877051200996,
+    "order_value": 50000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "spread_x2": {
+    "cost_bp": 17.85430864699796,
+    "funding_bp": 4.040054205607477,
+    "gross_bp": 66.0673268560897,
+    "n": 321,
+    "n_high_vol": 162,
+    "n_low_vol": 159,
+    "net_bp": 44.17296400348425,
+    "net_bp_high_vol": 118.17970810170564,
+    "net_bp_low_vol": -31.230133756967728,
+    "net_t": 2.1126794170885264,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00038402427377674813,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "spread_x3": {
+    "cost_bp": 21.69455138476544,
+    "funding_bp": 4.040054205607477,
+    "gross_bp": 66.0673268560897,
+    "n": 321,
+    "n_high_vol": 162,
+    "n_low_vol": 159,
+    "net_bp": 40.33272126571678,
+    "net_bp_high_vol": 114.33946536393817,
+    "net_bp_low_vol": -35.07037649473521,
+    "net_t": 1.9290104699908155,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.0005760364106651222,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   }
+  },
+  "schema": "cost_sensitivity_v1",
+  "stage": "dev",
+  "strategy_family": "spec:breakout_k+taker_share_z:long",
+  "symbols": [
+   "BTCUSDT",
+   "ETHUSDT"
+  ]
+ },
+ "S-ce1509d352d34861": {
+  "base_net_bp": 25.363569170377296,
+  "basis": {
+   "claim": "modelled cost under an assumption \u2014 not observed execution cost",
+   "cost_status": "ESTIMATED_FROM_PUBLIC_DATA",
+   "cost_version": "archive.cost_model.CandleCostModel@sha256:9afb474b3d1ad38c#public_estimate:PE-371c80b76eeba61b6dd27843"
+  },
+  "breakeven_cost_multiplier": 2.8085148285353068,
+  "first_scenario_net_not_positive": null,
+  "gate": false,
+  "monotone_issues": [],
+  "note": "DEV diagnostic only; optimistic_bound row is never a pass criterion",
+  "scenarios": {
+   "all_x2": {
+    "cost_bp": 28.04905856472178,
+    "funding_bp": 0.9487149732620321,
+    "gross_bp": 40.33681342600022,
+    "n": 374,
+    "n_high_vol": 186,
+    "n_low_vol": 188,
+    "net_bp": 11.339039888016407,
+    "net_bp_high_vol": 45.061211035542456,
+    "net_bp_low_vol": -22.024384757940215,
+    "net_t": 1.0208911594671213,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.001,
+     "half_spread": 0.00038402427377674813,
+     "impact_coefficient": 0.0020026591913120486,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "base": {
+    "cost_bp": 14.02452928236089,
+    "funding_bp": 0.9487149732620321,
+    "gross_bp": 40.33681342600022,
+    "n": 374,
+    "n_high_vol": 186,
+    "n_low_vol": 188,
+    "net_bp": 25.363569170377296,
+    "net_bp_high_vol": 59.06132128167345,
+    "net_bp_low_vol": -7.9756962163305944,
+    "net_t": 2.2838696006739467,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "fee_x1.5": {
+    "cost_bp": 19.02452928236089,
+    "funding_bp": 0.9487149732620321,
+    "gross_bp": 40.33681342600022,
+    "n": 374,
+    "n_high_vol": 186,
+    "n_low_vol": 188,
+    "net_bp": 20.363569170377296,
+    "net_bp_high_vol": 54.06132128167345,
+    "net_bp_low_vol": -12.975696216330595,
+    "net_t": 1.833643217838732,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.00075,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "fee_x2": {
+    "cost_bp": 24.024529282360888,
+    "funding_bp": 0.9487149732620321,
+    "gross_bp": 40.33681342600022,
+    "n": 374,
+    "n_high_vol": 186,
+    "n_low_vol": 188,
+    "net_bp": 15.3635691703773,
+    "net_bp_high_vol": 49.06132128167345,
+    "net_bp_low_vol": -17.975696216330594,
+    "net_t": 1.3834168350035179,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.001,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "impact_x2": {
+    "cost_bp": 14.208815826954295,
+    "funding_bp": 0.9487149732620321,
+    "gross_bp": 40.33681342600022,
+    "n": 374,
+    "n_high_vol": 186,
+    "n_low_vol": 188,
+    "net_bp": 25.179282625783888,
+    "net_bp_high_vol": 58.90145377330994,
+    "net_bp_low_vol": -8.184142020172738,
+    "net_t": 2.2669738609486103,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0020026591913120486,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "maker_fee_optimistic_bound": {
+    "cost_bp": 8.02452928236089,
+    "funding_bp": 0.9487149732620321,
+    "gross_bp": 40.33681342600022,
+    "n": 374,
+    "n_high_vol": 186,
+    "n_low_vol": 188,
+    "net_bp": 31.363569170377296,
+    "net_bp_high_vol": 65.06132128167346,
+    "net_bp_low_vol": -1.975696216330594,
+    "net_t": 2.824141260076204,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0002,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "size_x25": {
+    "cost_bp": 14.75738184499926,
+    "funding_bp": 0.9500514745308312,
+    "gross_bp": 40.66421622819495,
+    "n": 373,
+    "n_high_vol": 186,
+    "n_low_vol": 187,
+    "net_bp": 24.956782908664863,
+    "net_bp_high_vol": 58.42185124821943,
+    "net_bp_low_vol": -8.329327846186205,
+    "net_t": 2.244984218808256,
+    "order_value": 250000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 1
+   },
+   "size_x5": {
+    "cost_bp": 14.252319978816887,
+    "funding_bp": 0.9487149732620321,
+    "gross_bp": 40.33681342600022,
+    "n": 374,
+    "n_high_vol": 186,
+    "n_low_vol": 188,
+    "net_bp": 25.1357784739213,
+    "net_bp_high_vol": 58.86371417394263,
+    "net_bp_low_vol": -8.233349399504068,
+    "net_t": 2.262985845229262,
+    "order_value": 50000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "spread_x2": {
+    "cost_bp": 17.86477202012837,
+    "funding_bp": 0.9487149732620321,
+    "gross_bp": 40.33681342600022,
+    "n": 374,
+    "n_high_vol": 186,
+    "n_low_vol": 188,
+    "net_bp": 21.523326432609817,
+    "net_bp_high_vol": 55.22107854390597,
+    "net_bp_low_vol": -11.815938954098076,
+    "net_t": 1.938073881267096,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00038402427377674813,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "spread_x3": {
+    "cost_bp": 21.70501475789585,
+    "funding_bp": 0.9487149732620321,
+    "gross_bp": 40.33681342600022,
+    "n": 374,
+    "n_high_vol": 186,
+    "n_low_vol": 188,
+    "net_bp": 17.683083694842338,
+    "net_bp_high_vol": 51.380835806138485,
+    "net_bp_low_vol": -15.656181691865555,
+    "net_t": 1.5922781618602453,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.0005760364106651222,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   }
+  },
+  "schema": "cost_sensitivity_v1",
+  "stage": "dev",
+  "strategy_family": "spec:breakout_k:long",
+  "symbols": [
+   "BTCUSDT",
+   "ETHUSDT"
+  ]
+ },
+ "S-db25d24ca1ca4c96": {
+  "base_net_bp": 35.07536748488295,
+  "basis": {
+   "claim": "modelled cost under an assumption \u2014 not observed execution cost",
+   "cost_status": "ESTIMATED_FROM_PUBLIC_DATA",
+   "cost_version": "archive.cost_model.CandleCostModel@sha256:9afb474b3d1ad38c#public_estimate:PE-371c80b76eeba61b6dd27843"
+  },
+  "breakeven_cost_multiplier": 3.5014034365488484,
+  "first_scenario_net_not_positive": null,
+  "gate": false,
+  "monotone_issues": [],
+  "note": "DEV diagnostic only; optimistic_bound row is never a pass criterion",
+  "scenarios": {
+   "all_x2": {
+    "cost_bp": 28.04455048904543,
+    "funding_bp": 1.4775972899728995,
+    "gross_bp": 50.575240019378576,
+    "n": 369,
+    "n_high_vol": 183,
+    "n_low_vol": 186,
+    "net_bp": 21.053092240360243,
+    "net_bp_high_vol": 59.51952802345629,
+    "net_bp_low_vol": -16.792917159137485,
+    "net_t": 1.7645440570747397,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.001,
+     "half_spread": 0.00038402427377674813,
+     "impact_coefficient": 0.0020026591913120486,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "base": {
+    "cost_bp": 14.022275244522715,
+    "funding_bp": 1.4775972899728995,
+    "gross_bp": 50.575240019378576,
+    "n": 369,
+    "n_high_vol": 183,
+    "n_low_vol": 186,
+    "net_bp": 35.07536748488295,
+    "net_bp_high_vol": 73.5147906161979,
+    "net_bp_low_vol": -2.7440649507656136,
+    "net_t": 2.9401341835091714,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "fee_x1.5": {
+    "cost_bp": 19.022275244522714,
+    "funding_bp": 1.4775972899728995,
+    "gross_bp": 50.575240019378576,
+    "n": 369,
+    "n_high_vol": 183,
+    "n_low_vol": 186,
+    "net_bp": 30.07536748488296,
+    "net_bp_high_vol": 68.5147906161979,
+    "net_bp_low_vol": -7.744064950765613,
+    "net_t": 2.5210175221119204,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.00075,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "fee_x2": {
+    "cost_bp": 24.022275244522714,
+    "funding_bp": 1.4775972899728995,
+    "gross_bp": 50.575240019378576,
+    "n": 369,
+    "n_high_vol": 183,
+    "n_low_vol": 186,
+    "net_bp": 25.07536748488296,
+    "net_bp_high_vol": 63.5147906161979,
+    "net_bp_low_vol": -12.74406495076561,
+    "net_t": 2.101900860714669,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.001,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "impact_x2": {
+    "cost_bp": 14.20430775127795,
+    "funding_bp": 1.4775972899728995,
+    "gross_bp": 50.575240019378576,
+    "n": 369,
+    "n_high_vol": 183,
+    "n_low_vol": 186,
+    "net_bp": 34.893334978127726,
+    "net_bp_high_vol": 73.35977076122377,
+    "net_bp_low_vol": -2.952674421370003,
+    "net_t": 2.924550282886134,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0020026591913120486,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "maker_fee_optimistic_bound": {
+    "cost_bp": 8.022275244522715,
+    "funding_bp": 1.4775972899728995,
+    "gross_bp": 50.575240019378576,
+    "n": 369,
+    "n_high_vol": 183,
+    "n_low_vol": 186,
+    "net_bp": 41.07536748488296,
+    "net_bp_high_vol": 79.5147906161979,
+    "net_bp_low_vol": 3.2559350492343873,
+    "net_t": 3.443074177185874,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0002,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "size_x25": {
+    "cost_bp": 14.75040527154365,
+    "funding_bp": 1.4775972899728995,
+    "gross_bp": 50.575240019378576,
+    "n": 369,
+    "n_high_vol": 183,
+    "n_low_vol": 186,
+    "net_bp": 34.34723745786202,
+    "net_bp_high_vol": 72.8947111963014,
+    "net_bp_low_vol": -3.5785028331831765,
+    "net_t": 2.877813905194952,
+    "order_value": 250000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "size_x5": {
+    "cost_bp": 14.247279796986874,
+    "funding_bp": 1.4775972899728995,
+    "gross_bp": 50.575240019378576,
+    "n": 369,
+    "n_high_vol": 183,
+    "n_low_vol": 186,
+    "net_bp": 34.8503629324188,
+    "net_bp_high_vol": 73.32317553758772,
+    "net_bp_low_vol": -3.001920437182884,
+    "net_t": 2.9208717936948383,
+    "order_value": 50000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00019201213688837407,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "spread_x2": {
+    "cost_bp": 17.8625179822902,
+    "funding_bp": 1.4775972899728995,
+    "gross_bp": 50.575240019378576,
+    "n": 369,
+    "n_high_vol": 183,
+    "n_low_vol": 186,
+    "net_bp": 31.235124747115474,
+    "net_bp_high_vol": 69.67454787843042,
+    "net_bp_low_vol": -6.584307688533094,
+    "net_t": 2.618232240467542,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.00038402427377674813,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   },
+   "spread_x3": {
+    "cost_bp": 21.70276072005768,
+    "funding_bp": 1.4775972899728995,
+    "gross_bp": 50.575240019378576,
+    "n": 369,
+    "n_high_vol": 183,
+    "n_low_vol": 186,
+    "net_bp": 27.394882009348,
+    "net_bp_high_vol": 65.83430514066293,
+    "net_bp_low_vol": -10.424550426300573,
+    "net_t": 2.296330297425913,
+    "order_value": 10000.0,
+    "params": {
+     "fee_rate": 0.0005,
+     "half_spread": 0.0005760364106651222,
+     "impact_coefficient": 0.0010013295956560243,
+     "max_participation": 0.05
+    },
+    "refused": 0
+   }
+  },
+  "schema": "cost_sensitivity_v1",
+  "stage": "dev",
+  "strategy_family": "spec:breakout_k:long",
+  "symbols": [
+   "BTCUSDT",
+   "ETHUSDT"
+  ]
+ }
+}
