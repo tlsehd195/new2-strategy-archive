@@ -12,7 +12,8 @@ Scenarios (multipliers of the base parameters; never below 1 except the one
 row labelled ``optimistic_bound``, which is reported, never used as a gate):
 
     fee x1.5 / x2, half spread x2 / x3, impact x2, order size x5 / x25,
-    all components x2, maker fee (optimistic bound)
+    all components x2, maker fee (optimistic bound), and (ADR 0034) the half
+    spread scaled with entry volatility (``spread_vol_scaled``, analytic)
 
 Each row: events, refused orders, mean gross / cost / funding / net bp,
 HAC t of the net, and the net split by entry volatility (above / below the
@@ -53,8 +54,10 @@ SCENARIOS = (
 )
 #: maker fee of the public Binance USD-M base tier — an OPTIMISTIC bound only
 MAKER_FEE_RATE = 0.0002
+#: half spread scaled with entry volatility (analytic, on the base events; ADR 0034)
+VOL_SCENARIO = "spread_vol_scaled"
 #: scenarios that only raise per-order cost on the same order size (monotonicity check)
-COSTLIER = ("fee_x1.5", "fee_x2", "spread_x2", "spread_x3", "impact_x2", "all_x2")
+COSTLIER = ("fee_x1.5", "fee_x2", "spread_x2", "spread_x3", "impact_x2", "all_x2", VOL_SCENARIO)
 
 
 def scenario_cost(base, mult: Mapping[str, float], *, name: str):
@@ -103,7 +106,7 @@ def sensitivity(spec: Mapping, inputs: Mapping[str, Mapping], base_cost, order_v
     from strategy_spec import canonicalize_spec
     spec = canonicalize_spec(spec)
     plan = list(SCENARIOS) + [("maker_fee_optimistic_bound", None, 1.0)]
-    rows, vol_split = {}, {}
+    rows, vol_split, vol_ratio, base_events = {}, {}, {}, []
     for name, mult, size in plan:
         if mult is None:
             from costs_bridge import CostContext
@@ -121,10 +124,14 @@ def sensitivity(spec: Mapping, inputs: Mapping[str, Mapping], base_cost, order_v
                 vols = {x["entry_ts"]: _vol_at(d["bars"], idx[x["entry_ts"]] - 1) for x in ev}
                 med = sorted(vols.values())[len(vols) // 2] if vols else 0.0
                 vol_split.update({ts: ("high_vol" if v > med else "low_vol") for ts, v in vols.items()})
+                vol_ratio.update({(sym, ts): (v / med if med > 0 else 1.0) for ts, v in vols.items()})
+                base_events += [dict(x, symbol=sym) for x in ev]
             evs += ev
             refused += r
         rows[name] = {"params": dict(cost.params), "order_value": order_value * size,
                       **_row(evs, refused, vol_split)}
+    rows[VOL_SCENARIO] = vol_scaled_spread_row(base_events, vol_ratio, base_cost.params["half_spread"],
+                                               rows["base"]["refused"], vol_split)
     base = rows["base"]
     from pipeline import cost_breakeven
     return {"schema": SCHEMA, "strategy_family": spec["family"], "symbols": sorted(inputs),
@@ -139,6 +146,25 @@ def sensitivity(spec: Mapping, inputs: Mapping[str, Mapping], base_cost, order_v
             "note": "DEV diagnostic only; optimistic_bound row is never a pass criterion",
             "breakeven_cost_multiplier": None if base["n"] == 0 else cost_breakeven(
                 [{"gross_bp": base["gross_bp"], "funding_bp": base["funding_bp"], "cost_bp": base["cost_bp"]}])}
+
+
+def vol_scaled_spread_row(events: Sequence[Mapping], vol_ratio: Mapping, half_spread: float,
+                          refused: int, vol_split: Mapping) -> dict:
+    """The base events with the half spread of BOTH sides scaled by the entry
+    volatility relative to the median of the base events (never below 1x):
+    ``extra = 2 * half_spread * max(0, vol / median - 1)``.  A diagnostic of
+    how a volatility-dependent spread would change the result; the cost model
+    itself has a constant half spread (stated in ``cost_model.py``).  The
+    entry volatility stands in for the exit bar too (an approximation)."""
+    adj = []
+    for e in events:
+        k = max(0.0, vol_ratio.get((e["symbol"], e["entry_ts"]), 1.0) - 1.0)
+        extra = 2.0 * half_spread * 1e4 * k
+        adj.append(dict(e, cost_bp=e["cost_bp"] + extra, net_bp=e["net_bp"] - extra))
+    row = {"params": {"half_spread": "x max(1, entry vol / median vol)"}, "order_value": None,
+           **_row(adj, refused, vol_split)}
+    row["approximation"] = "analytic re-pricing of the base events (not a re-run)"
+    return row
 
 
 def monotone_issues(rows: Mapping[str, Mapping]) -> list[str]:
