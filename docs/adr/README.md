@@ -36,3 +36,4 @@
 | [0030](0030-adopt-prpl-eb-bootstrap-t-pbo005-as-drafts.md) | 사용자 결정으로 논문 그대로 채택(초안·새 버전, 효력 없음): e-값 v3 베팅 PrPl-EB, StepM bootstrap-t·PBO 0.05인 promotion_v4, IW1 v2 초안 | Accepted (초안) |
 | [0031](0031-one-candidate-per-entry-signal-and-conservative-stop-fill.md) | 검증 배치에 진입 신호당 후보 하나(청산만 다른 변형 제외), 손절은 봉 극단가 체결(보수적): R6 재실행에서 DEV 통과 64→63, 배치 후보 33 | Accepted |
 | [0032](0032-pdf-papers-gk1996-wsr-appendix-rw2003.md) | PDF로 받은 논문 3편 대조(Götze–Künsch 1996, WS-R v7 부록, Romano–Wolf 2003): GK 블록 StepM·WS-R 베팅 규칙 추가(기본값 그대로), ONS 인쇄 부호 오류·"PrPl-EB" 이름 정정 | Accepted (측정·도구) |
+| [0033](0033-pr30-review-near-entry-duplicates.md) | PR #30 검토: 진입이 반 단계 안이고 청산만 다른 후보도 한 가설(selection v2), 스킵에 양쪽 청산 기록, R8에서 R7 결과 재현(DEV 통과 63, 배치 33, 독립 검증 0) | Accepted |

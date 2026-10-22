@@ -1,0 +1,400 @@
+{
+ "at": "2026-10-22T23:59:13Z",
+ "bundle_sha256": "c0a8f977ad967249ce0b6d56cf9c29ad755926606d264f108e1c025aeed10eb2",
+ "candidates": {
+  "list_sha256": "ea04d7337a49c3b56b80b67e54eb1aadb5743cf3f7987ec56c1b579a20ebba5e",
+  "registered": 894
+ },
+ "code": {
+  "code_hash": "4fc62429aeca393cc41ceb08a75d887ac3e6d8e68ce37071d50132fc73b75b4d"
+ },
+ "command": [
+  "run/discovery/repro_bundle.py",
+  "dev",
+  "--state-dir",
+  "/tmp/claude-0/-home-claude-new2-strategy-archive/82599d40-3044-5e20-8566-df039cbaa9f9/scratchpad/r8_state/state",
+  "--out",
+  "/tmp/claude-0/-home-claude-new2-strategy-archive/82599d40-3044-5e20-8566-df039cbaa9f9/scratchpad/r8_out/r8_dev_repro_bundle.json"
+ ],
+ "context_id": "C2-a488c80b29e95ba2c425",
+ "cost": {
+  "assumption_profile": "PE-371c80b76eeba61b6dd27843",
+  "assumption_sha256": "PE-371c80b76eeba61b6dd27843",
+  "params": {
+   "fee_rate": "0.0005",
+   "half_spread": "0.00019201213688837407",
+   "impact_coefficient": "0.0010013295956560243",
+   "max_participation": "0.05"
+  },
+  "source_sha256": "9afb474b3d1ad38c4789746f4476f6523c8596ad7f2e622e84f0cb1826c7a91e",
+  "status": "ESTIMATED_FROM_PUBLIC_DATA",
+  "test_only": false,
+  "verification_record": null,
+  "verified": false,
+  "version": "archive.cost_model.CandleCostModel@sha256:9afb474b3d1ad38c#public_estimate:PE-371c80b76eeba61b6dd27843"
+ },
+ "data": {
+  "BTCUSDT": {
+   "data_sha256": "2e50644f5b2676a98a22a3f3e400e44d0430dad881573b0f6ea04f200ef22877",
+   "dataset_id": "BTCUSDT-15m-2e50644f5b26",
+   "first_ts": 1609459200000,
+   "funding_sha256": "e10a9d6f7793a949e87135afd46d87530f7764773f8acf382aac89db982d5d43",
+   "last_ts": 1711323900000,
+   "quality_ok": true,
+   "quality_verdict": "WARN",
+   "rows": 113184
+  },
+  "ETHUSDT": {
+   "data_sha256": "182f9942562290124cf3a0a02821476a097a094a194d68ede64780ae05e57f68",
+   "dataset_id": "ETHUSDT-15m-182f99425622",
+   "first_ts": 1609459200000,
+   "funding_sha256": "ed16c5ca5571547d15088856599d5b6f86bf36e7a88e569e32135b1cb7ce4c95",
+   "last_ts": 1777333500000,
+   "quality_ok": true,
+   "quality_verdict": "WARN",
+   "rows": 186528
+  },
+  "_fng": {
+   "missing": "FNG dataset absent"
+  }
+ },
+ "data_policy": {
+  "data_exceptions": {
+   "file": "data_exceptions.json",
+   "n": 0,
+   "sha256": "b839aec30e3a4fe809540f3ed9364122a3f4f131e6938843612600bb68fa1bdf"
+  },
+  "embargo": "max(horizon, 96 bars) between dev and validation and before the readable end",
+  "fng_known_at": "values of UTC days strictly before the bar's day",
+  "fng_publication_lag_days": 1,
+  "funding_gaps": "holding windows overlapping a settlement gap are dropped (never summed short)",
+  "funding_known_at": "calc_time <= bar close (no early use)",
+  "funding_quality": "duplicates/inversions fail-closed; event dropped when holding window not covered",
+  "funding_z": "z of the latest known settlement vs the previous funding_window settlements",
+  "kline_interval_ms": 900000,
+  "max_abs_logret_15m": "0.2",
+  "missing_candles": "fail-closed, never interpolated (exact 15m grid; only documented exchange exceptions excuse a gap)",
+  "quality_policy": "dq-v2 (OK/WARN/BLOCK; BLOCK never reaches a backtest)",
+  "read_end": "day before the symbol's locked TEST window, else 2026-12-31",
+  "read_start": "2021-01-01",
+  "timezone": "UTC (epoch ms; day boundaries in UTC)",
+  "version": "datapol-v1",
+  "window_cut": "hard truncation to [start 00:00, end 23:59:59.999] UTC before the quality gate"
+ },
+ "kind": "dev",
+ "ledgers": {
+  "evaluations.jsonl": "2b274563dce8766e6d7e42833d9c24e3c570c6aa4f86d858171fce8af7d93edf",
+  "lineage.jsonl": "38a91aa23216efb40580412f239e4af7900040de4ed5900d50c1cc12e063ab78",
+  "specs.jsonl": "1ebadca980e983c76c2ec242d9afc0e640d6ee3a2c89c8e2f576ef872fe1e870",
+  "statuses.jsonl": "5f55a1d56ecf83930c7236154e022b365e7bcb95f276ff398276b3e6966231f7",
+  "validation_batches.jsonl": null
+ },
+ "limits": [
+  "'at' / 'created_at' timestamps differ on every run (excluded from record hashes)",
+  "results are reproducible only on the same Python minor version (runtime is part of the context)",
+  "git_dirty=true means the code hashes, not the commit, identify the code"
+ ],
+ "repo": {
+  "commit": "e5b016a3499261ba7115a5c9df0a6eeefb0937dc",
+  "git_dirty": true
+ },
+ "result": {
+  "dev_evaluated": 894,
+  "dev_ok": 894,
+  "dev_screen_pass": 63,
+  "failure_reasons": {
+   "dev_cost_share_too_high": 34,
+   "dev_folds_unstable": 587,
+   "dev_mean_not_positive": 658,
+   "dev_t_below_screen": 769,
+   "dev_underpowered": 171
+  },
+  "statuses": {
+   "INCONCLUSIVE": 93,
+   "REJECTED": 738,
+   "RESEARCH_ONLY": 63
+  }
+ },
+ "runtime": {
+  "python_implementation": "CPython",
+  "python_version": "3.13.16"
+ },
+ "schema": "repro_bundle_v1",
+ "seeds": {
+  "lineage_seeds": [
+   20261015
+  ]
+ },
+ "statistics": {
+  "dev_screen": "promotion config dev_screen (hash in validation_config)",
+  "multiple_testing": "none at DEV (screen only); FWER is spent at validation"
+ },
+ "validation_config": {
+  "mc_method": "mc-v3(stationary-bootstrap,RC,SPA,StepM-studentized,StepSPA-diagnostic,MCS-Tmax,BY,alpha-spending-1/k^2)",
+  "order_value": "10000.0",
+  "pipeline": "evo-pipeline-v1",
+  "promotion_config": "01fbef5c49465e01",
+  "search_config": "a860f63620fe5d99",
+  "spec_registry": {
+   "features": {
+    "breakout_k": {
+     "data": [
+      "klines"
+     ],
+     "ops": [
+      "gt",
+      "ge",
+      "lt",
+      "le",
+      "between"
+     ],
+     "params": {
+      "window": [
+       "int",
+       8,
+       1024
+      ]
+     },
+     "range": [
+      "-8.0",
+      "8.0"
+     ],
+     "signed": false
+    },
+    "fng_max": {
+     "data": [
+      "klines",
+      "fng"
+     ],
+     "ops": [
+      "gt",
+      "ge",
+      "lt",
+      "le",
+      "between"
+     ],
+     "params": {
+      "days": [
+       "int",
+       1,
+       10
+      ]
+     },
+     "range": [
+      "0.0",
+      "100.0"
+     ],
+     "signed": false
+    },
+    "fng_min": {
+     "data": [
+      "klines",
+      "fng"
+     ],
+     "ops": [
+      "gt",
+      "ge",
+      "lt",
+      "le",
+      "between"
+     ],
+     "params": {
+      "days": [
+       "int",
+       1,
+       10
+      ]
+     },
+     "range": [
+      "0.0",
+      "100.0"
+     ],
+     "signed": false
+    },
+    "funding_z": {
+     "data": [
+      "klines",
+      "funding"
+     ],
+     "ops": [
+      "gt",
+      "ge",
+      "lt",
+      "le",
+      "between"
+     ],
+     "params": {
+      "window": [
+       "int",
+       8,
+       1000
+      ]
+     },
+     "range": [
+      "-8.0",
+      "8.0"
+     ],
+     "signed": true
+    },
+    "hour_utc": {
+     "data": [
+      "klines"
+     ],
+     "ops": [
+      "between"
+     ],
+     "params": {},
+     "range": [
+      "0.0",
+      "24.0"
+     ],
+     "signed": false
+    },
+    "ret_z": {
+     "data": [
+      "klines"
+     ],
+     "ops": [
+      "gt",
+      "ge",
+      "lt",
+      "le",
+      "between"
+     ],
+     "params": {
+      "lookback": [
+       "int",
+       1,
+       384
+      ],
+      "min_history": [
+       "int",
+       0,
+       4096
+      ],
+      "window": [
+       "int",
+       32,
+       2048
+      ]
+     },
+     "range": [
+      "-8.0",
+      "8.0"
+     ],
+     "signed": true
+    },
+    "rsi": {
+     "data": [
+      "klines"
+     ],
+     "ops": [
+      "gt",
+      "ge",
+      "lt",
+      "le",
+      "between"
+     ],
+     "params": {
+      "period": [
+       "int",
+       2,
+       256
+      ]
+     },
+     "range": [
+      "0.0",
+      "100.0"
+     ],
+     "signed": false
+    },
+    "taker_share_z": {
+     "data": [
+      "klines"
+     ],
+     "ops": [
+      "gt",
+      "ge",
+      "lt",
+      "le",
+      "between"
+     ],
+     "params": {
+      "window": [
+       "int",
+       16,
+       2048
+      ]
+     },
+     "range": [
+      "-8.0",
+      "8.0"
+     ],
+     "signed": true
+    },
+    "vol_ratio": {
+     "data": [
+      "klines"
+     ],
+     "ops": [
+      "gt",
+      "ge",
+      "lt",
+      "le",
+      "between"
+     ],
+     "params": {
+      "long": [
+       "int",
+       32,
+       2048
+      ],
+      "short": [
+       "int",
+       4,
+       256
+      ]
+     },
+     "range": [
+      "0.0",
+      "10.0"
+     ],
+     "signed": false
+    },
+    "volume_z": {
+     "data": [
+      "klines"
+     ],
+     "ops": [
+      "gt",
+      "ge",
+      "lt",
+      "le",
+      "between"
+     ],
+     "params": {
+      "window": [
+       "int",
+       16,
+       2048
+      ]
+     },
+     "range": [
+      "-8.0",
+      "8.0"
+     ],
+     "signed": true
+    }
+   },
+   "symbols": [
+    "BTCUSDT",
+    "ETHUSDT"
+   ],
+   "version": "spec-registry-v1"
+  },
+  "symbols": [
+   "BTCUSDT",
+   "ETHUSDT"
+  ]
+ }
+}
