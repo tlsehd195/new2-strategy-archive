@@ -180,9 +180,10 @@ def log_e_plugin(Z, sz0, lam_max=LAM_MAX, k0=PRIOR_K0):
     shrunk to 0 and variance to the prior sz0^2 with k0 pseudo-blocks.  No
     prior on the edge.  The formula is the GROW bet of Waudby-Smith & Ramdas
     (2010.09686 v1 Sec. 4.4) / aSOS (v3 Sec. 5.3) written in Z units
-    (Z = (X - m)/m maps lam_X <= c/m to lam_Z <= c); the paper's appendix
-    aGRAPA could not be read.  Differences from the paper: k0 = 3 pseudo-blocks
-    instead of 1 and an uncentred second moment; see ``log_e_wsr``."""
+    (Z = (X - m)/m maps lam_X <= c/m to lam_Z <= c).  The appendix aGRAPA
+    (v7 B.3) has the same form, see ``log_e_agrapa``.  Differences from the
+    paper: k0 = 3 pseudo-blocks instead of 1 and an uncentred second moment;
+    see ``log_e_wsr``."""
     n, nb = Z.shape
     s1 = np.zeros(n)
     s2 = np.zeros(n)
@@ -231,13 +232,122 @@ def log_e_wsr(Z, sz0, lam_max=LAM_MAX):
 
 
 def log_e_prpl_eb(Z, sz0, alpha=ALPHA, lam_max=LAM_MAX):
-    """PrPl-EB of WS-R v7 eq. (15) in Z units:
-    lam_t = sqrt(2 log(2/alpha) / (s2_{t-1} t log(1+t))) ^ c.  Built for
-    confidence sequences (no estimate of the edge in the bet)."""
+    """BETTING capital prod(1 + lam_t Z_t) with the bet of WS-R v7 eq. (15)/(26)
+    in Z units: lam_t = sqrt(2 log(2/alpha) / (s2_{t-1} t log(1+t))) ^ c.
+    Built for confidence sequences (no estimate of the edge in the bet).
+
+    Name caveat (ADR 0028): in the paper this bet drives the one-sided K+ of
+    the HEDGED capital process (Theorem 3, truncation c/m).  The paper's own
+    "PrPl-EB" is the exponential supermartingale of eq. (13), not a betting
+    product: see ``log_e_prpl_eb_exp``.  Kept under this name because earlier
+    result files use it."""
     _, s2 = _wsr_moments(Z, sz0)
     t = np.arange(1, Z.shape[1] + 1)[None, :]
     lam = np.minimum(np.sqrt(2 * math.log(2 / alpha) / (s2 * t * np.log1p(t))), lam_max)
     return np.cumsum(np.log1p(lam * Z), axis=1)
+
+
+def log_e_prpl_eb_exp(Z, sz0, alpha=ALPHA, lam_max=LAM_MAX):
+    """PrPl-EB of WS-R v7 Theorem 2 as written (eq. (13), (14), (15)):
+    M_t = prod exp{lam_i Z_i - v_i psi_E(lam_i)}, v_i = 4 (Z_i - mu_{i-1})^2,
+    psi_E(l) = (-log(1-l) - l)/4, lam_i from (15) (same bet as
+    ``log_e_prpl_eb``), mu, sigma^2 predictable regularised moments.  Null mean
+    m = 0 in Z units.  Valid for the composite null E[Z | past] <= 0 because
+    Z - mu >= -1 for every mu <= 0 (Fan et al. needs only y >= -1; no upper
+    bound on Z) and M_t(m) falls with m, so M_t(0) <= M_t(true mean).  Log
+    scale."""
+    mu, s2 = _wsr_moments(Z, sz0)
+    t = np.arange(1, Z.shape[1] + 1)[None, :]
+    lam = np.minimum(np.sqrt(2 * math.log(2 / alpha) / (s2 * t * np.log1p(t))), lam_max)
+    v = 4.0 * (Z - mu) ** 2
+    psi = (-np.log1p(-lam) - lam) / 4.0
+    return np.cumsum(lam * Z - v * psi, axis=1)
+
+
+def log_e_agrapa(Z, sz0, lam_max=LAM_MAX):
+    """aGRAPA (WS-R v7 App. B.3), one-sided, Z units: lam_t = mu/(s2 + mu^2) cut
+    to [0, c].  In X units the paper's bet is (mu - m)/(s2 + (mu - m)^2) cut to
+    [-c/(1-m), c/m]; with Z = (X - m)/m and lam_Z = m lam_X this is exactly the
+    ``log_e_wsr`` bet (B.3 does not restate mu, s2: eq. (26)'s regularised,
+    centred estimates are used).  The lower cut -c/(1-m) is dropped because a
+    one-sided test never bets on the other side."""
+    return log_e_wsr(Z, sz0, lam_max)
+
+
+def log_e_lbow(Z, sz0, lam_max=LAM_MAX):
+    """LBOW (WS-R v7 App. B.4, eq. (47)), one-sided, Z units: for mu >= 0,
+    lam_Z = mu/(mu + s2 + mu^2), cut to [0, c]  (X units: omega = m when
+    mu_hat - m >= 0; lam_Z = m lam_X)."""
+    mu, s2 = _wsr_moments(Z, sz0)
+    lam = np.clip(mu / (np.abs(mu) + s2 + mu * mu), 0.0, lam_max)
+    return np.cumsum(np.log1p(lam * Z), axis=1)
+
+
+def log_e_grapa(Z, lam_max=LAM_MAX, iters=40):
+    """GRAPA (WS-R v7 App. B.2, eq. (42)), one-sided, Z units: lam_t solves
+    (t-1)^-1 sum_{i<t} Z_i / (1 + lam Z_i) = 0, cut to [0, c]; the paper uses
+    the raw past average (no regularisation), so lam_1 = 0.  The left side
+    falls in lam, so bisection on [0, c] is exact to 2^-iters."""
+    n, nb = Z.shape
+    out = np.empty((n, nb))
+    acc = np.zeros(n)
+    for b in range(nb):
+        lam = np.zeros(n)
+        if b > 0:
+            past = Z[:, :b]
+            lo, hi = np.zeros(n), np.full(n, lam_max)
+            for _ in range(iters):
+                mid = (lo + hi) / 2
+                f = (past / (1.0 + mid[:, None] * past)).mean(axis=1)
+                lo, hi = np.where(f > 0, mid, lo), np.where(f > 0, hi, mid)
+            lam = (lo + hi) / 2
+            lam = np.where(past.mean(axis=1) <= 0, 0.0, lam)
+            f_max = (past / (1.0 + lam_max * past)).mean(axis=1)
+            lam = np.where(f_max >= 0, lam_max, lam)
+        acc = acc + np.log1p(lam * Z[:, b])
+        out[:, b] = acc
+    return out
+
+
+def log_e_ons(Z, lam_max=LAM_MAX, lam0=1.0, as_printed=False):
+    """ONS-m (WS-R v7 App. B.5, Algorithm 1 adapted to Z units): y_t = Z_t,
+    A_t = 1 + sum z_i^2, lam_{t+1} = clip(lam_t + 2/(2 - log 3) z_t / A_t) with
+    z_t = y_t/(1 + y_t lam_t) — the gradient of log(1 + lam y), as in the coin
+    betting ONS of Cutkosky & Orabona that the paper cites.  lam_1 = 1 as
+    printed, cut to the one-sided domain [0, c] (ONS over an interval).
+
+    ``as_printed=True`` follows the PRINTED algorithm literally
+    (z_t = y_t/(1 - y_t lam_t), lam_{t+1} = lam_t - 2/(2-log 3) z_t/A_t): that
+    ascends log(1 - lam y), i.e. it bets AGAINST the observed excess; kept only
+    to show it has no power.  Validity does not depend on it: any predictable
+    lam in [0, 1] keeps the product a test supermartingale.  The Z-unit
+    A_0 = 1 equals the X-unit algorithm at m = 1."""
+    n, nb = Z.shape
+    k = 2.0 / (2.0 - math.log(3.0))
+    lam = np.full(n, min(lam0, lam_max))
+    A = np.ones(n)
+    out = np.empty((n, nb))
+    acc = np.zeros(n)
+    for b in range(nb):
+        y = Z[:, b]
+        acc = acc + np.log1p(lam * y)
+        out[:, b] = acc
+        if as_printed:
+            z = y / np.maximum(1.0 - y * lam, 1e-6)
+            A = A + z * z
+            lam = np.clip(lam - k * z / A, 0.0, lam_max)
+        else:
+            z = y / (1.0 + y * lam)
+            A = A + z * z
+            lam = np.clip(lam + k * z / A, 0.0, lam_max)
+    return out
+
+
+def log_e_gkelly(Z, lam_max=LAM_MAX, grid=20):
+    """gKelly / dKelly (WS-R v7 App. B.6), one-sided: the average capital of
+    ``grid`` constant bets evenly spaced in (0, c].  Same as ``log_e_mixture``
+    (the paper's two-sided grid on [-1/(1-m), 1/m] reduces to this)."""
+    return log_e_mixture(Z, lam_max, grid)
 
 
 def log_e_prior(Z, sr_prior_ann, sz0, lam_max=LAM_MAX, k0=PRIOR_K0):
