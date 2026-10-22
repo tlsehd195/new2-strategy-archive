@@ -6,7 +6,7 @@
   "file": "discovery/config/independent_window_v1.json",
   "sha256": "49721cc7daadb4968390ebdab1ceee0e91c05eaa85a44ed8717d4fa69c0edf79"
  },
- "change_from_v1": "ONLY test.studentize: 'fixed' (v1 implicit) -> 'bootstrap_t' (Romano-Wolf 2005 eq. (11): sigma* recomputed on each resample). Reason: paper form; synthetic FWER at 5% closer to nominal (fixed sigma 5.25-6.0% / 11.4%, bootstrap-t 4.1-5.5% / 7.1%; ADR 0027). Stricter; alpha, members rule, tranches, cost unchanged. Decided by 동동 2026-10-22 ('추천하는 걸로 진행'), ADR 0028.",
+ "change_from_v1": "ONLY test.studentize: 'fixed' (v1 implicit) -> 'bootstrap_t' (Romano-Wolf 2005 eq. (11): sigma* recomputed on each resample). Reason: paper form; synthetic FWER at 5% closer to nominal (fixed sigma 5.25-6.0% / 11.4%, bootstrap-t 4.1-5.5% / 7.1%; ADR 0027). Stricter; alpha, members rule, tranches, cost unchanged. Decided by 동동 2026-10-22 ('추천하는 걸로 진행'), ADR 0029.",
  "note": "Fixed 2026-10-21 BEFORE any strategy was evaluated on these data (only archive download and the data quality gate had run). A new search family, separate from the BTC/ETH validation windows that were already looked at 7 times. A change needs a new file (v2) with a reason; a change after a tranche was opened never re-opens it.",
  "family": "independent-window-family-v1",
  "independence": {

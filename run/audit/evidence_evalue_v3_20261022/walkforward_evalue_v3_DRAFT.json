@@ -37,7 +37,7 @@
  },
  "e_process": {
   "factor": "1 + lam_b * Z_b, Z_b = (X_b - c) / (B + c) >= -1",
-  "bet_rule": "Waudby-Smith & Ramdas PrPl-EB (2010.09686 v7 eq. (15)) in Z units, no prior on the edge: lam_b = min(sqrt(2 * ln(2 / alpha) / (s2_{b-1} * b * ln(1 + b))), 0.75), alpha = 0.0091; s2_0 = s0^2, s2_t = (s0^2 + sum_{i<=t} (Z_i - mu_i)^2) / (t + 1), mu_t = sum_{i<=t} Z_i / (t + 1), s0 = block_sd / (B + c). Code: run/evalue_walkforward_sim.py log_e_prpl_eb (alpha=0.0091). Changed 2026-10-22 (ADR 0028, decision V3)",
+  "bet_rule": "Waudby-Smith & Ramdas PrPl-EB (2010.09686 v7 eq. (15)) in Z units, no prior on the edge: lam_b = min(sqrt(2 * ln(2 / alpha) / (s2_{b-1} * b * ln(1 + b))), 0.75), alpha = 0.0091; s2_0 = s0^2, s2_t = (s0^2 + sum_{i<=t} (Z_i - mu_i)^2) / (t + 1), mu_t = sum_{i<=t} Z_i / (t + 1), s0 = block_sd / (B + c). Code: run/evalue_walkforward_sim.py log_e_prpl_eb (alpha=0.0091). Changed 2026-10-22 (ADR 0029, decision V3)",
   "bet_rule_previous": "predictable plug-in: lam_b = clip(mu / (v + mu^2), 0, 0.75) with mu = sum(Z_1..Z_{b-1}) / (b - 1 + 3) and v = (3 * s0^2 + sum Z_i^2) / (b - 1 + 3) (replaced: same type I, lower power; ADR 0027)",
   "lam_max": 0.75,
   "E_b": "product of the factors of blocks 1..b (E_0 = 1)",
@@ -84,7 +84,7 @@
  "open_decisions": {
   "V1": "DECIDED 2026-10-22: share forward data, Bonferroni split 7:3 (v2 0.0213, v3 0.0091), ratio confirmed by 동동. First block 2026-12-01 still a suggestion.",
   "V2": "DECIDED 2026-10-22: equal-weight bundle of the top 5 (see pipeline.bundle)",
-  "V3": "DECIDED 2026-10-22 by 동동 ('추천하는 걸로 진행', ADR 0028): WS-R PrPl-EB, see e_process.bet_rule. Synthetic (GARCH t4, alpha 0.0091): 36-block power SR2 52.0% (plug-in 37.6%), SR3 94.0% (87.5%), null <= 0.03%; run/audit/evidence_paper_faithful_20261022/evalue_v3_alpha_results.json",
+  "V3": "DECIDED 2026-10-22 by 동동 ('추천하는 걸로 진행', ADR 0029): WS-R PrPl-EB, see e_process.bet_rule. Synthetic (GARCH t4, alpha 0.0091): 36-block power SR2 52.0% (plug-in 37.6%), SR3 94.0% (87.5%), null <= 0.03%; run/audit/evidence_paper_faithful_20261022/evalue_v3_alpha_results.json",
   "V4": "DECIDED 2026-10-22: liquid 9 symbols of ADR 0024 (see universe)",
   "first_block": "DECIDED 2026-10-22: 2026-12-01"
  },
