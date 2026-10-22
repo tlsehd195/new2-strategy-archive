@@ -40,6 +40,10 @@ Parts (each writes one key of the output JSON):
                Sharpe of the 12 rules) with four null generators: daily sign
                flip, 30-day block sign flip, stationary block bootstrap and
                iid bootstrap (both centred).  Size at 5 % per data process.
+  mmc          Dufour (2006) MAXIMIZED MC test (Prop. 4.1) with a GARCH(1,1)-t
+               null family (sup over a nuisance grid), size inside and
+               outside the family, and why the stationary bootstrap is
+               conservative (its draws are not exchangeable with S_0).
 
     cd run && python3 evalue_walkforward_sim.py --out audit/evidence_evalue_v3_20261022/sim_results.json
     cd run && python3 evalue_walkforward_sim.py --quick   # smoke run, minutes -> seconds
@@ -172,9 +176,13 @@ def log_e_mixture(Z, lam_max=LAM_MAX, grid=20):
 
 
 def log_e_plugin(Z, sz0, lam_max=LAM_MAX, k0=PRIOR_K0):
-    """Predictable plug-in (WS-R aGRAPA style): lam_i = mu/(v+mu^2) from blocks
-    before i, mean shrunk to 0 and variance to the prior sz0^2 with k0
-    pseudo-blocks.  No prior on the edge."""
+    """Predictable plug-in: lam_i = mu/(v+mu^2) from blocks before i, mean
+    shrunk to 0 and variance to the prior sz0^2 with k0 pseudo-blocks.  No
+    prior on the edge.  The formula is the GROW bet of Waudby-Smith & Ramdas
+    (2010.09686 v1 Sec. 4.4) / aSOS (v3 Sec. 5.3) written in Z units
+    (Z = (X - m)/m maps lam_X <= c/m to lam_Z <= c); the paper's appendix
+    aGRAPA could not be read.  Differences from the paper: k0 = 3 pseudo-blocks
+    instead of 1 and an uncentred second moment; see ``log_e_wsr``."""
     n, nb = Z.shape
     s1 = np.zeros(n)
     s2 = np.zeros(n)
@@ -189,6 +197,47 @@ def log_e_plugin(Z, sz0, lam_max=LAM_MAX, k0=PRIOR_K0):
         s1 += Z[:, b]
         s2 += Z[:, b] ** 2
     return out
+
+
+def _wsr_moments(Z, sz0):
+    """WS-R regularised running moments, structure of 2010.09686 v7 eq. (15):
+    mu_t = (mu_0 + sum_{i<=t} Z_i)/(t+1), s2_t = (s_0^2 + sum_{i<=t} (Z_i -
+    mu_i)^2)/(t+1).  The paper's (mu_0, s_0^2) = (1/2, 1/4) belong to [0,1]
+    data; Z has no upper bound, so (0, sz0^2) is our mapping.  Returns the
+    PREDICTABLE values used for block b (moments up to b-1)."""
+    n, nb = Z.shape
+    mu_pred = np.empty((n, nb))
+    s2_pred = np.empty((n, nb))
+    s1 = np.zeros(n)
+    ss = np.zeros(n)
+    mu, s2 = np.zeros(n), np.full(n, sz0 * sz0)        # t = 0
+    for b in range(nb):
+        mu_pred[:, b], s2_pred[:, b] = mu, s2
+        s1 += Z[:, b]
+        mu = s1 / (b + 2)
+        ss += (Z[:, b] - mu) ** 2
+        s2 = (sz0 * sz0 + ss) / (b + 2)
+    return mu_pred, s2_pred
+
+
+def log_e_wsr(Z, sz0, lam_max=LAM_MAX):
+    """GROW / aSOS bet with WS-R's own regularisation (one pseudo-observation,
+    centred residuals): lam_t = (mu_{t-1})/(s2_{t-1} + mu_{t-1}^2), cut to
+    [0, c], c = lam_max (paper default 1/2 or 3/4).  Valid for any predictable
+    lam in [0, 1] because Z >= -1 (WS-R v7 Prop. 3, supermartingale form)."""
+    mu, s2 = _wsr_moments(Z, sz0)
+    lam = np.clip(mu / (s2 + mu * mu), 0.0, lam_max)
+    return np.cumsum(np.log1p(lam * Z), axis=1)
+
+
+def log_e_prpl_eb(Z, sz0, alpha=ALPHA, lam_max=LAM_MAX):
+    """PrPl-EB of WS-R v7 eq. (15) in Z units:
+    lam_t = sqrt(2 log(2/alpha) / (s2_{t-1} t log(1+t))) ^ c.  Built for
+    confidence sequences (no estimate of the edge in the bet)."""
+    _, s2 = _wsr_moments(Z, sz0)
+    t = np.arange(1, Z.shape[1] + 1)[None, :]
+    lam = np.minimum(np.sqrt(2 * math.log(2 / alpha) / (s2 * t * np.log1p(t))), lam_max)
+    return np.cumsum(np.log1p(lam * Z), axis=1)
 
 
 def log_e_prior(Z, sr_prior_ann, sz0, lam_max=LAM_MAX, k0=PRIOR_K0):
@@ -235,6 +284,11 @@ def run_bets(X, B, horizons, prior_srs=(), fixed_max=False, c=None):
     res |= {
         "plugin": summarise(first_cross(log_e_plugin(Z, sz0)), horizons),
         "mixture": summarise(first_cross(log_e_mixture(Z)), horizons),
+        "wsr_grow": summarise(first_cross(log_e_wsr(Z, sz0)), horizons),
+        "wsr_prpl_eb": summarise(first_cross(log_e_prpl_eb(Z, sz0)), horizons),
+        # Arnold et al. (2404.18678) Sec. 3.4 default lam = (2c)^-1 for
+        # |d| <= c/2; with d = X - c_gap >= -(B + c_gap) that is lam_Z = 1/4
+        "arnold_fixed_quarter": summarise(first_cross(log_e_fixed(Z, 0.25)), horizons),
     }
     for p in prior_srs:
         res[f"prior_sr{p:g}"] = summarise(first_cross(log_e_prior(Z, p, sz0)), horizons)
@@ -494,6 +548,71 @@ def part_mc_null(rng, reps, N=99, T=730, level=0.05):
             "statistic": "max over 12 rules of full-sample net daily Sharpe", "rows": rows}
 
 
+# ---------------------------------------------------------------- part: Dufour MMC
+#: null family for the maximized MC test: zero-mean GARCH(1,1) with
+#: unit-variance Student-t innovations; nuisance y = (a, b, nu)
+MMC_GRID = tuple((a, b, nu) for a, b in ((0.05, 0.80), (0.05, 0.88), (0.10, 0.80),
+                                         (0.10, 0.88), (0.15, 0.80))
+                 for nu in (4.0, 8.0))
+
+
+def garch_t_paths(seed, N, T, a, b, nu):
+    """S_i(y) = S[g(y, u_i)] (Dufour 2006 Sec. 4): the SAME random stream
+    (seed) for every nuisance value y = (a, b, nu)."""
+    rng = np.random.default_rng(seed)
+    z = std_t(rng, (N, T), nu)
+    h = np.ones(N)
+    out = np.empty((N, T))
+    for t in range(T):
+        out[:, t] = np.sqrt(h) * z[:, t]
+        h = (1 - a - b) + a * out[:, t] ** 2 + b * h
+    return out
+
+
+def part_mmc(rng, reps, N=99, T=730, level=0.05):
+    """Maximized Monte Carlo test (Dufour 2006 Prop. 4.1) of the search
+    statistic with the GARCH-t null family above, sup over the grid; plus a
+    diagnostic of WHY the stationary bootstrap is conservative: its draws
+    are built from the observed series, so they are not exchangeable with S_0
+    (corr(S_0, median of the draws) and the mean shift are reported)."""
+    rows = []
+    for kind, phi in (("garch_t4", 0.0), ("regime_t4", 0.0), ("gjr_skewt", 0.0),
+                      ("ar_garch", 0.05), ("ar_garch", 0.10)):
+        x_all = ASSET_SD * innovations(rng, kind, reps, T, phi)
+        s0 = search_stat(x_all)
+        rej_mmc = rej_local = 0
+        argmax = {}
+        sb_med = np.empty(reps)
+        for i in range(reps):
+            seed = int(rng.integers(2 ** 62))
+            ps = {}
+            for y in MMC_GRID:
+                sn = search_stat(garch_t_paths(seed, N, T, *y))
+                ps[y] = (1 + np.sum(sn >= s0[i])) / (N + 1)
+            pmax = max(ps.values())
+            ystar = max(ps, key=ps.get)
+            argmax[str(ystar)] = argmax.get(str(ystar), 0) + 1
+            rej_mmc += pmax <= level
+            # local MC (Dufour Sec. 6): one point, the grid value nearest the
+            # true process is unknown in practice; use the family centre
+            rej_local += ps[(0.10, 0.88, 4.0)] <= level
+            if i < min(reps, 300):
+                sb_med[i] = np.median(search_stat(null_draws(rng, x_all[i], N, "stationary_boot")))
+        k = min(reps, 300)
+        row = {"dgp": kind, "phi": phi, "dgp_in_null_family": kind == "garch_t4",
+               "h0_no_predictability": phi == 0.0,
+               "mmc_reject_rate": rej_mmc / reps, "local_mc_reject_rate": rej_local / reps,
+               "mc_se": se(level, reps), "argmax_counts": argmax,
+               "stationary_boot_diag": {
+                   "n": k, "corr_s0_null_median": float(np.corrcoef(s0[:k], sb_med[:k])[0, 1]),
+                   "mean_s0": float(s0[:k].mean()), "mean_null_median": float(sb_med[:k].mean())}}
+        rows.append(row)
+        print("mmc", kind, phi, row["mmc_reject_rate"], row["local_mc_reject_rate"],
+              row["stationary_boot_diag"], flush=True)
+    return {"level": level, "N": N, "T": T, "reps": reps, "grid": [list(y) for y in MMC_GRID],
+            "statistic": "max over 12 rules of full-sample net daily Sharpe", "rows": rows}
+
+
 # ---------------------------------------------------------------- part: alpha split v2/v3
 def part_split(rng, n, nb=36):
     """v2 (frozen bundle, one look after 12 months) and v3 (this e-process) on
@@ -564,6 +683,8 @@ def main(argv=None):
         t0 = time.time()
         if part == "mc_null":
             out[part] = part_mc_null(rng, 60 if q else 1000)
+        elif part == "mmc":
+            out[part] = part_mmc(rng, 20 if q else 600)
         else:
             out[part] = PARTS[part](rng, *size[part])
         out[part]["secs"] = round(time.time() - t0, 1)
