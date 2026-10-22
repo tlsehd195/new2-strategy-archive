@@ -163,7 +163,7 @@ def rules(Z, sz0, alpha, thr_alpha, with_grapa=True):
         "ons_B5": ev.log_e_ons(Z),
         "ons_as_printed": ev.log_e_ons(Z, as_printed=True),
         "gkelly_B6": ev.log_e_gkelly(Z),
-        "prpl_betting_hedged_K+": ev.log_e_prpl_eb(Z, sz0, alpha=alpha),
+        "prpl_betting_hedged_K+": ev.log_e_hedged_prpl_bet(Z, sz0, alpha=alpha),
         "prpl_eb_exp_thm2": ev.log_e_prpl_eb_exp(Z, sz0, alpha=alpha),
     }
     if with_grapa:

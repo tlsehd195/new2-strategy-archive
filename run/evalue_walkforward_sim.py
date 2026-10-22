@@ -231,20 +231,23 @@ def log_e_wsr(Z, sz0, lam_max=LAM_MAX):
     return np.cumsum(np.log1p(lam * Z), axis=1)
 
 
-def log_e_prpl_eb(Z, sz0, alpha=ALPHA, lam_max=LAM_MAX):
-    """BETTING capital prod(1 + lam_t Z_t) with the bet of WS-R v7 eq. (15)/(26)
-    in Z units: lam_t = sqrt(2 log(2/alpha) / (s2_{t-1} t log(1+t))) ^ c.
-    Built for confidence sequences (no estimate of the edge in the bet).
+def log_e_hedged_prpl_bet(Z, sz0, alpha=ALPHA, lam_max=LAM_MAX):
+    """Hedged-capital BETTING product prod(1 + lam_t Z_t) (WS-R v7 Theorem 3,
+    one-sided K+) with the predictable plug-in bet of eq. (15)/(26) in Z units:
+    lam_t = sqrt(2 log(2/alpha) / (s2_{t-1} t log(1+t))) ^ c.  Built for
+    confidence sequences (no estimate of the edge in the bet).
 
-    Name caveat (ADR 0028): in the paper this bet drives the one-sided K+ of
-    the HEDGED capital process (Theorem 3, truncation c/m).  The paper's own
-    "PrPl-EB" is the exponential supermartingale of eq. (13), not a betting
-    product: see ``log_e_prpl_eb_exp``.  Kept under this name because earlier
-    result files use it."""
+    Name (ADR 0032): ADR 0027/0030 and result files call this "PrPl-EB".  The
+    paper's own PrPl-EB (Theorem 2, eq. (13)) is the exponential supermartingale
+    ``log_e_prpl_eb_exp``, a different and weaker rule.  Computation unchanged;
+    ``log_e_prpl_eb`` stays as an alias so earlier scripts still run."""
     _, s2 = _wsr_moments(Z, sz0)
     t = np.arange(1, Z.shape[1] + 1)[None, :]
     lam = np.minimum(np.sqrt(2 * math.log(2 / alpha) / (s2 * t * np.log1p(t))), lam_max)
     return np.cumsum(np.log1p(lam * Z), axis=1)
+
+
+log_e_prpl_eb = log_e_hedged_prpl_bet     # old name, see ADR 0032
 
 
 def log_e_prpl_eb_exp(Z, sz0, alpha=ALPHA, lam_max=LAM_MAX):
@@ -395,7 +398,7 @@ def run_bets(X, B, horizons, prior_srs=(), fixed_max=False, c=None):
         "plugin": summarise(first_cross(log_e_plugin(Z, sz0)), horizons),
         "mixture": summarise(first_cross(log_e_mixture(Z)), horizons),
         "wsr_grow": summarise(first_cross(log_e_wsr(Z, sz0)), horizons),
-        "wsr_prpl_eb": summarise(first_cross(log_e_prpl_eb(Z, sz0)), horizons),
+        "wsr_prpl_eb": summarise(first_cross(log_e_hedged_prpl_bet(Z, sz0)), horizons),   # key kept for old result files
         # Arnold et al. (2404.18678) Sec. 3.4 default lam = (2c)^-1 for
         # |d| <= c/2; with d = X - c_gap >= -(B + c_gap) that is lam_Z = 1/4
         "arnold_fixed_quarter": summarise(first_cross(log_e_fixed(Z, 0.25)), horizons),
