@@ -81,6 +81,12 @@ class EValueWalkForwardTest(unittest.TestCase):
         self.assertTrue(np.all(X >= -B - 1e-12))
         self.assertTrue(set(np.unique(ch)) <= set(range(-1, 2 * len(ev.LOOKBACKS))))
 
+    def test_alpha_split_sums_to_family_alpha_and_either_dominates(self):
+        out = ev.part_split(np.random.default_rng(9), 300, nb=24)
+        for r in out["rows"]:
+            self.assertAlmostEqual(r["alpha_v2"] + r["alpha_v3"], ev.ALPHA)
+            self.assertGreaterEqual(r["either_by_24"], max(r["v2_reject_at_12"], r["v3_reject_by_24"]))
+
 
 if __name__ == "__main__":
     unittest.main()

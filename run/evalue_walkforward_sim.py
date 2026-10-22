@@ -209,8 +209,8 @@ def log_e_prior(Z, sr_prior_ann, sz0, lam_max=LAM_MAX, k0=PRIOR_K0):
     return out
 
 
-def first_cross(logE):
-    hit = logE >= LOG_THR
+def first_cross(logE, log_thr=LOG_THR):
+    hit = logE >= log_thr
     any_hit = hit.any(axis=1)
     tau = np.where(any_hit, hit.argmax(axis=1) + 1, np.inf)
     return tau
@@ -494,9 +494,48 @@ def part_mc_null(rng, reps, N=99, T=730, level=0.05):
             "statistic": "max over 12 rules of full-sample net daily Sharpe", "rows": rows}
 
 
+# ---------------------------------------------------------------- part: alpha split v2/v3
+def part_split(rng, n, nb=36):
+    """v2 (frozen bundle, one look after 12 months) and v3 (this e-process) on
+    the SAME forward data, alpha split by Bonferroni: v2 gets w*alpha, v3 gets
+    (1-w)*alpha, so P(either rejects | both nulls) <= alpha whatever their
+    correlation.  Both see the same synthetic daily P&L path (the strongest
+    possible correlation: the bundle and the pipeline earn the same edge).
+
+    v2 is modelled as its unhedged gate only, a one-sided t test on 360 daily
+    returns (normal critical value); its beta-hedged second gate can only
+    lower its power, so v2 numbers are upper bounds."""
+    from statistics import NormalDist
+    L, B = L_MULT * BLOCK_SD, B_MULT * BLOCK_SD
+    weights = (1.0, 0.8, 0.7, 0.5, 0.3, 0.2, 0.0)
+    rows = []
+    for sr in (0.0, 1.0, 2.0, 3.0, 4.0):
+        mu = sr * S0 / math.sqrt(ANN)
+        r = mu + S0 * innovations(rng, "garch_t4", n, nb * DAYS)
+        d12 = r[:, :12 * DAYS]
+        t12 = d12.mean(axis=1) / d12.std(axis=1, ddof=1) * math.sqrt(d12.shape[1])
+        X, _, _ = block_pnl(r, L, B)
+        c = GAP_C * BLOCK_SD
+        logE = log_e_plugin((X - c) / (B + c), BLOCK_SD / (B + c))
+        for w in weights:
+            a2, a3 = w * ALPHA, (1 - w) * ALPHA
+            v2 = (t12 > NormalDist().inv_cdf(1 - a2)) if a2 > 0 else np.zeros(n, bool)
+            tau = first_cross(logE, math.log(1 / a3)) if a3 > 0 else np.full(n, np.inf)
+            row = {"true_sr_ann": sr, "w_v2": w, "alpha_v2": a2, "alpha_v3": a3,
+                   "v2_reject_at_12": float(v2.mean())}
+            for h in (12, 24, 36):
+                row[f"v3_reject_by_{h}"] = float(np.mean(tau <= h))
+                row[f"either_by_{h}"] = float(np.mean(v2 | (tau <= h)))
+            rows.append(row)
+        print("split", sr, [(w, rows[-len(weights) + i]["either_by_24"])
+                            for i, w in enumerate(weights)], flush=True)
+    return {"dgp": "garch_t4", "n_paths": n, "blocks": nb, "alpha_total": ALPHA,
+            "rows": rows}
+
+
 # ---------------------------------------------------------------- main
 PARTS = {"design": part_design, "type1": part_type1, "power": part_power,
-         "prior": part_prior, "pipeline": part_pipeline}
+         "prior": part_prior, "pipeline": part_pipeline, "split": part_split}
 
 
 def main(argv=None):
@@ -513,6 +552,7 @@ def main(argv=None):
         "power": (300, 60) if q else (5000, 60),
         "prior": (300, 60) if q else (5000, 60),
         "pipeline": (200, 36) if q else (4000, 60),
+        "split": (300,) if q else (20000,),
     }
     out = {"schema": "evalue_walkforward_sim_v1", "seed": a.seed, "quick": q,
            "synthetic_only": True, "alpha": ALPHA, "block_days": DAYS,

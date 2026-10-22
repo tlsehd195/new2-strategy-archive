@@ -8,7 +8,7 @@
  "why_this_null": "The e-process below is valid under this conditional-mean null whatever the dependence, volatility clustering or right tail of returns (Waudby-Smith & Ramdas 2010.09686 Prop. 2-3; Ville). It does NOT need i.i.d. blocks or a model of returns. It needs a LOWER bound on X_b, which is why the stop and the margin floor are part of the hypothesis.",
  "blocks": {
   "length": "one calendar month (simulated as 30 days)",
-  "first_block_start": "OPEN (decision V1)",
+  "first_block_start": "2026-12-01 suggested (first full month after v2's window starts; members/engine frozen before it). Still to be confirmed by the user.",
   "warmup": "the engine may read any data strictly before the block start; entries only inside the block; every position is closed at or before the block end (the next block starts flat)",
   "no_end_date": "the e-process may be monitored after every block and stopped at any time; the error rate holds for any stopping rule (anytime-valid). A block's X_b is booked once, after the block ends, and is never revised."
  },
@@ -34,13 +34,13 @@
   "bet_rule": "predictable plug-in (no prior on the edge): lam_b = clip(mu / (v + mu^2), 0, 0.75) with mu = sum(Z_1..Z_{b-1}) / (b - 1 + 3) and v = (3 * s0^2 + sum Z_i^2) / (b - 1 + 3), s0 = block_sd / (B + c)",
   "lam_max": 0.75,
   "E_b": "product of the factors of blocks 1..b (E_0 = 1)",
-  "reject_H0": "the first time E_b >= 1/alpha",
+  "reject_H0": "the first time E_b >= 1/alpha = 1/0.0091 (about 110)",
   "prior_from_spent_windows": "NOT USED for the bet (decision V3). Spent BTC/ETH windows and DEV overstate Sharpe by about 3-5x (ADR 0021: H1 1.9-2.5 -> H2 0.44-0.90); simulated 5x overestimate lost half the power at true SR 3, the plug-in needs no prior.",
   "breach": "if a realised X_b < -B ever occurs (margin floor failed, e.g. ADL or exchange failure), the family is VOID: no rejection may be claimed from that block on, and the breach is reported"
  },
- "alpha": 0.0304,
- "alpha_note": "same alpha as IW1 v1 and prereg v2 (not looser). One hypothesis (the pipeline), so no split inside the family.",
- "relation_to_v2": "OPEN (decision V1). v2 and v3 would both use forward data from 2026-11. Two tests on the same data spend alpha twice: either v3 replaces v2, or the forward-window family alpha is split between them (each stricter than 0.0304), or v3 starts after v2's window ends (2027-11).",
+ "alpha": 0.0091,
+ "alpha_note": "DECIDED 2026-10-22 (동동): Bonferroni split of the forward-window family alpha 0.0304 with prereg v2 (v2 0.0213 + v3 0.0091 = 0.0304). Reject when E_b >= 1/0.0091 (about 110). One hypothesis (the pipeline), no further split inside the family.",
+ "relation_to_v2": "DECIDED (V1, option 2): v2 and v3 share the forward data from 2026-11 and split alpha 7:3 (v2 0.0213, v3 0.0091). Evidence for the ratio: split_results.json in this directory.",
  "cost": {
   "profile": "assumed_public_v1 unless a measured alt cost is sealed before the first block (same rule as v2 D2)",
   "order_value": 10000.0
@@ -49,12 +49,32 @@
   "source": "sim_results.json (synthetic only, seed 20261022)",
   "type1_max_over_null_processes_120_blocks": 0.0083,
   "type1_plugin_max_120_blocks": 0.0021,
-  "power_plugin_garch_t4": {"sr2_by_24": 0.28, "sr2_by_36": 0.62, "sr3_by_24": 0.76, "sr3_by_36": 0.95, "sr4_by_24": 0.94, "sr1_by_60": 0.21},
-  "median_blocks_to_reject_plugin": {"sr2": 31, "sr3": 19, "sr4": 14},
-  "toy_engine": "a 12-rule toy engine on an AR(0.2) asset reached block SR 1.4 and rejected in 57 % of paths by 60 blocks; on martingale assets it never exceeded 0.025 %"
+  "power_plugin_garch_t4": {
+   "sr2_by_24": 0.28,
+   "sr2_by_36": 0.62,
+   "sr3_by_24": 0.76,
+   "sr3_by_36": 0.95,
+   "sr4_by_24": 0.94,
+   "sr1_by_60": 0.21
+  },
+  "median_blocks_to_reject_plugin": {
+   "sr2": 31,
+   "sr3": 19,
+   "sr4": 14
+  },
+  "toy_engine": "a 12-rule toy engine on an AR(0.2) asset reached block SR 1.4 and rejected in 57 % of paths by 60 blocks; on martingale assets it never exceeded 0.025 %",
+  "power_at_alpha_0.0091_garch_t4": {
+   "sr2_by_24": 0.057,
+   "sr2_by_36": 0.366,
+   "sr3_by_24": 0.472,
+   "sr3_by_36": 0.877,
+   "sr4_by_24": 0.84,
+   "sr4_by_36": 0.983
+  },
+  "note": "the other numbers in this block are at alpha 0.0304 (before the split)"
  },
  "open_decisions": {
-  "V1": "start date and relation to v2 (replace v2 / split alpha / start after 2027-11)",
+  "V1": "DECIDED 2026-10-22: share forward data, split alpha 7:3 (ratio itself to be confirmed by the user before freeze)",
   "V2": "what the pipeline trades each block: the single top strategy, or an equal-weight bundle of the top 5 (as v2 D3)",
   "V3": "bet rule: plug-in without prior (recommended) or a prior from spent windows shrunk by a fixed factor",
   "V4": "universe: v2's 15-symbol basket or BTC/ETH only"
