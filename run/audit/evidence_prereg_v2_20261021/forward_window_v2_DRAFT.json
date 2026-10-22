@@ -1,6 +1,6 @@
 {
  "schema": "forward_window_prereg_v2_DRAFT",
- "status": "DRAFT - NOT IN FORCE. All of D1-D5 decided by 동동 on 2026-10-21 (see decided). Becomes a prereg only when the members file is frozen on or before 2026-10-31 and this file is committed with its sha256 BEFORE window_start (2026-11-01), after a final read-through by the user. No window is open.",
+ "status": "DRAFT - NOT IN FORCE. All of D1-D5 decided by 동동 on 2026-10-21 (see decided). Becomes a prereg only when the members file is frozen on or before 2026-10-31 and this file is committed with its sha256 BEFORE window_start (2026-11-01), after a final read-through by the user. No window is open. 2026-10-22: alpha changed to 0.0213 by the v2/v3 split (still a draft).",
  "note": "Drafted 2026-10-21 after ADR 0022 (power audit). Goal: raise power WITHOUT loosening any criterion: a longer, forward, never-seen window; one pooled basket test instead of per-symbol intersection; fewer members. Every number below that is a statistical criterion (alpha, one-sided StepM, min events) is the same as promo-v3 / IW1 v1 or stricter.",
  "family": "forward-window-family-v2",
  "window": {
@@ -49,8 +49,8 @@
  "test": {
   "statistic": "per member, equal-weight average over basket symbols of the daily net return series (bp, exit-day booking) on the common UTC-day grid of the window",
   "method": "two one-sided studentized bootstrap tests (stats_mc.stepm with a single series, i.e. K=1) of H0 mean <= 0, both at alpha, on (i) the bundle series and (ii) the beta-hedged bundle series; the bundle passes only if BOTH reject (intersection-union)",
-  "alpha": 0.0304,
-  "alpha_note": "same spending as IW1 v1 (0.0304); K=1 because the bundle is one hypothesis; both gates at 0.0304 (intersection-union)",
+  "alpha": 0.0213,
+  "alpha_note": "DECIDED 2026-10-22 (동동, ADR 0025): the forward-window family alpha 0.0304 is split by Bonferroni between v2 (this file, 0.7 x 0.0304 = 0.0213) and the walk-forward e-value v3 (0.3 x 0.0304 = 0.0091), because both use forward data from 2026-11. Sum = 0.0304, valid whatever the correlation of the two tests. Both gates (unhedged and beta-hedged) at 0.0213 (intersection-union). Previously 0.0304.",
   "bootstrap_B": 10000,
   "bootstrap_B_why": "ADR 0022 side finding: with B=1000 the critical value cannot go below the max of 1000 draws (effective alpha ~0.001). B >= 20*m/alpha ~ 3300 is needed for alpha/m; 10000 used.",
   "pass": "both tests reject AND pooled events >= 60 AND >= 30 non-zero days (unchanged)",
@@ -149,5 +149,17 @@
   "D1": "12 months (2026-11-01..2027-10-31). Result earliest 2027-11. A second window of the same family (alpha spending k=2) rather than extending this one.",
   "D2": "the assumed alt cost is replaced by a MEASURED alt cost (criteria cost_public_estimate_v2_alts.json, ESTIMATED_FROM_PUBLIC_DATA) when one is sealed. To prevent cherry-picking, replacement is allowed only if the estimate is sealed BEFORE the freeze date (D5): then the universe rule, the member selection and the evaluation all use it, re-run from scratch. Sealed later: assumed_public_v1 stays for this window; the measured cost is reported alongside as a diagnostic.",
   "D5": "members file frozen on 2026-10-31 (DEV-only evolve run on the then-current code, ADR 0023 entry rule DEV SR >= 1.0). If fewer than 5 members meet the entry rule, the window is not registered and nothing is spent."
+ },
+ "alpha_split": {
+  "decided": "2026-10-22 by 동동 (option 2: share the forward data, split alpha)",
+  "family_alpha_total": 0.0304,
+  "v2_share": 0.7,
+  "v2_alpha": 0.0213,
+  "v3_share": 0.3,
+  "v3_alpha": 0.0091,
+  "v3_file": "run/audit/evidence_evalue_v3_20261022/walkforward_evalue_v3_DRAFT.json",
+  "why_7_to_3": "run/audit/evidence_evalue_v3_20261022/split_results.json: with both earning the same edge, P(either rejects by 36 months) is nearly flat across splits (SR2 0.67-0.68, SR3 0.90-0.96), so the split decides WHEN evidence arrives. 7:3 keeps v2's 12-month power within 2-4 points of the unsplit test (SR2 0.675 -> 0.626, SR3 0.900 -> 0.880) while v3 still reaches SR3 0.88 / SR2 0.37 by 36 months.",
+  "power_table_note": "power_table below was computed at alpha 0.0304 and is now slightly optimistic for v2 (see split_results.json)",
+  "ratio_confirmed": "2026-10-22 by 동동 (\"추천으로 해\"): 7:3 final"
  }
 }

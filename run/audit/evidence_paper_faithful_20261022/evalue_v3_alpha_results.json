@@ -1,0 +1,117 @@
+{
+ "alpha_v3": 0.0091,
+ "dgp": "garch_t4",
+ "n_paths": 5000,
+ "blocks": 60,
+ "seed": [
+  20261022,
+  99
+ ],
+ "rows": [
+  {
+   "true_sr_ann": 0.0,
+   "plugin": {
+    "reject_by_12": 0.0,
+    "reject_by_24": 0.0,
+    "reject_by_36": 0.0,
+    "reject_by_60": 0.0001
+   },
+   "wsr_grow": {
+    "reject_by_12": 0.0,
+    "reject_by_24": 0.0,
+    "reject_by_36": 0.0,
+    "reject_by_60": 0.0002
+   },
+   "wsr_prpl_eb": {
+    "reject_by_12": 0.0,
+    "reject_by_24": 5e-05,
+    "reject_by_36": 5e-05,
+    "reject_by_60": 0.0003
+   }
+  },
+  {
+   "true_sr_ann": 1.0,
+   "plugin": {
+    "reject_by_12": 0.0,
+    "reject_by_24": 0.0002,
+    "reject_by_36": 0.014,
+    "reject_by_60": 0.0906
+   },
+   "wsr_grow": {
+    "reject_by_12": 0.0,
+    "reject_by_24": 0.0006,
+    "reject_by_36": 0.0216,
+    "reject_by_60": 0.1178
+   },
+   "wsr_prpl_eb": {
+    "reject_by_12": 0.0,
+    "reject_by_24": 0.0026,
+    "reject_by_36": 0.033,
+    "reject_by_60": 0.1436
+   }
+  },
+  {
+   "true_sr_ann": 2.0,
+   "plugin": {
+    "reject_by_12": 0.0,
+    "reject_by_24": 0.0584,
+    "reject_by_36": 0.376,
+    "reject_by_60": 0.811
+   },
+   "wsr_grow": {
+    "reject_by_12": 0.0002,
+    "reject_by_24": 0.0906,
+    "reject_by_36": 0.4394,
+    "reject_by_60": 0.8458
+   },
+   "wsr_prpl_eb": {
+    "reject_by_12": 0.0012,
+    "reject_by_24": 0.1464,
+    "reject_by_36": 0.5198,
+    "reject_by_60": 0.8642
+   }
+  },
+  {
+   "true_sr_ann": 3.0,
+   "plugin": {
+    "reject_by_12": 0.0002,
+    "reject_by_24": 0.4718,
+    "reject_by_36": 0.8752,
+    "reject_by_60": 0.9914
+   },
+   "wsr_grow": {
+    "reject_by_12": 0.0018,
+    "reject_by_24": 0.571,
+    "reject_by_36": 0.9128,
+    "reject_by_60": 0.9948
+   },
+   "wsr_prpl_eb": {
+    "reject_by_12": 0.007,
+    "reject_by_24": 0.6738,
+    "reject_by_36": 0.9396,
+    "reject_by_60": 0.9936
+   }
+  },
+  {
+   "true_sr_ann": 4.0,
+   "plugin": {
+    "reject_by_12": 0.0014,
+    "reject_by_24": 0.8428,
+    "reject_by_36": 0.9832,
+    "reject_by_60": 0.9996
+   },
+   "wsr_grow": {
+    "reject_by_12": 0.0342,
+    "reject_by_24": 0.9084,
+    "reject_by_36": 0.9898,
+    "reject_by_60": 1.0
+   },
+   "wsr_prpl_eb": {
+    "reject_by_12": 0.0978,
+    "reject_by_24": 0.9404,
+    "reject_by_36": 0.992,
+    "reject_by_60": 0.9996
+   }
+  }
+ ]
+}

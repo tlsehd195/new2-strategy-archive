@@ -28,4 +28,7 @@
 | [0022](0022-false-negative-power-audit.md) | 거짓 음성 점검: 가상 엣지 검정력, 관문별 기여, 비용 가정, 숏 보류 후보, 검정력 개선 제안 | Accepted (측정만) |
 | [0023](0023-forward-window-prereg-v2-draft.md) | 사전등록 v2 초안: 12개월 전진 창, 바구니 평균 검정 (효력 없음) | Proposed |
 | [0024](0024-liquid-universe-dev-search.md) | 유동성 높은 9종목 DEV 재탐색 (가정 비용): 단일 후보 기준 미달, 묶음은 유망하나 베타 미확인 | Accepted (측정만) |
+| [0025](0025-walkforward-evalue-prereg-v3-draft.md) | 매 블록 e-값 누적 검증: 합성 시뮬레이션(1종 오류·검정력·사전분포·널 생성법)과 사전등록 v3 초안 (효력 없음) | Proposed |
+| [0026](0026-top5-bundle-regime-and-buy-and-hold.md) | 상위 5개 묶음 국면별(하락장) 성적과 단순 보유 비교(DEV, 가정 비용): 하락장 약 0, 수익은 상승장에 집중, 베타는 작음 | Accepted (측정만) |
+| [0027](0027-paper-faithful-recheck-of-estimated-parts.md) | 추정·변형 항목을 논문 원문과 대조: alpha 지출=Tian–Ramdas와 같음, StepM bootstrap-t·Politis–White 블록·Dufour MMC·WS-R PrPl-EB 추가(기본값 그대로), 합성 오류율 재확인 | Accepted (측정·도구) |
 | [0028](0028-short-top-candidates-and-long-short-regime-mix-dev.md) | 숏 전용 상위 후보 성적, 롱·숏 묶음 상관과 국면별 비중 전환(앞/뒤 절반) DEV 점검: 우연 최대치 못 넘고 조합 이득 없음 | Accepted (측정만) |

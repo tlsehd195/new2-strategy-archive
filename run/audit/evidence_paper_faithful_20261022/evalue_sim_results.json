@@ -1,0 +1,2217 @@
+{
+ "schema": "evalue_walkforward_sim_v1",
+ "seed": 20261022,
+ "quick": false,
+ "synthetic_only": true,
+ "alpha": 0.0304,
+ "block_days": 30,
+ "strategy_daily_sd": 0.01,
+ "main_design": {
+  "L_sd": 1.0,
+  "B_sd": 2.0,
+  "lam_max": 0.75,
+  "gap_c_sd": 0.05,
+  "k0": 3.0
+ },
+ "type1": {
+  "alpha": 0.0304,
+  "n_paths": 20000,
+  "blocks": 120,
+  "L": 0.05477225575051661,
+  "B": 0.10954451150103323,
+  "lam_max": 0.75,
+  "gap_allowance_c": 0.0027386127875258306,
+  "mc_se_at_alpha": 0.001213998352552424,
+  "cases": [
+   {
+    "dgp": "iid_normal",
+    "sr_ann": 0.0,
+    "phi": 0.0,
+    "h0_holds": true,
+    "block_mean_realised": -7.2060125212139115e-06,
+    "block_mean_realised_se": 3.3245106334970625e-05,
+    "overshoot_rate": 0.0,
+    "stop_rate": 0.2707225,
+    "bets": {
+     "fixed_lam_max": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.00155,
+      "reject_by_36": 0.0033,
+      "reject_by_60": 0.00615,
+      "reject_by_120": 0.0077,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 43.5
+     },
+     "plugin": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.00035,
+      "reject_by_36": 0.0007,
+      "reject_by_60": 0.0011,
+      "reject_by_120": 0.00175,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 52.17142857142857
+     },
+     "mixture": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.00035,
+      "reject_by_60": 0.0008,
+      "reject_by_120": 0.00215,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 65.83720930232558
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0007,
+      "reject_by_36": 0.0015,
+      "reject_by_60": 0.00235,
+      "reject_by_120": 0.00305,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 45.0
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.00155,
+      "reject_by_36": 0.003,
+      "reject_by_60": 0.0043,
+      "reject_by_120": 0.0055,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 42.28181818181818
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0,
+      "reject_by_60": 0.0,
+      "reject_by_120": 0.00015,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 99.33333333333333
+     },
+     "prior_sr2": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.00145,
+      "reject_by_36": 0.00335,
+      "reject_by_60": 0.0063,
+      "reject_by_120": 0.00785,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 43.87261146496815
+     },
+     "prior_sr4": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.00145,
+      "reject_by_36": 0.00325,
+      "reject_by_60": 0.0061,
+      "reject_by_120": 0.00765,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 43.8235294117647
+     }
+    },
+    "naive_clip_after_the_fact": {
+     "block_mean": 0.004558096794010226,
+     "bets": {
+      "fixed_lam_max": {
+       "reject_by_12": 0.01805,
+       "reject_by_24": 0.04285,
+       "reject_by_36": 0.0547,
+       "reject_by_60": 0.0645,
+       "reject_by_120": 0.0681,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 24.680616740088105
+      },
+      "plugin": {
+       "reject_by_12": 0.0,
+       "reject_by_24": 0.0023,
+       "reject_by_36": 0.00695,
+       "reject_by_60": 0.01985,
+       "reject_by_120": 0.0501,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 71.03293413173652
+      },
+      "mixture": {
+       "reject_by_12": 0.0021,
+       "reject_by_24": 0.0174,
+       "reject_by_36": 0.03075,
+       "reject_by_60": 0.0523,
+       "reject_by_120": 0.09035,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 56.97399003873824
+      },
+      "wsr_grow": {
+       "reject_by_12": 0.0044,
+       "reject_by_24": 0.0148,
+       "reject_by_36": 0.0218,
+       "reject_by_60": 0.03415,
+       "reject_by_120": 0.05835,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 55.72236503856041
+      },
+      "wsr_prpl_eb": {
+       "reject_by_12": 0.0171,
+       "reject_by_24": 0.036,
+       "reject_by_36": 0.0437,
+       "reject_by_60": 0.05405,
+       "reject_by_120": 0.06855,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 36.8074398249453
+      },
+      "arnold_fixed_quarter": {
+       "reject_by_12": 0.0,
+       "reject_by_24": 0.0003,
+       "reject_by_36": 0.00355,
+       "reject_by_60": 0.0244,
+       "reject_by_120": 0.10495,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 81.18961410195331
+      }
+     }
+    },
+    "secs": 19.9
+   },
+   {
+    "dgp": "garch_t4",
+    "sr_ann": 0.0,
+    "phi": 0.0,
+    "h0_holds": true,
+    "block_mean_realised": 9.606308111999477e-05,
+    "block_mean_realised_se": 3.0333544138558057e-05,
+    "overshoot_rate": 0.00242875,
+    "stop_rate": 0.16112958333333333,
+    "bets": {
+     "fixed_lam_max": {
+      "reject_by_12": 0.00025,
+      "reject_by_24": 0.00115,
+      "reject_by_36": 0.0026,
+      "reject_by_60": 0.0045,
+      "reject_by_120": 0.00655,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 48.11450381679389
+     },
+     "plugin": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0001,
+      "reject_by_36": 0.0003,
+      "reject_by_60": 0.00065,
+      "reject_by_120": 0.0012,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 61.125
+     },
+     "mixture": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.00015,
+      "reject_by_36": 0.00015,
+      "reject_by_60": 0.00085,
+      "reject_by_120": 0.0018,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 67.0
+     },
+     "wsr_grow": {
+      "reject_by_12": 5e-05,
+      "reject_by_24": 0.0003,
+      "reject_by_36": 0.0008,
+      "reject_by_60": 0.00135,
+      "reject_by_120": 0.0021,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 50.523809523809526
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.0002,
+      "reject_by_24": 0.00085,
+      "reject_by_36": 0.00185,
+      "reject_by_60": 0.00295,
+      "reject_by_120": 0.00375,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 42.026666666666664
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0,
+      "reject_by_60": 5e-05,
+      "reject_by_120": 5e-05,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 49.0
+     },
+     "prior_sr2": {
+      "reject_by_12": 5e-05,
+      "reject_by_24": 0.0006,
+      "reject_by_36": 0.0019,
+      "reject_by_60": 0.00375,
+      "reject_by_120": 0.0058,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 51.58620689655172
+     },
+     "prior_sr4": {
+      "reject_by_12": 0.0001,
+      "reject_by_24": 0.00075,
+      "reject_by_36": 0.00215,
+      "reject_by_60": 0.004,
+      "reject_by_120": 0.00605,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 50.65289256198347
+     }
+    },
+    "naive_clip_after_the_fact": {
+     "block_mean": 0.003739683638271561,
+     "bets": {
+      "fixed_lam_max": {
+       "reject_by_12": 0.0134,
+       "reject_by_24": 0.03615,
+       "reject_by_36": 0.0505,
+       "reject_by_60": 0.06405,
+       "reject_by_120": 0.07255,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 31.290833907649898
+      },
+      "plugin": {
+       "reject_by_12": 0.0,
+       "reject_by_24": 0.0013,
+       "reject_by_36": 0.0038,
+       "reject_by_60": 0.0116,
+       "reject_by_120": 0.0349,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 74.310888252149
+      },
+      "mixture": {
+       "reject_by_12": 0.00315,
+       "reject_by_24": 0.01155,
+       "reject_by_36": 0.02435,
+       "reject_by_60": 0.0447,
+       "reject_by_120": 0.08135,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 58.795328826060235
+      },
+      "wsr_grow": {
+       "reject_by_12": 0.00195,
+       "reject_by_24": 0.00935,
+       "reject_by_36": 0.01575,
+       "reject_by_60": 0.0251,
+       "reject_by_120": 0.0453,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 57.62251655629139
+      },
+      "wsr_prpl_eb": {
+       "reject_by_12": 0.0113,
+       "reject_by_24": 0.02755,
+       "reject_by_36": 0.0362,
+       "reject_by_60": 0.04655,
+       "reject_by_120": 0.0632,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 41.688291139240505
+      },
+      "arnold_fixed_quarter": {
+       "reject_by_12": 0.0003,
+       "reject_by_24": 0.00165,
+       "reject_by_36": 0.00445,
+       "reject_by_60": 0.01685,
+       "reject_by_120": 0.076,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 81.17434210526316
+      }
+     }
+    },
+    "secs": 19.1
+   },
+   {
+    "dgp": "gjr_skewt",
+    "sr_ann": 0.0,
+    "phi": 0.0,
+    "h0_holds": true,
+    "block_mean_realised": 0.0002662265688034255,
+    "block_mean_realised_se": 3.2194907671580967e-05,
+    "overshoot_rate": 0.0070016666666666665,
+    "stop_rate": 0.23260833333333333,
+    "bets": {
+     "fixed_lam_max": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0005,
+      "reject_by_36": 0.00205,
+      "reject_by_60": 0.00505,
+      "reject_by_120": 0.00745,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 53.23489932885906
+     },
+     "plugin": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0002,
+      "reject_by_36": 0.0007,
+      "reject_by_60": 0.0013,
+      "reject_by_120": 0.0021,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 53.5
+     },
+     "mixture": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.00015,
+      "reject_by_60": 0.0006,
+      "reject_by_120": 0.00185,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 72.5945945945946
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.00025,
+      "reject_by_36": 0.00115,
+      "reject_by_60": 0.0022,
+      "reject_by_120": 0.0034,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 52.98529411764706
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0005,
+      "reject_by_36": 0.002,
+      "reject_by_60": 0.00395,
+      "reject_by_120": 0.00545,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 49.57798165137615
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0,
+      "reject_by_60": 0.0,
+      "reject_by_120": 0.0,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": null
+     },
+     "prior_sr2": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.00045,
+      "reject_by_36": 0.00205,
+      "reject_by_60": 0.005,
+      "reject_by_120": 0.0074,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 53.4527027027027
+     },
+     "prior_sr4": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.00045,
+      "reject_by_36": 0.002,
+      "reject_by_60": 0.005,
+      "reject_by_120": 0.0074,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 53.479729729729726
+     }
+    },
+    "naive_clip_after_the_fact": {
+     "block_mean": 0.007052703269056171,
+     "bets": {
+      "fixed_lam_max": {
+       "reject_by_12": 0.0193,
+       "reject_by_24": 0.0651,
+       "reject_by_36": 0.0941,
+       "reject_by_60": 0.12495,
+       "reject_by_120": 0.14925,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 35.79798994974875
+      },
+      "plugin": {
+       "reject_by_12": 0.0,
+       "reject_by_24": 0.00485,
+       "reject_by_36": 0.01675,
+       "reject_by_60": 0.0482,
+       "reject_by_120": 0.1471,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 75.09823249490142
+      },
+      "mixture": {
+       "reject_by_12": 0.00125,
+       "reject_by_24": 0.0236,
+       "reject_by_36": 0.0511,
+       "reject_by_60": 0.10475,
+       "reject_by_120": 0.2248,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 65.27669039145907
+      },
+      "wsr_grow": {
+       "reject_by_12": 0.0043,
+       "reject_by_24": 0.0258,
+       "reject_by_36": 0.04145,
+       "reject_by_60": 0.06915,
+       "reject_by_120": 0.1501,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 64.21752165223185
+      },
+      "wsr_prpl_eb": {
+       "reject_by_12": 0.0184,
+       "reject_by_24": 0.05445,
+       "reject_by_36": 0.07145,
+       "reject_by_60": 0.10045,
+       "reject_by_120": 0.157,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 49.5015923566879
+      },
+      "arnold_fixed_quarter": {
+       "reject_by_12": 0.0,
+       "reject_by_24": 0.00025,
+       "reject_by_36": 0.00405,
+       "reject_by_60": 0.0413,
+       "reject_by_120": 0.24785,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 84.92414766996167
+      }
+     }
+    },
+    "secs": 29.7
+   },
+   {
+    "dgp": "regime_t4",
+    "sr_ann": 0.0,
+    "phi": 0.0,
+    "h0_holds": true,
+    "block_mean_realised": 9.617148423464134e-05,
+    "block_mean_realised_se": 3.277760837050358e-05,
+    "overshoot_rate": 0.002575833333333333,
+    "stop_rate": 0.22174833333333333,
+    "bets": {
+     "fixed_lam_max": {
+      "reject_by_12": 0.0002,
+      "reject_by_24": 0.00145,
+      "reject_by_36": 0.00335,
+      "reject_by_60": 0.00555,
+      "reject_by_120": 0.00775,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 48.29677419354839
+     },
+     "plugin": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0002,
+      "reject_by_36": 0.00065,
+      "reject_by_60": 0.00135,
+      "reject_by_120": 0.0017,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 44.529411764705884
+     },
+     "mixture": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0001,
+      "reject_by_60": 0.001,
+      "reject_by_120": 0.0025,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 69.24
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0006,
+      "reject_by_36": 0.0012,
+      "reject_by_60": 0.00205,
+      "reject_by_120": 0.0026,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 43.11538461538461
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.00015,
+      "reject_by_24": 0.00135,
+      "reject_by_36": 0.00265,
+      "reject_by_60": 0.0037,
+      "reject_by_120": 0.0047,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 43.265957446808514
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0,
+      "reject_by_60": 0.0,
+      "reject_by_120": 5e-05,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 119.0
+     },
+     "prior_sr2": {
+      "reject_by_12": 0.00015,
+      "reject_by_24": 0.0013,
+      "reject_by_36": 0.0031,
+      "reject_by_60": 0.0056,
+      "reject_by_120": 0.00775,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 49.148387096774194
+     },
+     "prior_sr4": {
+      "reject_by_12": 0.00015,
+      "reject_by_24": 0.00145,
+      "reject_by_36": 0.0033,
+      "reject_by_60": 0.00555,
+      "reject_by_120": 0.00775,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 48.63870967741936
+     }
+    },
+    "naive_clip_after_the_fact": {
+     "block_mean": 0.004601572958852888,
+     "bets": {
+      "fixed_lam_max": {
+       "reject_by_12": 0.01575,
+       "reject_by_24": 0.0435,
+       "reject_by_36": 0.05565,
+       "reject_by_60": 0.06885,
+       "reject_by_120": 0.07405,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 27.238352464550978
+      },
+      "plugin": {
+       "reject_by_12": 5e-05,
+       "reject_by_24": 0.00235,
+       "reject_by_36": 0.00715,
+       "reject_by_60": 0.0186,
+       "reject_by_120": 0.0491,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 71.479633401222
+      },
+      "mixture": {
+       "reject_by_12": 0.0025,
+       "reject_by_24": 0.0172,
+       "reject_by_36": 0.0302,
+       "reject_by_60": 0.0534,
+       "reject_by_120": 0.09475,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 57.97572559366755
+      },
+      "wsr_grow": {
+       "reject_by_12": 0.00335,
+       "reject_by_24": 0.0132,
+       "reject_by_36": 0.0206,
+       "reject_by_60": 0.033,
+       "reject_by_120": 0.0582,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 56.65635738831615
+      },
+      "wsr_prpl_eb": {
+       "reject_by_12": 0.0144,
+       "reject_by_24": 0.0341,
+       "reject_by_36": 0.0426,
+       "reject_by_60": 0.0547,
+       "reject_by_120": 0.0729,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 40.02057613168724
+      },
+      "arnold_fixed_quarter": {
+       "reject_by_12": 0.0,
+       "reject_by_24": 0.00035,
+       "reject_by_36": 0.00445,
+       "reject_by_60": 0.02345,
+       "reject_by_120": 0.1043,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 81.6836049856184
+      }
+     }
+    },
+    "secs": 21.8
+   },
+   {
+    "dgp": "gjr_skewt3",
+    "sr_ann": 0.0,
+    "phi": 0.0,
+    "h0_holds": true,
+    "block_mean_realised": 0.0007078751474419522,
+    "block_mean_realised_se": 3.0750898880778305e-05,
+    "overshoot_rate": 0.012290833333333334,
+    "stop_rate": 0.19091125,
+    "bets": {
+     "fixed_lam_max": {
+      "reject_by_12": 0.0001,
+      "reject_by_24": 0.00025,
+      "reject_by_36": 0.0017,
+      "reject_by_60": 0.00375,
+      "reject_by_120": 0.0066,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 57.65151515151515
+     },
+     "plugin": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0003,
+      "reject_by_60": 0.0013,
+      "reject_by_120": 0.00195,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 53.94871794871795
+     },
+     "mixture": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0,
+      "reject_by_60": 0.00035,
+      "reject_by_120": 0.0014,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 77.85714285714286
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0006,
+      "reject_by_60": 0.00195,
+      "reject_by_120": 0.0029,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 54.46551724137931
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0001,
+      "reject_by_36": 0.00145,
+      "reject_by_60": 0.0031,
+      "reject_by_120": 0.00405,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 49.65432098765432
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0,
+      "reject_by_60": 0.0,
+      "reject_by_120": 0.0,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": null
+     },
+     "prior_sr2": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0001,
+      "reject_by_36": 0.0015,
+      "reject_by_60": 0.0035,
+      "reject_by_120": 0.00645,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 60.27131782945737
+     },
+     "prior_sr4": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0001,
+      "reject_by_36": 0.0015,
+      "reject_by_60": 0.00355,
+      "reject_by_120": 0.00655,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 59.961832061068705
+     }
+    },
+    "naive_clip_after_the_fact": {
+     "block_mean": 0.006704611439928346,
+     "bets": {
+      "fixed_lam_max": {
+       "reject_by_12": 0.01265,
+       "reject_by_24": 0.06115,
+       "reject_by_36": 0.0984,
+       "reject_by_60": 0.1402,
+       "reject_by_120": 0.18,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 41.43388888888889
+      },
+      "plugin": {
+       "reject_by_12": 0.0001,
+       "reject_by_24": 0.00465,
+       "reject_by_36": 0.0176,
+       "reject_by_60": 0.04915,
+       "reject_by_120": 0.15755,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 75.81910504601714
+      },
+      "mixture": {
+       "reject_by_12": 0.001,
+       "reject_by_24": 0.01805,
+       "reject_by_36": 0.048,
+       "reject_by_60": 0.10865,
+       "reject_by_120": 0.24205,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 66.65771534806858
+      },
+      "wsr_grow": {
+       "reject_by_12": 0.00265,
+       "reject_by_24": 0.02665,
+       "reject_by_36": 0.0457,
+       "reject_by_60": 0.0768,
+       "reject_by_120": 0.16325,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 64.36232771822358
+      },
+      "wsr_prpl_eb": {
+       "reject_by_12": 0.0123,
+       "reject_by_24": 0.0535,
+       "reject_by_36": 0.0768,
+       "reject_by_60": 0.1089,
+       "reject_by_120": 0.1738,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 51.43527042577676
+      },
+      "arnold_fixed_quarter": {
+       "reject_by_12": 0.0001,
+       "reject_by_24": 0.00055,
+       "reject_by_36": 0.0028,
+       "reject_by_60": 0.02875,
+       "reject_by_120": 0.23365,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 87.79178258078322
+      }
+     }
+    },
+    "secs": 35.9
+   },
+   {
+    "dgp": "garch_t4",
+    "sr_ann": -0.5,
+    "phi": 0.0,
+    "h0_holds": true,
+    "block_mean_realised": -0.007160077020909251,
+    "block_mean_realised_se": 2.9365748723144594e-05,
+    "overshoot_rate": 0.002522916666666667,
+    "stop_rate": 0.19697541666666665,
+    "bets": {
+     "fixed_lam_max": {
+      "reject_by_12": 0.00035,
+      "reject_by_24": 0.0005,
+      "reject_by_36": 0.00055,
+      "reject_by_60": 0.00055,
+      "reject_by_120": 0.00055,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 11.727272727272727
+     },
+     "plugin": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0,
+      "reject_by_60": 0.0,
+      "reject_by_120": 0.0,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": null
+     },
+     "mixture": {
+      "reject_by_12": 5e-05,
+      "reject_by_24": 0.0001,
+      "reject_by_36": 0.0001,
+      "reject_by_60": 0.0001,
+      "reject_by_120": 0.0001,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 15.0
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0001,
+      "reject_by_36": 0.00015,
+      "reject_by_60": 0.00015,
+      "reject_by_120": 0.00015,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 19.0
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.00035,
+      "reject_by_24": 0.0005,
+      "reject_by_36": 0.0005,
+      "reject_by_60": 0.0005,
+      "reject_by_120": 0.0005,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 10.3
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0,
+      "reject_by_60": 0.0,
+      "reject_by_120": 0.0,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": null
+     },
+     "prior_sr2": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.00015,
+      "reject_by_36": 0.00015,
+      "reject_by_60": 0.00015,
+      "reject_by_120": 0.00015,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 18.666666666666668
+     },
+     "prior_sr4": {
+      "reject_by_12": 5e-05,
+      "reject_by_24": 0.0002,
+      "reject_by_36": 0.0002,
+      "reject_by_60": 0.0002,
+      "reject_by_120": 0.0002,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 18.25
+     }
+    },
+    "naive_clip_after_the_fact": {
+     "block_mean": -0.003307589347064057,
+     "bets": {
+      "fixed_lam_max": {
+       "reject_by_12": 0.00545,
+       "reject_by_24": 0.00875,
+       "reject_by_36": 0.00995,
+       "reject_by_60": 0.01075,
+       "reject_by_120": 0.01085,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 16.43778801843318
+      },
+      "plugin": {
+       "reject_by_12": 0.0001,
+       "reject_by_24": 0.0002,
+       "reject_by_36": 0.0004,
+       "reject_by_60": 0.0006,
+       "reject_by_120": 0.0008,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 42.25
+      },
+      "mixture": {
+       "reject_by_12": 0.00175,
+       "reject_by_24": 0.0034,
+       "reject_by_36": 0.0045,
+       "reject_by_60": 0.0057,
+       "reject_by_120": 0.00635,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 29.58267716535433
+      },
+      "wsr_grow": {
+       "reject_by_12": 0.00065,
+       "reject_by_24": 0.00175,
+       "reject_by_36": 0.0022,
+       "reject_by_60": 0.00255,
+       "reject_by_120": 0.0028,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 26.5
+      },
+      "wsr_prpl_eb": {
+       "reject_by_12": 0.0044,
+       "reject_by_24": 0.0066,
+       "reject_by_36": 0.0071,
+       "reject_by_60": 0.00745,
+       "reject_by_120": 0.0078,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 16.423076923076923
+      },
+      "arnold_fixed_quarter": {
+       "reject_by_12": 0.0002,
+       "reject_by_24": 0.00055,
+       "reject_by_36": 0.0014,
+       "reject_by_60": 0.0022,
+       "reject_by_120": 0.0034,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 51.220588235294116
+      }
+     }
+    },
+    "secs": 23.5
+   },
+   {
+    "dgp": "ar_garch",
+    "sr_ann": 0.0,
+    "phi": 0.05,
+    "h0_holds": false,
+    "block_mean_realised": 0.00029909404887643574,
+    "block_mean_realised_se": 3.156794976458523e-05,
+    "overshoot_rate": 0.0024191666666666667,
+    "stop_rate": 0.173645,
+    "bets": {
+     "fixed_lam_max": {
+      "reject_by_12": 0.00035,
+      "reject_by_24": 0.0017,
+      "reject_by_36": 0.003,
+      "reject_by_60": 0.0054,
+      "reject_by_120": 0.00755,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 48.324503311258276
+     },
+     "plugin": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.00035,
+      "reject_by_36": 0.0006,
+      "reject_by_60": 0.00095,
+      "reject_by_120": 0.00165,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 57.36363636363637
+     },
+     "mixture": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.00015,
+      "reject_by_36": 0.00045,
+      "reject_by_60": 0.0011,
+      "reject_by_120": 0.00265,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 70.50943396226415
+     },
+     "wsr_grow": {
+      "reject_by_12": 5e-05,
+      "reject_by_24": 0.00055,
+      "reject_by_36": 0.001,
+      "reject_by_60": 0.0015,
+      "reject_by_120": 0.0025,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 52.42
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.00015,
+      "reject_by_24": 0.0013,
+      "reject_by_36": 0.0023,
+      "reject_by_60": 0.0035,
+      "reject_by_120": 0.0048,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 46.083333333333336
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0,
+      "reject_by_60": 0.0,
+      "reject_by_120": 0.00025,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 94.2
+     },
+     "prior_sr2": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.00105,
+      "reject_by_36": 0.0024,
+      "reject_by_60": 0.0048,
+      "reject_by_120": 0.00725,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 52.44137931034483
+     },
+     "prior_sr4": {
+      "reject_by_12": 0.0001,
+      "reject_by_24": 0.0014,
+      "reject_by_36": 0.0027,
+      "reject_by_60": 0.00515,
+      "reject_by_120": 0.00735,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 50.29931972789116
+     }
+    },
+    "naive_clip_after_the_fact": {
+     "block_mean": 0.004212429521554791,
+     "bets": {
+      "fixed_lam_max": {
+       "reject_by_12": 0.0156,
+       "reject_by_24": 0.04165,
+       "reject_by_36": 0.0562,
+       "reject_by_60": 0.06945,
+       "reject_by_120": 0.07875,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 30.45968253968254
+      },
+      "plugin": {
+       "reject_by_12": 0.0,
+       "reject_by_24": 0.00155,
+       "reject_by_36": 0.0052,
+       "reject_by_60": 0.01535,
+       "reject_by_120": 0.0446,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 73.87668161434978
+      },
+      "mixture": {
+       "reject_by_12": 0.00295,
+       "reject_by_24": 0.01525,
+       "reject_by_36": 0.02875,
+       "reject_by_60": 0.0518,
+       "reject_by_120": 0.09465,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 58.56788166930798
+      },
+      "wsr_grow": {
+       "reject_by_12": 0.0023,
+       "reject_by_24": 0.01035,
+       "reject_by_36": 0.01745,
+       "reject_by_60": 0.02835,
+       "reject_by_120": 0.0557,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 60.58438061041293
+      },
+      "wsr_prpl_eb": {
+       "reject_by_12": 0.01285,
+       "reject_by_24": 0.03215,
+       "reject_by_36": 0.0413,
+       "reject_by_60": 0.05235,
+       "reject_by_120": 0.07215,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 41.476784476784474
+      },
+      "arnold_fixed_quarter": {
+       "reject_by_12": 0.0003,
+       "reject_by_24": 0.002,
+       "reject_by_36": 0.00595,
+       "reject_by_60": 0.0221,
+       "reject_by_120": 0.0942,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 80.45063694267516
+      }
+     }
+    },
+    "secs": 27.2
+   },
+   {
+    "dgp": "ar_garch",
+    "sr_ann": 0.0,
+    "phi": -0.05,
+    "h0_holds": false,
+    "block_mean_realised": -2.505217253330474e-05,
+    "block_mean_realised_se": 3.007152661512675e-05,
+    "overshoot_rate": 0.00243125,
+    "stop_rate": 0.14899166666666666,
+    "bets": {
+     "fixed_lam_max": {
+      "reject_by_12": 0.0001,
+      "reject_by_24": 0.0005,
+      "reject_by_36": 0.00125,
+      "reject_by_60": 0.00245,
+      "reject_by_120": 0.0034,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 50.26470588235294
+     },
+     "plugin": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 5e-05,
+      "reject_by_36": 0.00015,
+      "reject_by_60": 0.0003,
+      "reject_by_120": 0.00065,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 59.30769230769231
+     },
+     "mixture": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 5e-05,
+      "reject_by_60": 0.00035,
+      "reject_by_120": 0.00085,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 63.529411764705884
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0001,
+      "reject_by_36": 0.0004,
+      "reject_by_60": 0.00075,
+      "reject_by_120": 0.00115,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 51.130434782608695
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.0001,
+      "reject_by_24": 0.00035,
+      "reject_by_36": 0.0009,
+      "reject_by_60": 0.00155,
+      "reject_by_120": 0.0021,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 44.92857142857143
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0,
+      "reject_by_60": 5e-05,
+      "reject_by_120": 0.0001,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 69.0
+     },
+     "prior_sr2": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0003,
+      "reject_by_36": 0.0009,
+      "reject_by_60": 0.0023,
+      "reject_by_120": 0.0033,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 53.15151515151515
+     },
+     "prior_sr4": {
+      "reject_by_12": 5e-05,
+      "reject_by_24": 0.0004,
+      "reject_by_36": 0.00105,
+      "reject_by_60": 0.00245,
+      "reject_by_120": 0.00335,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 51.582089552238806
+     }
+    },
+    "naive_clip_after_the_fact": {
+     "block_mean": 0.003375289462345127,
+     "bets": {
+      "fixed_lam_max": {
+       "reject_by_12": 0.0113,
+       "reject_by_24": 0.0333,
+       "reject_by_36": 0.0466,
+       "reject_by_60": 0.06025,
+       "reject_by_120": 0.0677,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 31.459379615952734
+      },
+      "plugin": {
+       "reject_by_12": 0.0,
+       "reject_by_24": 0.00125,
+       "reject_by_36": 0.00345,
+       "reject_by_60": 0.0105,
+       "reject_by_120": 0.0287,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 73.4616724738676
+      },
+      "mixture": {
+       "reject_by_12": 0.00235,
+       "reject_by_24": 0.0116,
+       "reject_by_36": 0.02105,
+       "reject_by_60": 0.0389,
+       "reject_by_120": 0.0725,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 59.69655172413793
+      },
+      "wsr_grow": {
+       "reject_by_12": 0.00195,
+       "reject_by_24": 0.00925,
+       "reject_by_36": 0.01375,
+       "reject_by_60": 0.02285,
+       "reject_by_120": 0.0393,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 55.723918575063614
+      },
+      "wsr_prpl_eb": {
+       "reject_by_12": 0.00965,
+       "reject_by_24": 0.02535,
+       "reject_by_36": 0.03365,
+       "reject_by_60": 0.04325,
+       "reject_by_120": 0.0575,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 40.759130434782605
+      },
+      "arnold_fixed_quarter": {
+       "reject_by_12": 0.00025,
+       "reject_by_24": 0.00095,
+       "reject_by_36": 0.00275,
+       "reject_by_60": 0.0119,
+       "reject_by_120": 0.06105,
+       "median_blocks_to_reject": null,
+       "mean_blocks_given_reject": 83.83947583947584
+      }
+     }
+    },
+    "secs": 27.4
+   }
+  ],
+  "secs": 204.4
+ },
+ "power": {
+  "n_paths": 5000,
+  "blocks": 60,
+  "L": 0.05477225575051661,
+  "B": 0.10954451150103323,
+  "rows": [
+   {
+    "dgp": "iid_normal",
+    "sr_ann_daily": 1.0,
+    "sr_ann_realised_blocks": 0.9285720465052784,
+    "bets": {
+     "plugin": {
+      "reject_by_12": 0.0002,
+      "reject_by_24": 0.0154,
+      "reject_by_36": 0.0478,
+      "reject_by_60": 0.1304,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 40.967791411042946
+     },
+     "mixture": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0056,
+      "reject_by_36": 0.0332,
+      "reject_by_60": 0.1436,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 44.87604456824513
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.0004,
+      "reject_by_24": 0.0278,
+      "reject_by_36": 0.0762,
+      "reject_by_60": 0.1648,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 38.08009708737864
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.002,
+      "reject_by_24": 0.0462,
+      "reject_by_36": 0.1096,
+      "reject_by_60": 0.2112,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 36.40435606060606
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0,
+      "reject_by_60": 0.0068,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 55.6764705882353
+     },
+     "prior_sr1": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.008,
+      "reject_by_36": 0.0518,
+      "reject_by_60": 0.203,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 43.99310344827586
+     }
+    }
+   },
+   {
+    "dgp": "iid_normal",
+    "sr_ann_daily": 2.0,
+    "sr_ann_realised_blocks": 1.8590216031906586,
+    "bets": {
+     "plugin": {
+      "reject_by_12": 0.0026,
+      "reject_by_24": 0.1928,
+      "reject_by_36": 0.4558,
+      "reject_by_60": 0.8038,
+      "median_blocks_to_reject": 39.0,
+      "mean_blocks_given_reject": 35.02438417516795
+     },
+     "mixture": {
+      "reject_by_12": 0.0006,
+      "reject_by_24": 0.1238,
+      "reject_by_36": 0.4264,
+      "reject_by_60": 0.8434,
+      "median_blocks_to_reject": 39.0,
+      "mean_blocks_given_reject": 37.028219113113586
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.0134,
+      "reject_by_24": 0.272,
+      "reject_by_36": 0.549,
+      "reject_by_60": 0.8336,
+      "median_blocks_to_reject": 34.0,
+      "mean_blocks_given_reject": 32.087332053742806
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.0364,
+      "reject_by_24": 0.3672,
+      "reject_by_36": 0.6264,
+      "reject_by_60": 0.866,
+      "median_blocks_to_reject": 30.0,
+      "mean_blocks_given_reject": 29.55473441108545
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0106,
+      "reject_by_60": 0.353,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 50.77393767705382
+     },
+     "prior_sr2": {
+      "reject_by_12": 0.0214,
+      "reject_by_24": 0.3626,
+      "reject_by_36": 0.6624,
+      "reject_by_60": 0.9146,
+      "median_blocks_to_reject": 29.0,
+      "mean_blocks_given_reject": 29.830964356002625
+     }
+    }
+   },
+   {
+    "dgp": "iid_normal",
+    "sr_ann_daily": 3.0,
+    "sr_ann_realised_blocks": 2.772293331663952,
+    "bets": {
+     "plugin": {
+      "reject_by_12": 0.0358,
+      "reject_by_24": 0.6372,
+      "reject_by_36": 0.9116,
+      "reject_by_60": 0.997,
+      "median_blocks_to_reject": 22.0,
+      "mean_blocks_given_reject": 23.395987963891674
+     },
+     "mixture": {
+      "reject_by_12": 0.0092,
+      "reject_by_24": 0.565,
+      "reject_by_36": 0.9202,
+      "reject_by_60": 0.9978,
+      "median_blocks_to_reject": 23.0,
+      "mean_blocks_given_reject": 24.649027861294847
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.1096,
+      "reject_by_24": 0.74,
+      "reject_by_36": 0.943,
+      "reject_by_60": 0.997,
+      "median_blocks_to_reject": 19.0,
+      "mean_blocks_given_reject": 20.882246740220662
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.1958,
+      "reject_by_24": 0.8206,
+      "reject_by_36": 0.9622,
+      "reject_by_60": 0.9988,
+      "median_blocks_to_reject": 17.0,
+      "mean_blocks_given_reject": 18.769122947537046
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0034,
+      "reject_by_36": 0.266,
+      "reject_by_60": 0.955,
+      "median_blocks_to_reject": 42.0,
+      "mean_blocks_given_reject": 41.74492146596859
+     },
+     "prior_sr3": {
+      "reject_by_12": 0.1804,
+      "reject_by_24": 0.8272,
+      "reject_by_36": 0.9738,
+      "reject_by_60": 0.9996,
+      "median_blocks_to_reject": 17.0,
+      "mean_blocks_given_reject": 18.689475790316127
+     }
+    }
+   },
+   {
+    "dgp": "iid_normal",
+    "sr_ann_daily": 4.0,
+    "sr_ann_realised_blocks": 3.733356774346084,
+    "bets": {
+     "plugin": {
+      "reject_by_12": 0.175,
+      "reject_by_24": 0.937,
+      "reject_by_36": 0.9972,
+      "reject_by_60": 1.0,
+      "median_blocks_to_reject": 16.0,
+      "mean_blocks_given_reject": 16.6666
+     },
+     "mixture": {
+      "reject_by_12": 0.0906,
+      "reject_by_24": 0.9214,
+      "reject_by_36": 0.9984,
+      "reject_by_60": 1.0,
+      "median_blocks_to_reject": 17.0,
+      "mean_blocks_given_reject": 17.6508
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.3614,
+      "reject_by_24": 0.9686,
+      "reject_by_36": 0.9992,
+      "reject_by_60": 1.0,
+      "median_blocks_to_reject": 14.0,
+      "mean_blocks_given_reject": 14.6596
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.5224,
+      "reject_by_24": 0.9866,
+      "reject_by_36": 0.9994,
+      "reject_by_60": 1.0,
+      "median_blocks_to_reject": 12.0,
+      "mean_blocks_given_reject": 13.077
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.104,
+      "reject_by_36": 0.8422,
+      "reject_by_60": 1.0,
+      "median_blocks_to_reject": 31.0,
+      "mean_blocks_given_reject": 31.0454
+     },
+     "prior_sr4": {
+      "reject_by_12": 0.4894,
+      "reject_by_24": 0.9872,
+      "reject_by_36": 0.9996,
+      "reject_by_60": 1.0,
+      "median_blocks_to_reject": 13.0,
+      "mean_blocks_given_reject": 13.3698
+     }
+    }
+   },
+   {
+    "dgp": "garch_t4",
+    "sr_ann_daily": 1.0,
+    "sr_ann_realised_blocks": 1.079722745155228,
+    "bets": {
+     "plugin": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0108,
+      "reject_by_36": 0.0688,
+      "reject_by_60": 0.2098,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 42.35653002859866
+     },
+     "mixture": {
+      "reject_by_12": 0.0002,
+      "reject_by_24": 0.003,
+      "reject_by_36": 0.0336,
+      "reject_by_60": 0.1884,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 46.3067940552017
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.0004,
+      "reject_by_24": 0.0194,
+      "reject_by_36": 0.0946,
+      "reject_by_60": 0.2596,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 41.19183359013868
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.0018,
+      "reject_by_24": 0.038,
+      "reject_by_36": 0.142,
+      "reject_by_60": 0.3104,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 38.68298969072165
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0002,
+      "reject_by_24": 0.0002,
+      "reject_by_36": 0.0002,
+      "reject_by_60": 0.0048,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 51.25
+     },
+     "prior_sr1": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0084,
+      "reject_by_36": 0.0846,
+      "reject_by_60": 0.3144,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 43.89440203562341
+     }
+    }
+   },
+   {
+    "dgp": "garch_t4",
+    "sr_ann_daily": 2.0,
+    "sr_ann_realised_blocks": 2.103836649037332,
+    "bets": {
+     "plugin": {
+      "reject_by_12": 0.0022,
+      "reject_by_24": 0.2666,
+      "reject_by_36": 0.6268,
+      "reject_by_60": 0.9104,
+      "median_blocks_to_reject": 31.0,
+      "mean_blocks_given_reject": 31.989235500878735
+     },
+     "mixture": {
+      "reject_by_12": 0.0006,
+      "reject_by_24": 0.1232,
+      "reject_by_36": 0.5268,
+      "reject_by_60": 0.922,
+      "median_blocks_to_reject": 36.0,
+      "mean_blocks_given_reject": 35.65835140997831
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.0076,
+      "reject_by_24": 0.3346,
+      "reject_by_36": 0.6938,
+      "reject_by_60": 0.9292,
+      "median_blocks_to_reject": 29.0,
+      "mean_blocks_given_reject": 30.059190701678865
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.0196,
+      "reject_by_24": 0.4378,
+      "reject_by_36": 0.7662,
+      "reject_by_60": 0.9404,
+      "median_blocks_to_reject": 26.0,
+      "mean_blocks_given_reject": 27.56103785623139
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0002,
+      "reject_by_24": 0.0002,
+      "reject_by_36": 0.0068,
+      "reject_by_60": 0.402,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 51.830348258706465
+     },
+     "prior_sr2": {
+      "reject_by_12": 0.0124,
+      "reject_by_24": 0.4346,
+      "reject_by_36": 0.7862,
+      "reject_by_60": 0.9632,
+      "median_blocks_to_reject": 26.0,
+      "mean_blocks_given_reject": 27.67691029900332
+     }
+    }
+   },
+   {
+    "dgp": "garch_t4",
+    "sr_ann_daily": 3.0,
+    "sr_ann_realised_blocks": 3.1183964593011395,
+    "bets": {
+     "plugin": {
+      "reject_by_12": 0.035,
+      "reject_by_24": 0.7532,
+      "reject_by_36": 0.9498,
+      "reject_by_60": 0.997,
+      "median_blocks_to_reject": 19.0,
+      "mean_blocks_given_reject": 21.10330992978937
+     },
+     "mixture": {
+      "reject_by_12": 0.0044,
+      "reject_by_24": 0.6452,
+      "reject_by_36": 0.9518,
+      "reject_by_60": 0.9984,
+      "median_blocks_to_reject": 22.0,
+      "mean_blocks_given_reject": 23.44110576923077
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.0796,
+      "reject_by_24": 0.8162,
+      "reject_by_36": 0.9642,
+      "reject_by_60": 0.9976,
+      "median_blocks_to_reject": 18.0,
+      "mean_blocks_given_reject": 19.550120288692863
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.1864,
+      "reject_by_24": 0.8758,
+      "reject_by_36": 0.9738,
+      "reject_by_60": 0.9964,
+      "median_blocks_to_reject": 16.0,
+      "mean_blocks_given_reject": 17.6258530710558
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0024,
+      "reject_by_36": 0.2648,
+      "reject_by_60": 0.975,
+      "median_blocks_to_reject": 41.0,
+      "mean_blocks_given_reject": 41.14584615384615
+     },
+     "prior_sr3": {
+      "reject_by_12": 0.1716,
+      "reject_by_24": 0.8812,
+      "reject_by_36": 0.9808,
+      "reject_by_60": 0.9986,
+      "median_blocks_to_reject": 16.0,
+      "mean_blocks_given_reject": 17.625475665932306
+     }
+    }
+   },
+   {
+    "dgp": "garch_t4",
+    "sr_ann_daily": 4.0,
+    "sr_ann_realised_blocks": 4.099179130007564,
+    "bets": {
+     "plugin": {
+      "reject_by_12": 0.2514,
+      "reject_by_24": 0.948,
+      "reject_by_36": 0.9948,
+      "reject_by_60": 1.0,
+      "median_blocks_to_reject": 14.0,
+      "mean_blocks_given_reject": 15.6412
+     },
+     "mixture": {
+      "reject_by_12": 0.0704,
+      "reject_by_24": 0.944,
+      "reject_by_36": 0.9976,
+      "reject_by_60": 1.0,
+      "median_blocks_to_reject": 16.0,
+      "mean_blocks_given_reject": 17.1408
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.4092,
+      "reject_by_24": 0.9708,
+      "reject_by_36": 0.9968,
+      "reject_by_60": 1.0,
+      "median_blocks_to_reject": 13.0,
+      "mean_blocks_given_reject": 14.1902
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.5838,
+      "reject_by_24": 0.9836,
+      "reject_by_36": 0.9974,
+      "reject_by_60": 0.9996,
+      "median_blocks_to_reject": 12.0,
+      "mean_blocks_given_reject": 12.72689075630252
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0784,
+      "reject_by_36": 0.884,
+      "reject_by_60": 1.0,
+      "median_blocks_to_reject": 30.0,
+      "mean_blocks_given_reject": 30.6684
+     },
+     "prior_sr4": {
+      "reject_by_12": 0.5634,
+      "reject_by_24": 0.986,
+      "reject_by_36": 0.9992,
+      "reject_by_60": 1.0,
+      "median_blocks_to_reject": 12.0,
+      "mean_blocks_given_reject": 12.9326
+     }
+    }
+   },
+   {
+    "dgp": "regime_t4",
+    "sr_ann_daily": 1.0,
+    "sr_ann_realised_blocks": 0.9566554657122257,
+    "bets": {
+     "plugin": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.016,
+      "reject_by_36": 0.0522,
+      "reject_by_60": 0.1428,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 41.214285714285715
+     },
+     "mixture": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0046,
+      "reject_by_36": 0.0306,
+      "reject_by_60": 0.161,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 45.414906832298136
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0256,
+      "reject_by_36": 0.0788,
+      "reject_by_60": 0.1832,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 39.21615720524017
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.0024,
+      "reject_by_24": 0.0452,
+      "reject_by_36": 0.1144,
+      "reject_by_60": 0.2244,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 36.72370766488414
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0002,
+      "reject_by_60": 0.0046,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 54.34782608695652
+     },
+     "prior_sr1": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0088,
+      "reject_by_36": 0.0552,
+      "reject_by_60": 0.2244,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 43.96524064171123
+     }
+    }
+   },
+   {
+    "dgp": "regime_t4",
+    "sr_ann_daily": 2.0,
+    "sr_ann_realised_blocks": 1.8682746699463877,
+    "bets": {
+     "plugin": {
+      "reject_by_12": 0.004,
+      "reject_by_24": 0.194,
+      "reject_by_36": 0.4662,
+      "reject_by_60": 0.814,
+      "median_blocks_to_reject": 38.0,
+      "mean_blocks_given_reject": 34.8955773955774
+     },
+     "mixture": {
+      "reject_by_12": 0.0006,
+      "reject_by_24": 0.1214,
+      "reject_by_36": 0.4246,
+      "reject_by_60": 0.8476,
+      "median_blocks_to_reject": 40.0,
+      "mean_blocks_given_reject": 37.051911278905145
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.0128,
+      "reject_by_24": 0.2714,
+      "reject_by_36": 0.5538,
+      "reject_by_60": 0.848,
+      "median_blocks_to_reject": 34.0,
+      "mean_blocks_given_reject": 32.225
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.0294,
+      "reject_by_24": 0.369,
+      "reject_by_36": 0.6348,
+      "reject_by_60": 0.8746,
+      "median_blocks_to_reject": 30.0,
+      "mean_blocks_given_reject": 29.58380974159616
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0128,
+      "reject_by_60": 0.358,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 51.10837988826815
+     },
+     "prior_sr2": {
+      "reject_by_12": 0.0174,
+      "reject_by_24": 0.3646,
+      "reject_by_36": 0.672,
+      "reject_by_60": 0.9198,
+      "median_blocks_to_reject": 29.0,
+      "mean_blocks_given_reject": 29.83953033268102
+     }
+    }
+   },
+   {
+    "dgp": "regime_t4",
+    "sr_ann_daily": 3.0,
+    "sr_ann_realised_blocks": 2.796748686746329,
+    "bets": {
+     "plugin": {
+      "reject_by_12": 0.0396,
+      "reject_by_24": 0.6408,
+      "reject_by_36": 0.914,
+      "reject_by_60": 0.9964,
+      "median_blocks_to_reject": 21.0,
+      "mean_blocks_given_reject": 23.14291449217182
+     },
+     "mixture": {
+      "reject_by_12": 0.0114,
+      "reject_by_24": 0.5648,
+      "reject_by_36": 0.9186,
+      "reject_by_60": 0.9978,
+      "median_blocks_to_reject": 23.0,
+      "mean_blocks_given_reject": 24.61314892764081
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.0986,
+      "reject_by_24": 0.7426,
+      "reject_by_36": 0.9444,
+      "reject_by_60": 0.9968,
+      "median_blocks_to_reject": 19.0,
+      "mean_blocks_given_reject": 20.832062600321027
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.1878,
+      "reject_by_24": 0.8194,
+      "reject_by_36": 0.9634,
+      "reject_by_60": 0.9966,
+      "median_blocks_to_reject": 17.0,
+      "mean_blocks_given_reject": 18.62492474413004
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.004,
+      "reject_by_36": 0.2642,
+      "reject_by_60": 0.9634,
+      "median_blocks_to_reject": 42.0,
+      "mean_blocks_given_reject": 41.77475607224414
+     },
+     "prior_sr3": {
+      "reject_by_12": 0.1698,
+      "reject_by_24": 0.8264,
+      "reject_by_36": 0.976,
+      "reject_by_60": 0.999,
+      "median_blocks_to_reject": 17.0,
+      "mean_blocks_given_reject": 18.606206206206206
+     }
+    }
+   },
+   {
+    "dgp": "regime_t4",
+    "sr_ann_daily": 4.0,
+    "sr_ann_realised_blocks": 3.7011948815985822,
+    "bets": {
+     "plugin": {
+      "reject_by_12": 0.1898,
+      "reject_by_24": 0.9134,
+      "reject_by_36": 0.9966,
+      "reject_by_60": 1.0,
+      "median_blocks_to_reject": 16.0,
+      "mean_blocks_given_reject": 16.7594
+     },
+     "mixture": {
+      "reject_by_12": 0.0852,
+      "reject_by_24": 0.9138,
+      "reject_by_36": 0.9978,
+      "reject_by_60": 1.0,
+      "median_blocks_to_reject": 17.0,
+      "mean_blocks_given_reject": 17.7684
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.3596,
+      "reject_by_24": 0.9562,
+      "reject_by_36": 0.9978,
+      "reject_by_60": 1.0,
+      "median_blocks_to_reject": 14.0,
+      "mean_blocks_given_reject": 14.8224
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.5192,
+      "reject_by_24": 0.9776,
+      "reject_by_36": 0.9986,
+      "reject_by_60": 1.0,
+      "median_blocks_to_reject": 12.0,
+      "mean_blocks_given_reject": 13.238
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.095,
+      "reject_by_36": 0.8408,
+      "reject_by_60": 0.9996,
+      "median_blocks_to_reject": 30.0,
+      "mean_blocks_given_reject": 31.126850740296117
+     },
+     "prior_sr4": {
+      "reject_by_12": 0.485,
+      "reject_by_24": 0.9794,
+      "reject_by_36": 0.9994,
+      "reject_by_60": 1.0,
+      "median_blocks_to_reject": 13.0,
+      "mean_blocks_given_reject": 13.5344
+     }
+    }
+   }
+  ],
+  "secs": 16.5
+ },
+ "pipeline": {
+  "n_paths": 4000,
+  "blocks": 60,
+  "train_days": 365,
+  "rules": 12,
+  "cost_per_unit_turnover": 0.0005,
+  "rows": [
+   {
+    "dgp": "garch_t4",
+    "phi": 0.0,
+    "h0_holds": true,
+    "block_mean": -0.0014827818571768177,
+    "block_mean_se": 9.569968790515518e-05,
+    "share_blocks_traded": 1.0,
+    "realised_sr_ann_blocks": -0.11031813877459505,
+    "bets": {
+     "plugin": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.00025,
+      "reject_by_36": 0.0005,
+      "reject_by_60": 0.001,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 31.25
+     },
+     "mixture": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.00025,
+      "reject_by_60": 0.00025,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 35.0
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.0005,
+      "reject_by_24": 0.00075,
+      "reject_by_36": 0.001,
+      "reject_by_60": 0.00125,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 23.0
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.0005,
+      "reject_by_24": 0.001,
+      "reject_by_36": 0.0015,
+      "reject_by_60": 0.003,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 33.083333333333336
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0,
+      "reject_by_60": 0.0,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": null
+     }
+    }
+   },
+   {
+    "dgp": "gjr_skewt",
+    "phi": 0.0,
+    "h0_holds": true,
+    "block_mean": -0.0014748744347262818,
+    "block_mean_se": 0.000109705997536828,
+    "share_blocks_traded": 1.0,
+    "realised_sr_ann_blocks": -0.09572047849939559,
+    "bets": {
+     "plugin": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.00025,
+      "reject_by_36": 0.0005,
+      "reject_by_60": 0.0005,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 25.5
+     },
+     "mixture": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0005,
+      "reject_by_60": 0.001,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 39.5
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0005,
+      "reject_by_36": 0.00075,
+      "reject_by_60": 0.0015,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 35.5
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.00025,
+      "reject_by_24": 0.00125,
+      "reject_by_36": 0.002,
+      "reject_by_60": 0.00325,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 32.07692307692308
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0,
+      "reject_by_60": 0.0,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": null
+     }
+    }
+   },
+   {
+    "dgp": "regime_t4",
+    "phi": 0.0,
+    "h0_holds": true,
+    "block_mean": -0.0015651195435524897,
+    "block_mean_se": 0.00010309892877365097,
+    "share_blocks_traded": 1.0,
+    "realised_sr_ann_blocks": -0.10808702056886067,
+    "bets": {
+     "plugin": {
+      "reject_by_12": 0.00025,
+      "reject_by_24": 0.00025,
+      "reject_by_36": 0.00025,
+      "reject_by_60": 0.00025,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 12.0
+     },
+     "mixture": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0,
+      "reject_by_60": 0.00025,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 54.0
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.00025,
+      "reject_by_24": 0.0005,
+      "reject_by_36": 0.00075,
+      "reject_by_60": 0.00075,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 22.666666666666668
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.0005,
+      "reject_by_24": 0.00075,
+      "reject_by_36": 0.0015,
+      "reject_by_60": 0.002,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 26.5
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0,
+      "reject_by_60": 0.0,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": null
+     }
+    }
+   },
+   {
+    "dgp": "ar_garch",
+    "phi": 0.05,
+    "h0_holds": false,
+    "block_mean": 6.704414161442341e-06,
+    "block_mean_se": 0.0001074213273039927,
+    "share_blocks_traded": 1.0,
+    "realised_sr_ann_blocks": 0.000444375907025573,
+    "bets": {
+     "plugin": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0,
+      "reject_by_60": 0.0005,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 46.5
+     },
+     "mixture": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.00025,
+      "reject_by_60": 0.0015,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 46.666666666666664
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0,
+      "reject_by_60": 0.0005,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 46.5
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.00025,
+      "reject_by_24": 0.00125,
+      "reject_by_36": 0.00275,
+      "reject_by_60": 0.00425,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 33.11764705882353
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0,
+      "reject_by_60": 0.0,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": null
+     }
+    }
+   },
+   {
+    "dgp": "ar_garch",
+    "phi": 0.1,
+    "h0_holds": false,
+    "block_mean": 0.004809196441743252,
+    "block_mean_se": 0.0001023650154111213,
+    "share_blocks_traded": 1.0,
+    "realised_sr_ann_blocks": 0.33450386870615323,
+    "bets": {
+     "plugin": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.001,
+      "reject_by_36": 0.0055,
+      "reject_by_60": 0.01425,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 41.07017543859649
+     },
+     "mixture": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0005,
+      "reject_by_36": 0.00325,
+      "reject_by_60": 0.01175,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 43.87234042553192
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.003,
+      "reject_by_36": 0.01025,
+      "reject_by_60": 0.02325,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 38.58064516129032
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.0005,
+      "reject_by_24": 0.0055,
+      "reject_by_36": 0.0165,
+      "reject_by_60": 0.03375,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 36.577777777777776
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.00025,
+      "reject_by_60": 0.00025,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 36.0
+     }
+    }
+   },
+   {
+    "dgp": "ar_garch",
+    "phi": 0.15,
+    "h0_holds": false,
+    "block_mean": 0.012990419005334427,
+    "block_mean_se": 0.00010877258417286231,
+    "share_blocks_traded": 1.0,
+    "realised_sr_ann_blocks": 0.8503229427312526,
+    "bets": {
+     "plugin": {
+      "reject_by_12": 0.0005,
+      "reject_by_24": 0.01675,
+      "reject_by_36": 0.055,
+      "reject_by_60": 0.147,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 40.98299319727891
+     },
+     "mixture": {
+      "reject_by_12": 0.00025,
+      "reject_by_24": 0.01025,
+      "reject_by_36": 0.0405,
+      "reject_by_60": 0.1505,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 43.990033222591364
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.0015,
+      "reject_by_24": 0.0285,
+      "reject_by_36": 0.07825,
+      "reject_by_60": 0.18675,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 39.44310575635877
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.0045,
+      "reject_by_24": 0.04925,
+      "reject_by_36": 0.11475,
+      "reject_by_60": 0.22625,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 36.6353591160221
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.0,
+      "reject_by_36": 0.0005,
+      "reject_by_60": 0.011,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 52.56818181818182
+     }
+    }
+   },
+   {
+    "dgp": "ar_garch",
+    "phi": 0.2,
+    "h0_holds": false,
+    "block_mean": 0.023246462550212604,
+    "block_mean_se": 0.00011901501295277955,
+    "share_blocks_traded": 1.0,
+    "realised_sr_ann_blocks": 1.390705943775933,
+    "bets": {
+     "plugin": {
+      "reject_by_12": 0.00225,
+      "reject_by_24": 0.11175,
+      "reject_by_36": 0.29425,
+      "reject_by_60": 0.56575,
+      "median_blocks_to_reject": 54.0,
+      "mean_blocks_given_reject": 36.66990720282811
+     },
+     "mixture": {
+      "reject_by_12": 0.003,
+      "reject_by_24": 0.06675,
+      "reject_by_36": 0.24275,
+      "reject_by_60": 0.5885,
+      "median_blocks_to_reject": 54.0,
+      "mean_blocks_given_reject": 39.76805437553101
+     },
+     "wsr_grow": {
+      "reject_by_12": 0.00675,
+      "reject_by_24": 0.16125,
+      "reject_by_36": 0.356,
+      "reject_by_60": 0.6175,
+      "median_blocks_to_reject": 48.0,
+      "mean_blocks_given_reject": 34.703643724696356
+     },
+     "wsr_prpl_eb": {
+      "reject_by_12": 0.0235,
+      "reject_by_24": 0.2215,
+      "reject_by_36": 0.4255,
+      "reject_by_60": 0.65325,
+      "median_blocks_to_reject": 43.0,
+      "mean_blocks_given_reject": 32.07692307692308
+     },
+     "arnold_fixed_quarter": {
+      "reject_by_12": 0.0,
+      "reject_by_24": 0.001,
+      "reject_by_36": 0.0105,
+      "reject_by_60": 0.1435,
+      "median_blocks_to_reject": null,
+      "mean_blocks_given_reject": 50.26829268292683
+     }
+    }
+   }
+  ],
+  "secs": 121.4
+ }
+}

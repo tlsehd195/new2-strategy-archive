@@ -66,6 +66,18 @@ batches, locked-TEST campaigns): batch/campaign k of a window is tested at
 alpha_k = alpha_total * (6/pi^2) / k^2, so sum_k alpha_k <= alpha_total
 (union bound — valid under arbitrary dependence between batches, including
 batches whose members were chosen after looking at earlier DEV results).
+This is exactly "Alpha-Spending" of Tian & Ramdas (2021, arXiv 1910.04900,
+eq. (2): test H_i at alpha_i := alpha*gamma_i with sum gamma_i = 1; "works
+even when the p-values are arbitrarily dependent", Sec. 3) with the gamma
+sequence gamma_i = 6/(pi^2 i^2) they use in their own experiments (Fig. 3-5).
+Their Online Fallback (eq. (4)/(5), Prop. 2: valid under arbitrary
+dependence, at least as powerful) is available as ``fallback_alpha`` but is
+NOT wired into any gate (adopting it needs a new preregistration).
+
+Paper checks added 2026-10-22 (ADR 0027): ``ppw_block_length`` (Politis &
+White 2004 eq. (9) with the corrected D_SB of Patton, Politis & White 2009),
+``mc_pvalue`` / ``mmc_pvalue`` (Dufour 2006 eq. (2.16)/(2.35), Prop. 4.1).
+None of them changes a default: every frozen procedure keeps ``default_q``.
 """
 
 from __future__ import annotations
@@ -102,8 +114,78 @@ def stationary_bootstrap_indices(n: int, q: float, rng: random.Random) -> list[i
 
 def default_q(n: int) -> float:
     """Mean block length ~ n^(1/3) (a common rate choice; White 2000 leaves
-    q to the user).  Recorded with every result."""
+    q to the user).  Recorded with every result.  The n^(1/3) RATE is the
+    optimal one (Politis & White 2004 eq. (6): b_opt = (2G^2/D)^(1/3) n^(1/3));
+    the constant 1 is ours — ``ppw_block_length`` estimates it from data."""
     return min(1.0, 1.0 / max(1.0, n ** (1.0 / 3.0)))
+
+
+def _flat_top(t: float) -> float:
+    """Flat-top lag window (Politis & White 2004, Sec. 3.2)."""
+    t = abs(t)
+    if t <= 0.5:
+        return 1.0
+    if t <= 1.0:
+        return 2.0 * (1.0 - t)
+    return 0.0
+
+
+def ppw_block_length(x: Sequence[float]) -> float:
+    """Expected block length of the STATIONARY bootstrap estimated from the
+    data: Politis & White (2004) eq. (9), b = (2 G^2 / D_SB)^(1/3) n^(1/3),
+    G = sum_{|k|<=M} lam(k/M) |k| R_k, with the corrected
+    D_SB = 2 g(0)^2, g(0) = sum_{|k|<=M} lam(k/M) R_k (Patton, Politis & White
+    2009, eq. (8)).  M = 2 m_hat, m_hat = the smallest m such that
+    |rho_{m+k}| < c sqrt(log10(n)/n) for k = 1..K_N, c = 2,
+    K_N = max(5, sqrt(log10 n)) (PW 2004 footnote c, rounded up to an integer).
+
+    Not in the papers but in the authors' code (ppw.R, Patton/Racine 2008):
+    lags searched up to ceil(sqrt(n)) + K_N; if no run of K_N insignificant
+    lags exists, m_hat = largest significant lag (1 if none); M capped at
+    that search range; b capped at ceil(min(3 sqrt(n), n/3)) and floored at 1.
+    (ppw.R takes m_hat one lag later than footnote c; the footnote is followed.)
+    """
+    n = len(x)
+    if n < 10:
+        raise ValueError("too few observations for a block-length estimate")
+    mu = _mean(x)
+    u = [v - mu for v in x]
+    r0 = sum(v * v for v in u) / n
+    if r0 <= 0:
+        return 1.0
+    kn = max(5, int(math.ceil(math.sqrt(math.log10(n)))))
+    mmax = int(math.ceil(math.sqrt(n))) + kn
+    mmax = min(mmax, n - 1)
+
+    def acov(k: int) -> float:
+        return sum(u[t] * u[t + k] for t in range(n - k)) / n
+
+    R = [r0] + [acov(k) for k in range(1, mmax + 1)]
+    crit = 2.0 * math.sqrt(math.log10(n) / n)
+    insig = [abs(R[k] / r0) < crit for k in range(1, mmax + 1)]     # insig[k-1] ~ lag k
+    m_hat = None
+    for m in range(1, mmax - kn + 1):       # smallest POSITIVE m (footnote c)
+        if all(insig[m:m + kn]):            # lags m+1..m+kn insignificant
+            m_hat = m
+            break
+    if m_hat is None:
+        sig = [k for k in range(1, mmax + 1) if not insig[k - 1]]
+        m_hat = max(sig) if sig else 1
+    M = min(2 * m_hat, mmax)
+    G = sum(_flat_top(k / M) * abs(k) * R[abs(k)] for k in range(-M, M + 1))
+    g0 = sum(_flat_top(k / M) * R[abs(k)] for k in range(-M, M + 1))
+    if g0 <= 0:
+        return 1.0
+    b = (2.0 * G * G / (2.0 * g0 * g0)) ** (1.0 / 3.0) * n ** (1.0 / 3.0)
+    return max(1.0, min(b, math.ceil(min(3.0 * math.sqrt(n), n / 3.0))))
+
+
+def ppw_q(series: Mapping[str, Sequence[float]]) -> float:
+    """One stationary-bootstrap q = 1/b for a JOINT resample of several
+    series.  The papers give b per series; taking the LONGEST of them (so no
+    series' dependence is cut shorter than its own estimate) is our choice."""
+    keys, _ = _check_matrix(series)
+    return 1.0 / max(ppw_block_length(series[k]) for k in keys)
 
 
 def _mean(xs: Sequence[float]) -> float:
@@ -194,10 +276,20 @@ def spa_test(series: Mapping[str, Sequence[float]], *, B: int = 1000,
 
 
 def stepm(series: Mapping[str, Sequence[float]], *, alpha: float, B: int = 1000,
-          q: Optional[float] = None, seed: int = 0) -> dict:
-    """Romano & Wolf (2005) studentized StepM (Algorithm 4.1) for the
-    one-sided hypotheses H0_k: E d_k <= 0.  Returns the rejected keys —
-    strategies whose mean is shown > 0 with asymptotic FWER <= alpha."""
+          q: Optional[float] = None, seed: int = 0, studentize: str = "fixed") -> dict:
+    """Romano & Wolf (2005) studentized StepM (Algorithm 4.1; RSW2008 Alg. 4.3
+    with k=1) for the one-sided hypotheses H0_k: E d_k <= 0.  Difference from
+    the papers' bootstrap step (RW2005 eq. (11), RSW2008 Alg. A.3): sigma* is
+    NOT recomputed on each resample, see the returned note.  Returns the rejected keys —
+    strategies whose mean is shown > 0 with asymptotic FWER <= alpha.
+
+    ``studentize="bootstrap_t"`` is the papers' form: sigma*_k is recomputed
+    on every resample by "applying the same algorithm to the bootstrap data
+    matrix" (RW2005 Sec. 4.1) — here the same Hansen variance.  Synthetic
+    FWER (ADR 0027) is closer to alpha with it; it costs B x m variance
+    evaluations.  Not the default: frozen procedures keep "fixed"."""
+    if studentize not in ("fixed", "bootstrap_t"):
+        raise ValueError("studentize must be 'fixed' or 'bootstrap_t'")
     keys, n = _check_matrix(series)
     q = q or default_q(n)
     if not 0.0 < alpha < 1.0:
@@ -215,7 +307,15 @@ def stepm(series: Mapping[str, Sequence[float]], *, alpha: float, B: int = 1000,
     draws: list[dict] = []
     for _ in range(B):
         ix = stationary_bootstrap_indices(n, q, rng)
-        draws.append({k: (_mean([series[k][i] for i in ix]) - dbar[k]) / sig[k] for k in keys})
+        d = {}
+        for k in keys:
+            xs = [series[k][i] for i in ix]
+            if studentize == "fixed":
+                d[k] = (_mean(xs) - dbar[k]) / sig[k]
+            else:
+                vs = bootstrap_variance(xs, q)
+                d[k] = (_mean(xs) - dbar[k]) / math.sqrt(vs / n) if vs > 0 else 0.0
+        draws.append(d)
     rejected: list[str] = []
     steps = []
     remaining = sorted(keys, key=lambda k: -z[k])
@@ -228,12 +328,20 @@ def stepm(series: Mapping[str, Sequence[float]], *, alpha: float, B: int = 1000,
             break
         rejected += newly
         remaining = [k for k in remaining if k not in newly]
+    if studentize == "bootstrap_t":
+        return {"method": "romano_wolf2005_stepm_bootstrap_t", "alpha": alpha,
+                "rejected": sorted(rejected), "z": z, "steps": steps, "B": B, "q": q,
+                "n": n, "m": len(keys), "seed": seed,
+                "note": "sigma* recomputed on each resample with the same Hansen-2005 "
+                        "variance (RW2005 eq. (11), Sec. 4.1)"}
     return {"method": "romano_wolf2005_stepm_studentized", "alpha": alpha,
             "rejected": sorted(rejected), "z": z, "steps": steps, "B": B, "q": q,
             "n": n, "m": len(keys), "seed": seed,
             "note": "sigma from Hansen-2005 bootstrap-population variance, held fixed "
-                    "across resamples (Romano-Wolf allow sigma*; fixed sigma is the "
-                    "simpler consistent choice under their Assumption 4.1)"}
+                    "across resamples: RW2005 Assumption 4.1 / RSW2008 Assumption 4.2 only "
+                    "need sqrt(T)sigma and sqrt(T)sigma* to share one limit; Hsu-Hsu-Kuan "
+                    "2010 fn. 6 do the same (no per-resample sigma* formula exists for the "
+                    "stationary bootstrap in RW2005/RSW2008)"}
 
 
 def step_spa(series: Mapping[str, Sequence[float]], *, alpha: float, B: int = 1000,
@@ -364,10 +472,65 @@ def by_fdr(pvalues: Sequence[float], m_family: int, q: float = 0.05) -> list[boo
 
 
 def spending_alpha(k: int, alpha_total: float = 0.05) -> float:
-    """alpha for the k-th (1-based) use of one data window; sum <= alpha_total."""
+    """alpha for the k-th (1-based) use of one data window; sum <= alpha_total.
+    Tian & Ramdas (2021) Alpha-Spending with gamma_k = 6/(pi^2 k^2)."""
     if k < 1:
         raise ValueError("k is 1-based")
     return alpha_total * 6.0 / (math.pi ** 2) / (k * k)
+
+
+def fallback_alpha(rejected: Sequence[bool], alpha_total: float = 0.05) -> float:
+    """Online Fallback-1 (Tian & Ramdas 2021 eq. (5)): alpha_1 = alpha*gamma_1,
+    alpha_i = alpha*gamma_i + R_{i-1} alpha_{i-1}, gamma_i = 6/(pi^2 i^2).
+    ``rejected`` holds R_1..R_{i-1} of the earlier tests; returns alpha_i.
+    FWER <= alpha under arbitrary dependence (their Prop. 2).  NOT used by any
+    gate — it would raise a later test's level after a rejection, which needs
+    a new preregistration."""
+    a = spending_alpha(1, alpha_total)
+    for i, r in enumerate(rejected, start=2):
+        a = spending_alpha(i, alpha_total) + (a if r else 0.0)
+    return a
+
+
+# ---------------------------------------------------------------------------
+# Monte Carlo tests (Dufour 2006)
+# ---------------------------------------------------------------------------
+
+def mc_pvalue(s0: float, sims: Sequence[float], rng: Optional[random.Random] = None) -> float:
+    """Dufour (2006) Monte Carlo p-value p_N = (N G_N(s0) + 1)/(N + 1), eq.
+    (2.16), with the randomised tie-break of Sec. 2.2 / eq. (2.35) when a
+    ``rng`` is given (each statistic gets an independent U(0,1); ties in S are
+    ordered by U).  Exact, P[p <= a] = I[a(N+1)]/(N+1), when (S_0..S_N) are
+    EXCHANGEABLE under H0 (Prop. 2.2/2.4) — a bootstrap from the observed
+    data does not give that."""
+    n = len(sims)
+    if n < 1:
+        raise ValueError("no simulated statistics")
+    if rng is None:
+        ge = sum(1 for s in sims if s >= s0)
+    else:
+        u0 = rng.random()
+        ge = sum(1 for s in sims if s > s0 or (s == s0 and rng.random() >= u0))
+    return (ge + 1) / (n + 1)
+
+
+def mmc_pvalue(s0: float, sims_by_nuisance: Mapping[object, Sequence[float]],
+               rng_seed: Optional[int] = None) -> dict:
+    """Maximized Monte Carlo p-value (Dufour 2006 Prop. 4.1, eq. (4.21)):
+    sup over the nuisance set of p_N(s0 | y).  Level <= a in finite samples
+    when the sup is over the WHOLE null set and S_i(y) = S[g(y, u_i)] uses the
+    same draws u_i for every y.  Here the sup is over the values supplied (a
+    grid): the paper does not cover an approximate maximisation, so a grid
+    that misses the worst y can over-reject."""
+    if not sims_by_nuisance:
+        raise ValueError("empty nuisance set")
+    best_y, best_p = None, -1.0
+    for y, sims in sims_by_nuisance.items():
+        rng = random.Random(rng_seed) if rng_seed is not None else None
+        p = mc_pvalue(s0, sims, rng)
+        if p > best_p:
+            best_y, best_p = y, p
+    return {"p": best_p, "argmax": best_y, "grid_size": len(sims_by_nuisance)}
 
 
 # ---------------------------------------------------------------------------
