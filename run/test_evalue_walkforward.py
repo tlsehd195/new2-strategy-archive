@@ -81,6 +81,29 @@ class EValueWalkForwardTest(unittest.TestCase):
         self.assertTrue(np.all(X >= -B - 1e-12))
         self.assertTrue(set(np.unique(ch)) <= set(range(-1, 2 * len(ev.LOOKBACKS))))
 
+    def test_wsr_moments_are_predictable(self):
+        Z = np.random.default_rng(10).standard_normal((3, 8)) * 0.2
+        mu, s2 = ev._wsr_moments(Z, 0.2)
+        Z2 = Z.copy()
+        Z2[:, 5:] += 5.0                                     # change the future only
+        mu2, s22 = ev._wsr_moments(Z2, 0.2)
+        np.testing.assert_allclose(mu[:, :6], mu2[:, :6])
+        np.testing.assert_allclose(s2[:, :6], s22[:, :6])
+        self.assertTrue(np.all(mu[:, 0] == 0) and np.allclose(s2[:, 0], 0.04))
+        # WS-R eq. (15) structure: mu_1 = (0 + Z_1) / 2
+        np.testing.assert_allclose(mu[:, 1], Z[:, 0] / 2)
+
+    def test_wsr_bets_stay_in_range(self):
+        Z = np.random.default_rng(11).uniform(-1, 3, (50, 30))
+        for f in (ev.log_e_wsr, ev.log_e_prpl_eb):
+            self.assertTrue(np.all(np.isfinite(f(Z, 0.5))))
+
+    def test_mmc_paths_share_the_random_stream(self):
+        a = ev.garch_t_paths(5, 3, 50, 0.05, 0.80, 4.0)
+        b = ev.garch_t_paths(5, 3, 50, 0.15, 0.80, 4.0)
+        np.testing.assert_allclose(np.sign(a), np.sign(b))   # same u_i, other y
+        self.assertFalse(np.allclose(a, b))
+
     def test_alpha_split_sums_to_family_alpha_and_either_dominates(self):
         out = ev.part_split(np.random.default_rng(9), 300, nb=24)
         for r in out["rows"]:
