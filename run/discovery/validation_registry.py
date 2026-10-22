@@ -1,4 +1,4 @@
-"""Independent-validation run registry (ADR 0027).
+"""Independent-validation run registry (ADR 0028).
 
 One append-only, hash-chained ledger (``validation_registry.jsonl``) that
 links a frozen candidate set to an independent validation run and to its

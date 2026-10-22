@@ -1,4 +1,4 @@
-"""Reproducibility bundle of a DEV run or an independent validation run (ADR 0027).
+"""Reproducibility bundle of a DEV run or an independent validation run (ADR 0028).
 
 A bundle states everything needed to regenerate and check a result:
 repository commit (and whether the work tree was dirty), the hash of every
@@ -184,7 +184,7 @@ def verify_rerun(bundle: Mapping, result: Mapping) -> list[str]:
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:  # pragma: no cover - CLI
-    ap = argparse.ArgumentParser(description="reproducibility bundle (ADR 0027)")
+    ap = argparse.ArgumentParser(description="reproducibility bundle (ADR 0028)")
     sub = ap.add_subparsers(dest="cmd", required=True)
     d = sub.add_parser("dev")
     d.add_argument("--state-dir", required=True)

@@ -1,4 +1,4 @@
-"""Directive 2026-10-22 (ADR 0027): DEV -> independent validation flow,
+"""Directive 2026-10-22 (ADR 0028): DEV -> independent validation flow,
 preregistration lifecycle gate, near-duplicate cases, cost sensitivity,
 ledger / report consistency, restart, reproducibility, criteria pinning and
 repository independence.  Synthetic data and temp dirs only — no real window

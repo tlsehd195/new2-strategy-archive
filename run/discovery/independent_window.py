@@ -14,7 +14,7 @@ Three steps, each a CLI subcommand:
                     (ids, canonical specs, context) before anything is opened
 ``power``           power precheck from the preregistered numbers (diagnostic)
 ``open``            open ONE tranche, once: needs an ACTIVE preregistration
-                    (``prereg_gate``, ADR 0027); the run is registered, the
+                    (``prereg_gate``, ADR 0028); the run is registered, the
                     history row is written, the run is started, every member
                     is evaluated, StepM decides, the result file is written
                     (never over an existing one) and the run is completed
@@ -47,7 +47,7 @@ from stats_mc import by_fdr, daily_series, default_q, spending_alpha, stepm  # n
 
 DEFAULT_PREREG = HERE / "config" / "independent_window_v1.json"
 DEFAULT_HISTORY = HERE / "validation_window_history.jsonl"
-#: lifecycle ledger of independent runs (ADR 0027): REGISTERED -> STARTED -> COMPLETED
+#: lifecycle ledger of independent runs (ADR 0028): REGISTERED -> STARTED -> COMPLETED
 DEFAULT_REGISTRY = HERE / "validation_registry.jsonl"
 MEMBERS_SCHEMA = "independent_window_members_v1"
 RESULT_SCHEMA = "independent_window_result_v1"
@@ -203,7 +203,7 @@ def members_record(pipe, pre: Mapping, prereg_sha: str, *, state_dir: str = "") 
     body = {"schema": MEMBERS_SCHEMA, "window_id": pre["window_id"], "prereg_sha256": prereg_sha,
             "context_id": pipe.context_id(), "state_dir": state_dir, "rule": pre["members"]["rule"],
             "members": members, "excluded_before_test": excluded,
-            # the evaluation code the members are frozen against (ADR 0027)
+            # the evaluation code the members are frozen against (ADR 0028)
             "code": {"code_hash": research_code_identity()["code_hash"]}}
     body["members_sha256"] = hashlib.sha256(canonical_json(body).encode()).hexdigest()
     return body
@@ -277,7 +277,7 @@ def open_tranche(pre: Mapping, prereg_sha: str, tranche: str, data_dir: Path, me
     _tranche(pre, tranche)
     if not gate or gate.get("lifecycle") != "ACTIVE" or gate.get("prereg_sha256") != prereg_sha:
         raise WindowRefused("preregistration is not ACTIVE for this prereg sha256 (prereg_gate, "
-                            "ADR 0027): a draft or unapproved prereg cannot start a validation")
+                            "ADR 0028): a draft or unapproved prereg cannot start a validation")
     history = list(iter_jsonl(history_path)) if Path(history_path).exists() else None
     if history is None:
         raise WindowRefused(f"validation window history {history_path} missing")
@@ -536,7 +536,7 @@ def main(argv: Sequence[str]) -> int:
     o.add_argument("--members", required=True)
     o.add_argument("--out-dir", required=True)
     o.add_argument("--confirm-single-use", action="store_true")
-    o.add_argument("--activation", help="prereg_activation_v1 record (prereg_gate, ADR 0027)")
+    o.add_argument("--activation", help="prereg_activation_v1 record (prereg_gate, ADR 0028)")
     o.add_argument("--registry", default=str(DEFAULT_REGISTRY))
     o.add_argument("--resume", action="store_true",
                    help="finish a STARTED run whose result was never written")

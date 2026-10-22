@@ -1,4 +1,4 @@
-"""Preregistration lifecycle gate (ADR 0027).
+"""Preregistration lifecycle gate (ADR 0028).
 
 A preregistration is DRAFT until a human activates it.  The lifecycle is
 DERIVED from evidence, never read from a field the file sets for itself:
@@ -152,7 +152,7 @@ def check_members_file(members: Mapping, prereg_sha: str) -> list[str]:
         out.append("no members")
     code = (members.get("code") or {}).get("code_hash")
     if not code:
-        out.append("members file records no evaluation-code hash (frozen before ADR 0027): refreeze")
+        out.append("members file records no evaluation-code hash (frozen before ADR 0028): refreeze")
     elif code != research_code_identity()["code_hash"]:
         out.append("evaluation code changed after the freeze (FROZEN_CODE_CHANGED): refreeze or "
                    "restore the frozen code")
@@ -257,7 +257,7 @@ def require_active(prereg_path: Path, *, activation_path: Optional[Path], member
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:  # pragma: no cover - CLI
-    ap = argparse.ArgumentParser(description="preregistration lifecycle gate (ADR 0027)")
+    ap = argparse.ArgumentParser(description="preregistration lifecycle gate (ADR 0028)")
     ap.add_argument("--prereg", required=True)
     ap.add_argument("--activation")
     ap.add_argument("--members")

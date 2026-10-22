@@ -1,6 +1,6 @@
 # Legacy scripts under `run/` (retired execution paths)
 
-Recorded 2026-10-22 (ADR 0027). Every script below refers to the retired v1 machine
+Recorded 2026-10-22 (ADR 0028). Every script below refers to the retired v1 machine
 (`/home/z/my-project/NEW2_run`) and/or imports the main trading repository's package
 (`cointrader`, via `COINTRADER_SRC`). They are **not** part of the research engine
 (`run/discovery/`), are not imported by it, are not run by CI and cannot run in this

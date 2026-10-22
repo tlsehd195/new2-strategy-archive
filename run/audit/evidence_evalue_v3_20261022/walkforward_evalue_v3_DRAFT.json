@@ -82,7 +82,7 @@
  "open_decisions": {
   "V1": "DECIDED 2026-10-22: share forward data, Bonferroni split 7:3 (v2 0.0213, v3 0.0091), ratio confirmed by 동동. First block 2026-12-01 still a suggestion.",
   "V2": "DECIDED 2026-10-22: equal-weight bundle of the top 5 (see pipeline.bundle)",
-  "V3": "recommended: plug-in without prior (current e_process.bet_rule); not yet confirmed",
+  "V3": "recommended (updated 2026-10-22, ADR 0027): Waudby-Smith & Ramdas PrPl-EB, eq. (15) of 2010.09686 v7 in Z units: lam_b = min(sqrt(2 log(2/alpha) / (s2_{b-1} * b * log(1+b))), 0.75), s2_b = (s0^2 + sum_{i<=b} (Z_i - mu_i)^2) / (b+1), mu_b = sum_{i<=b} Z_i / (b+1). At alpha 0.0091 (synthetic GARCH t4) 36-block power SR2 37.6% -> 52.0%, SR3 87.5% -> 94.0%, null <= 0.03%. e_process.bet_rule still holds the old plug-in until the user confirms; not yet confirmed",
   "V4": "DECIDED 2026-10-22: liquid 9 symbols of ADR 0024 (see universe)",
   "first_block": "DECIDED 2026-10-22: 2026-12-01"
  },
