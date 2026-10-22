@@ -95,7 +95,7 @@ class EValueWalkForwardTest(unittest.TestCase):
 
     def test_wsr_bets_stay_in_range(self):
         Z = np.random.default_rng(11).uniform(-1, 3, (50, 30))
-        for f in (ev.log_e_wsr, ev.log_e_prpl_eb):
+        for f in (ev.log_e_wsr, ev.log_e_hedged_prpl_bet):
             self.assertTrue(np.all(np.isfinite(f(Z, 0.5))))
 
     def test_mmc_paths_share_the_random_stream(self):

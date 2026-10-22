@@ -208,6 +208,98 @@ def bootstrap_variance(d: Sequence[float], q: float) -> float:
     return max(total, 0.0)
 
 
+# ---------------------------------------------------------------------------
+# Goetze & Kuensch (1996) studentized blockwise bootstrap (sample mean)
+# ---------------------------------------------------------------------------
+
+def _parzen(x: float) -> float:
+    x = abs(x)
+    if x <= 0.5:
+        return 1.0 - 6.0 * x * x + 6.0 * x ** 3
+    if x <= 1.0:
+        return 2.0 * (1.0 - x) ** 3
+    return 0.0
+
+
+def gk_block_length(n: int, lag_window: str = "parzen") -> int:
+    """Block length l = lag-window width.  GK (1996, end of Sec. 2) give only
+    the ORDER: l = O(n^(1/4)) for rectangular weights, O(n^(1/3)) for weights
+    with v(x) - 1 ~ -c x^2; the constant 1 is ours."""
+    if lag_window not in ("parzen", "rectangular"):
+        raise ValueError("lag_window must be 'parzen' or 'rectangular'")
+    return max(2, int(round(n ** (0.25 if lag_window == "rectangular" else 1.0 / 3.0))))
+
+
+def gk_lag_window_variance(d: Sequence[float], l: int, lag_window: str = "parzen") -> float:
+    """GK (1996) eq. (3) for H = identity: sigma_hat^2 = sum_{k=0}^{l-1} w_k
+    gamma_hat_k, gamma_hat_k = n^-1 sum_{j=1}^{n-l} (Y_j - Ybar)(Y_{j+k} - Ybar)
+    (the same n - l terms for every lag, as printed), w_0 = 1, w_k = 2 v(k/l).
+    ``rectangular``: v = 1, the lowest bias (n^(1/4) rate) but NOT guaranteed
+    >= 0.  ``parzen``: v(x) - 1 ~ -6 x^2 and a valid (non-negative) kernel,
+    the n^(1/3) case — the paper names only the condition, Parzen is our pick.
+    The triangular v(x) = 1 - x is excluded by GK (second-order correctness
+    fails)."""
+    n = len(d)
+    if not 1 <= l < n:
+        raise ValueError("need 1 <= l < n")
+    mu = _mean(d)
+    u = [x - mu for x in d]
+    total = 0.0
+    for k in range(l):
+        g = sum(u[j] * u[j + k] for j in range(n - l)) / n
+        if k == 0:
+            total += g
+        else:
+            total += 2.0 * (1.0 if lag_window == "rectangular" else _parzen(k / l)) * g
+    return total
+
+
+def gk_mean_of_bootstrap_mean(x: Sequence[float], l: int, circular: bool = False) -> float:
+    """mu*_n = E*[Ybar*] for the truncated moving-block bootstrap of GK (1996)
+    (start uniform on {0..n-l}, ceil(n/l) blocks cut to n values): position t
+    of a resample has expectation m_{t mod l}, m_o = mean of x[s+o], s = 0..n-l.
+    For n a multiple of l this is GK's weighted mean with weights
+    min(j/l, 1, (n+1-j)/l).  Circular blocks (start uniform on {0..n-1},
+    wrapped): mu*_n = Ybar_n exactly."""
+    n = len(x)
+    if circular:
+        return sum(x) / n
+    m_off = [sum(x[o:o + n - l + 1]) / (n - l + 1) for o in range(l)]
+    return sum(m_off[t % l] for t in range(n)) / n
+
+
+def gk_blockwise_t(x: Sequence[float], l: int, starts: Sequence[int],
+                   mu_star: Optional[float] = None, circular: bool = False) -> float:
+    """One draw of GK's studentized bootstrap statistic n^(1/2) (Ybar* - mu*_n)
+    / sigma_hat* for the sample mean (H = identity) from the block starts
+    ``starts`` (moving blocks of length l, ceil(n/l) of them, uniform on
+    {0..n-l}, not wrapped; the resample is cut to n values).
+
+    * mu*_n = E*[Ybar*], NOT Ybar_n: GK show centring at Ybar_n leaves a bias
+      of O(l^(1/2) n^(-1/2)), larger than the skewness term, and second-order
+      correctness is lost.
+    * sigma_hat*^2 = eq. (5): n^-1 times the sum over pairs (i, j) inside the
+      SAME bootstrap block of (Y*_i - Ybar*)(Y*_j - Ybar*) = the mean of the
+      squared block sums.  Pairs across blocks are independent and left out; for
+      linear H this gives E* sigma_hat*^2 = sigma*^2 (1 - 1/b) — a bias of the
+      same order as that of sigma_hat_n^2 in (3), which is what GK require.
+    Returns 0.0 when sigma_hat*^2 = 0."""
+    n = len(x)
+    ys: list[float] = []
+    for s in starts:
+        ys.extend(x[(s + o) % n] for o in range(l)) if circular else ys.extend(x[s:s + l])
+    ys = ys[:n]
+    ybar = sum(ys) / n
+    mu_star = gk_mean_of_bootstrap_mean(x, l, circular) if mu_star is None else mu_star
+    ss = 0.0
+    for b0 in range(0, n, l):
+        blk = ys[b0:b0 + l]
+        dev = sum(blk) - len(blk) * ybar
+        ss += dev * dev
+    var = ss / n
+    return math.sqrt(n) * (ybar - mu_star) / math.sqrt(var) if var > 0 else 0.0
+
+
 def _check_matrix(series: Mapping[str, Sequence[float]]) -> tuple[list[str], int]:
     keys = sorted(series)
     if not keys:
@@ -276,7 +368,9 @@ def spa_test(series: Mapping[str, Sequence[float]], *, B: int = 1000,
 
 
 def stepm(series: Mapping[str, Sequence[float]], *, alpha: float, B: int = 1000,
-          q: Optional[float] = None, seed: int = 0, studentize: str = "fixed") -> dict:
+          q: Optional[float] = None, seed: int = 0, studentize: str = "fixed",
+          block_len: Optional[int] = None, lag_window: str = "parzen",
+          blocks: str = "moving") -> dict:
     """Romano & Wolf (2005) studentized StepM (Algorithm 4.1; RSW2008 Alg. 4.3
     with k=1) for the one-sided hypotheses H0_k: E d_k <= 0.  Difference from
     the papers' bootstrap step (RW2005 eq. (11), RSW2008 Alg. A.3): sigma* is
@@ -287,9 +381,25 @@ def stepm(series: Mapping[str, Sequence[float]], *, alpha: float, B: int = 1000,
     on every resample by "applying the same algorithm to the bootstrap data
     matrix" (RW2005 Sec. 4.1) — here the same Hansen variance.  Synthetic
     FWER (ADR 0027) is closer to alpha with it; it costs B x m variance
-    evaluations.  Not the default: frozen procedures keep "fixed"."""
-    if studentize not in ("fixed", "bootstrap_t"):
-        raise ValueError("studentize must be 'fixed' or 'bootstrap_t'")
+    evaluations.  Not the default: frozen procedures keep "fixed".
+
+    ``studentize="gk_block"``: the blockwise bootstrap of Goetze & Kuensch
+    (1996) instead of the stationary bootstrap — moving blocks of length
+    ``block_len`` (default ``gk_block_length``), the draw centred at the
+    bootstrap mean mu*_n and studentized with the within-block estimator
+    (eq. (5)), the observed statistic studentized with the lag-window
+    estimator (eq. (3), ``lag_window`` 'parzen' or 'rectangular').  GK prove
+    second-order correctness of the studentized bootstrap distribution for a
+    smooth function of means (here the mean); RW2005's StepM uses it as the
+    bootstrap-t step, which is an application, not something GK treat.
+    ``blocks="circular"``: wrapped blocks (start uniform on {0..n-1}, mu*_n =
+    the sample mean), the variant Romano & Wolf's own simulations use (2003
+    working paper Sec. 7.2; GK's argument carries over, RW 2003 Sec. 4.1).
+    ``q`` is not used in this mode."""
+    if blocks not in ("moving", "circular"):
+        raise ValueError("blocks must be 'moving' or 'circular'")
+    if studentize not in ("fixed", "bootstrap_t", "gk_block"):
+        raise ValueError("studentize must be 'fixed', 'bootstrap_t' or 'gk_block'")
     keys, n = _check_matrix(series)
     q = q or default_q(n)
     if not 0.0 < alpha < 1.0:
@@ -297,15 +407,28 @@ def stepm(series: Mapping[str, Sequence[float]], *, alpha: float, B: int = 1000,
     rng = random.Random(seed)
     dbar = {k: _mean(series[k]) for k in keys}
     sig = {}
+    gk_l = None
+    if studentize == "gk_block":
+        gk_l = block_len or gk_block_length(n, lag_window)
+        if not 2 <= gk_l < n:
+            raise ValueError("block_len must satisfy 2 <= l < n")
     for k in keys:
-        var = bootstrap_variance(series[k], q)
+        var = (gk_lag_window_variance(series[k], gk_l, lag_window) if gk_l
+               else bootstrap_variance(series[k], q))
         if var <= 0:
-            raise ValueError(f"zero variance for {k}")
+            raise ValueError(f"non-positive variance estimate for {k}"
+                             + (" (rectangular weights can go negative; use 'parzen')" if gk_l else ""))
         sig[k] = math.sqrt(var / n)
     z = {k: dbar[k] / sig[k] for k in keys}
     # joint bootstrap draws, reused across steps (same resamples for every k)
     draws: list[dict] = []
+    circ = blocks == "circular"
+    mu_star = {k: gk_mean_of_bootstrap_mean(series[k], gk_l, circ) for k in keys} if gk_l else {}
     for _ in range(B):
+        if gk_l:
+            starts = [rng.randrange(n if circ else n - gk_l + 1) for _ in range(-(-n // gk_l))]
+            draws.append({k: gk_blockwise_t(series[k], gk_l, starts, mu_star[k], circ) for k in keys})
+            continue
         ix = stationary_bootstrap_indices(n, q, rng)
         d = {}
         for k in keys:
@@ -328,6 +451,14 @@ def stepm(series: Mapping[str, Sequence[float]], *, alpha: float, B: int = 1000,
             break
         rejected += newly
         remaining = [k for k in remaining if k not in newly]
+    if studentize == "gk_block":
+        return {"method": "romano_wolf2005_stepm_gk1996_blockwise", "alpha": alpha,
+                "rejected": sorted(rejected), "z": z, "steps": steps, "B": B,
+                "block_len": gk_l, "lag_window": lag_window, "blocks": blocks, "n": n, "m": len(keys),
+                "seed": seed,
+                "note": "Goetze-Kuensch 1996: moving blocks of length l, draw centred at the "
+                        "bootstrap mean mu*_n, studentized by the within-block estimator "
+                        "(eq. (5)); observed statistic by the lag-window estimator (eq. (3))"}
     if studentize == "bootstrap_t":
         return {"method": "romano_wolf2005_stepm_bootstrap_t", "alpha": alpha,
                 "rejected": sorted(rejected), "z": z, "steps": steps, "B": B, "q": q,
