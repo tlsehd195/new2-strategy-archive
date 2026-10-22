@@ -2,7 +2,7 @@
 
 - 지시: 동동, 2026-10-22 "NEW2 Strategy Archive 전체 감사 및 연구 파이프라인 문제 해결 지시문"
 - 기준 커밋: `338654c` (main, PR #22까지). 작업 브랜치 `claude/project-thread-8sjm14`, PR #24
-- 결정 기록: [ADR 0028](../../docs/adr/0028-dev-to-independent-flow-prereg-gate-repro.md)
+- 결정 기록: [ADR 0029](../../docs/adr/0029-dev-to-independent-flow-prereg-gate-repro.md)
 - 증거: `run/audit/evidence_pipeline_20261022/`
 - 이 보고서는 연구 파이프라인의 정확성에 관한 것이다. **어떤 전략의 수익성도 입증하지 않는다.**
   `CYCLE_OK`는 파이프라인이 실행됐다는 뜻일 뿐이다.
@@ -39,7 +39,7 @@
 - 수정: `run/discovery/pipeline.py`(F1·F2), `runner.py`(F8), `independent_window.py`(F3·F4), `evolution_report.py`(F5),
   `README.md`, `tests/test_independent_window.py`(게이트·원장 인자), `.github/workflows/research-ci.yml`, `docs/adr/README.md`
 - 추가: `validation_registry.py`, `prereg_gate.py`, `repro_bundle.py`, `cost_sensitivity.py`, `behaviour_overlap.py`,
-  `tests/test_pipeline_flow_20261022.py`(31개), `run/LEGACY_SCRIPTS.md`, ADR 0028, 이 보고서와 증거 폴더
+  `tests/test_pipeline_flow_20261022.py`(31개), `run/LEGACY_SCRIPTS.md`, ADR 0029, 이 보고서와 증거 폴더
 - 평가 코드 해시가 바뀌어 맥락 id가 `C2-f64e…` → `C2-bf2c…`가 됐다. 예전 증거는 재사용되지 않는다(기존 규칙).
 
 ## 4. 중복 제거 재검증

@@ -119,7 +119,7 @@ class PathConfig:
             str(Path(__file__).resolve().parent),
         ))
         # no default: the former default was a data path on the retired v1
-        # machine (ADR 0028)
+        # machine (ADR 0029)
         if not os.environ.get("NEW2_DATA_DIR"):
             raise PathConfigError("NEW2_DATA_DIR is not set (fail-closed — no default data path)")
         data_dir = Path(os.environ["NEW2_DATA_DIR"])

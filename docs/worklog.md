@@ -1339,7 +1339,7 @@ Stage Summary:
 - 실데이터 R4(공개 추정 비용): DEV 777, 검증 20명(배치 k=7, 알파 0.00062), 생존 0
 - 보고서: `run/audit/AUDIT_FULL_20261020.md`, 현재 상태: `run/audit/STATUS_CURRENT_20261020.md`
 
-## 2026-10-22 연구 파이프라인 감사 및 문제 해결 (ADR 0028, PR #24)
+## 2026-10-22 연구 파이프라인 감사 및 문제 해결 (ADR 0029, PR #24)
 
 - 결함 2건 재현·수정: 검증 배치 재개 영구 실패(`REJECTED -> REJECTED`), DEV 기록 후 상태 누락
 - 독립 검증 등록 원장(`validation_registry.py`), 사전등록 활성화 게이트(`prereg_gate.py`), 재현성 번들, 비용 민감도·실제 거래 중복 진단
