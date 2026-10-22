@@ -1,0 +1,20 @@
+{
+ "schema": "prereg_bundle_regime_v1",
+ "fixed_on": "2026-10-22, before any regime result was computed",
+ "asked_by": "동동 2026-10-22: top-5 bundle in bear markets; compare with buy-and-hold",
+ "object": "top5_distinct bundle of ADR 0024 (liquid_search_dev.py, same data, same search re-run; reproduction must give S1 2.16 / S2 2.46 or the difference is reported)",
+ "reads": "S1 (2021-01-01..2023-09-18, 9 symbols) and S2 (2024-06-19..2025-10-20, ETH + 7 alts, no BTC) only; the tool's assert_allowed refuses everything else (validation, locked TEST, paper, IW1)",
+ "cost": "assumed_public_v1 (unchanged); buy-and-hold pays entry cost once and funding every day it holds",
+ "market_index": "equal-weight daily-rebalanced index of the segment's own symbols from the daily opens (BTC is not available in S2)",
+ "regimes": {
+  "R1_trailing_90d": "label for day d uses only index values up to d's open: index[d]/index[d-90] - 1 >= +20% -> BULL; <= -20% -> BEAR; else SIDEWAYS; days without 90 prior days -> UNLABELED",
+  "R2_drawdown": "index[d] <= 0.75 * running peak of the index since the segment read_start -> DRAWDOWN (bear phase); else NOT_DRAWDOWN"
+ },
+ "benchmarks": ["S1: BTC hold, ETH hold, equal-weight basket hold", "S2: ETH hold, equal-weight basket hold"],
+ "metrics_per_segment_and_regime": ["days", "mean bp/day", "annual SR", "cumulative bp", "max drawdown bp (cumulative arithmetic, same as ADR 0024)", "worst calendar month bp", "monthly bp table for the R2 DRAWDOWN days"],
+ "beta": "OLS of bundle daily bp on EW basket hold daily bp (whole segment and BEAR/DRAWDOWN days only): beta, alpha bp/day, Newey-West(5) t of alpha",
+ "vol_matched": "bundle scaled by sd(hold)/sd(bundle) (leverage) vs the hold: mean bp/day, cumulative bp, max drawdown; also hold scaled to the bundle's sd",
+ "exposure": "average share of days the bundle is in a position and its average net long share (per rule, mean over symbols)",
+ "min_days_for_a_regime_statistic": 60,
+ "rules": "no threshold or definition is changed after results; no statistical criterion is relaxed; if the bundle is weak in bear it is reported as weak"
+}
