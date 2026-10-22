@@ -151,7 +151,7 @@ def hour_spec(lo, hi, *, horizon=8, direction="long"):
 
 
 EDGE = hour_spec(0, 2)
-# a second real edge with a DIFFERENT entry signal: since ADR 0030 a validation
+# a second real edge with a DIFFERENT entry signal: since ADR 0031 a validation
 # batch takes one candidate per entry signal, so an exit-only variant of EDGE
 # (e.g. horizon=9) is skipped, not validated
 EDGE2 = hour_spec(0, 3)

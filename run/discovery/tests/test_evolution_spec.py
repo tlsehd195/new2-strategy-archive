@@ -108,7 +108,7 @@ class TestStopExit(unittest.TestCase):
         bars = [self._b(0, 100, 103, 97, 100), self._b(1, 100, 100, 100, 100)]
         sp = spec([RZ], stop_loss_bp=200, take_profit_bp=200)
         self.assertEqual(stop_exit_rule(sp, "stop_price")(bars, 0, 1, 1)[1:], (98.0, "stop"))
-        # default (config/exit_fill_v1.json, ADR 0030): the bar's worst price
+        # default (config/exit_fill_v1.json, ADR 0031): the bar's worst price
         self.assertEqual(stop_exit_rule(sp)(bars, 0, 1, 1)[1:], (97.0, "stop"))
 
     def test_gap_fills_at_open_not_at_stop(self):

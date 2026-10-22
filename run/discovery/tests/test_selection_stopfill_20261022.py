@@ -1,4 +1,4 @@
-"""ADR 0030: one validation candidate per entry signal, and the conservative
+"""ADR 0031: one validation candidate per entry signal, and the conservative
 intrabar stop fill.  Synthetic data and temp dirs only — no real window is
 opened, no network, no account."""
 from __future__ import annotations
@@ -23,8 +23,8 @@ from strategy_spec import STOP_FILLS, default_stop_fill, stop_exit_rule  # noqa:
 from test_pipeline import EDGE, NOISE, PipelineCase, SyntheticProvider, hour_spec  # noqa: E402
 
 PINNED_NEW = {
-    "config/exit_fill_v1.json": "203686950c4d",
-    "config/candidate_selection_v1.json": "08134e7b11a2",
+    "config/exit_fill_v1.json": "42f7f95dd610",
+    "config/candidate_selection_v1.json": "07320d5c835e",
 }
 
 

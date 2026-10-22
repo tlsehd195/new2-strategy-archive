@@ -1,4 +1,4 @@
-# ADR 0030 — 검증 배치에 진입 신호당 후보 하나, 손절 체결을 보수적으로
+# ADR 0031 — 검증 배치에 진입 신호당 후보 하나, 손절 체결을 보수적으로
 
 - 상태: Accepted (선정 규칙과 체결 가정만 바꿈. 통계 기준·비용 가정 파일은 그대로)
 - 날짜: 2026-10-22
@@ -6,6 +6,7 @@
   `config/candidate_selection_v1.json`, `config/exit_fill_v1.json`),
   `run/discovery/tests/test_selection_stopfill_20261022.py`, `tests/test_pipeline.py`(테스트 후보 교체)
 - 사용자 요청: 동동, 2026-10-22 ("일단 너가 추천하는 걸로 진행하는데 추천하는 이유도 설명")
+- 번호: 처음 0030이었으나 PR #29가 0030을 써서 0031로 바꿈
 - 앞선 결정: [ADR 0029](0029-dev-to-independent-flow-prereg-gate-repro.md)의 진단 결과
 
 ## 맥락

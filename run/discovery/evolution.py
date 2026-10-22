@@ -463,7 +463,7 @@ def entry_signal_key(spec: Mapping) -> str:
 
     Two strategies with the same key take the same entries on every input and
     differ only in how they leave (horizon, stop-loss, take-profit); a
-    validation batch treats them as one hypothesis (ADR 0030)."""
+    validation batch treats them as one hypothesis (ADR 0031)."""
     body = {k: v for k, v in _behaviour_body(spec).items() if k != "exit"}
     return "EK-" + hashlib.sha256(canonical_json(body).encode()).hexdigest()[:20]
 

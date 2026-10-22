@@ -538,7 +538,7 @@ def build_spec_signal(spec: Mapping, aux: Mapping) -> Callable:
     return sig
 
 
-#: how an intrabar stop is filled (versioned config, ADR 0030)
+#: how an intrabar stop is filled (versioned config, ADR 0031)
 EXIT_FILL_CONFIG = Path(__file__).resolve().parent / "config" / "exit_fill_v1.json"
 STOP_FILLS = ("stop_price", "bar_extreme")
 

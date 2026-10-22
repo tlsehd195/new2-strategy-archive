@@ -1347,7 +1347,7 @@ Stage Summary:
 - 사전등록 v2·IW1 모두 DRAFT(활성화 기록 없음), 검증 기간 미시작. 기준 변경 없음
 - 보고서: `run/audit/AUDIT_PIPELINE_20261022.md`
 
-## 2026-10-22 검증 후보 진입 신호당 하나, 손절 보수적 체결 (ADR 0030)
+## 2026-10-22 검증 후보 진입 신호당 하나, 손절 보수적 체결 (ADR 0031)
 
 - `config/candidate_selection_v1.json`: 진입 신호가 같고 청산만 다른 후보는 검증 배치에 대표 하나만
 - `config/exit_fill_v1.json`: 봉 안 손절은 그 봉의 저가(롱)/고가(숏)에 체결, 갭은 시가, 익절 불변

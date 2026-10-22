@@ -68,7 +68,7 @@ EVO_CODE_FILES = tuple(sorted(set(CODE_FILES) | {"public_cost_estimate.py", "por
                                                  "config/paper_forward_v1.json",
                                                  "config/exit_fill_v1.json",
                                                  "config/candidate_selection_v1.json"}))
-#: which DEV screen-pass candidates go into a validation batch (ADR 0030)
+#: which DEV screen-pass candidates go into a validation batch (ADR 0031)
 DEFAULT_SELECTION_CONFIG = Path(__file__).resolve().parent / "config" / "candidate_selection_v1.json"
 
 
@@ -703,7 +703,7 @@ class EvolutionPipeline:
         cap = self.search_cfg.max_t_objective
         ranked = sorted(out, key=lambda s: (-min(fb[s]["dev_t"] or 0, cap), s))
         # at most one member per near-duplicate group (thresholds within half a
-        # mutation step, evolution.near_duplicate) and, since ADR 0030, at most
+        # mutation step, evolution.near_duplicate) and, since ADR 0031, at most
         # one per entry signal (same entries, different exit), counting
         # strategies already submitted to validation in this context: a twin is
         # a second look at the same hypothesis, not a new one.  The skipped ones
@@ -723,7 +723,7 @@ class EvolutionPipeline:
             ek = entry_signal_key(d)
             if sel["one_per_entry_signal"] and ek in entries:
                 self._near_skips[sid] = {"twin": entries[ek], "reason": f"same entry signal {ek}, "
-                                         "different exit (one per entry signal, ADR 0030)"}
+                                         "different exit (one per entry signal, ADR 0031)"}
                 continue
             ns = near_signature(d)[0]
             twin = (next((o for o in groups.get(ns, []) if near_duplicate(d, self.specs.get(o)) is not None), None)
