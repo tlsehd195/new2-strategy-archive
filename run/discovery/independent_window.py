@@ -13,8 +13,11 @@ Three steps, each a CLI subcommand:
 ``freeze-members``  write the members file of one DEV-only state directory
                     (ids, canonical specs, context) before anything is opened
 ``power``           power precheck from the preregistered numbers (diagnostic)
-``open``            open ONE tranche, once: the history row is written first,
-                    then every member is evaluated and StepM decides
+``open``            open ONE tranche, once: needs an ACTIVE preregistration
+                    (``prereg_gate``, ADR 0025); the run is registered, the
+                    history row is written, the run is started, every member
+                    is evaluated, StepM decides, the result file is written
+                    (never over an existing one) and the run is completed
 
 A tranche whose key is already in ``validation_window_history.jsonl`` is
 never opened again.  An outcome is research evidence only: the cost stays
@@ -44,6 +47,8 @@ from stats_mc import by_fdr, daily_series, default_q, spending_alpha, stepm  # n
 
 DEFAULT_PREREG = HERE / "config" / "independent_window_v1.json"
 DEFAULT_HISTORY = HERE / "validation_window_history.jsonl"
+#: lifecycle ledger of independent runs (ADR 0025): REGISTERED -> STARTED -> COMPLETED
+DEFAULT_REGISTRY = HERE / "validation_registry.jsonl"
 MEMBERS_SCHEMA = "independent_window_members_v1"
 RESULT_SCHEMA = "independent_window_result_v1"
 #: datasets that exist for 2020 in the public archive
@@ -194,9 +199,12 @@ def members_record(pipe, pre: Mapping, prereg_sha: str, *, state_dir: str = "") 
             excluded[sid] = f"needs {need} (not in the 2020 archive)"
             continue
         members.append({"strategy_id": sid, "spec": spec})
+    from prereg_gate import research_code_identity
     body = {"schema": MEMBERS_SCHEMA, "window_id": pre["window_id"], "prereg_sha256": prereg_sha,
             "context_id": pipe.context_id(), "state_dir": state_dir, "rule": pre["members"]["rule"],
-            "members": members, "excluded_before_test": excluded}
+            "members": members, "excluded_before_test": excluded,
+            # the evaluation code the members are frozen against (ADR 0025)
+            "code": {"code_hash": research_code_identity()["code_hash"]}}
     body["members_sha256"] = hashlib.sha256(canonical_json(body).encode()).hexdigest()
     return body
 
@@ -249,19 +257,57 @@ def member_events(spec: Mapping, sym: str, e: Mapping, pre: Mapping, cost) -> li
     return [x.to_json() for x in es.events]
 
 
+def run_id_for(pre: Mapping, prereg_sha: str, tranche: str, members: Mapping) -> str:
+    return "IWR-" + hashlib.sha256(canonical_json(
+        {"key": window_key(pre, tranche), "members": members["members_sha256"],
+         "prereg": prereg_sha}).encode()).hexdigest()[:16]
+
+
 def open_tranche(pre: Mapping, prereg_sha: str, tranche: str, data_dir: Path, members: Mapping,
-                 history_path: Path, out_dir: Path, cost, *, check: Optional[Mapping] = None) -> dict:
+                 history_path: Path, out_dir: Path, cost, *, check: Optional[Mapping] = None,
+                 gate: Optional[Mapping] = None, registry_path: Optional[Path] = None,
+                 resume: bool = False, command: Sequence[str] = ()) -> dict:
+    """``gate`` is the report of :func:`prereg_gate.require_active` for this
+    prereg (the CLI computes it); without an ACTIVE gate nothing is opened.
+    ``resume`` completes a run that was STARTED and stopped before its result
+    was written (the window row exists, nothing was reported); it never
+    re-opens a COMPLETED, ABORTED or INVALIDATED run."""
+    from prereg_gate import research_code_identity
+    from validation_registry import RegistryRefused, ValidationRegistry, members_pin
     _tranche(pre, tranche)
+    if not gate or gate.get("lifecycle") != "ACTIVE" or gate.get("prereg_sha256") != prereg_sha:
+        raise WindowRefused("preregistration is not ACTIVE for this prereg sha256 (prereg_gate, "
+                            "ADR 0025): a draft or unapproved prereg cannot start a validation")
     history = list(iter_jsonl(history_path)) if Path(history_path).exists() else None
     if history is None:
         raise WindowRefused(f"validation window history {history_path} missing")
     key = window_key(pre, tranche)
-    if any(key in (r.get("window_keys") or []) for r in history):
+    check_members(members, pre, prereg_sha)
+    reg = ValidationRegistry(registry_path or DEFAULT_REGISTRY)
+    run_id = run_id_for(pre, prereg_sha, tranche, members)
+    code_hash = research_code_identity()["code_hash"]
+    state = reg.state(run_id)
+    spent = any(key in (r.get("window_keys") or []) for r in history)
+    out_dir = Path(out_dir)
+    result_path = out_dir / f"{pre['window_id']}-{tranche}_result.json"
+    if state in ("COMPLETED", "ABORTED", "INVALIDATED"):
+        raise WindowRefused(f"{run_id} is {state} — a tranche is single-use, its result is never replaced")
+    if state == "RUNNING":
+        if not (resume and spent):
+            raise WindowRefused(f"{run_id} was started and not completed (window spent, no result): "
+                                "use --resume to finish it with the same members and code")
+        if result_path.exists():
+            raise WindowRefused(f"{result_path} exists but the run is not completed — inspect by hand")
+        drift = reg.member_drift(run_id, members["members"])
+        if drift:
+            raise WindowRefused(f"{run_id}: members differ from the registration: {drift}")
+    elif spent:
         raise WindowRefused(f"{key} was already opened — a tranche is single-use")
-    issues = overlap_issues(pre, history)
+    elif state == "REGISTERED":
+        pass                                  # registered, stopped before the history row: continue
+    issues = overlap_issues(pre, [r for r in history if not (state == "RUNNING" and key in (r.get("window_keys") or []))])
     if issues:
         raise WindowRefused("; ".join(issues))
-    check_members(members, pre, prereg_sha)
     check = check or data_check(data_dir, pre)
     syms = resolve_tranches(pre, check)[tranche]["symbols"]
     if not syms:
@@ -273,16 +319,25 @@ def open_tranche(pre: Mapping, prereg_sha: str, tranche: str, data_dir: Path, me
     if bad:
         raise WindowRefused(f"data not usable: {bad}")
     ids = [m["strategy_id"] for m in members["members"]]
-    run_id = "IWR-" + hashlib.sha256(canonical_json(
-        {"key": key, "members": members["members_sha256"], "prereg": prereg_sha}).encode()).hexdigest()[:16]
-    # the window counts as used from here on, whatever happens next
-    append_jsonl(history_path, {
+    try:
+        if state is None:
+            reg.register(run_id, window_key=key, prereg_sha256=prereg_sha,
+                         members_sha256=members["members_sha256"], members=members_pin(members["members"]),
+                         code_hash=code_hash, context_id=members["context_id"], symbols=syms,
+                         config={"test": pre["test"], "period": pre["period"], "tranche": tranche},
+                         cost={"version": cost.version, "status": getattr(cost, "status", None)})
+    except RegistryRefused as e:
+        raise WindowRefused(str(e)) from e
+    if state != "RUNNING":
+        # the window counts as used from here on, whatever happens next
+        append_jsonl(history_path, {
         "run": f"{pre['window_id']}-{tranche}", "batches": 1, "batch_ids": [run_id],
         "context_id": members["context_id"], "date": dt.date.today().isoformat(),
         "window_keys": [key], "symbols": syms, "alpha": alpha, "tranche_index": k,
         "members": len(ids), "prereg_sha256": prereg_sha,
         "note": "independent window (ADR 0016): written BEFORE evaluation; result in the run's out dir",
         "source": "run/discovery/independent_window.py open"})
+        reg.start(run_id, members_sha256=members["members_sha256"], code_hash=code_hash)
     g0, g1 = _ms(pre["period"]["entry_start"]), _end_ms(pre["period"]["read_end"])
     per_member, series, excluded = {}, {}, {}
     for m in members["members"]:
@@ -335,10 +390,15 @@ def open_tranche(pre: Mapping, prereg_sha: str, tranche: str, data_dir: Path, me
               "claim": pre["outcome_meaning"], "at": iso_now()}
     result["record_sha256"] = hashlib.sha256(canonical_json(
         {k_: v for k_, v in result.items() if k_ != "at"}).encode()).hexdigest()
-    out_dir = Path(out_dir)
+    from repro_bundle import independent_bundle
+    # outside record_sha256: the commit changes with every doc commit, the result does not
+    result["repro"] = independent_bundle(result, pre=pre, members=members, cost=cost, command=command)
     out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / f"{pre['window_id']}-{tranche}_result.json").write_text(
-        json.dumps(result, indent=1, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
+    with open(result_path, "x", encoding="utf-8") as f:        # never over an existing result
+        f.write(json.dumps(result, indent=1, sort_keys=True, ensure_ascii=False) + "\n")
+    reg.complete(run_id, members_sha256=members["members_sha256"], code_hash=code_hash,
+                 result_sha256=result["record_sha256"], outcomes=result["outcome"],
+                 result_path=str(result_path))
     return result
 
 
@@ -433,11 +493,19 @@ def _cmd_open(a) -> int:
     if not a.confirm_single_use:
         print("REFUSED: --confirm-single-use is required (a tranche can be opened once)", file=sys.stderr)
         return 1
+    from prereg_gate import GateRefused, require_active
     pre, sha = load_prereg(a.prereg)
     members = json.loads(Path(a.members).read_text())
     cost = CostContext.from_assumed_profile(pre["cost"]["profile"])
     try:
-        r = open_tranche(pre, sha, a.tranche, Path(a.data_dir), members, Path(a.history), Path(a.out_dir), cost)
+        gate = require_active(Path(a.prereg), activation_path=Path(a.activation) if a.activation else None,
+                              members_path=Path(a.members))
+    except GateRefused as e:
+        print(f"REFUSED: {e}", file=sys.stderr)
+        return 4
+    try:
+        r = open_tranche(pre, sha, a.tranche, Path(a.data_dir), members, Path(a.history), Path(a.out_dir), cost,
+                         gate=gate, registry_path=Path(a.registry), resume=a.resume, command=sys.argv)
     except WindowRefused as e:
         print(f"REFUSED: {e}", file=sys.stderr)
         return 4
@@ -468,6 +536,10 @@ def main(argv: Sequence[str]) -> int:
     o.add_argument("--members", required=True)
     o.add_argument("--out-dir", required=True)
     o.add_argument("--confirm-single-use", action="store_true")
+    o.add_argument("--activation", help="prereg_activation_v1 record (prereg_gate, ADR 0025)")
+    o.add_argument("--registry", default=str(DEFAULT_REGISTRY))
+    o.add_argument("--resume", action="store_true",
+                   help="finish a STARTED run whose result was never written")
     a = ap.parse_args(argv)
     return {"check": _cmd_check, "freeze-members": _cmd_freeze, "power": _cmd_power,
             "open": _cmd_open}[a.cmd](a)

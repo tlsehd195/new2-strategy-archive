@@ -118,8 +118,11 @@ class PathConfig:
             "NEW2_DISCOVERY_ROOT",
             str(Path(__file__).resolve().parent),
         ))
-        data_dir = Path(os.environ.get(
-            "NEW2_DATA_DIR", "/home/z/my-project/NEW2_run/data"))
+        # no default: the former default was a data path on the retired v1
+        # machine (ADR 0025)
+        if not os.environ.get("NEW2_DATA_DIR"):
+            raise PathConfigError("NEW2_DATA_DIR is not set (fail-closed — no default data path)")
+        data_dir = Path(os.environ["NEW2_DATA_DIR"])
         state_dir = Path(os.environ.get("NEW2_STATE_DIR", root / "state"))
         results_dir = Path(os.environ.get("NEW2_RESULTS_DIR", root / "results"))
         audit_dir = Path(os.environ.get("NEW2_AUDIT_DIR", root.parent / "audit"))

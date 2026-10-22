@@ -567,6 +567,11 @@ class EvolutionPipeline:
         ctx = self.context_id()
         have = self.evaluation("dev", sid)
         if have is not None:
+            # the record exists; a run that stopped between the record and the
+            # status write left the candidate without a status: write it now
+            # from the stored record (ADR 0025), never re-evaluate
+            if record_status and self.statuses.status(sid, ctx) is None:
+                self._dev_status(sid, have)
             return have
         spec = canonicalize_spec(self.specs.get(sid))
         data, fng, missing = self._inputs(spec)
@@ -640,17 +645,32 @@ class EvolutionPipeline:
                                         "series": {s: [d0, [round(v, 6) for v in vals]]
                                                    for s, (d0, vals) in day_series.items()}})
         if record_status:
-            cur = self.statuses.status(sid, ctx)
-            if cur in (None, "BLOCKED_DATA", "BLOCKED_COST"):
-                if not fails:
-                    st, why = "RESEARCH_ONLY", []
-                elif "dev_underpowered" in fails and (metrics["dev_mean_bp"] or 0) > 0:
-                    st, why = "INCONCLUSIVE", fails
-                else:
-                    st, why = "REJECTED", fails
-                self.statuses.set(sid, ctx, st, stage="dev_screen", reasons=why,
-                                  evidence={"dev": rec["record_id"]})
+            self._dev_status(sid, rec)
         return rec
+
+    def _dev_status(self, sid: str, rec: Mapping) -> None:
+        """Status of a DEV record (screen pass / underpowered / reject)."""
+        ctx = rec["context_id"]
+        cur = self.statuses.status(sid, ctx)
+        if rec.get("status") == "BLOCKED_DATA" and cur is None:
+            self.statuses.set(sid, ctx, "BLOCKED_DATA", stage="dev", reasons=rec.get("missing") or [],
+                              resume_to="RESEARCH_ONLY")
+            return
+        if rec.get("status") == "BLOCKED_COST" and cur is None:
+            self.statuses.set(sid, ctx, "BLOCKED_COST", stage="dev", reasons=[rec.get("error") or ""],
+                              resume_to="RESEARCH_ONLY")
+            return
+        if rec.get("status") != "OK" or cur not in (None, "BLOCKED_DATA", "BLOCKED_COST"):
+            return
+        fails = rec["screen"]["failures"]
+        if not fails:
+            st, why = "RESEARCH_ONLY", []
+        elif "dev_underpowered" in fails and (rec["metrics"]["dev_mean_bp"] or 0) > 0:
+            st, why = "INCONCLUSIVE", fails
+        else:
+            st, why = "REJECTED", fails
+        self.statuses.set(sid, ctx, st, stage="dev_screen", reasons=why,
+                          evidence={"dev": rec["record_id"]})
 
     # -- stage 2: preregistered validation batches -------------------------------------
     def _batches(self) -> list[dict]:
@@ -849,24 +869,38 @@ class EvolutionPipeline:
             powered = all((per_member[m][s]["n"] or 0) >= vc["min_events_per_symbol"] for s in syms)
             fclass = validation_failure_class(per_member[m], syms, rejected=rejected, powered=powered,
                                               min_events=vc["min_events_per_symbol"])
-            rec = self._append_eval({"stage": "validation", "strategy_id": m, "context_id": ctx,
-                                     "status": "OK", "batch_id": batch["batch_id"],
-                                     "per_symbol": per_member[m], "stepm_rejected": rejected,
-                                     "powered": powered, "failure_class": fclass,
-                                     "cost_model": self._cost_block()})
+            prev = self.evaluation("validation", m)
+            if prev is not None and prev.get("batch_id") == batch["batch_id"]:
+                # resumed batch (the run stopped after this member's record and
+                # before the RESULT row): reuse the record — never a second one —
+                # and require the recomputation to agree with it (ADR 0025)
+                if (prev.get("stepm_rejected"), prev.get("powered")) != (rejected, powered):
+                    raise EvidenceTampered(f"{m}: resumed batch {batch['batch_id']} disagrees with "
+                                           f"its stored validation record {prev['record_id']}")
+                rec = prev
+            else:
+                rec = self._append_eval({"stage": "validation", "strategy_id": m, "context_id": ctx,
+                                         "status": "OK", "batch_id": batch["batch_id"],
+                                         "per_symbol": per_member[m], "stepm_rejected": rejected,
+                                         "powered": powered, "failure_class": fclass,
+                                         "cost_model": self._cost_block()})
+            cur = self.statuses.get(m, ctx) or {}
+            done = (cur.get("evidence") or {}).get("validation") == rec["record_id"]
             if rejected and powered:
                 outcome[m] = "PASSED_STEPM"
             elif powered:
                 outcome[m] = "REJECTED"
-                self.statuses.set(m, ctx, "REJECTED", stage="validation",
-                                  reasons=["validation StepM did not reject H0 (mean <= 0)",
-                                           f"failure_class={fclass}"],
-                                  evidence={"validation": rec["record_id"]})
+                if not done:
+                    self.statuses.set(m, ctx, "REJECTED", stage="validation",
+                                      reasons=["validation StepM did not reject H0 (mean <= 0)",
+                                               f"failure_class={fclass}"],
+                                      evidence={"validation": rec["record_id"]})
             else:
                 outcome[m] = "INCONCLUSIVE"
-                self.statuses.set(m, ctx, "INCONCLUSIVE", stage="validation",
-                                  reasons=["validation underpowered", f"failure_class={fclass}"],
-                                  evidence={"validation": rec["record_id"]})
+                if not done:
+                    self.statuses.set(m, ctx, "INCONCLUSIVE", stage="validation",
+                                      reasons=["validation underpowered", f"failure_class={fclass}"],
+                                      evidence={"validation": rec["record_id"]})
         result = {"kind": "RESULT", "batch_id": batch["batch_id"], "tests": tests,
                   "outcome": outcome, "at": iso_now()}
         append_jsonl(self.batch_path, result)
