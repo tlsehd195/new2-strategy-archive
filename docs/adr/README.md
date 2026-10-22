@@ -32,4 +32,4 @@
 | [0026](0026-top5-bundle-regime-and-buy-and-hold.md) | 상위 5개 묶음 국면별(하락장) 성적과 단순 보유 비교(DEV, 가정 비용): 하락장 약 0, 수익은 상승장에 집중, 베타는 작음 | Accepted (측정만) |
 | [0027](0027-paper-faithful-recheck-of-estimated-parts.md) | 추정·변형 항목을 논문 원문과 대조: alpha 지출=Tian–Ramdas와 같음, StepM bootstrap-t·Politis–White 블록·Dufour MMC·WS-R PrPl-EB 추가(기본값 그대로), 합성 오류율 재확인 | Accepted (측정·도구) |
 | [0028](0028-short-top-candidates-and-long-short-regime-mix-dev.md) | 숏 전용 상위 후보 성적, 롱·숏 묶음 상관과 국면별 비중 전환(앞/뒤 절반) DEV 점검: 우연 최대치 못 넘고 조합 이득 없음 | Accepted (측정만) |
-| [0029](0029-adopt-prpl-eb-bootstrap-t-pbo005-as-drafts.md) | 사용자 결정으로 논문 그대로 채택(초안·새 버전, 효력 없음): e-값 v3 베팅 PrPl-EB, StepM bootstrap-t·PBO 0.05인 promotion_v4, IW1 v2 초안 | Accepted (초안) |
+| [0030](0030-adopt-prpl-eb-bootstrap-t-pbo005-as-drafts.md) | 사용자 결정으로 논문 그대로 채택(초안·새 버전, 효력 없음): e-값 v3 베팅 PrPl-EB, StepM bootstrap-t·PBO 0.05인 promotion_v4, IW1 v2 초안 | Accepted (초안) |

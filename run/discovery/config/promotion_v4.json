@@ -2,7 +2,7 @@
   "schema": "promotion_config_v1",
   "version": "promo-v4",
   "status": "DRAFT_NOT_DEFAULT: pipeline.DEFAULT_PROMOTION_CONFIG stays promotion_v3.json; selecting this file is a new experiment context and needs the user's go-ahead for a real run",
-  "note": "promo-v3 + two paper-faithful changes (ADR 0029, user 동동 2026-10-22 '추천하는 걸로 진행'): (1) validation StepM studentized as bootstrap-t (Romano-Wolf 2005 eq. (11), RSW2008 Alg. A.3: sigma* recomputed on every resample; synthetic FWER closer to alpha, ADR 0027); (2) max_pbo 0.5 -> 0.05 (Bailey et al. PBO paper: rejecting PBO > 0.05 is the customary approach). Both stricter, alpha unchanged, every other value unchanged.",
+  "note": "promo-v3 + two paper-faithful changes (ADR 0030, user 동동 2026-10-22 '추천하는 걸로 진행'): (1) validation StepM studentized as bootstrap-t (Romano-Wolf 2005 eq. (11), RSW2008 Alg. A.3: sigma* recomputed on every resample; synthetic FWER closer to alpha, ADR 0027); (2) max_pbo 0.5 -> 0.05 (Bailey et al. PBO paper: rejecting PBO > 0.05 is the customary approach). Both stricter, alpha unchanged, every other value unchanged.",
   "dev_screen": {
     "min_events_per_symbol": 30,
     "min_mean_bp": 0.0,

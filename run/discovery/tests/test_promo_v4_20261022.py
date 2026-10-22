@@ -1,4 +1,4 @@
-"""promo-v4 DRAFT (ADR 0029): bootstrap-t StepM and max_pbo 0.05; never looser
+"""promo-v4 DRAFT (ADR 0030): bootstrap-t StepM and max_pbo 0.05; never looser
 than promo-v3 and not the default.  IW1 v2 DRAFT changes only studentize.
 
     cd run && python3 -m unittest discovery.tests.test_promo_v4_20261022

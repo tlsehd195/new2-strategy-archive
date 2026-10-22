@@ -1,4 +1,4 @@
-# ADR 0029 — 논문 그대로의 세 가지를 초안·새 버전으로 채택 (e-값 PrPl-EB, StepM bootstrap-t, PBO 0.05)
+# ADR 0030 — 논문 그대로의 세 가지를 초안·새 버전으로 채택 (e-값 PrPl-EB, StepM bootstrap-t, PBO 0.05)
 
 - 상태: Accepted (초안·새 버전 파일만. 효력 없음. 기본 설정과 동결된 사전등록은 그대로)
 - 날짜: 2026-10-22
