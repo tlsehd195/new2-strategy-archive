@@ -1,0 +1,261 @@
+{
+ "schema": "pdf_check_sim_v1",
+ "part": "gk",
+ "seed": 20261022,
+ "reps": 600,
+ "note": "run in 4 parallel processes, checkpointed per row (container restarts); circular rows are in gk_circ_results.json (800 reps)",
+ "rows": [
+  {
+   "dgp": "iid_t4",
+   "n_alt": 0,
+   "reps": 600,
+   "B": 499,
+   "block_len": {
+    "gk_parzen": 7,
+    "gk_rect": 4,
+    "gk_parzen_l15": 15,
+    "stationary_mean_block": 7.1465694988150235
+   },
+   "fwer": {
+    "current_fixed": 0.051666666666666666,
+    "boot_t_stationary": 0.03666666666666667,
+    "gk_parzen": 0.03833333333333333,
+    "gk_rect": 0.05,
+    "gk_parzen_l15": 0.03
+   },
+   "usable_reps": {
+    "current_fixed": 600,
+    "boot_t_stationary": 600,
+    "gk_parzen": 600,
+    "gk_rect": 600,
+    "gk_parzen_l15": 600
+   },
+   "mc_se_at_alpha": 0.008897565210026092,
+   "secs": 189.6
+  },
+  {
+   "dgp": "iid_t4",
+   "n_alt": 3,
+   "reps": 600,
+   "B": 499,
+   "block_len": {
+    "gk_parzen": 7,
+    "gk_rect": 4,
+    "gk_parzen_l15": 15,
+    "stationary_mean_block": 7.1465694988150235
+   },
+   "fwer": {
+    "current_fixed": 0.03833333333333333,
+    "boot_t_stationary": 0.03,
+    "gk_parzen": 0.03,
+    "gk_rect": 0.03666666666666667,
+    "gk_parzen_l15": 0.021666666666666667
+   },
+   "usable_reps": {
+    "current_fixed": 600,
+    "boot_t_stationary": 600,
+    "gk_parzen": 600,
+    "gk_rect": 600,
+    "gk_parzen_l15": 600
+   },
+   "mc_se_at_alpha": 0.008897565210026092,
+   "avg_power_alt": {
+    "current_fixed": 0.29500000000000026,
+    "boot_t_stationary": 0.25722222222222224,
+    "gk_parzen": 0.24888888888888885,
+    "gk_rect": 0.271666666666667,
+    "gk_parzen_l15": 0.21277777777777718
+   },
+   "secs": 196.3
+  },
+  {
+   "dgp": "garch_corr",
+   "n_alt": 0,
+   "reps": 600,
+   "B": 499,
+   "block_len": {
+    "gk_parzen": 7,
+    "gk_rect": 4,
+    "gk_parzen_l15": 15,
+    "stationary_mean_block": 7.1465694988150235
+   },
+   "fwer": {
+    "current_fixed": 0.07,
+    "boot_t_stationary": 0.065,
+    "gk_parzen": 0.07166666666666667,
+    "gk_rect": 0.07833333333333334,
+    "gk_parzen_l15": 0.058333333333333334
+   },
+   "usable_reps": {
+    "current_fixed": 600,
+    "boot_t_stationary": 600,
+    "gk_parzen": 600,
+    "gk_rect": 600,
+    "gk_parzen_l15": 600
+   },
+   "mc_se_at_alpha": 0.008897565210026092,
+   "secs": 191.8
+  },
+  {
+   "dgp": "garch_corr",
+   "n_alt": 3,
+   "reps": 600,
+   "B": 499,
+   "block_len": {
+    "gk_parzen": 7,
+    "gk_rect": 4,
+    "gk_parzen_l15": 15,
+    "stationary_mean_block": 7.1465694988150235
+   },
+   "fwer": {
+    "current_fixed": 0.055,
+    "boot_t_stationary": 0.043333333333333335,
+    "gk_parzen": 0.03833333333333333,
+    "gk_rect": 0.05175292153589316,
+    "gk_parzen_l15": 0.03666666666666667
+   },
+   "usable_reps": {
+    "current_fixed": 600,
+    "boot_t_stationary": 600,
+    "gk_parzen": 600,
+    "gk_rect": 599,
+    "gk_parzen_l15": 600
+   },
+   "mc_se_at_alpha": 0.008897565210026092,
+   "avg_power_alt": {
+    "current_fixed": 0.3811111111111116,
+    "boot_t_stationary": 0.34222222222222237,
+    "gk_parzen": 0.3316666666666667,
+    "gk_rect": 0.35392320534223726,
+    "gk_parzen_l15": 0.30444444444444446
+   },
+   "secs": 195.0
+  },
+  {
+   "dgp": "garch_ar02",
+   "n_alt": 0,
+   "reps": 600,
+   "B": 499,
+   "block_len": {
+    "gk_parzen": 7,
+    "gk_rect": 4,
+    "gk_parzen_l15": 15,
+    "stationary_mean_block": 7.1465694988150235
+   },
+   "fwer": {
+    "current_fixed": 0.056666666666666664,
+    "boot_t_stationary": 0.045,
+    "gk_parzen": 0.051666666666666666,
+    "gk_rect": 0.055,
+    "gk_parzen_l15": 0.04
+   },
+   "usable_reps": {
+    "current_fixed": 600,
+    "boot_t_stationary": 600,
+    "gk_parzen": 600,
+    "gk_rect": 600,
+    "gk_parzen_l15": 600
+   },
+   "mc_se_at_alpha": 0.008897565210026092,
+   "secs": 193.2
+  },
+  {
+   "dgp": "garch_ar02",
+   "n_alt": 3,
+   "reps": 600,
+   "B": 499,
+   "block_len": {
+    "gk_parzen": 7,
+    "gk_rect": 4,
+    "gk_parzen_l15": 15,
+    "stationary_mean_block": 7.1465694988150235
+   },
+   "fwer": {
+    "current_fixed": 0.05333333333333334,
+    "boot_t_stationary": 0.03166666666666667,
+    "gk_parzen": 0.041666666666666664,
+    "gk_rect": 0.03666666666666667,
+    "gk_parzen_l15": 0.028333333333333332
+   },
+   "usable_reps": {
+    "current_fixed": 600,
+    "boot_t_stationary": 600,
+    "gk_parzen": 600,
+    "gk_rect": 600,
+    "gk_parzen_l15": 600
+   },
+   "mc_se_at_alpha": 0.008897565210026092,
+   "avg_power_alt": {
+    "current_fixed": 0.2399999999999999,
+    "boot_t_stationary": 0.2005555555555555,
+    "gk_parzen": 0.2,
+    "gk_rect": 0.20444444444444435,
+    "gk_parzen_l15": 0.17444444444444435
+   },
+   "secs": 198.2
+  },
+  {
+   "dgp": "garch_ar06",
+   "n_alt": 0,
+   "reps": 600,
+   "B": 499,
+   "block_len": {
+    "gk_parzen": 7,
+    "gk_rect": 4,
+    "gk_parzen_l15": 15,
+    "stationary_mean_block": 7.1465694988150235
+   },
+   "fwer": {
+    "current_fixed": 0.11333333333333333,
+    "boot_t_stationary": 0.07,
+    "gk_parzen": 0.13333333333333333,
+    "gk_rect": 0.09833333333333333,
+    "gk_parzen_l15": 0.08
+   },
+   "usable_reps": {
+    "current_fixed": 600,
+    "boot_t_stationary": 600,
+    "gk_parzen": 600,
+    "gk_rect": 600,
+    "gk_parzen_l15": 600
+   },
+   "mc_se_at_alpha": 0.008897565210026092,
+   "secs": 193.9
+  },
+  {
+   "dgp": "garch_ar06",
+   "n_alt": 3,
+   "reps": 600,
+   "B": 499,
+   "block_len": {
+    "gk_parzen": 7,
+    "gk_rect": 4,
+    "gk_parzen_l15": 15,
+    "stationary_mean_block": 7.1465694988150235
+   },
+   "fwer": {
+    "current_fixed": 0.08166666666666667,
+    "boot_t_stationary": 0.041666666666666664,
+    "gk_parzen": 0.085,
+    "gk_rect": 0.06333333333333334,
+    "gk_parzen_l15": 0.03666666666666667
+   },
+   "usable_reps": {
+    "current_fixed": 600,
+    "boot_t_stationary": 600,
+    "gk_parzen": 600,
+    "gk_rect": 600,
+    "gk_parzen_l15": 600
+   },
+   "mc_se_at_alpha": 0.008897565210026092,
+   "avg_power_alt": {
+    "current_fixed": 0.13055555555555548,
+    "boot_t_stationary": 0.08000000000000006,
+    "gk_parzen": 0.13611111111111107,
+    "gk_rect": 0.10055555555555558,
+    "gk_parzen_l15": 0.08000000000000006
+   },
+   "secs": 199.4
+  }
+ ]
+}
