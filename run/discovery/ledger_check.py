@@ -30,6 +30,14 @@ batch has at most one result and every result a preregistration; every
 evidence id a status cites exists; at most one PAPER_TEST_READY review per
 (strategy, context); the summary's status counts match the status ledger.
 
+Frozen v1 history (``state.json`` with ``engine == "NEW2-discovery-v1"``, the
+files committed at ``run/discovery``): ``state.json`` is a cache rebuilt from
+the ledger, so ``tested`` = distinct ``cand_hash``, ``tested_rows`` = ledger
+rows, ``cursors`` = distinct candidates per family, ``cycle`` / ``last_ts`` =
+the last ledger row, and survivors / promotion queue only name candidates
+with a survivor verdict (ADR 0034; before it the check called the file
+unreadable).
+
 Legacy engine checks: state.json loads with its schema; a final state in
 state.json agrees with the latest ledger record of that strategy (or is a
 legal re-verification of it); a RUNNING candidate without a live lock is an
@@ -50,7 +58,12 @@ from engine_lib import JsonlCorruption, iter_jsonl, load_json
 FINDING_KINDS = ("IMPOSSIBLE_TRANSITION", "BROKEN_STATUS_CHAIN", "EVIDENCE_TAMPERED",
                  "DUPLICATE_EVALUATION", "DUPLICATE_SUBMISSION", "DUPLICATE_RESULT", "ORPHAN_RESULT",
                  "MISSING_EVIDENCE", "DUPLICATE_PROMOTION", "SUMMARY_MISMATCH", "INTERRUPTED_CYCLE",
-                 "STATE_LEDGER_MISMATCH", "STUCK_RUNNING", "STATE_UNREADABLE")
+                 "STATE_LEDGER_MISMATCH", "STUCK_RUNNING", "STATE_UNREADABLE", "V1_ARCHIVE_MISMATCH")
+#: the frozen v1 engine history committed at run/discovery (state.json rebuilt
+#: from the ledger on 2026-10-15); it predates the CandidateStore schema
+V1_ENGINE = "NEW2-discovery-v1"
+#: v1 verdicts that put a candidate on the survivor list
+V1_SURVIVOR_VERDICTS = ("SURVIVOR", "SURVIVOR_COMBO", "PASS")
 
 
 def _lock_alive(state_dir: Path) -> bool:
@@ -155,6 +168,12 @@ def check_legacy(state_dir: Path) -> list[dict]:
     if not (sd / "state.json").exists():
         return out
     try:
+        raw = load_json(sd / "state.json")
+    except (OSError, ValueError):
+        raw = None
+    if isinstance(raw, dict) and raw.get("engine") == V1_ENGINE:
+        return check_v1_archive(sd, raw)
+    try:
         store = CandidateStore(sd / "state.json")
     except StoreCorruption as e:
         return [{"kind": "STATE_UNREADABLE", "detail": str(e)}]
@@ -180,6 +199,35 @@ def check_legacy(state_dir: Path) -> list[dict]:
                                                      CandidateState.PENDING.value, CandidateState.RUNNING.value):
             out.append({"kind": "STATE_LEDGER_MISMATCH", "strategy_id": sid,
                         "detail": f"ledger {rec.get('status')}, state.json {cur}"})
+    return out
+
+
+def check_v1_archive(sd: Path, st: dict) -> list[dict]:
+    """Frozen v1 history: the state cache must be exactly what its ledger implies."""
+    rows = list(iter_jsonl(sd / "discovery_ledger.jsonl"))
+    out: list[dict] = []
+
+    def bad(what: str, have, want):
+        out.append({"kind": "V1_ARCHIVE_MISMATCH", "detail": f"state.json {what} = {have!r}, ledger implies {want!r}"})
+    fam: dict = defaultdict(set)
+    for r in rows:
+        fam[r.get("family")].add(r.get("cand_hash"))
+    hashes = {r.get("cand_hash") for r in rows}
+    want = {"tested": len(hashes), "tested_rows": len(rows),
+            "cycle": max((r.get("cycle") or 0 for r in rows), default=0),
+            "last_ts": rows[-1].get("ts") if rows else None,
+            "cursors": {k: len(v) for k, v in fam.items()}}
+    for k, v in want.items():
+        if st.get(k) != v:
+            bad(k, st.get(k), v)
+    surv = {r.get("cand_hash") for r in rows if r.get("verdict") in V1_SURVIVOR_VERDICTS}
+    for k in ("survivors", "promotion_queue", "stouffer_done"):
+        names = {x if isinstance(x, str) else (x or {}).get("cand_hash") for x in st.get(k) or []}
+        if names - surv:
+            bad(k, sorted(names - surv), "only candidates with a survivor verdict")
+    if set(st.get("survivor_specs") or {}) - surv:
+        bad("survivor_specs", sorted(set(st.get("survivor_specs") or {}) - surv),
+            "only candidates with a survivor verdict")
     return out
 
 

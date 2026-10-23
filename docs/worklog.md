@@ -1358,3 +1358,9 @@ Stage Summary:
 - main(6291e27) 병합, ADR 표 충돌만 해결
 - `config/candidate_selection_v2.json`(기본): 진입 임계값이 반 단계 안이면 청산이 달라도 대표 하나. 스킵 기록에 양쪽 청산
 - R8 DEV 재실행: 894 / DEV 통과 63 / 배치 후보 33, R7과 같음(v1 선정 결과는 순서까지 같음). 독립 검증 완료 0
+
+## 2026-10-23 최신 main 잔여 문제 점검 (ADR 0034)
+
+- main CI 실패: GitHub 결제/지출 한도로 러너 미배정(코드 무관). 로컬 3.11·3.13 동등 실행은 통과
+- v1 기록 원장 검사(오판 STATE_UNREADABLE 수정) + CI 단계, DRAFT 사전등록 멤버 점검, 변동성 비례 스프레드 진단
+- DEV 통과 63, 독립 검증 완료 0. 보고서: `run/audit/AUDIT_FOLLOWUP_20261023.md`

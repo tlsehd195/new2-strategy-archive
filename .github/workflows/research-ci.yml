@@ -78,6 +78,11 @@ jobs:
           print("\n".join(bad) or "stdlib-only: ok")
           sys.exit(1 if bad else 0)
           EOF
+      - name: Ledger consistency (committed v1 history and state/; read-only, ADR 0034)
+        working-directory: run/discovery
+        run: |
+          python ledger_check.py . --json /dev/null
+          python ledger_check.py state --json /dev/null
       - name: Unit tests
         working-directory: run
         run: python -m unittest discover -s discovery/tests -v 2>&1 | tail -n 40

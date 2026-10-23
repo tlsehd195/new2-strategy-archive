@@ -182,6 +182,12 @@ def evaluate(prereg_path: Path, *, activation_path: Optional[Path] = None,
         rep["human_items"] = ["freeze the members file", "final read-through by the user",
                               "write and commit a prereg_activation_v1 record (approved_by, checklist)"]
         rep["lifecycle"] = "DRAFT"
+        if members_path and Path(members_path).exists():
+            # freeze integrity is reported for a draft too (ADR 0034): a members
+            # file that already fails would make any later activation INVALID.
+            # Informational only — the lifecycle stays DRAFT.
+            mem = json.loads(Path(members_path).read_text(encoding="utf-8"))
+            rep["members_issues"] = check_members_file(mem, sha)
         return rep
     act = json.loads(Path(activation_path).read_text(encoding="utf-8"))
     iss = rep["issues"]

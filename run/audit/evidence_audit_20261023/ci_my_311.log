@@ -1,0 +1,32 @@
+[PASS] Compile (0s)
+
+[PASS] Independence (no other repository, token or retired path in the runtime) (0s)
+
+[PASS] Static analysis (gating — syntax errors and undefined names) (0s)
+    All checks passed!
+[PASS] Static analysis (gating — all pyflakes rules; legacy v1 diagnostics excluded, see README) (0s)
+
+[PASS] Shell syntax and ShellCheck (0s)
+
+[PASS] Config schemas (0s)
+    configs ok
+[PASS] Dependency scan (runtime code must be stdlib-only) (1s)
+    stdlib-only: ok
+[PASS] Ledger consistency (committed v1 history and state/; read-only, ADR 0034) (0s)
+     "status": "CONSISTENT",
+     "counts": {},
+     "error": null
+    }
+[PASS] Unit tests (307s)
+    ----------------------------------------------------------------------
+    Ran 591 tests in 306.388s
+    
+    OK
+[PASS] Root-level research tests (run/test_*.py, DEV-only tools; ADR 0025) (3s)
+    ----------------------------------------------------------------------
+    Ran 40 tests in 2.552s
+    
+    OK
+[PASS] Current-tool compile (run/*_dev.py and power-audit tools; legacy v1 scripts listed in run/LEGACY_SCRIPTS.md) (0s)
+
+exit 0
