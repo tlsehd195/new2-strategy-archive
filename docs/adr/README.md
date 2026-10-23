@@ -35,3 +35,4 @@
 | [0029](0029-dev-to-independent-flow-prereg-gate-repro.md) | DEV→독립 검증 흐름 연결(등록 원장·재개), 사전등록 활성화 게이트, 재현성 번들, 비용 민감도·실제 거래 중복 진단, 재시작 결함 2건 수정 | Accepted |
 | [0030](0030-adopt-prpl-eb-bootstrap-t-pbo005-as-drafts.md) | 사용자 결정으로 논문 그대로 채택(초안·새 버전, 효력 없음): e-값 v3 베팅 PrPl-EB, StepM bootstrap-t·PBO 0.05인 promotion_v4, IW1 v2 초안 | Accepted (초안) |
 | [0032](0032-pdf-papers-gk1996-wsr-appendix-rw2003.md) | PDF로 받은 논문 3편 대조(Götze–Künsch 1996, WS-R v7 부록, Romano–Wolf 2003): GK 블록 StepM·WS-R 베팅 규칙 추가(기본값 그대로), ONS 인쇄 부호 오류·"PrPl-EB" 이름 정정 | Accepted (측정·도구) |
+| [0034](0034-ci-billing-v1-ledger-check-draft-members-vol-spread.md) | main CI 실패 원인은 GitHub 결제(코드 무관), v1 기록 원장 검사·CI 단계 추가, DRAFT 사전등록도 멤버 동결 점검 보고, 변동성 비례 스프레드 진단 | Accepted (진단·검사) |
