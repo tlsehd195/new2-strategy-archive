@@ -1,0 +1,7 @@
+{
+ "schema": "exit_fill_v1",
+ "note": "Fixed 2026-10-22 (ADR 0031). How an intrabar stop-loss is filled in every evaluation (DEV, independent window, paper, cost sensitivity). bar_extreme = a stop touched inside a bar fills at that bar's worst price (low for a long, high for a short): an upper bound on stop slippage for a stop-market order, never better than the stop price. A bar that opens beyond the stop still fills at its open (gap). Take-profit fills are unchanged (limit price; gap at open). A change needs a new file and an ADR; a looser mode must not replace this one for an existing candidate set.",
+ "stop_fill": "bar_extreme",
+ "allowed_stop_fills": ["stop_price", "bar_extreme"],
+ "take_profit_fill": "limit_price"
+}

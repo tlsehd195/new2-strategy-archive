@@ -1,0 +1,26 @@
+{
+ "command": "same as R7 (README), code e5b016a (PR #30 + main 6291e27 + ADR 0033)",
+ "context_id": "C2-a488c80b29e95ba2c425",
+ "cycle_status": "CYCLE_OK (= the pipeline ran; not a strategy verdict)",
+ "dev_screen_pass": 63,
+ "exit": 0,
+ "finished_at": "2026-10-22T23:58:50Z",
+ "independent_validation_completed": 0,
+ "note": "DEV only. No validation, locked or IW1 window was opened.",
+ "repro_bundle_git_dirty_reason": "cost_sensitivity.py (ADR 0034 diagnostic, not part of the code identity) was copied into the tree after the run",
+ "runtime_seconds": 2192.6,
+ "started_at": "2026-10-22T23:22:17Z",
+ "status_counts": {
+  "INCONCLUSIVE": 93,
+  "REJECTED": 738,
+  "RESEARCH_ONLY": 63
+ },
+ "v1_candidates": 33,
+ "v1_equals_r7": true,
+ "v1_set_equals_r7": true,
+ "v2_candidates": 33,
+ "v2_minus_v1": [],
+ "v2_skip_reasons": {
+  "exact-entry": 30
+ }
+}

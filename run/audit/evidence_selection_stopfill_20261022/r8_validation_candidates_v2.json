@@ -1,0 +1,491 @@
+{
+ "candidates": [
+  "S-80fe4b122603f292",
+  "S-db25d24ca1ca4c96",
+  "S-181c15b4139efdd3",
+  "S-9d752d63324074cc",
+  "S-b5e5df1c18d5a57d",
+  "S-1ec0bc1c95b4c488",
+  "S-3a3dbdf422939143",
+  "S-72655636c7034155",
+  "S-ace182d55342733b",
+  "S-5f8884793cae1ba1",
+  "S-a990790314cf322d",
+  "S-043c5506668fb8f1",
+  "S-91ab3cffaa7bab47",
+  "S-e9d1bf7b37ad8eb8",
+  "S-0f439995bcd4af4d",
+  "S-adf9e2e1e6bc8af8",
+  "S-f8b1648d499419f6",
+  "S-aa609b6862018d48",
+  "S-bc62b843361277d5",
+  "S-ed2d1c8ed9cf1879",
+  "S-fd45e2af64d20e15",
+  "S-8e033ef78d187315",
+  "S-21113d1f21e54643",
+  "S-5e78172a43be4822",
+  "S-d2815e608ab226a1",
+  "S-f2273f0c4c2e00fd",
+  "S-00bfeb8ed64b092c",
+  "S-a2aa1c77ccf11ba3",
+  "S-63f95ff089ff1ea1",
+  "S-64db241c60255cb4",
+  "S-3f825ccdd41fb32d",
+  "S-bdae1ff0b24876cc",
+  "S-adec1de192ad9818"
+ ],
+ "context_id": "C2-a488c80b29e95ba2c425",
+ "selection": "candidate_selection_v2",
+ "skipped": {
+  "S-02d11e89cebc308b": {
+   "entry_signal_key": "EK-ad8cd4128263cb263cbb",
+   "exit": {
+    "horizon": 96,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-ad8cd4128263cb263cbb, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-9d752d63324074cc",
+   "twin_exit": {
+    "horizon": 32,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-202b2284faa1e9ac": {
+   "entry_signal_key": "EK-a78d306ae01bd7ea56b0",
+   "exit": {
+    "horizon": 96,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-a78d306ae01bd7ea56b0, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-db25d24ca1ca4c96",
+   "twin_exit": {
+    "horizon": 32,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-209ce2dd7db8d919": {
+   "entry_signal_key": "EK-e9867128ed0f71eaf242",
+   "exit": {
+    "horizon": 64,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-e9867128ed0f71eaf242, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-80fe4b122603f292",
+   "twin_exit": {
+    "horizon": 48,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-23be1526ebe239b8": {
+   "entry_signal_key": "EK-4ef27848b0aa11f954c0",
+   "exit": {
+    "horizon": 96,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-4ef27848b0aa11f954c0, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-ace182d55342733b",
+   "twin_exit": {
+    "horizon": 48,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-28e523543ff2e86d": {
+   "entry_signal_key": "EK-57dd3daa688cac3c912c",
+   "exit": {
+    "horizon": 192,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-57dd3daa688cac3c912c, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-fd45e2af64d20e15",
+   "twin_exit": {
+    "horizon": 96,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-2a2b74714bf8deaf": {
+   "entry_signal_key": "EK-d3e3bf46698e4f633948",
+   "exit": {
+    "horizon": 128,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-d3e3bf46698e4f633948, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-181c15b4139efdd3",
+   "twin_exit": {
+    "horizon": 192,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-2d59854060280dc5": {
+   "entry_signal_key": "EK-e63e244af2b1fbd55cd7",
+   "exit": {
+    "horizon": 48,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-e63e244af2b1fbd55cd7, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-1ec0bc1c95b4c488",
+   "twin_exit": {
+    "horizon": 192,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-391396a9487de780": {
+   "entry_signal_key": "EK-a78d306ae01bd7ea56b0",
+   "exit": {
+    "horizon": 48,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-a78d306ae01bd7ea56b0, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-db25d24ca1ca4c96",
+   "twin_exit": {
+    "horizon": 32,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-3b932a500832bd74": {
+   "entry_signal_key": "EK-57dd3daa688cac3c912c",
+   "exit": {
+    "horizon": 48,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-57dd3daa688cac3c912c, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-fd45e2af64d20e15",
+   "twin_exit": {
+    "horizon": 96,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-3f1ba25668936097": {
+   "entry_signal_key": "EK-01bfb376a938e30604de",
+   "exit": {
+    "horizon": 8,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-01bfb376a938e30604de, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-5f8884793cae1ba1",
+   "twin_exit": {
+    "horizon": 192,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-3f9bee804cd3003b": {
+   "entry_signal_key": "EK-ee59f722740affd84882",
+   "exit": {
+    "horizon": 8,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-ee59f722740affd84882, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-8e033ef78d187315",
+   "twin_exit": {
+    "horizon": 192,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-453555caf895a33d": {
+   "entry_signal_key": "EK-ad8cd4128263cb263cbb",
+   "exit": {
+    "horizon": 48,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-ad8cd4128263cb263cbb, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-9d752d63324074cc",
+   "twin_exit": {
+    "horizon": 32,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-4d4ec0ad8481a2a2": {
+   "entry_signal_key": "EK-91514edef41370634a57",
+   "exit": {
+    "horizon": 128,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-91514edef41370634a57, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-91ab3cffaa7bab47",
+   "twin_exit": {
+    "horizon": 64,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-536416d892f93e61": {
+   "entry_signal_key": "EK-a78d306ae01bd7ea56b0",
+   "exit": {
+    "horizon": 16,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-a78d306ae01bd7ea56b0, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-db25d24ca1ca4c96",
+   "twin_exit": {
+    "horizon": 32,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-599eb25afe1731e6": {
+   "entry_signal_key": "EK-b4aa49c4ad65c07dfc4c",
+   "exit": {
+    "horizon": 256,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-b4aa49c4ad65c07dfc4c, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-043c5506668fb8f1",
+   "twin_exit": {
+    "horizon": 384,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-5a47c0baf0100e04": {
+   "entry_signal_key": "EK-e9867128ed0f71eaf242",
+   "exit": {
+    "horizon": 128,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-e9867128ed0f71eaf242, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-80fe4b122603f292",
+   "twin_exit": {
+    "horizon": 48,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-6b558706e36cca5a": {
+   "entry_signal_key": "EK-01bfb376a938e30604de",
+   "exit": {
+    "horizon": 96,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-01bfb376a938e30604de, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-5f8884793cae1ba1",
+   "twin_exit": {
+    "horizon": 192,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-6d1f375a260fc295": {
+   "entry_signal_key": "EK-a78d306ae01bd7ea56b0",
+   "exit": {
+    "horizon": 192,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-a78d306ae01bd7ea56b0, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-db25d24ca1ca4c96",
+   "twin_exit": {
+    "horizon": 32,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-706cd371788987ea": {
+   "entry_signal_key": "EK-a78d306ae01bd7ea56b0",
+   "exit": {
+    "horizon": 8,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-a78d306ae01bd7ea56b0, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-db25d24ca1ca4c96",
+   "twin_exit": {
+    "horizon": 32,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-709c0acee26b7519": {
+   "entry_signal_key": "EK-e63e244af2b1fbd55cd7",
+   "exit": {
+    "horizon": 64,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-e63e244af2b1fbd55cd7, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-1ec0bc1c95b4c488",
+   "twin_exit": {
+    "horizon": 192,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-863298b6e9ae91d3": {
+   "entry_signal_key": "EK-4ef27848b0aa11f954c0",
+   "exit": {
+    "horizon": 16,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-4ef27848b0aa11f954c0, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-ace182d55342733b",
+   "twin_exit": {
+    "horizon": 48,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-8e45919cce207805": {
+   "entry_signal_key": "EK-4ef27848b0aa11f954c0",
+   "exit": {
+    "horizon": 8,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-4ef27848b0aa11f954c0, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-ace182d55342733b",
+   "twin_exit": {
+    "horizon": 48,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-8f4053d8e7125ca5": {
+   "entry_signal_key": "EK-d3e3bf46698e4f633948",
+   "exit": {
+    "horizon": 48,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-d3e3bf46698e4f633948, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-181c15b4139efdd3",
+   "twin_exit": {
+    "horizon": 192,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-90882f36d927630a": {
+   "entry_signal_key": "EK-e63e244af2b1fbd55cd7",
+   "exit": {
+    "horizon": 128,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-e63e244af2b1fbd55cd7, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-1ec0bc1c95b4c488",
+   "twin_exit": {
+    "horizon": 192,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-acda232f3d3b97f5": {
+   "entry_signal_key": "EK-d9bc4638c5387bd377e3",
+   "exit": {
+    "horizon": 96,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-d9bc4638c5387bd377e3, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-5e78172a43be4822",
+   "twin_exit": {
+    "horizon": 48,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-af5b9301777d21a5": {
+   "entry_signal_key": "EK-a78d306ae01bd7ea56b0",
+   "exit": {
+    "horizon": 64,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-a78d306ae01bd7ea56b0, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-db25d24ca1ca4c96",
+   "twin_exit": {
+    "horizon": 32,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-c515b31a298bdaf1": {
+   "entry_signal_key": "EK-e9867128ed0f71eaf242",
+   "exit": {
+    "horizon": 96,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-e9867128ed0f71eaf242, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-80fe4b122603f292",
+   "twin_exit": {
+    "horizon": 48,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-ce1509d352d34861": {
+   "entry_signal_key": "EK-a78d306ae01bd7ea56b0",
+   "exit": {
+    "horizon": 24,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-a78d306ae01bd7ea56b0, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-db25d24ca1ca4c96",
+   "twin_exit": {
+    "horizon": 32,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-d00961a63fe7e300": {
+   "entry_signal_key": "EK-bce3ab20af48b8653b75",
+   "exit": {
+    "horizon": 192,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-bce3ab20af48b8653b75, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-a2aa1c77ccf11ba3",
+   "twin_exit": {
+    "horizon": 96,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  },
+  "S-e941fd88b7880cd1": {
+   "entry_signal_key": "EK-e9867128ed0f71eaf242",
+   "exit": {
+    "horizon": 192,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   },
+   "reason": "same entry signal EK-e9867128ed0f71eaf242, different exit (one per entry signal, ADR 0031)",
+   "twin": "S-80fe4b122603f292",
+   "twin_exit": {
+    "horizon": 48,
+    "stop_loss_bp": null,
+    "take_profit_bp": null
+   }
+  }
+ }
+}
