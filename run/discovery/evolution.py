@@ -458,6 +458,28 @@ def behaviour_key(spec: Mapping) -> str:
     return "BK-" + hashlib.sha256(canonical_json(_behaviour_body(spec)).encode()).hexdigest()[:20]
 
 
+def entry_signal_key(spec: Mapping) -> str:
+    """Hash of WHEN a strategy enters (the behaviour key without the exit).
+
+    Two strategies with the same key take the same entries on every input and
+    differ only in how they leave (horizon, stop-loss, take-profit); a
+    validation batch treats them as one hypothesis (ADR 0031)."""
+    body = {k: v for k, v in _behaviour_body(spec).items() if k != "exit"}
+    return "EK-" + hashlib.sha256(canonical_json(body).encode()).hexdigest()[:20]
+
+
+def near_entry_duplicate(a: Mapping, b: Mapping) -> Optional[str]:
+    """None, or why the ENTRIES of two specs are near duplicates, whatever their
+    exits: ``near_duplicate`` with ``b``'s exit replaced by ``a``'s.  Closes the
+    gap between the exact entry key and the near-duplicate rule (which keeps
+    the exit in its structure): entries within half a mutation step that also
+    differ in the exit are one hypothesis too (ADR 0033)."""
+    ca, cb = canonicalize_spec(a), _strip_derived(canonicalize_spec(b))
+    cb["exit"] = copy.deepcopy(ca["exit"])
+    why = near_duplicate(ca, cb)
+    return None if why is None else "entries " + why + " (exit ignored)"
+
+
 def _near_tolerance(feature: str) -> float:
     """Half of the smallest deliberate threshold step of ``op_tweak_threshold``
     (0.25 on z-like scales, 5 on 0-100 scales): one mutation step is always a

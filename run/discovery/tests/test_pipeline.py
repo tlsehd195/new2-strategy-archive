@@ -151,6 +151,10 @@ def hour_spec(lo, hi, *, horizon=8, direction="long"):
 
 
 EDGE = hour_spec(0, 2)
+# a second real edge with a DIFFERENT entry signal: since ADR 0031 a validation
+# batch takes one candidate per entry signal, so an exit-only variant of EDGE
+# (e.g. horizon=9) is skipped, not validated
+EDGE2 = hour_spec(0, 3)
 NOISE = [hour_spec(h, h + 2) for h in range(4, 24, 2)]          # 10 hours without drift
 
 
@@ -229,7 +233,7 @@ class TestStagedPipeline(PipelineCase):
     def test_batch_is_preregistered_before_results_and_spends_alpha(self):
         from stats_mc import spending_alpha
         p = self.pipe(SyntheticProvider())
-        self.register_all(p, [EDGE, hour_spec(0, 2, horizon=9)] + NOISE[:7])
+        self.register_all(p, [EDGE, EDGE2] + NOISE[:7])
         p.run_validation(max_batch=1)
         p.run_validation(max_batch=1)
         recs = list(iter_jsonl(p.batch_path))
@@ -264,7 +268,7 @@ class TestLockedCampaigns(PipelineCase):
     def test_window_retires_after_campaign_budget(self):
         p = self.pipe(SyntheticProvider(), cfg_patch={"locked": {"max_campaigns_per_window": 1}})
         ctx = p.context_id()
-        e1, e2, *_ = self.register_all(p, [EDGE, hour_spec(0, 2, horizon=9)] + NOISE[:7])
+        e1, e2, *_ = self.register_all(p, [EDGE, EDGE2] + NOISE[:7])
         p.run_validation(max_batch=1)
         first = [s for s in (e1, e2) if p.statuses.status(s, ctx) == "VALIDATION_SURVIVOR"]
         self.assertEqual(len(first), 1)
@@ -282,7 +286,7 @@ class TestLockedCampaigns(PipelineCase):
         from campaigns import member_alpha
         from stats_mc import spending_alpha
         p = self.pipe(SyntheticProvider())
-        e1, e2, *_ = self.register_all(p, [EDGE, hour_spec(0, 2, horizon=9)] + NOISE[:7])
+        e1, e2, *_ = self.register_all(p, [EDGE, EDGE2] + NOISE[:7])
         p.run_validation()
         camp = p.run_locked_campaign()
         pre = [r for r in p.campaigns.records() if r["kind"] == "PREREGISTERED"][0]

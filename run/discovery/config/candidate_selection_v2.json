@@ -1,0 +1,7 @@
+{
+ "schema": "candidate_selection_v2",
+ "note": "Fixed 2026-10-23 (ADR 0033), replaces v1 (ADR 0031) as the default; v1 stays readable for the R7 evidence. Same rules as v1 plus one_per_near_entry_signal: a candidate whose ENTRIES are within half a mutation step of an already selected or submitted candidate (evolution.near_entry_duplicate = near_duplicate with the exit ignored) is the same hypothesis even when its exit differs. v1 caught exact-entry twins and near twins with the same exit, but not near twins with a different exit. Each skip records both exits. This can only remove candidates from a batch, never add one, and changes no statistical criterion.",
+ "one_per_entry_signal": true,
+ "one_per_near_entry_signal": true,
+ "one_per_near_duplicate": true
+}
