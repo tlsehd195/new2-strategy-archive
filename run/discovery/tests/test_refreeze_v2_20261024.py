@@ -34,6 +34,9 @@ IW1_REFREEZE = EV / "IW1_members_refreeze_DRAFT.json"
 OLD_MEMBERS = REPO / "run" / "audit" / "evidence_independent_window_20261021" / "IW1_members.json"
 CRIT_V2 = DISC / "config" / "cost_public_estimate_v2_alts.json"
 CRIT_V3 = EV / "cost_public_estimate_v3_alts_DRAFT.json"
+CRIT_V3_CONFIG = DISC / "config" / "cost_public_estimate_v3_alts.json"
+CRIT_V3_CONFIG_SHA256 = "e11e1ccc4e34a030e0ab0e2ee4e833aa4e9f18acb674e06222d701fc057d8da6"
+V2_R2 = EV / "forward_window_v2_FINALFORM_DRAFT_r2.json"
 #: symbols of the order-book collection running on the user's PC (2026-10-23..27)
 PC_COLLECTION = {"SOLUSDT", "XRPUSDT", "DOGEUSDT", "BNBUSDT", "ADAUSDT", "AVAXUSDT", "LINKUSDT",
                  "SUIUSDT", "LTCUSDT", "DOTUSDT"}
@@ -159,7 +162,33 @@ class TestDrafts(unittest.TestCase):
         self.assertEqual(diff, {"note", "required_symbols", "status"})
         self.assertTrue(set(v3["required_symbols"]) <= PC_COLLECTION)
         self.assertIn("DRAFT", v3["status"])
-        self.assertFalse((DISC / "config" / "cost_public_estimate_v3_alts.json").exists())
+
+    def test_v3_alt_criteria_config_q1b(self):
+        """Q1-B (ADR 0037): the config equals the reviewed draft except the
+        notes, and is pinned by sha256 (a change needs a new version file)."""
+        cfg, sha = load_criteria(CRIT_V3_CONFIG)
+        draft = json.loads(CRIT_V3.read_text())
+        notes = {"note", "status", "supersedes_for_v2"}
+        self.assertEqual({k: v for k, v in cfg.items() if k not in notes},
+                         {k: v for k, v in draft.items() if k not in notes})
+        self.assertEqual(sha, CRIT_V3_CONFIG_SHA256)
+        self.assertNotIn("DRAFT", json.dumps(cfg))
+
+    def test_v2_r2_liquid9(self):
+        r1, r2 = json.loads(V2_FINAL.read_text()), json.loads(V2_R2.read_text())
+        rep = pg.evaluate(V2_R2)
+        self.assertEqual(rep["lifecycle"], "DRAFT")
+        self.assertEqual((rep["required_missing"], rep["issues"]), ([], []))
+        self.assertEqual(r2["supersedes"]["sha256"], hashlib.sha256(V2_FINAL.read_bytes()).hexdigest())
+        self.assertEqual(r2["basket"]["symbols"], ["BTCUSDT", "ETHUSDT", "BNBUSDT", "XRPUSDT", "SOLUSDT",
+                                                    "ADAUSDT", "DOGEUSDT", "LTCUSDT", "LINKUSDT"])
+        self.assertTrue(set(r2["basket"]["symbols"]) - {"BTCUSDT", "ETHUSDT"} <= PC_COLLECTION)
+        for k in ("test", "window", "single_use", "family", "members", "alpha_split"):
+            self.assertEqual(r2[k], r1[k], k)
+        self.assertEqual(r2["cost"]["profile"], "assumed_public_v1")
+        self.assertEqual(r2["cost"]["criteria_sha256"], CRIT_V3_CONFIG_SHA256)
+        self.assertEqual(list(r2["pending_at_freeze"]), ["Q2"])
+        self.assertIn("Q1", r2["decided"])
 
     def test_iw1_refreeze_draft(self):
         mem = json.loads(IW1_REFREEZE.read_text())

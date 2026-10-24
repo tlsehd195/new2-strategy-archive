@@ -1,0 +1,164 @@
+{
+ "schema": "forward_window_prereg_v2",
+ "status": "DRAFT - NOT IN FORCE (ADR 0036, revision r2 ADR 0037). Final-form layout of the v2 draft: the schema is already the final one (forward_window_prereg_v2) and prereg_gate finds no missing required field, but this status line marks it as a draft, so the gate keeps it DRAFT whatever else exists. On 2026-10-31, after the user's final decisions (pending_at_freeze), a NEW file is written from this one: status replaced, the pending answers applied, pending_at_freeze removed. Members are frozen against THAT file's sha256 (forward_window_freeze.py), and it is activated only by a committed prereg_activation_v1 record approved by 동동, all committed before window_start. No window is open; nothing reads this file.",
+ "supersedes": {
+  "file": "run/audit/evidence_refreeze_v2_20261024/forward_window_v2_FINALFORM_DRAFT.json",
+  "sha256": "852d20b36890b21da2364a71339f4d7e82d7db939500362ac2c55d8f1f16d05b",
+  "changes": [
+   "Q1 decided = B: basket is the liquid 9 (same universe as the v3 draft, V4); cost criteria config/cost_public_estimate_v3_alts.json for D2",
+   "C1 and C2 accepted as recommended",
+   "pending_at_freeze keeps only Q2",
+   "freeze_procedure step 1 done"
+  ],
+  "earlier": {
+   "file": "run/audit/evidence_prereg_v2_20261021/forward_window_v2_DRAFT.json",
+   "sha256": "1d9c928efbb4f510edbda18e06eb5b3596c0bfa874634b69f48763e46434d110",
+   "changes": [
+    "schema forward_window_prereg_v2_DRAFT -> forward_window_prereg_v2 (the _DRAFT schema can never be ACTIVE, ADR 0029); draft status kept in the status line",
+    "members.rule made mechanical: validation_candidates() order + entry bar on S1 (C1 below); the ADR 0024 top-5 mention in D3 was the motivating evidence, not the selection rule",
+    "members.entry_bar_s1_sr = 1.0 and members.entry_bar_tool named (C2)",
+    "members.file_schema forward_window_members_v2 + freeze tool forward_window_freeze.py",
+    "cost: the D2 measured-cost path cannot fire as written (C3): the running collection does not cover 8 of the 15 basket symbols; options are in pending_at_freeze Q1",
+    "power_table recomputed at alpha 0.0213 for 15 and 9 symbols",
+    "basket re-check items at freeze (HYPE excluded, every symbol still trading, >=180 days)"
+   ]
+  }
+ },
+ "family": "forward-window-family-v2",
+ "window": {
+  "kind": "forward (data does not exist yet, so nothing can have been read)",
+  "window_start": "2026-11-01",
+  "window_end": "2027-10-31",
+  "length_months": 12,
+  "warmup": "indicator warmup data from BEFORE window_start may be read; entries only inside the window; exits at or before window_end",
+  "single_look": "evaluated ONCE after window_end. No interim evaluation, no peeking at member P&L inside the window. Paper replays or live monitoring of the same members are forbidden to be used for decisions on this family.",
+  "extension_option": "DECIDED (D1): 12 months; no 24-month extension. More evidence comes from a second window of the same family."
+ },
+ "basket": {
+  "rule": "the liquid 9 of ADR 0024: symbols whose assumed one-side cost for a 10,000 USDT order (2021-01..2023-09 median bar traded value) is <= 75 bp; chosen by cost only, never by performance; identical to the v3 draft universe (V4). Fixed in this file; a symbol that stops trading is kept with zero return afterwards (no survivorship repair).",
+  "symbols": [
+   "BTCUSDT",
+   "ETHUSDT",
+   "BNBUSDT",
+   "XRPUSDT",
+   "SOLUSDT",
+   "ADAUSDT",
+   "DOGEUSDT",
+   "LTCUSDT",
+   "LINKUSDT"
+  ],
+  "size": 9,
+  "decided": "Q1-B 2026-10-24 by 동동 (\"너의 추천으로 진행해\", ADR 0037). Reason: every alt in it is covered by the running order-book collection, so D2 can actually use a measured cost; 15 -> 9 symbols changes the required annual SR only 2.27 -> 2.30 (rho 0.6).",
+  "recheck_at_freeze": "on 2026-10-31 confirm each symbol still has a trading Binance USD-M perpetual with >=180 days of history at window_start; a failing symbol is dropped (not replaced) and the change is listed in the frozen file"
+ },
+ "members": {
+  "max": 5,
+  "rule": "take pipeline.validation_candidates() of ONE DEV-only evolve state directory run on the then-current code (default candidate selection config, one per entry signal, ADR 0031/0033), in its own order; score each with run/forward_v2_entry_bar_dev.py on basket.symbols and cost.profile; the members are the first 5 in that order whose S1 annual SR >= entry_bar_s1_sr. Frozen with run/discovery/forward_window_freeze.py to a forward_window_members_v2 file bound to this prereg's sha256 and the evaluation-code hash. Each member's rule is applied to every basket symbol.",
+  "entry_bar_s1_sr": 1.0,
+  "entry_bar_tool": "run/forward_v2_entry_bar_dev.py (engine signal/stop/event code, DEV stretches S1 2021-04-01..2023-09-18 and S2 2024-07-15..2025-10-20 of strong_search_dev with the same refused reads; S2 never reads BTC). S1 decides, S2 is reported.",
+  "too_few": "fewer than 5 candidates pass the entry bar -> registrable false -> the window is NOT registered and nothing is spent (D5)",
+  "file_schema": "forward_window_members_v2",
+  "bundle_option": "DECIDED (D3): one bundle hypothesis. members.max stays 5; they are weighted equally."
+ },
+ "cost": {
+  "profile": "assumed_public_v1",
+  "order_value": 10000.0,
+  "measured_alt_cost": "D2 (decided): replaced by a measured cost only if a public_market_estimate record made with config/cost_public_estimate_v3_alts.json (criteria sha256 e11e1ccc4e34a030e0ab0e2ee4e833aa4e9f18acb674e06222d701fc057d8da6) is usable (ESTIMATED_FROM_PUBLIC_DATA) and SEALED BEFORE the 2026-10-31 freeze; then entry-bar scoring, member selection and evaluation all use it from scratch. Otherwise assumed_public_v1 stays and the measured cost is reported as a diagnostic.",
+  "criteria_file": "run/discovery/config/cost_public_estimate_v3_alts.json",
+  "criteria_sha256": "e11e1ccc4e34a030e0ab0e2ee4e833aa4e9f18acb674e06222d701fc057d8da6",
+  "criteria_committed_before_data": "committed 2026-10-24, before the collection (ends 2026-10-27 ~12:46Z) was uploaded or looked at",
+  "measured_naming": "if replaced, profile becomes 'public_estimate:<sealed record file name>' and the record's sha256 is listed here",
+  "status": "ALT_COST_DEPENDENT until 2026-10-31: which profile applies is known only after the estimate is run"
+ },
+ "test": {
+  "statistic": "per member, equal-weight average over basket symbols of the daily net return series (bp, exit-day booking) on the common UTC-day grid of the window",
+  "method": "two one-sided studentized bootstrap tests (stats_mc.stepm with a single series, i.e. K=1) of H0 mean <= 0, both at alpha, on (i) the bundle series and (ii) the beta-hedged bundle series; the bundle passes only if BOTH reject (intersection-union)",
+  "alpha": 0.0213,
+  "alpha_note": "DECIDED 2026-10-22 (동동, ADR 0025): the forward-window family alpha 0.0304 is split by Bonferroni between v2 (this file, 0.7 x 0.0304 = 0.0213) and the walk-forward e-value v3 (0.3 x 0.0304 = 0.0091), because both use forward data from 2026-11. Sum = 0.0304, valid whatever the correlation of the two tests. Both gates (unhedged and beta-hedged) at 0.0213 (intersection-union). Previously 0.0304.",
+  "bootstrap_B": 10000,
+  "bootstrap_B_why": "ADR 0022 side finding: with B=1000 the critical value cannot go below the max of 1000 draws (effective alpha ~0.001). B >= 20*m/alpha ~ 3300 is needed for alpha/m; 10000 used.",
+  "pass": "both tests reject AND pooled events >= 60 AND >= 30 non-zero days (unchanged)",
+  "beta_report": "required in the report; since D4 is decided it is also the second gate",
+  "beta_hedge": "hedged_t = bundle_t - beta * basket_buy_and_hold_t, beta = OLS slope on the equal-weight 15-symbol buy-and-hold daily series, estimated on the window itself (no look-ahead issue because the series is only used for evaluation, not for trading); beta and the unhedged/hedged means are reported"
+ },
+ "single_use": "RESERVED marker + window key appended to validation_window_history.jsonl before any member is evaluated; same mechanism as independent_window.py",
+ "power_table": {
+  "method": "normal approximation as ADR 0016/0017/0023, K=1 (D3), alpha 0.0213 (after the v2/v3 split), equal annual SR on each symbol, constant edge (an upper bound), pooling boost sqrt(M/(1+(M-1)rho)). The beta-hedged second gate (D4) lowers power further; treat as upper bounds.",
+  "basket_15_12m": {
+   "rho_0.3": {
+    "sr_for_80pct_power": 1.69,
+    "power_at_sr_1.0": 0.37,
+    "power_at_sr_1.5": 0.7,
+    "power_at_sr_2.0": 0.91
+   },
+   "rho_0.6": {
+    "sr_for_80pct_power": 2.27,
+    "power_at_sr_1.0": 0.22,
+    "power_at_sr_1.5": 0.45,
+    "power_at_sr_2.0": 0.69
+   }
+  },
+  "liquid_9_12m": {
+   "rho_0.3": {
+    "sr_for_80pct_power": 1.76,
+    "power_at_sr_1.0": 0.34,
+    "power_at_sr_1.5": 0.66,
+    "power_at_sr_2.0": 0.89
+   },
+   "rho_0.6": {
+    "sr_for_80pct_power": 2.3,
+    "power_at_sr_1.0": 0.22,
+    "power_at_sr_1.5": 0.44,
+    "power_at_sr_2.0": 0.68
+   }
+  },
+  "rho_note": "crypto daily returns across these symbols correlate ~0.6-0.8 in a market move; rho 0.6 is the realistic row. A signal that is mostly market beta is not helped by pooling and the 12m/rho 0.6 row is the honest one: needs annual SR ~2.2-2.7.",
+  "reading": "The basket is the liquid 9 (Q1-B). rho 0.6 row: required annual SR 2.30 at 80% power (2.27 for the old 15). Upper bounds."
+ },
+ "decided": {
+  "D3": "yes - the 5 members are tested as ONE bundle hypothesis (equal-weight daily series of the 5 members, then the basket average). K=1, one more degree of selection: the bundle is chosen on DEV (ADR 0024 top-5), reported as such.",
+  "D4": "yes - second gate: beta-hedged bundle series must also reject H0 (mean <= 0) at the same alpha. Intersection-union test: size <= alpha without splitting alpha; power <= the weaker of the two.",
+  "D1": "12 months (2026-11-01..2027-10-31). Result earliest 2027-11. A second window of the same family (alpha spending k=2) rather than extending this one.",
+  "D2": "the assumed alt cost is replaced by a MEASURED alt cost (criteria cost_public_estimate_v2_alts.json, ESTIMATED_FROM_PUBLIC_DATA) when one is sealed. To prevent cherry-picking, replacement is allowed only if the estimate is sealed BEFORE the freeze date (D5): then the universe rule, the member selection and the evaluation all use it, re-run from scratch. Sealed later: assumed_public_v1 stays for this window; the measured cost is reported alongside as a diagnostic.",
+  "D5": "members file frozen on 2026-10-31 (DEV-only evolve run on the then-current code, ADR 0023 entry rule DEV SR >= 1.0). If fewer than 5 members meet the entry rule, the window is not registered and nothing is spent.",
+  "Q1": "B 2026-10-24 by 동동 (\"너의 추천으로 진행해\", ADR 0037): liquid 9 basket + cost criteria v3_alts for D2"
+ },
+ "alpha_split": {
+  "decided": "2026-10-22 by 동동 (option 2: share the forward data, split alpha)",
+  "family_alpha_total": 0.0304,
+  "v2_share": 0.7,
+  "v2_alpha": 0.0213,
+  "v3_share": 0.3,
+  "v3_alpha": 0.0091,
+  "v3_file": "run/audit/evidence_evalue_v3_20261022/walkforward_evalue_v3_DRAFT.json",
+  "why_7_to_3": "run/audit/evidence_evalue_v3_20261022/split_results.json: with both earning the same edge, P(either rejects by 36 months) is nearly flat across splits (SR2 0.67-0.68, SR3 0.90-0.96), so the split decides WHEN evidence arrives. 7:3 keeps v2's 12-month power within 2-4 points of the unsplit test (SR2 0.675 -> 0.626, SR3 0.900 -> 0.880) while v3 still reaches SR3 0.88 / SR2 0.37 by 36 months.",
+  "ratio_confirmed": "2026-10-22 by 동동 (\"추천으로 해\"): 7:3 final"
+ },
+ "clarifications": {
+  "C1": "Members rule. The old draft said both 'first 5 of validation_candidates()' (members.rule) and 'the bundle is chosen on DEV (ADR 0024 top-5)' (D3). Only the first is mechanical and reproducible by a tool at freeze; ADR 0024's top-5 came from a separate 3,856-rule search with no freeze tool and a large trial count. Recommended reading: members.rule above; ADR 0024 stays the evidence that a bundle is the right unit. Same unit as the v3 draft (its rerun_rule also takes the evolve pipeline's top 5). ACCEPTED 2026-10-24 by 동동 (\"너의 추천으로 진행해\", ADR 0037).",
+  "C2": "Entry bar. 'DEV annual SR >= 1.0 in the 2021-2025 DEV stretches' did not say which stretch. Recommended: S1 decides (the selection stretch, as ADR 0019/0024), S2 reported. ACCEPTED 2026-10-24 by 동동 (\"너의 추천으로 진행해\", ADR 0037)."
+ },
+ "pending_at_freeze": {
+  "Q2": {
+   "label": "ALT_COST_DEPENDENT",
+   "question": "Register v2 at all on 10-31?",
+   "fact": "D5: registered only if 5 candidates pass the entry bar. Rehearsal with assumed cost on R9: liquid 9 0/33 pass (best S1 +0.17; rehearsal_v2_entry_bar_liquid9_assumed.json). If a measured cost is sealed before 10-31 the count is redone with it (run/forward_v2_entry_bar_dev.py --cost-record, a few hours).",
+   "options": {
+    "register": "if registrable is true, activate after the user's read-through (spends nothing until the window ends; result 2027-11)",
+    "do not register": "if registrable is false the rule itself says no window; nothing is spent and v3 (e-value, from 2026-12-01) is the only forward evidence"
+   }
+  }
+ },
+ "freeze_procedure": [
+  "1. DONE 2026-10-24: config/cost_public_estimate_v3_alts.json committed before the collected data were uploaded. After upload: run public_cost_estimate.py --criteria run/discovery/config/cost_public_estimate_v3_alts.json and seal the record (usable or not, it is kept)",
+  "2. write the final prereg file from this draft: set cost.profile per D2, remove pending_at_freeze, replace status (no DRAFT/NOT IN FORCE words); commit it",
+  "3. DEV-only evolve run on the then-current code (NEW2_COST_PROFILE as R7/R8); keep the state dir",
+  "4. run/forward_v2_entry_bar_dev.py on validation_candidates() with basket.symbols and cost.profile",
+  "5. forward_window_freeze.py -> members file (registrable true/false); commit it with the repro bundle",
+  "6. prereg_gate.py --prereg <final> --members <file>: must show no issue except the missing activation",
+  "7. user's final read-through; prereg_activation_v1 record (approved_by 동동, checklist all true) committed before 2026-11-01T00:00Z; prereg_gate must show ACTIVE",
+  "8. nothing is evaluated until after 2027-10-31"
+ ],
+ "not_changed": "no stats criterion is looser than promo-v3 / IW1 v1; locked TEST, paper and promotion rules (ADR 0009/0010) are unchanged; IW1 stays closed.",
+ "reliability_flag": "All cost-dependent numbers (DEV SR of the bundle, member selection, universe) rest on the ASSUMED cost profile assumed_public_v1 for alts, not on a measurement (ADR 0022/0024). Alt order books were not collected. Re-select the universe and members if a measured alt cost is sealed before freeze (D2). ADR 0036: rehearsal numbers in this directory also rest on assumed cost. r2: basket now liquid 9; the rehearsal count 0/33 is still on assumed cost."
+}
