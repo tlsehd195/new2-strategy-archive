@@ -38,3 +38,4 @@
 | [0032](0032-pdf-papers-gk1996-wsr-appendix-rw2003.md) | PDF로 받은 논문 3편 대조(Götze–Künsch 1996, WS-R v7 부록, Romano–Wolf 2003): GK 블록 StepM·WS-R 베팅 규칙 추가(기본값 그대로), ONS 인쇄 부호 오류·"PrPl-EB" 이름 정정 | Accepted (측정·도구) |
 | [0033](0033-pr30-review-near-entry-duplicates.md) | PR #30 검토: 진입이 반 단계 안이고 청산만 다른 후보도 한 가설(selection v2), 스킵에 양쪽 청산 기록, R8에서 R7 결과 재현(DEV 통과 63, 배치 33, 독립 검증 0) | Accepted |
 | [0034](0034-ci-billing-v1-ledger-check-draft-members-vol-spread.md) | main CI 실패 원인은 GitHub 결제(코드 무관), v1 기록 원장 검사·CI 단계 추가, DRAFT 사전등록도 멤버 동결 점검 보고, 변동성 비례 스프레드 진단 | Accepted (진단·검사) |
+| [0035](0035-broad-universe-cross-sectional-dev.md) | 종목 수를 늘린 횡단면 가설 4개(모멘텀·반전·펀딩 캐리·저변동성, 시점별 상위 50개, DEV 전용): 가정 비용에서 전부 손실, 비용 전에도 우연 이상 없음, 측정 비용으로 재실행 예정 | Accepted (측정) |

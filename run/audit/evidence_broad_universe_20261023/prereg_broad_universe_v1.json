@@ -1,0 +1,42 @@
+{
+ "schema": "broad_universe_prereg_v1",
+ "written": "2026-10-23T14:20Z",
+ "written_before_any_result": true,
+ "requested_by": "동동, 2026-10-23 '코인 수 늘려봐' (after the strategy-search review recommended a few economically motivated hypotheses on a broad universe)",
+ "question": "On a broad, point-in-time universe of Binance USDT-M perpetuals, does any of four cross-sectional hypotheses with a known economic story earn a positive return after assumed costs on DEV data only?",
+ "scope": "DEV only. No validation, locked, paper or IW1 window. No criteria change. Results are research notes; nothing here is promoted or sent to a validation window.",
+ "universe": {
+  "source": "every USDT-quoted symbol under data/futures/um/monthly/klines/ of the public Binance archive (S3 mirror), including symbols delisted later (no survivorship filter)",
+  "exclude": "stable or fiat bases (USDC, BUSD, TUSD, FDUSD, USDP, DAI, USDE, EUR, GBP, AEUR) and index contracts (names containing DOM or DEFI)",
+  "point_in_time_rule": "at each rebalance: symbols with at least 60 complete daily bars before the signal cut-off, ranked by mean daily quote volume over the 30 days before the cut-off; keep the top 50",
+  "segment_rule": "BTCUSDT is not read in S2 (BTC locked TEST/paper era, ADR 0019); every other symbol obeys the never_read list"
+ },
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "first_rebalance_from": "2021-03-01", "use": "the only segment that decides anything"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "first_rebalance_from": "2024-08-19", "use": "reported only, never used to choose"}
+ },
+ "never_read": [["2000-01-01", "2020-12-31", "IW1"], ["2023-09-19", "2024-06-18", "BTC validation/locked TEST + embargo, all symbols"], ["2025-10-21", "2099-12-31", "ETH validation/locked/paper + embargo, all symbols"]],
+ "timing": "rebalance every Monday at the 00:00 UTC daily open. Signals use daily bars that closed by Sunday 00:00 UTC (one day skipped, against bid-ask bounce and look-ahead). Positions are held 7 days to the next rebalance.",
+ "portfolio": "long the 10 best and short the 10 worst of the 50 by the hypothesis signal, equal weight, +1/20 and -1/20 of capital per name (gross 1, net 0). Ties broken by symbol name.",
+ "missing_data": "never filled. A held symbol with no daily bar earns 0 that day and is closed at the next rebalance at its last close; such days are counted and reported (delisting losses may be missed).",
+ "hypotheses": [
+  {"id": "H1_MOM28", "story": "cross-sectional momentum: slow diffusion of information / trend chasing across coins", "signal": "28-day return to the cut-off", "long": "top 10", "short": "bottom 10"},
+  {"id": "H2_REV7", "story": "short-term reversal: liquidity providers paid for absorbing one-week overreaction", "signal": "7-day return to the cut-off", "long": "bottom 10", "short": "top 10"},
+  {"id": "H3_CARRY7", "story": "funding carry: crowded longs pay funding; short high-funding and long low-funding coins and collect the difference", "signal": "mean settled funding rate per 8h over the 7 days to the cut-off (rates of 1h/4h symbols scaled to 8h)", "long": "bottom 10", "short": "top 10"},
+  {"id": "H4_LOWVOL30", "story": "low-volatility anomaly: lottery demand overprices volatile coins", "signal": "standard deviation of the last 30 daily returns to the cut-off", "long": "lowest 10", "short": "highest 10"}
+ ],
+ "trials": "exactly these 4, each run once. A new family on new data (broad universe), recorded in run/audit/dev_search_trials.jsonl. The report also shows the deflation against the cumulative count of earlier DEV searches for reference.",
+ "cost": {
+  "profile": "assumed_public_v1 (taker 5bp + half spread 2bp + slippage 3bp + 0.1*sqrt(10,000 USDT / quote volume of the 15m bar before execution), every side), charged on each name's absolute weight change at every rebalance with an order value of 10,000 USDT per name",
+  "impact_bar": "the 23:45-00:00 UTC 15m bar before the Monday open, read from the 15m archive; if that bar is missing the day's quote volume / 96 is used and counted",
+  "participation": "a name whose order would exceed 5% of that bar is still traded but flagged and counted (the profile's max participation), not dropped",
+  "funding": "actual settled funding on every held position (short receives positive funding)",
+  "sensitivity_reported_only": ["cost x2", "cost x0", "no impact term (flat 10bp per side)"],
+  "status": "ASSUMED. Alt order books are being measured (ends about 2026-10-27); the run will be repeated once with the measured cost and counted as a new run of the same 4."
+ },
+ "statistics": {
+  "unit": "daily portfolio return, entry-day booking, simple sum",
+  "report": "annualised Sharpe, annual return, max drawdown, t of mean, beta and correlation to the equal-weight universe, beta-adjusted mean and its t, S1 halves, S2, sensitivity rows, turnover per rebalance, cost share",
+  "dev_flag_not_a_verdict": "DEV_PROMISING only if, under assumed cost: S1 annual Sharpe above the expected maximum of 4 unskilled trials over the S1 length, S1 beta-adjusted mean t >= 2, both S1 halves positive, and S2 annual Sharpe > 0.5. Anything else is NOT_PROMISING. The flag never opens a window; a DEV_PROMISING hypothesis can only be proposed for a new preregistered forward window."
+ }
+}
