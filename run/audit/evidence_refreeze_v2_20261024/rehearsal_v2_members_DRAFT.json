@@ -1,0 +1,239 @@
+{
+ "code": {
+  "code_hash": "480ea0365f62377a172d26cd025a4576925681cc7349eddd869bc091b58703e6"
+ },
+ "considered": [
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -2.2008095807197274,
+   "s2_sr_ann": 0.12573452534690005,
+   "strategy_id": "S-80fe4b122603f292"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -2.2264987562440535,
+   "s2_sr_ann": -0.4043714765436158,
+   "strategy_id": "S-db25d24ca1ca4c96"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -0.8879638037210629,
+   "s2_sr_ann": 0.33676619997532403,
+   "strategy_id": "S-181c15b4139efdd3"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -3.1290153198534463,
+   "s2_sr_ann": -0.9755336080346991,
+   "strategy_id": "S-9d752d63324074cc"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -1.6805465085841886,
+   "s2_sr_ann": -0.32931764637298594,
+   "strategy_id": "S-b5e5df1c18d5a57d"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -0.9801711520429409,
+   "s2_sr_ann": -0.5940691678435407,
+   "strategy_id": "S-1ec0bc1c95b4c488"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -1.3135293836146456,
+   "s2_sr_ann": -0.6028441922251137,
+   "strategy_id": "S-3a3dbdf422939143"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -0.40327084260431256,
+   "s2_sr_ann": -0.048982197474195535,
+   "strategy_id": "S-72655636c7034155"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -4.1217454453435325,
+   "s2_sr_ann": -2.724400044552845,
+   "strategy_id": "S-ace182d55342733b"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -0.7761817063709829,
+   "s2_sr_ann": -0.26559803060891934,
+   "strategy_id": "S-5f8884793cae1ba1"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -1.1986818798625918,
+   "s2_sr_ann": -0.8467504324853188,
+   "strategy_id": "S-a990790314cf322d"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -1.3413278420676438,
+   "s2_sr_ann": -0.7363766363359923,
+   "strategy_id": "S-043c5506668fb8f1"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -6.151874341311853,
+   "s2_sr_ann": -9.284510517386742,
+   "strategy_id": "S-91ab3cffaa7bab47"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -2.227852696690172,
+   "s2_sr_ann": -0.17664852008387683,
+   "strategy_id": "S-e9d1bf7b37ad8eb8"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -1.7858669041772417,
+   "s2_sr_ann": 0.15085875242421787,
+   "strategy_id": "S-0f439995bcd4af4d"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -1.089929673716586,
+   "s2_sr_ann": -0.3858344740515821,
+   "strategy_id": "S-adf9e2e1e6bc8af8"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -6.60899592436523,
+   "s2_sr_ann": -8.116172406633856,
+   "strategy_id": "S-f8b1648d499419f6"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -1.098130367112328,
+   "s2_sr_ann": -0.852903522970865,
+   "strategy_id": "S-aa609b6862018d48"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -1.289273975087132,
+   "s2_sr_ann": 0.014014773282823854,
+   "strategy_id": "S-bc62b843361277d5"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -1.2458738787978998,
+   "s2_sr_ann": -2.786583207707597,
+   "strategy_id": "S-ed2d1c8ed9cf1879"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -0.8554416627378377,
+   "s2_sr_ann": -0.19187209922457643,
+   "strategy_id": "S-fd45e2af64d20e15"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -1.219112769761307,
+   "s2_sr_ann": -0.32785798873004485,
+   "strategy_id": "S-8e033ef78d187315"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -1.8952902730924315,
+   "s2_sr_ann": -0.8073374445870204,
+   "strategy_id": "S-21113d1f21e54643"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -2.0794960680986962,
+   "s2_sr_ann": -0.8986095229763842,
+   "strategy_id": "S-5e78172a43be4822"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -2.5662838940227757,
+   "s2_sr_ann": -1.7747982489891374,
+   "strategy_id": "S-d2815e608ab226a1"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -0.7633754560946736,
+   "s2_sr_ann": -0.2640651958576613,
+   "strategy_id": "S-f2273f0c4c2e00fd"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -3.10980163078413,
+   "s2_sr_ann": -2.3175966155681866,
+   "strategy_id": "S-00bfeb8ed64b092c"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -1.1042581664381372,
+   "s2_sr_ann": -0.7429758791526931,
+   "strategy_id": "S-a2aa1c77ccf11ba3"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -1.6741960102405138,
+   "s2_sr_ann": -1.0749894980078747,
+   "strategy_id": "S-63f95ff089ff1ea1"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -2.8675563327942064,
+   "s2_sr_ann": -1.1780686928372848,
+   "strategy_id": "S-64db241c60255cb4"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -1.6075025404931131,
+   "s2_sr_ann": -3.963254086867616,
+   "strategy_id": "S-3f825ccdd41fb32d"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -1.6075025404931131,
+   "s2_sr_ann": -3.963254086867616,
+   "strategy_id": "S-bdae1ff0b24876cc"
+  },
+  {
+   "entry_bar_pass": false,
+   "s1_sr_ann": -1.223004804813506,
+   "s2_sr_ann": -0.8866941393452202,
+   "strategy_id": "S-adec1de192ad9818"
+  }
+ ],
+ "context_id": "C2-ccfa2ef38101803483e1",
+ "entry_bar": {
+  "cost": "assumed_public_v1",
+  "s1_sr_ann_min": 1.0,
+  "scores_sha256": "ffbd0957eb56983cb0b9223e85186f3333a05f420c49273a0a20ee0c600f94a2",
+  "symbols": [
+   "BTCUSDT",
+   "ETHUSDT",
+   "BNBUSDT",
+   "XRPUSDT",
+   "SOLUSDT",
+   "TRXUSDT",
+   "ZECUSDT",
+   "DOGEUSDT",
+   "XMRUSDT",
+   "LINKUSDT",
+   "ADAUSDT",
+   "NEARUSDT",
+   "XLMUSDT",
+   "BCHUSDT",
+   "LTCUSDT"
+  ]
+ },
+ "family": "forward-window-family-v2",
+ "frozen_at": "2026-10-24T08:46:17Z",
+ "members": [],
+ "members_sha256": "79c13f84c7abf15e922670c8aed4498f2372b438eebb73b8c00b699fcebd2e81",
+ "prereg_sha256": "852d20b36890b21da2364a71339f4d7e82d7db939500362ac2c55d8f1f16d05b",
+ "registrable": false,
+ "registrable_meaning": "true: members.max candidates passed the entry bar; the window may be activated by a human. false: decision D5, the window is NOT registered and nothing is spent",
+ "rule": "take pipeline.validation_candidates() of ONE DEV-only evolve state directory run on the then-current code (default candidate selection config, one per entry signal, ADR 0031/0033), in its own order; score each with run/forward_v2_entry_bar_dev.py on basket.symbols and cost.profile; the members are the first 5 in that order whose S1 annual SR >= entry_bar_s1_sr. Frozen with run/discovery/forward_window_freeze.py to a forward_window_members_v2 file bound to this prereg's sha256 and the evaluation-code hash. Each member's rule is applied to every basket symbol.",
+ "schema": "forward_window_members_v2",
+ "state_dir": "/tmp/claude-0/-home-claude-new2-strategy-archive/4cac5d9a-3691-55ae-9dbb-f34b93b3eb64/scratchpad/r9root/state",
+ "unscored": []
+}

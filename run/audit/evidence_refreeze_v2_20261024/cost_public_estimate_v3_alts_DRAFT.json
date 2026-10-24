@@ -1,0 +1,35 @@
+{
+ "schema": "cost_public_estimate_criteria_v2",
+ "note": "DRAFT - NOT IN FORCE (ADR 0036). Written 2026-10-24, while the alt order-book collection was still running on the user PC and BEFORE anyone looked at its data. Same estimator and every threshold as cost_public_estimate_v2_alts.json; ONLY required_symbols differs: the 7 alts of the liquid-9 basket that the running collection covers (it does not collect TRX ZEC XMR NEAR XLM BCH, so v2_alts can only return INSUFFICIENT). BTC/ETH are not required: the engine takes the WORST symbol parameters, so they are charged at least the worst alt cost (conservative). Becomes a config only if the user picks prereg v2 option Q1-B on 2026-10-31 AND it is committed as config/cost_public_estimate_v3_alts.json before the collected data are uploaded or looked at.",
+ "required_symbols": [
+  "BNBUSDT",
+  "XRPUSDT",
+  "SOLUSDT",
+  "ADAUSDT",
+  "DOGEUSDT",
+  "LTCUSDT",
+  "LINKUSDT"
+ ],
+ "min_hours_per_symbol": 72,
+ "min_snapshots_per_symbol": 2000,
+ "max_gap_minutes": 10,
+ "max_gap_share": 0.02,
+ "max_invalid_share": 0.01,
+ "notionals": [
+  1000,
+  10000,
+  50000
+ ],
+ "impact_fit_min_notional": 10000,
+ "half_spread_quantile": 0.9,
+ "impact_ratio_quantile": 0.9,
+ "latency_move_quantile": 0.5,
+ "fee_profile": "assumed_public_v1",
+ "max_participation": 0.05,
+ "side_aggregation": "max",
+ "max_thin_share": 0.01,
+ "max_book_age_ms": 5000,
+ "max_kline_age_ms": 1020000,
+ "require_manifest": true,
+ "status": "DRAFT_NOT_IN_FORCE"
+}
