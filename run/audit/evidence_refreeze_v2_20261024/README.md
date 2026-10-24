@@ -20,3 +20,4 @@ R9 = the R7/R8 DEV-only command on main 491d073:
 | `rehearsal_v2_entry_bar_basket15_assumed.json` | `run/forward_v2_entry_bar_dev.py` on the 33 candidates, 15-symbol basket (two shards merged) |
 | `rehearsal_v2_entry_bar_liquid9_assumed.json` | same on the liquid 9 (preview of Q1-B, still assumed cost) |
 | `rehearsal_v2_members_DRAFT.json` | `run/discovery/forward_window_freeze.py` on the basket-15 scores: 0 members, registrable false (D5) |
+| `forward_window_v2_FINALFORM_DRAFT_r2.json` | ADR 0037: Q1-B applied (liquid 9, cost criteria v3_alts config), still DRAFT; only Q2 open |
