@@ -1,0 +1,1024 @@
+{
+ "code": {
+  "code_hash": "480ea0365f62377a172d26cd025a4576925681cc7349eddd869bc091b58703e6"
+ },
+ "context_id": "C2-ccfa2ef38101803483e1",
+ "excluded_before_test": {},
+ "frozen_at": "2026-10-24T07:39:16Z",
+ "members": [
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 96
+       },
+       "value": 1.5
+      },
+      {
+       "feature": "taker_share_z",
+       "op": "gt",
+       "params": {
+        "window": 1091
+       },
+       "value": 0.68
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 48,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k+taker_share_z:long",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 48,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-80fe4b122603f292"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 96
+       },
+       "value": 1.5
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 32,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k:long",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 32,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-db25d24ca1ca4c96"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 96
+       },
+       "value": 1.5
+      },
+      {
+       "feature": "ret_z",
+       "op": "gt",
+       "params": {
+        "lookback": 64,
+        "min_history": 0,
+        "window": 128
+       },
+       "value": 2.5
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 192,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k+ret_z:long",
+    "filters": [
+     {
+      "feature": "taker_share_z",
+      "op": "gt",
+      "params": {
+       "window": 1091
+      },
+      "value": 0.68
+     }
+    ],
+    "primary_cell": {
+     "horizon": 192,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-181c15b4139efdd3"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 96
+       },
+       "value": 1.25
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 32,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k:long",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 32,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-9d752d63324074cc"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 96
+       },
+       "value": 1.75
+      },
+      {
+       "feature": "taker_share_z",
+       "op": "gt",
+       "params": {
+        "window": 1091
+       },
+       "value": 0.68
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 96,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k+taker_share_z:long",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 96,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-b5e5df1c18d5a57d"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 96
+       },
+       "value": 1.5
+      },
+      {
+       "feature": "ret_z",
+       "op": "gt",
+       "params": {
+        "lookback": 64,
+        "min_history": 0,
+        "window": 128
+       },
+       "value": 2.5
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 192,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k+ret_z:long",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 192,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-1ec0bc1c95b4c488"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 96
+       },
+       "value": 1.5
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 96,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k:long",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 96,
+     "symbol": "ETHUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-3a3dbdf422939143"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 96
+       },
+       "value": 1.5
+      },
+      {
+       "feature": "ret_z",
+       "op": "gt",
+       "params": {
+        "lookback": 64,
+        "min_history": 0,
+        "window": 179
+       },
+       "value": 2.5
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 192,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k+ret_z:long",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 192,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-72655636c7034155"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 96
+       },
+       "value": 1.0
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 48,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k:long",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 48,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-ace182d55342733b"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 64
+       },
+       "value": 2.5
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 192,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k:long",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 192,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-5f8884793cae1ba1"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 96
+       },
+       "value": 1.75
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 192,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k:long",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 192,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-a990790314cf322d"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "symmetric",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "ret_z",
+       "op": "gt",
+       "params": {
+        "lookback": 64,
+        "min_history": 0,
+        "window": 1145
+       },
+       "value": 2.5
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 384,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:ret_z:symmetric",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 384,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-043c5506668fb8f1"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "short",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "taker_share_z",
+       "op": "gt",
+       "params": {
+        "window": 192
+       },
+       "value": 3.0
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 64,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:taker_share_z:short",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 64,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-91ab3cffaa7bab47"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 96
+       },
+       "value": 1.25
+      },
+      {
+       "feature": "taker_share_z",
+       "op": "gt",
+       "params": {
+        "window": 1091
+       },
+       "value": 0.68
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 96,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k+taker_share_z:long",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 96,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-e9d1bf7b37ad8eb8"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 96
+       },
+       "value": 1.5
+      },
+      {
+       "feature": "taker_share_z",
+       "op": "gt",
+       "params": {
+        "window": 1091
+       },
+       "value": 0.93
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 128,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k+taker_share_z:long",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 128,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-0f439995bcd4af4d"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 96
+       },
+       "value": 1.5
+      },
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 96
+       },
+       "value": 1.75
+      },
+      {
+       "feature": "ret_z",
+       "op": "gt",
+       "params": {
+        "lookback": 64,
+        "min_history": 0,
+        "window": 128
+       },
+       "value": 2.5
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 192,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k+ret_z:long",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 192,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-adf9e2e1e6bc8af8"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "short",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "taker_share_z",
+       "op": "gt",
+       "params": {
+        "window": 384
+       },
+       "value": 3.0
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 64,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:taker_share_z:short",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 64,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-f8b1648d499419f6"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 96
+       },
+       "value": 1.75
+      },
+      {
+       "feature": "taker_share_z",
+       "op": "gt",
+       "params": {
+        "window": 1091
+       },
+       "value": 0.43
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 96,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k+taker_share_z:long",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 96,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-aa609b6862018d48"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 134
+       },
+       "value": 1.5
+      },
+      {
+       "feature": "taker_share_z",
+       "op": "gt",
+       "params": {
+        "window": 1091
+       },
+       "value": 0.68
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 64,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k+taker_share_z:long",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 64,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-bc62b843361277d5"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "symmetric",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "ret_z",
+       "op": "gt",
+       "params": {
+        "lookback": 64,
+        "min_history": 0,
+        "window": 128
+       },
+       "value": 2.75
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 384,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:ret_z:symmetric",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 384,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-ed2d1c8ed9cf1879"
+  }
+ ],
+ "members_sha256": "8e03e0cd24cc5eb9994c322f149bf5849713f68bce1859b811337240c0f8c113",
+ "prereg_sha256": "d46bbb20d1f7759db55809991b1b69d14409ca686a6d4c040c789dd853192a76",
+ "rule": "the validation candidates of one DEV-only evolve state directory, exactly as pipeline.validation_candidates() ranks them (DEV screen pass, capped DEV t, one per near-duplicate group), first max_batch_size of promotion_v3. Frozen to a members file (ids + canonical specs + context) BEFORE the tranche is opened.",
+ "schema": "independent_window_members_v1",
+ "state_dir": "/tmp/claude-0/-home-claude-new2-strategy-archive/4cac5d9a-3691-55ae-9dbb-f34b93b3eb64/scratchpad/r9root/state",
+ "window_id": "IW1"
+}

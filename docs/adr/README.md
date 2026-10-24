@@ -39,3 +39,4 @@
 | [0033](0033-pr30-review-near-entry-duplicates.md) | PR #30 검토: 진입이 반 단계 안이고 청산만 다른 후보도 한 가설(selection v2), 스킵에 양쪽 청산 기록, R8에서 R7 결과 재현(DEV 통과 63, 배치 33, 독립 검증 0) | Accepted |
 | [0034](0034-ci-billing-v1-ledger-check-draft-members-vol-spread.md) | main CI 실패 원인은 GitHub 결제(코드 무관), v1 기록 원장 검사·CI 단계 추가, DRAFT 사전등록도 멤버 동결 점검 보고, 변동성 비례 스프레드 진단 | Accepted (진단·검사) |
 | [0035](0035-broad-universe-cross-sectional-dev.md) | 종목 수를 늘린 횡단면 가설 4개(모멘텀·반전·펀딩 캐리·저변동성, 시점별 상위 50개, DEV 전용): 가정 비용에서 전부 손실, 비용 전에도 우연 이상 없음, 측정 비용으로 재실행 예정 | Accepted (측정) |
+| [0036](0036-iw1-refreeze-and-prereg-v2-final-form-draft.md) | IW1 멤버 재동결 초안(코드 해시 고정, 20개 모두 IW1 방식 DEV 손실 → 닫아 두기 추천), 사전등록 v2 최종 양식 초안·동결 도구, 리허설 진입 기준 통과 0/33, 알트 수집 종목이 v2 바구니를 못 덮음(Q1) | Accepted (초안·도구) |
