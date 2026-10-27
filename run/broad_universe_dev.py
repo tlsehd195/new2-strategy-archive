@@ -124,6 +124,16 @@ def load_cost() -> dict:
             "imp": p["impact_coefficient"], "maxp": p["max_participation"]}
 
 
+def load_cost_record(path: Path) -> dict:
+    """Same cost form from a sealed public estimate record (ESTIMATED_FROM_PUBLIC_DATA, ADR 0038)."""
+    from costs_bridge import CostContext  # noqa: E402  (validates the record)
+    rec = json.loads(path.read_text())
+    CostContext.from_public_estimate(rec)
+    q = rec["params"]
+    return {"fixed": q["fee_rate"] + q["half_spread"], "imp": q["impact_coefficient"],
+            "maxp": q["max_participation"]}
+
+
 def side_cost(qv: float, cost: dict, mode: str) -> float:
     if mode == "no_impact":
         return 0.0010
@@ -319,15 +329,18 @@ def main(argv=None) -> int:
     ap.add_argument("--data-dir", required=True, type=Path)
     ap.add_argument("--write-universe", action="store_true",
                     help="only write <data-dir>/ever_top50.json and exit")
+    ap.add_argument("--cost-record", type=Path, help="sealed public estimate record (replaces the assumed profile)")
+    ap.add_argument("--out", type=Path, default=EVID / "broad_universe_dev.json")
     a = ap.parse_args(argv)
     if a.write_universe:
         syms = ever_top50(a.data_dir)
         (a.data_dir / "ever_top50.json").write_text(json.dumps(syms))
         print(len(syms), "symbols")
         return 0
-    cost = load_cost()
+    cost = load_cost_record(a.cost_record) if a.cost_record else load_cost()
     out = {"version": VERSION, "prereg_sha256": sha(PREREG), "script_sha256": sha(Path(__file__)),
-           "cost_profile_sha256": sha(COST_PROFILE), "segments": {}, "hypotheses": {}}
+           "cost_profile_sha256": sha(COST_PROFILE),
+           "cost_record_sha256": sha(a.cost_record) if a.cost_record else None, "cost": cost, "segments": {}, "hypotheses": {}}
     segs = {s: run_segment(a.data_dir, s, cost) for s in SEGMENTS}
     for s, r in segs.items():
         out["segments"][s] = {"first_day": r["days"][0], "last_day": r["days"][-1], "n_days": len(r["days"]),
@@ -357,7 +370,7 @@ def main(argv=None) -> int:
                      and s2["sr_ann"] > 0.5)
         row["flag"] = "DEV_PROMISING" if promising else "NOT_PROMISING"
         out["hypotheses"][h] = row
-    (EVID / "broad_universe_dev.json").write_text(json.dumps(out, indent=1, default=float))
+    a.out.write_text(json.dumps(out, indent=1, default=float))
     print(f"null max SR (N=4) {null4:.2f}; reference N={PRIOR_TRIALS_REF + 4}: {nullref:.2f}")
     for s in SEGMENTS:
         print(s, out["segments"][s]["flags"], "market SR", round(out["segments"][s]["market_ew"]["sr_ann"], 2))
