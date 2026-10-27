@@ -1,0 +1,10 @@
+{
+  "written_before_any_result": true,
+  "date": "2026-10-27",
+  "what": "Rerun the same 4 broad-universe hypotheses (H1_MOM28, H2_REV7, H3_CARRY7, H4_LOWVOL30) of ADR 0035/0038, DEV segments S1/S2 only, with a volume-scaled alt cost instead of one worst-liquid-alt cost.",
+  "cost_rule": "run/lowliq_cost_calibration.py (calibration_v1.json): for each symbol at each rebalance, q15 = mean daily quote volume of the last 30 days / 96. One-side cost = fee 5bp + half_spread(q15) + impact_coef(q15)*sqrt(10000 / 23:45 bar quote volume). half_spread and impact_coef are log-log OLS lines on the 10 measured alts (median 15m quote volume), intercept lifted to the upper envelope of all 10 symbols; q15 clipped to [10000, 8.2M]; slopes must be <= 0.",
+  "fixed_before": "the strategy rerun. The order-book per-symbol table was viewed to choose the functional form; no strategy result with this cost had been computed.",
+  "decision_rule": "unchanged from ADR 0035: DEV_PROMISING needs S1 SR > expected max SR of 4 nulls, alpha t >= 2, both S1 halves > 0, S2 SR > 0.5, under the 'assumed' (here: calibrated) cost row.",
+  "not_allowed": "changing the fit, clipping bounds, envelope shift, or hypotheses after seeing results; opening validation/locked/IW1/paper windows; activating any preregistration.",
+  "assumption_to_report": "cost depends on absolute USDT volume (stable mapping across 2021-2025 and the Oct 2026 collection); measured coins are only the liquid 10, so everything below their volume is extrapolation."
+}

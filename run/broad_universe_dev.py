@@ -134,9 +134,22 @@ def load_cost_record(path: Path) -> dict:
             "maxp": q["max_participation"]}
 
 
-def side_cost(qv: float, cost: dict, mode: str) -> float:
+def load_cost_calibration(path: Path) -> dict:
+    """Volume-scaled cost (ADR 0039): per-symbol fixed and impact terms from its 30-day volume."""
+    from lowliq_cost_calibration import VERSION as CAL_VERSION  # noqa: E402
+    cal = json.loads(path.read_text())
+    if cal.get("version") != CAL_VERSION:
+        raise SystemExit("unknown calibration version")
+    return {"calib": cal, "maxp": cal["max_participation"]}
+
+
+def side_cost(qv: float, cost: dict, mode: str, sym_q15: float = float("nan")) -> float:
     if mode == "no_impact":
         return 0.0010
+    if "calib" in cost:
+        from lowliq_cost_calibration import cost_params  # noqa: E402
+        fixed, imp = cost_params(cost["calib"], sym_q15)
+        return fixed + imp * math.sqrt(ORDER_VALUE / qv)
     c = cost["fixed"] + cost["imp"] * math.sqrt(ORDER_VALUE / qv)
     return c
 
@@ -248,7 +261,7 @@ def run_segment(data: Path, seg: str, cost: dict) -> dict:
                         b = dq / 96.0 if dq > 0 else 1.0
                     if m == "assumed" and ORDER_VALUE / b > cost["maxp"]:
                         flags["participation_over_max"] += 1
-                    c = side_cost(b, cost, m)
+                    c = side_cost(b, cost, m, vol30[s] / 96.0)
                     cst += dw * c * mult
                     if m == "assumed":
                         to += dw
@@ -330,6 +343,8 @@ def main(argv=None) -> int:
     ap.add_argument("--write-universe", action="store_true",
                     help="only write <data-dir>/ever_top50.json and exit")
     ap.add_argument("--cost-record", type=Path, help="sealed public estimate record (replaces the assumed profile)")
+    ap.add_argument("--cost-calibration", type=Path,
+                    help="volume-scaled cost calibration (ADR 0039; replaces the assumed profile)")
     ap.add_argument("--out", type=Path, default=EVID / "broad_universe_dev.json")
     a = ap.parse_args(argv)
     if a.write_universe:
@@ -337,10 +352,15 @@ def main(argv=None) -> int:
         (a.data_dir / "ever_top50.json").write_text(json.dumps(syms))
         print(len(syms), "symbols")
         return 0
-    cost = load_cost_record(a.cost_record) if a.cost_record else load_cost()
+    if a.cost_calibration:
+        cost = load_cost_calibration(a.cost_calibration)
+    else:
+        cost = load_cost_record(a.cost_record) if a.cost_record else load_cost()
     out = {"version": VERSION, "prereg_sha256": sha(PREREG), "script_sha256": sha(Path(__file__)),
            "cost_profile_sha256": sha(COST_PROFILE),
-           "cost_record_sha256": sha(a.cost_record) if a.cost_record else None, "cost": cost, "segments": {}, "hypotheses": {}}
+           "cost_record_sha256": sha(a.cost_record) if a.cost_record else None,
+           "cost_calibration_sha256": sha(a.cost_calibration) if a.cost_calibration else None,
+           "cost": cost if "calib" not in cost else {"calibration": a.cost_calibration.name, "maxp": cost["maxp"]}, "segments": {}, "hypotheses": {}}
     segs = {s: run_segment(a.data_dir, s, cost) for s in SEGMENTS}
     for s, r in segs.items():
         out["segments"][s] = {"first_day": r["days"][0], "last_day": r["days"][-1], "n_days": len(r["days"]),

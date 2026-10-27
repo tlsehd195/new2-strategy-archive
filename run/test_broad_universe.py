@@ -54,6 +54,21 @@ class BroadUniverseTest(unittest.TestCase):
         self.assertAlmostEqual(b.side_cost(1e6, cost, "assumed"),
                                cost["fixed"] + q["impact_coefficient"] * math.sqrt(b.ORDER_VALUE / 1e6))
 
+    def test_volume_scaled_cost_rises_as_volume_falls(self):
+        cal_path = Path(__file__).resolve().parent / "audit" / "lowliq_cost_20261027" / "calibration_v1.json"
+        cost = b.load_cost_calibration(cal_path)
+        cal = cost["calib"]
+        qs = [1e3, 1e4, 1e5, 1e6, 1e7, 1e9]
+        c = [b.side_cost(1e6, cost, "assumed", q) for q in qs]
+        self.assertEqual(c, sorted(c, reverse=True))
+        self.assertEqual(c[0], c[1])  # clipped at q_min
+        self.assertEqual(c[-1], c[-2])  # no credit above the most liquid sample
+        for sym, v in cal["per_symbol"].items():  # envelope covers every measured symbol
+            from lowliq_cost_calibration import cost_params
+            fixed, k = cost_params(cal, v["qv15_median"])
+            self.assertGreaterEqual(fixed - cal["fee_rate"], v["half_spread"] * (1 - 1e-9), sym)
+            self.assertGreaterEqual(k, v["impact_coef"] * (1 - 1e-9), sym)
+
     def test_prereg_is_the_committed_one(self):
         p = json.loads(b.PREREG.read_text())
         self.assertTrue(p["written_before_any_result"])
