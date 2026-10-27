@@ -43,3 +43,4 @@
 | [0037](0037-prereg-v2-liquid9-basket-alt-cost-criteria-v3.md) | 사용자 결정 Q1-B: v2 바구니를 유동성 9종목으로, 알트 비용 기준 v3(알트 7개) 설정 파일을 수집 자료를 보기 전에 확정, v2 초안 r2(남은 질문 Q2) | Accepted |
 | [0038](0038-measured-alt-cost-estimate-and-reruns.md) | 측정한 알트 호가(96시간)로 비용 추정(사용 가능, 반스프레드 7.3bp·충격계수 0.0015), 진입 기준 통과 1/33(5개 미만이라 등록 불가), 알트 4개 가설 재실행도 모두 NOT_PROMISING | Accepted (측정) |
 | [0039](0039-v2-1031-options-and-freeze-date-origin.md) | 10-31 v2 판단 선택지 정리(보류 / 규칙 변경 / v3 e-값 전환)와 동결일 10-31의 출처(ADR 0023 D5), 기준 변경 없음 |
+| [0040](0040-cross-section-v2-five-new-hypotheses-measured-cost.md) | 새 횡단면 가설 5개(크기·거래량 충격·MAX·테이커 흐름·합성, 28일 리밸런싱, 측정 알트 비용, DEV 전용) 사전등록 후 실행: 모두 NOT_PROMISING, 비용은 작아졌지만 비용 전 수익이 약함, 가장 나은 N4도 우연 최대치 미달 | Accepted (측정) |
