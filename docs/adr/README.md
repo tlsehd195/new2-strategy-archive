@@ -42,3 +42,4 @@
 | [0036](0036-iw1-refreeze-and-prereg-v2-final-form-draft.md) | IW1 멤버 재동결 초안(코드 해시 고정, 20개 모두 IW1 방식 DEV 손실 → 닫아 두기 추천), 사전등록 v2 최종 양식 초안·동결 도구, 리허설 진입 기준 통과 0/33, 알트 수집 종목이 v2 바구니를 못 덮음(Q1) | Accepted (초안·도구) |
 | [0037](0037-prereg-v2-liquid9-basket-alt-cost-criteria-v3.md) | 사용자 결정 Q1-B: v2 바구니를 유동성 9종목으로, 알트 비용 기준 v3(알트 7개) 설정 파일을 수집 자료를 보기 전에 확정, v2 초안 r2(남은 질문 Q2) | Accepted |
 | [0038](0038-measured-alt-cost-estimate-and-reruns.md) | 측정한 알트 호가(96시간)로 비용 추정(사용 가능, 반스프레드 7.3bp·충격계수 0.0015), 진입 기준 통과 1/33(5개 미만이라 등록 불가), 알트 4개 가설 재실행도 모두 NOT_PROMISING | Accepted (측정) |
+| [0039](0039-volume-scaled-low-liquidity-cost-rerun.md) | 저유동 코인용 거래량 비례 비용 보정(측정 10종목 호가를 거래량에 외삽, 결과 보기 전 고정)으로 알트 4개 가설 DEV 재실행, 모두 NOT_PROMISING | Accepted (측정) |
