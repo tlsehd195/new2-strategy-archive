@@ -46,6 +46,14 @@ class BroadUniverseTest(unittest.TestCase):
         self.assertAlmostEqual(b.side_cost(qv, cost, "assumed"), want)
         self.assertAlmostEqual(b.side_cost(qv, cost, "no_impact"), 0.0010)
 
+    def test_cost_from_measured_record(self):
+        rec = Path(__file__).resolve().parent / "audit" / "alt_cost_measured_20261027" / "estimate_v3_alts.json"
+        cost = b.load_cost_record(rec)
+        q = json.loads(rec.read_text())["params"]
+        self.assertAlmostEqual(cost["fixed"], q["fee_rate"] + q["half_spread"])
+        self.assertAlmostEqual(b.side_cost(1e6, cost, "assumed"),
+                               cost["fixed"] + q["impact_coefficient"] * math.sqrt(b.ORDER_VALUE / 1e6))
+
     def test_prereg_is_the_committed_one(self):
         p = json.loads(b.PREREG.read_text())
         self.assertTrue(p["written_before_any_result"])

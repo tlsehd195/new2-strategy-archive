@@ -1,0 +1,749 @@
+{
+ "claim": "\ucd94\uc815 \uadfc\uac70 \uc788\uc74c(ESTIMATED_FROM_PUBLIC_DATA) \u2014 not verified, never promotable; a public book is not a fill",
+ "criteria": {
+  "fee_profile": "assumed_public_v1",
+  "half_spread_quantile": 0.9,
+  "impact_fit_min_notional": 10000,
+  "impact_ratio_quantile": 0.9,
+  "latency_move_quantile": 0.5,
+  "max_book_age_ms": 5000,
+  "max_gap_minutes": 10,
+  "max_gap_share": 0.02,
+  "max_invalid_share": 0.01,
+  "max_kline_age_ms": 1020000,
+  "max_participation": 0.05,
+  "max_thin_share": 0.01,
+  "min_hours_per_symbol": 72,
+  "min_snapshots_per_symbol": 2000,
+  "note": "Fixed 2026-10-24 (ADR 0037, decision Q1-B by \ub3d9\ub3d9: \"\ub108\uc758 \ucd94\ucc9c\uc73c\ub85c \uc9c4\ud589\ud574\") while the alt order-book collection on the user PC was still running and BEFORE anyone uploaded or looked at its data. Same estimator and every threshold as cost_public_estimate_v2_alts.json; ONLY required_symbols differs: the 7 alts of the liquid-9 basket (BNB XRP SOL ADA DOGE LTC LINK), all in the running collection. BTC/ETH are not required: the engine takes the WORST symbol parameters, so they are charged at least the worst alt cost (conservative). Estimates stay ESTIMATED_FROM_PUBLIC_DATA, never VERIFIED. Used by prereg v2 (forward window) through decision D2 only if the record is usable and sealed before the 2026-10-31 freeze; otherwise assumed_public_v1 stays. The alt collection also covers AVAX SUI DOT; they are not required here.",
+  "notionals": [
+   1000,
+   10000,
+   50000
+  ],
+  "require_manifest": true,
+  "required_symbols": [
+   "BNBUSDT",
+   "XRPUSDT",
+   "SOLUSDT",
+   "ADAUSDT",
+   "DOGEUSDT",
+   "LTCUSDT",
+   "LINKUSDT"
+  ],
+  "schema": "cost_public_estimate_criteria_v2",
+  "side_aggregation": "max",
+  "supersedes_for_v2": {
+   "file": "config/cost_public_estimate_v2_alts.json",
+   "why": "its 15 required symbols are not all collected (TRX ZEC XMR NEAR XLM BCH missing), so it can only return INSUFFICIENT"
+  }
+ },
+ "criteria_sha256": "e11e1ccc4e34a030e0ab0e2ee4e833aa4e9f18acb674e06222d701fc057d8da6",
+ "estimator_sha256": "8f226977e3a9b644792c7df713313bb176a7d3c3930ad82e80f15d790ee9a3a8",
+ "estimator_version": "public-estimate-v2",
+ "fee_basis": {
+  "fee_source": "Binance USDT-M futures public fee schedule for the base (regular, no BNB discount) tier: maker 0.0200%, taker 0.0500%. Not fetched in this environment (Binance hosts are blocked); re-check against the exchange's published page before relying on it.",
+  "observed": false,
+  "profile": "assumed_public_v1",
+  "profile_sha256": "b6478c34e5f1b7bfcae2515ecc32824f60d904b8c09916cff43915082431ef74"
+ },
+ "limitations": [
+  "public order book snapshots, not executions: hidden liquidity, queue position, latency and adverse selection are only approximated",
+  "fees are the public-schedule assumption (not observable in public data)",
+  "estimated over the collection period only; another regime can be costlier"
+ ],
+ "manifest_problems": [],
+ "manifest_sha256": "9e51f4de1055078a02b58080ca5eb9a7d870c7a3331a72424e42cefc00ac2bde",
+ "params": {
+  "fee_rate": 0.0005,
+  "half_spread": 0.0007270083821078204,
+  "impact_coefficient": 0.001513716147670749,
+  "max_participation": 0.05
+ },
+ "per_symbol": {
+  "ADAUSDT": {
+   "book_too_thin": 0,
+   "buy_minus_sell_median_bp": {
+    "1000": 0.0,
+    "10000": 0.0,
+    "50000": 1.1102230246251565e-12
+   },
+   "cost_per_side_bp_by_notional": {
+    "1000": {
+     "buy_median": 2.4324981756262964,
+     "median": 2.4324981756262964,
+     "n": 11443,
+     "p90": 2.4612355402398034,
+     "sell_median": 2.4324981756262964,
+     "thin_share": 0.0
+    },
+    "10000": {
+     "buy_median": 2.433682161109285,
+     "median": 2.4348672997320797,
+     "n": 11443,
+     "p90": 2.4721878862798974,
+     "sell_median": 2.433682161109285,
+     "thin_share": 0.0
+    },
+    "50000": {
+     "buy_median": 2.457606291472736,
+     "median": 3.900980182600655,
+     "n": 11443,
+     "p90": 5.981276253361756,
+     "sell_median": 2.4576062914716257,
+     "thin_share": 0.0
+    }
+   },
+   "fetch_failed": 0,
+   "first_ms": 1792759555731,
+   "fit_participation_range": [
+    0.0006691870128200477,
+    0.2131539646926683
+   ],
+   "gaps": 2,
+   "half_spread_bp": {
+    "median": 2.432498175626775,
+    "q": 2.46123554024093
+   },
+   "half_spread_param": 0.0007270083821078204,
+   "hours": 95.997,
+   "impact_fit_n": 22886,
+   "impact_k_ols": 0.0005178223149663547,
+   "impact_k_quantile": 0.001371165928653693,
+   "impact_param": 0.001371165928653693,
+   "invalid_reasons": {
+    "non-positive price, size or volume": 30,
+    "stale book": 47
+   },
+   "last_ms": 1793105145105,
+   "latency_move_bp": 4.808848280837275,
+   "median_interval_s": 30.002,
+   "not_usable_because": [],
+   "snapshots_invalid": 77,
+   "snapshots_ok": 11443,
+   "thin_share_by_notional": {
+    "1000": 0.0,
+    "10000": 0.0,
+    "50000": 0.0
+   },
+   "unsupported_notionals": [],
+   "usable": true
+  },
+  "BNBUSDT": {
+   "book_too_thin": 0,
+   "buy_minus_sell_median_bp": {
+    "1000": -1.1102230246251565e-12,
+    "10000": 1.8377288579785045e-06,
+    "50000": -0.01634674737682751
+   },
+   "cost_per_side_bp_by_notional": {
+    "1000": {
+     "buy_median": 0.06754794215080295,
+     "median": 0.06756254602668932,
+     "n": 11443,
+     "p90": 0.06888333235322008,
+     "sell_median": 0.06754794215191318,
+     "thin_share": 0.0
+    },
+    "10000": {
+     "buy_median": 0.06778236438353957,
+     "median": 0.15366437332353655,
+     "n": 11443,
+     "p90": 0.7123320372766088,
+     "sell_median": 0.0677805266546816,
+     "thin_share": 0.0
+    },
+    "50000": {
+     "buy_median": 0.4263767231194038,
+     "median": 0.8373261962191236,
+     "n": 11443,
+     "p90": 1.3929879582958997,
+     "sell_median": 0.4427234704962313,
+     "thin_share": 0.0
+    }
+   },
+   "fetch_failed": 0,
+   "first_ms": 1792759555422,
+   "fit_participation_range": [
+    0.0004571870403066217,
+    0.09767029613315774
+   ],
+   "gaps": 2,
+   "half_spread_bp": {
+    "median": 0.06753425675167589,
+    "q": 0.0682729004375672
+   },
+   "half_spread_param": 0.00016951599199133428,
+   "hours": 95.997,
+   "impact_fit_n": 22886,
+   "impact_k_ols": 0.0004695047822950179,
+   "impact_k_quantile": 0.0010955227258587137,
+   "impact_param": 0.0010955227258587137,
+   "invalid_reasons": {
+    "non-positive price, size or volume": 30,
+    "stale book": 47
+   },
+   "last_ms": 1793105144882,
+   "latency_move_bp": 1.6268870194757756,
+   "median_interval_s": 30.002,
+   "not_usable_because": [],
+   "snapshots_invalid": 77,
+   "snapshots_ok": 11443,
+   "thin_share_by_notional": {
+    "1000": 0.0,
+    "10000": 0.0,
+    "50000": 0.0
+   },
+   "unsupported_notionals": [],
+   "usable": true
+  },
+  "DOGEUSDT": {
+   "book_too_thin": 0,
+   "buy_minus_sell_median_bp": {
+    "1000": 2.220446049250313e-12,
+    "10000": 8.382970539955181e-05,
+    "50000": 0.004195504693660368
+   },
+   "cost_per_side_bp_by_notional": {
+    "1000": {
+     "buy_median": 0.6469560716837464,
+     "median": 0.6469560716837464,
+     "n": 11443,
+     "p90": 0.6534666405288991,
+     "sell_median": 0.6469560716815259,
+     "thin_share": 0.0
+    },
+    "10000": {
+     "buy_median": 0.6474587245075547,
+     "median": 0.6480461408864269,
+     "n": 11443,
+     "p90": 1.3077096641800354,
+     "sell_median": 0.6473748948021552,
+     "thin_share": 0.0
+    },
+    "50000": {
+     "buy_median": 1.0666920956547976,
+     "median": 1.4497600606810934,
+     "n": 11443,
+     "p90": 2.1223386507323028,
+     "sell_median": 1.0624965909611372,
+     "thin_share": 0.0
+    }
+   },
+   "fetch_failed": 0,
+   "first_ms": 1792759555182,
+   "fit_participation_range": [
+    0.0002010737251982797,
+    0.12020729920692756
+   ],
+   "gaps": 2,
+   "half_spread_bp": {
+    "median": 0.646956071682482,
+    "q": 0.6532105297543929
+   },
+   "half_spread_param": 0.000323936169029068,
+   "hours": 95.997,
+   "impact_fit_n": 22886,
+   "impact_k_ols": 0.0004028368225456382,
+   "impact_k_quantile": 0.0010039667622136579,
+   "impact_param": 0.0010039667622136579,
+   "invalid_reasons": {
+    "non-positive price, size or volume": 30,
+    "stale book": 47
+   },
+   "last_ms": 1793105144651,
+   "latency_move_bp": 2.5861511605362875,
+   "median_interval_s": 30.002,
+   "not_usable_because": [],
+   "snapshots_invalid": 77,
+   "snapshots_ok": 11443,
+   "thin_share_by_notional": {
+    "1000": 0.0,
+    "10000": 0.0,
+    "50000": 0.0
+   },
+   "unsupported_notionals": [],
+   "usable": true
+  },
+  "LINKUSDT": {
+   "book_too_thin": 0,
+   "buy_minus_sell_median_bp": {
+    "1000": 0.00015299301936444465,
+    "10000": -0.002608204876519693,
+    "50000": -0.05439675954899137
+   },
+   "cost_per_side_bp_by_notional": {
+    "1000": {
+     "buy_median": 0.4373879193453334,
+     "median": 0.43896229313888924,
+     "n": 11443,
+     "p90": 1.0330958432058783,
+     "sell_median": 0.43723492632596894,
+     "thin_share": 0.0
+    },
+    "10000": {
+     "buy_median": 0.8415591508748044,
+     "median": 1.2414940087035475,
+     "n": 11443,
+     "p90": 1.9280232861575988,
+     "sell_median": 0.8441673557513241,
+     "thin_share": 0.0
+    },
+    "50000": {
+     "buy_median": 2.349828206813509,
+     "median": 2.9313135596953366,
+     "n": 11443,
+     "p90": 3.8336405992240863,
+     "sell_median": 2.4042249663625004,
+     "thin_share": 0.0
+    }
+   },
+   "fetch_failed": 0,
+   "first_ms": 1792759556355,
+   "fit_participation_range": [
+    0.00099644682465602,
+    0.3340816184739555
+   ],
+   "gaps": 2,
+   "half_spread_bp": {
+    "median": 0.4361289197084241,
+    "q": 0.4413646996518613
+   },
+   "half_spread_param": 0.00030907222304502854,
+   "hours": 95.997,
+   "impact_fit_n": 22886,
+   "impact_k_ols": 0.0007906161553861227,
+   "impact_k_quantile": 0.001513716147670749,
+   "impact_param": 0.001513716147670749,
+   "invalid_reasons": {
+    "non-positive price, size or volume": 30,
+    "stale book": 47
+   },
+   "last_ms": 1793105145579,
+   "latency_move_bp": 2.649357530798424,
+   "median_interval_s": 30.001,
+   "not_usable_because": [],
+   "snapshots_invalid": 77,
+   "snapshots_ok": 11443,
+   "thin_share_by_notional": {
+    "1000": 0.0,
+    "10000": 0.0,
+    "50000": 0.0
+   },
+   "unsupported_notionals": [],
+   "usable": true
+  },
+  "LTCUSDT": {
+   "book_too_thin": 0,
+   "buy_minus_sell_median_bp": {
+    "1000": 0.00015613153214744102,
+    "10000": 0.027075299593448676,
+    "50000": -0.09287408715086265
+   },
+   "cost_per_side_bp_by_notional": {
+    "1000": {
+     "buy_median": 0.8836264027567431,
+     "median": 0.884407888919192,
+     "n": 11443,
+     "p90": 1.1696855834815205,
+     "sell_median": 0.8834702712245956,
+     "thin_share": 0.0
+    },
+    "10000": {
+     "buy_median": 1.3675549079983362,
+     "median": 1.9391752810626883,
+     "n": 11443,
+     "p90": 2.543840512974516,
+     "sell_median": 1.3404796084048876,
+     "thin_share": 0.0
+    },
+    "50000": {
+     "buy_median": 3.514901492540634,
+     "median": 4.070594647400672,
+     "n": 11443,
+     "p90": 5.159265268352754,
+     "sell_median": 3.6077755796914968,
+     "thin_share": 0.0
+    }
+   },
+   "fetch_failed": 0,
+   "first_ms": 1792759556998,
+   "fit_participation_range": [
+    0.0018237017936645172,
+    0.5819852943369185
+   ],
+   "gaps": 2,
+   "half_spread_bp": {
+    "median": 0.8828462964596105,
+    "q": 0.8900756564306196
+   },
+   "half_spread_param": 0.0002695618673494435,
+   "hours": 95.997,
+   "impact_fit_n": 22886,
+   "impact_k_ols": 0.0007948656097437663,
+   "impact_k_quantile": 0.0014951791075837394,
+   "impact_param": 0.0014951791075837394,
+   "invalid_reasons": {
+    "non-positive price, size or volume": 30,
+    "stale book": 47
+   },
+   "last_ms": 1793105146056,
+   "latency_move_bp": 1.8055430170638154,
+   "median_interval_s": 30.002,
+   "not_usable_because": [],
+   "snapshots_invalid": 77,
+   "snapshots_ok": 11443,
+   "thin_share_by_notional": {
+    "1000": 0.0,
+    "10000": 0.0,
+    "50000": 0.0
+   },
+   "unsupported_notionals": [],
+   "usable": true
+  },
+  "SOLUSDT": {
+   "book_too_thin": 0,
+   "buy_minus_sell_median_bp": {
+    "1000": 2.220446049250313e-12,
+    "10000": 4.862886204826111e-05,
+    "50000": 9.765216857360315e-05
+   },
+   "cost_per_side_bp_by_notional": {
+    "1000": {
+     "buy_median": 0.49302371444071014,
+     "median": 0.49302371444071014,
+     "n": 11443,
+     "p90": 0.4994256604917702,
+     "sell_median": 0.4930237144384897,
+     "thin_share": 0.0
+    },
+    "10000": {
+     "buy_median": 0.4931209625724797,
+     "median": 0.4931696010257447,
+     "n": 11443,
+     "p90": 0.5000750112515995,
+     "sell_median": 0.49307233371043147,
+     "thin_share": 0.0
+    },
+    "50000": {
+     "buy_median": 0.4941443889894259,
+     "median": 0.4962040390998901,
+     "n": 11443,
+     "p90": 1.031837388367541,
+     "sell_median": 0.4940467368208523,
+     "thin_share": 0.0
+    }
+   },
+   "fetch_failed": 0,
+   "first_ms": 1792759554350,
+   "fit_participation_range": [
+    6.035856571383239e-05,
+    0.027761799925730937
+   ],
+   "gaps": 2,
+   "half_spread_bp": {
+    "median": 0.49302371444091686,
+    "q": 0.4994256604906915
+   },
+   "half_spread_param": 0.00024973278631790533,
+   "hours": 95.997,
+   "impact_fit_n": 22886,
+   "impact_k_ols": 0.00012062292495923602,
+   "impact_k_quantile": 0.0003907514186691142,
+   "impact_param": 0.0003907514186691142,
+   "invalid_reasons": {
+    "non-positive price, size or volume": 30,
+    "stale book": 47
+   },
+   "last_ms": 1793105144159,
+   "latency_move_bp": 1.997902202688362,
+   "median_interval_s": 30.001,
+   "not_usable_because": [],
+   "snapshots_invalid": 77,
+   "snapshots_ok": 11443,
+   "thin_share_by_notional": {
+    "1000": 0.0,
+    "10000": 0.0,
+    "50000": 0.0
+   },
+   "unsupported_notionals": [],
+   "usable": true
+  },
+  "XRPUSDT": {
+   "book_too_thin": 0,
+   "buy_minus_sell_median_bp": {
+    "1000": -2.9814700708286068e-05,
+    "10000": 2.992089020992239e-05,
+    "50000": 0.0074914242109702656
+   },
+   "cost_per_side_bp_by_notional": {
+    "1000": {
+     "buy_median": 0.3860854793269475,
+     "median": 0.38611529402765576,
+     "n": 11443,
+     "p90": 0.39036577272999473,
+     "sell_median": 0.38611529402765576,
+     "thin_share": 0.0
+    },
+    "10000": {
+     "buy_median": 0.38680230534104965,
+     "median": 0.38755183505823076,
+     "n": 11443,
+     "p90": 0.8261720755236013,
+     "sell_median": 0.3867723844508397,
+     "thin_share": 0.0
+    },
+    "50000": {
+     "buy_median": 0.7041056955525704,
+     "median": 1.0098479996378806,
+     "n": 11443,
+     "p90": 1.532633171557274,
+     "sell_median": 0.6966142713416001,
+     "thin_share": 0.0
+    }
+   },
+   "fetch_failed": 0,
+   "first_ms": 1792759554830,
+   "fit_participation_range": [
+    0.00020606678171388357,
+    0.03998341511131563
+   ],
+   "gaps": 2,
+   "half_spread_bp": {
+    "median": 0.38608547932508014,
+    "q": 0.3900916715427696
+   },
+   "half_spread_param": 0.0002714681962505761,
+   "hours": 95.997,
+   "impact_fit_n": 22886,
+   "impact_k_ols": 0.0004846991154772656,
+   "impact_k_quantile": 0.0010724716225866842,
+   "impact_param": 0.0010724716225866842,
+   "invalid_reasons": {
+    "non-positive price, size or volume": 30,
+    "stale book": 47
+   },
+   "last_ms": 1793105144408,
+   "latency_move_bp": 2.324590290962991,
+   "median_interval_s": 30.002,
+   "not_usable_because": [],
+   "snapshots_invalid": 77,
+   "snapshots_ok": 11443,
+   "thin_share_by_notional": {
+    "1000": 0.0,
+    "10000": 0.0,
+    "50000": 0.0
+   },
+   "unsupported_notionals": [],
+   "usable": true
+  }
+ },
+ "reasons": [],
+ "record_id": "PE-ed757f477622f48d054b4172",
+ "schema": "cost_public_estimate_v2",
+ "sealed_at": "2026-10-27T13:01:35Z",
+ "source_files": [
+  {
+   "path": "ADAUSDT/public_20261023.jsonl",
+   "sha256": "42033abe8619aa19f02771a8b7e814ce6abadc237df9498d37c99768e9f6c660"
+  },
+  {
+   "path": "ADAUSDT/public_20261024.jsonl",
+   "sha256": "c0b8e57dda74536f343d6b71f73363d62f08339ae92a76de0e4fa12e98880b73"
+  },
+  {
+   "path": "ADAUSDT/public_20261025.jsonl",
+   "sha256": "4408198cae6fa7de341b55a3c20fa9e4db2dddac1f63141ceecc3daf63bea824"
+  },
+  {
+   "path": "ADAUSDT/public_20261026.jsonl",
+   "sha256": "157f4b6ea98703f4b7c5ba36aa1226570e8ae8691c39a844ab8eeaa4348c470f"
+  },
+  {
+   "path": "ADAUSDT/public_20261027.jsonl",
+   "sha256": "719c7b00bc3843705c2fc587ede308d0942234d6dff21c284a6b440b95bb8891"
+  },
+  {
+   "path": "AVAXUSDT/public_20261023.jsonl",
+   "sha256": "9bb7a9e210b434b8a3401743e45a46a04520bba5e27703186554a78d1c9f28b5"
+  },
+  {
+   "path": "AVAXUSDT/public_20261024.jsonl",
+   "sha256": "aa80915368d7636fe0e7f716d6a81d6aa145089acc403cd26771eb23b75e6dae"
+  },
+  {
+   "path": "AVAXUSDT/public_20261025.jsonl",
+   "sha256": "8495bd79e22ae17b2ae42a974c572beda0a1eaf852c601147c9fb49464175a4f"
+  },
+  {
+   "path": "AVAXUSDT/public_20261026.jsonl",
+   "sha256": "61cc168145c79c558361cdd850fc113a375fab7df22775ccf2c82d2fce6c21c6"
+  },
+  {
+   "path": "AVAXUSDT/public_20261027.jsonl",
+   "sha256": "23e8378f8d351ffdf3aee9a05d3b72ff9e912b58c222ba48d918f6a97f023e5a"
+  },
+  {
+   "path": "BNBUSDT/public_20261023.jsonl",
+   "sha256": "cb19d121c2687d67811fe27038a69456f517f284c1067b99c65e5cd77a660d61"
+  },
+  {
+   "path": "BNBUSDT/public_20261024.jsonl",
+   "sha256": "cf5afb4be7a2688815bcb50ae16c043262f6b46ad6b35e8a72cc4ded7fe9544c"
+  },
+  {
+   "path": "BNBUSDT/public_20261025.jsonl",
+   "sha256": "9a6a61e2308f11fa6a3faed08c7c7abbc8c4e3540ef64517358f2309afd236e4"
+  },
+  {
+   "path": "BNBUSDT/public_20261026.jsonl",
+   "sha256": "85122d9b5a558f55ddc9e6a05427853bb7d6a3593c362fed879fb0c295e47900"
+  },
+  {
+   "path": "BNBUSDT/public_20261027.jsonl",
+   "sha256": "5abe551f1de8ce0a976f6d896336275b49c0dded918ede4aa369c976580ea30c"
+  },
+  {
+   "path": "DOGEUSDT/public_20261023.jsonl",
+   "sha256": "743bcba9b8914f38bdad4e8af621ef8e35f840ec829d22cee2ebcca64c88aeb2"
+  },
+  {
+   "path": "DOGEUSDT/public_20261024.jsonl",
+   "sha256": "a3f147f669cea7dd081041c5877de1bf1f845beccdff2b5006048c77a2d3fee1"
+  },
+  {
+   "path": "DOGEUSDT/public_20261025.jsonl",
+   "sha256": "213b82f6bf8c3484174327d627a99ddcbf14a2200832341cf11aeba0a19e27d7"
+  },
+  {
+   "path": "DOGEUSDT/public_20261026.jsonl",
+   "sha256": "d2fd8c4b41c1df648ba5d0474282fc3d3ee529acf2cfc45c1a34b2f7142ff03b"
+  },
+  {
+   "path": "DOGEUSDT/public_20261027.jsonl",
+   "sha256": "ab8d4e62f5f2e02b47d7877a27e764bc18ff1cacb5d042e9a7f004be568a790d"
+  },
+  {
+   "path": "DOTUSDT/public_20261023.jsonl",
+   "sha256": "d38c36fd813527378dc7e766c2459f8bee64e8934f6ef34da15cbe1f6735e140"
+  },
+  {
+   "path": "DOTUSDT/public_20261024.jsonl",
+   "sha256": "0404a91f19cd05f4c4fa5fd44bc136e4e8fa984d770e8111020166550df081c4"
+  },
+  {
+   "path": "DOTUSDT/public_20261025.jsonl",
+   "sha256": "b25fe1d72738974d78f2fdff9277b8440461863a6d65a5e72f81aebb47bffeea"
+  },
+  {
+   "path": "DOTUSDT/public_20261026.jsonl",
+   "sha256": "47e80949909e10e6317716c90ecd54a2b5dd9de38ef9e68f8b569f4e51e3c690"
+  },
+  {
+   "path": "DOTUSDT/public_20261027.jsonl",
+   "sha256": "bfd52cd23f0e071f21c1d253b115b30822ee523f54919fb9e37be412db3b4a8a"
+  },
+  {
+   "path": "LINKUSDT/public_20261023.jsonl",
+   "sha256": "687a2750b6f0c60ee1af904ff7907aa72bad32429816bf6c1ede89fb12ecf1c8"
+  },
+  {
+   "path": "LINKUSDT/public_20261024.jsonl",
+   "sha256": "a5966c09b425e96f6faf658d767c7edb84f491a0fe2d1d2afd83e38e05ee710b"
+  },
+  {
+   "path": "LINKUSDT/public_20261025.jsonl",
+   "sha256": "b7d549ac05261ade05e86fb181cda41083f17df26ed468f5b96e1ee220dcbea3"
+  },
+  {
+   "path": "LINKUSDT/public_20261026.jsonl",
+   "sha256": "7267a428aa49612e09a9ebccd915818b890daa0bfc9f2d179b74782bc8091871"
+  },
+  {
+   "path": "LINKUSDT/public_20261027.jsonl",
+   "sha256": "b6f0f7647702039c056c5e154fdc3b141430f6f00bdbf94f5f83b8e6329bdba1"
+  },
+  {
+   "path": "LTCUSDT/public_20261023.jsonl",
+   "sha256": "2469115c9afbc12afbc971cf6684c124c29b19c552fdb2c67527e61f5414be07"
+  },
+  {
+   "path": "LTCUSDT/public_20261024.jsonl",
+   "sha256": "392ff3cadd44c74bc939675dcb4ae2b4c627462488ecc5602fa69734297a4806"
+  },
+  {
+   "path": "LTCUSDT/public_20261025.jsonl",
+   "sha256": "fabf1d92e325d0df470862e018b10fe9fe64dd05be3338cbce27dc3934f9aa14"
+  },
+  {
+   "path": "LTCUSDT/public_20261026.jsonl",
+   "sha256": "1b626b2ba0211d20e6b0c8976128f42ac1ae1dec65956ab963fecc5b14bd7ac7"
+  },
+  {
+   "path": "LTCUSDT/public_20261027.jsonl",
+   "sha256": "b915b6c2d4a2990d10a8ce4dd42624c580a0c75293dbb4cfb651a87f734d0bed"
+  },
+  {
+   "path": "SOLUSDT/public_20261023.jsonl",
+   "sha256": "cc280456c4b74fbb32be3babf7276a39ff32503219b812621648dc68e9e7ce72"
+  },
+  {
+   "path": "SOLUSDT/public_20261024.jsonl",
+   "sha256": "bab426b1ea15b823431f296ca3d0def114726d700652ad08937ac87823aa604d"
+  },
+  {
+   "path": "SOLUSDT/public_20261025.jsonl",
+   "sha256": "60d0f1bf11861a56e57ab58c6500437e0e36e11d7b8b53fdb09196198f3ba8cc"
+  },
+  {
+   "path": "SOLUSDT/public_20261026.jsonl",
+   "sha256": "a4247b36f29657c4ef2ccee749b5c50c04da4d2abdc9b711ec8690803b5a4103"
+  },
+  {
+   "path": "SOLUSDT/public_20261027.jsonl",
+   "sha256": "0c906ad195439210b139f3d09af16312b4e97d2376ae70636bd73303877eb574"
+  },
+  {
+   "path": "SUIUSDT/public_20261023.jsonl",
+   "sha256": "20c200c3b0c9a566a2511da552dce371b186e423f7f91f1b87caf0531416891b"
+  },
+  {
+   "path": "SUIUSDT/public_20261024.jsonl",
+   "sha256": "644008986c5f59a6794fc71c8693837a145006c067a3202b975e3fed567785d6"
+  },
+  {
+   "path": "SUIUSDT/public_20261025.jsonl",
+   "sha256": "3106d2c08b5a190c069f648f2d6ae730de22abdd494772c472fa12370977d560"
+  },
+  {
+   "path": "SUIUSDT/public_20261026.jsonl",
+   "sha256": "979d02a6a00a3d0843a4d5a9c35f9e3cd7ef4ce965f061e7eff451aebd06afc2"
+  },
+  {
+   "path": "SUIUSDT/public_20261027.jsonl",
+   "sha256": "acfc28d1cb94a20e81ea5ef7a9027de593bc946a220f3ccf0da796f621de8147"
+  },
+  {
+   "path": "XRPUSDT/public_20261023.jsonl",
+   "sha256": "9b8cfc929496d36028eb4f1411a8f60e08945755d1ffdfbc4f767ac8ade10adb"
+  },
+  {
+   "path": "XRPUSDT/public_20261024.jsonl",
+   "sha256": "d95966e15ccb5aa08e3e58a57fb7027f02e61a8436dda42ceefc2464310b063e"
+  },
+  {
+   "path": "XRPUSDT/public_20261025.jsonl",
+   "sha256": "d46bd8db53c9adbbd86831113d16952838309c1238f36ebbd2d17e70170ef80f"
+  },
+  {
+   "path": "XRPUSDT/public_20261026.jsonl",
+   "sha256": "f28de85d8cdf13a3087c6589e5cff8816b1783e9c8005ebfe49736b05559a2f2"
+  },
+  {
+   "path": "XRPUSDT/public_20261027.jsonl",
+   "sha256": "722ed2d9d1acf83fb83c2e983d078179c5a3cfe5748a8bc8bee261f068e7e797"
+  }
+ ],
+ "status": "ESTIMATED_FROM_PUBLIC_DATA",
+ "supported_max_notional": 50000.0
+}
