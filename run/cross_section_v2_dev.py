@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Five new cross-sectional hypotheses, DEV only, measured alt cost (ADR 0039).
+"""Five new cross-sectional hypotheses, DEV only, measured alt cost (ADR 0040).
 
 Runs exactly the hypotheses fixed in
 ``run/audit/evidence_cross_section_v2_20261027/prereg_cross_section_v2.json``

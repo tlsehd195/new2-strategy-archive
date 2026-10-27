@@ -1,4 +1,4 @@
-"""Tests for the cross-section v2 DEV check (ADR 0039). Needs numpy and pandas."""
+"""Tests for the cross-section v2 DEV check (ADR 0040). Needs numpy and pandas."""
 
 import json
 import math

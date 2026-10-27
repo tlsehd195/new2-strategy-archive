@@ -1,7 +1,7 @@
 {
  "version": "cross-section-dev-v2",
  "prereg_sha256": "a95cfaf1356bb7d445d9af346ffced982188ad3223c5cbd0f3544af320ca98db",
- "script_sha256": "5136edd9fd12b81f033fe3e887d1c8fefa512fab3395a33ed9af5a2e3d93e502",
+ "script_sha256": "0da6997fd30203ad78245b4dc97104fb0084c7d533700a6b05c408976c8cc475",
  "helper_sha256": "a33655236a8cc97c1543c3d1bbd7f089766e0d98e74fbd4ff4fc06bbb75d6679",
  "cost_record_sha256": "8a118f1a4ccb165750b450a0e5efe40f32a478b47cb8700f670449a35d6acb07",
  "cost_profile_sha256": "b6478c34e5f1b7bfcae2515ecc32824f60d904b8c09916cff43915082431ef74",
