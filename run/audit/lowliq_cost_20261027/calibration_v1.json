@@ -1,0 +1,83 @@
+{
+ "version": "lowliq-cost-calibration-v1",
+ "criteria_sha256": "e11e1ccc4e34a030e0ab0e2ee4e833aa4e9f18acb674e06222d701fc057d8da6",
+ "manifest_sha256": "9e51f4de1055078a02b58080ca5eb9a7d870c7a3331a72424e42cefc00ac2bde",
+ "fee_rate": 0.0005,
+ "max_participation": 0.05,
+ "q_min": 10000.0,
+ "q_max": 8221512.84995,
+ "half_spread_fit": {
+  "intercept": -4.681640070817663,
+  "slope": -0.18605847327254962,
+  "envelope_shift": 0.7193995350498845
+ },
+ "impact_fit": {
+  "intercept": 0.18156677661047294,
+  "slope": -0.4588360032198975,
+  "envelope_shift": 0.3731834497729247
+ },
+ "per_symbol": {
+  "ADAUSDT": {
+   "half_spread": 0.0007270083821078204,
+   "impact_coef": 0.001371165928653693,
+   "qv15_median": 871640.7727,
+   "snapshots_ok": 11443
+  },
+  "AVAXUSDT": {
+   "half_spread": 0.0003916529495083828,
+   "impact_coef": 0.0016596593669246779,
+   "qv15_median": 669481.704,
+   "snapshots_ok": 11443
+  },
+  "BNBUSDT": {
+   "half_spread": 0.00016951599199133428,
+   "impact_coef": 0.0010955227258587137,
+   "qv15_median": 2506426.0475,
+   "snapshots_ok": 11443
+  },
+  "DOGEUSDT": {
+   "half_spread": 0.000323936169029068,
+   "impact_coef": 0.0010039667622136579,
+   "qv15_median": 1850463.82689,
+   "snapshots_ok": 11443
+  },
+  "DOTUSDT": {
+   "half_spread": 0.00043824442970126336,
+   "impact_coef": 0.0030803664389974935,
+   "qv15_median": 410515.36763,
+   "snapshots_ok": 11443
+  },
+  "LINKUSDT": {
+   "half_spread": 0.00030907222304502854,
+   "impact_coef": 0.001513716147670749,
+   "qv15_median": 635200.67255,
+   "snapshots_ok": 11443
+  },
+  "LTCUSDT": {
+   "half_spread": 0.0002695618673494435,
+   "impact_coef": 0.0014951791075837394,
+   "qv15_median": 422961.06795,
+   "snapshots_ok": 11443
+  },
+  "SOLUSDT": {
+   "half_spread": 0.00024973278631790533,
+   "impact_coef": 0.0003907514186691142,
+   "qv15_median": 8221512.84995,
+   "snapshots_ok": 11443
+  },
+  "SUIUSDT": {
+   "half_spread": 0.0003852595020775594,
+   "impact_coef": 0.0018371169597042364,
+   "qv15_median": 1362925.3264,
+   "snapshots_ok": 11443
+  },
+  "XRPUSDT": {
+   "half_spread": 0.0002714681962505761,
+   "impact_coef": 0.0010724716225866842,
+   "qv15_median": 3854118.44915,
+   "snapshots_ok": 11443
+  }
+ },
+ "claim": "ESTIMATED_FROM_PUBLIC_DATA extrapolation; not verified, never promotable",
+ "script_sha256": "64a2d0d1b87af46e7d8f403845dcbeccc6e477d8d30cd4cd5352f812e9612ea9"
+}
