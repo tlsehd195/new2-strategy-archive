@@ -1,0 +1,58 @@
+{
+ "schema": "hilo_volume_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "2026-10-28T00:50Z",
+ "written_before_any_result": true,
+ "data_state_when_written": "no market data for this strategy is on disk or has been computed; the broad-universe archive is downloaded only after this file is committed",
+ "requested_by": "동동, 2026-10-28: 'recent high and low drawn as horizontal lines; when a large volume appears and volume rises above usual, short if price is near the high line, long if near the low line' (the sentence was cut off; this reading is the author's: mean-reversion at the lines). A breakout-following reading is tested as ONE fixed alternative.",
+ "question": "On the point-in-time top-50 Binance USDT-M perpetuals, does a volume spike at a recent high/low line predict a reversal (short near the high, long near the low) after the measured alt cost, on DEV data only?",
+ "what_the_author_had_already_seen": "ADR 0035/0038/0040/0041 results (cross-sectional weekly/28-day sorts, all NOT_PROMISING). No result of any rule below has been seen. The 15m/daily data of this universe is re-downloaded after this commit.",
+ "scope": "DEV only. No validation, locked, paper or IW1 window. No criteria change, no prereg v2/v3 change. A DEV_PROMISING flag can only lead to a proposal of a NEW preregistered forward window, which needs the user's explicit go.",
+ "universe": {
+  "source": "same as ADR 0035/0040: every USDT-quoted symbol of the public Binance archive including later-delisted ones",
+  "point_in_time_rule": "refreshed every Monday 00:00 UTC (from first_rebalance_from): symbols with >=60 daily bars before the cut-off (Saturday close, i.e. 2 bars before the Monday open) and a bar at the Monday open, ranked by mean daily quote volume of the 30 days to the cut-off; top 50. A symbol is tradeable on a day if it is in the universe of the latest Monday on/before the entry day.",
+  "segment_rule": "BTCUSDT is not read in S2 (ADR 0019); every symbol obeys never_read"
+ },
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "first_entry_from": "2021-03-01", "use": "the only segment that decides anything"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "first_entry_from": "2024-08-19", "use": "reported, and used only in the fixed S2 > 0.5 condition"}
+ },
+ "never_read": [["2000-01-01", "2020-12-31", "IW1"], ["2023-09-19", "2024-06-18", "BTC validation/locked TEST + embargo, all symbols"], ["2025-10-21", "2099-12-31", "ETH validation/locked/paper + embargo, all symbols"]],
+ "signal": {
+  "bars": "daily UTC bars. Event day t is a bar that has closed (00:00 UTC of t+1). Only bars <= t are used.",
+  "lines": "H = highest daily high and L = lowest daily low of the N bars t-N..t-1 (the event bar itself is NOT part of its own lines). Range R = H - L; R <= 0 -> no signal.",
+  "position_in_range": "p = (close_t - L) / R  (p > 1 means closed above the high line, p < 0 below the low line; both count as near)",
+  "volume_spike": "v = quote volume_t / mean quote volume of the 20 bars t-20..t-1; spike if v >= m",
+  "near_high": "p >= 1 - a",
+  "near_low": "p <= a",
+  "reversal_rule (R)": "spike and near_high -> SHORT; spike and near_low -> LONG",
+  "breakout_rule (B, one variant only)": "exact mirror of R at one fixed setting: spike and near_high -> LONG; spike and near_low -> SHORT"
+ },
+ "trade": {
+  "entry": "open of day t+1 (right after the signal bar closes). One position per symbol; signals while that symbol is held are ignored.",
+  "exit": "open of day t+1+H (time exit, no stop, no target).",
+  "size": "weight 0.05 of capital per position (an order of 10,000 USDT at 200,000 capital, as in ADR 0040). At most 20 positions open at once (gross <= 1). If more candidates than free slots on a day: highest v first, ties by symbol name; the rest are skipped and counted.",
+  "window_end": "an entry whose exit open would fall after the last day of the segment is not opened.",
+  "missing_data": "never filled: a held name with no daily bar earns 0 that day, counted. No lookahead: universe, lines and volume use only bars <= t."
+ },
+ "grid": {
+  "reversal": {"N": [20, 50], "a": [0.10, 0.20], "m": [2.0, 3.0], "H_days": [3, 7], "configs": 16},
+  "breakout": {"configs": 1, "setting": {"N": 20, "a": 0.10, "m": 2.0, "H_days": 7}, "note": "mirror of reversal config N20_a0.10_m2.0_H7; fixed now, not chosen from results"},
+  "ids": "R_N{N}_a{a}_m{m}_H{H} and B_N20_a0.10_m2.0_H7",
+  "trials": "exactly these 17, each run once. Recorded as 17 DEV evaluations in run/audit/dev_search_trials.jsonl and added to the cumulative count. Any change of lookback, band, spike threshold, hold, universe, exit rule, or the timeframe afterwards is a NEW trial with a new prereg and ADR."
+ },
+ "cost": {
+  "decides": "measured alt cost record run/audit/alt_cost_measured_20261027/estimate_v3_alts.json (PE-ed757f47..., ESTIMATED_FROM_PUBLIC_DATA): per side fee 5bp + half spread 7.27bp + 0.0015*sqrt(10,000 USDT / quote volume of the 23:45-00:00 UTC 15m bar before the trade open), charged at entry and at exit on weight x side cost",
+  "volume_scaled_row": "volume-scaled low-liquidity cost of ADR 0041 (run/audit/lowliq_cost_20261027/calibration_v1.json, q15 = mean daily quote volume of the 30 days to the bar before the trade open / 96). Must stay positive in S1 (flag condition e).",
+  "other_rows": "measured_x2 and assumed_public_v1 and cost0 are reported only",
+  "impact_bar": "if the 23:45 bar is missing, day quote volume / 96 is used and counted",
+  "funding": "actual settled funding on every held position; a short receives positive funding"
+ },
+ "statistics": {
+  "unit": "daily portfolio return on constant capital 1, simple sum of position returns x weight (days without a position count as 0)",
+  "report": "per config: S1/S2 number of trades, long/short split, hit rate, mean gross and net trade return (bp), annualised Sharpe, annual return, max drawdown, t, beta and correlation to the equal-weight universe, beta-adjusted alpha t, S1 halves, every cost row, share of total S1 net P&L from the 10 best days, skipped-for-capacity count",
+  "dev_flag_not_a_verdict": "DEV_PROMISING only if, under the measured cost: (a) S1 annual Sharpe above the expected maximum of 17 unskilled trials over the S1 length (Bailey et al. 2014, engine_lib.expected_max_sr), (b) S1 beta-adjusted alpha t >= 2, (c) both S1 halves positive, (d) S2 annual Sharpe > 0.5, (e) S1 annual Sharpe under the ADR 0041 volume-scaled cost > 0, (f) at least 100 S1 trades. Anything else is NOT_PROMISING. The flag never opens a window.",
+  "cumulative_trials": "also report the DEV evaluation count including all earlier ones (dev_search_trials.jsonl sum + 17) and the expected maximum Sharpe under that count (the 10,000-trial reference of ADR 0035 + 17) for context; this does not change the flag.",
+  "power_note": "S1 is about 2.5 years. A true effect of annual SR 1 will most likely be flagged NOT_PROMISING. Accepted and stated in advance. A rule that trades rarely adds little capital use, so its constant-capital Sharpe is low by construction; per-trade means are reported as well."
+ }
+}
