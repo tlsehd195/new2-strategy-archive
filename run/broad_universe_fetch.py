@@ -14,7 +14,7 @@ Steps (each skips files that already exist):
   bar2345  the 23:45 UTC 15m bar of each day (quote volume, for the impact
            term) of the same symbols; the 15m zips are streamed and dropped
   m15      every 15m bar (open time, o, h, l, c, quote volume) of the same
-           symbols as float64 .npy per symbol-month (ADR 0044, intraday lines)
+           symbols as float64 .npy per symbol-month (ADR 0046, intraday lines)
 
 Usage::
 

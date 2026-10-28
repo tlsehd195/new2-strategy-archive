@@ -1,4 +1,4 @@
-"""Tests for the intraday high/low line + volume-spike DEV check (ADR 0044). Needs numpy and pandas."""
+"""Tests for the intraday high/low line + volume-spike DEV check (ADR 0046). Needs numpy and pandas."""
 
 import json
 import sys
