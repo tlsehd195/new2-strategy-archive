@@ -1,0 +1,61 @@
+{
+ "schema": "hilo_intraday_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "2026-10-28T02:10Z",
+ "written_before_any_result": true,
+ "data_state_when_written": "no 15m/1h market data of this universe is on disk and nothing below has been computed; the archive is downloaded only after this file is committed",
+ "requested_by": "동동, 2026-10-28, answering '1 2 3 다 해봐' to the follow-ups of ADR 0043; this is item 1: lines on 15m/1h bars, swing-point definition of high/low, a few breakout-following variants",
+ "question": "Does a volume spike at a recent high/low line, drawn on 15m or 1h bars (rolling N-bar extremes or confirmed swing points), predict reversal (fade) or continuation (breakout) on the point-in-time top-50 Binance USDT-M perpetuals after the measured alt cost, DEV data only?",
+ "what_the_author_had_already_seen": "ADR 0043 (daily lines: 16 reversal configs lose even at cost 0; breakout mirror S1 SR 0.10) and ADR 0035/0038/0040/0041. No result of any rule below has been seen.",
+ "scope": "DEV only. No validation, locked, paper or IW1 window. No criteria change, no prereg v2/v3 change. A DEV_PROMISING flag can only lead to a proposal of a NEW preregistered forward window, which needs the user's explicit go.",
+ "universe": {
+  "source": "same as ADR 0035/0043 (daily bars; point-in-time top-50 refreshed every Monday 00:00 UTC with the same eligibility and cut-off rules; a symbol is tradeable on a bar if it is in the universe of the latest Monday on/before the bar's UTC day)",
+  "segment_rule": "BTCUSDT is not read in S2; every symbol obeys never_read"
+ },
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "first_entry_from": "2021-03-01", "use": "the only segment that decides anything"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "first_entry_from": "2024-08-19", "use": "reported, and used only in the fixed S2 > 0.5 condition"}
+ },
+ "never_read": [["2000-01-01", "2020-12-31", "IW1"], ["2023-09-19", "2024-06-18", "BTC validation/locked TEST + embargo, all symbols"], ["2025-10-21", "2099-12-31", "ETH validation/locked/paper + embargo, all symbols"]],
+ "bars": {
+  "tf15": "Binance USD-M 15m klines (UTC). tf1h = 4 consecutive 15m bars from :00 (open of the first, max high, min low, close of the last, summed quote volume); an hour with any missing 15m bar is missing (NaN) and never filled.",
+  "event_bar": "the bar t of the chosen timeframe that has just closed. Only bars <= t are used anywhere (lines, volume baseline, universe)."
+ },
+ "signal": {
+  "volume_spike": "v = quote volume_t / mean quote volume of the previous W bars t-W..t-1 with W = 96 (tf15) or 24 (tf1h), i.e. one day; spike if v >= m. Strictly full window, no NaN.",
+  "line_family_ROLL": "H = highest high and L = lowest low of the N bars t-N..t-1 (event bar excluded). N in {96, 672} for tf15 (1 and 7 days), {168, 480} for tf1h (7 and 20 days). R = H - L; R <= 0 -> no signal.",
+  "line_family_SWING": "a bar j is a swing high if high_j >= max(high over the k bars before j) and high_j > max(high over the k bars after j); swing low symmetric (low_j <= min of k before, < min of k after). A swing is known from bar j+k closing on. H = high of the latest swing high known at t, L = low of the latest swing low known at t, each no older than 672 (tf15) / 168 (tf1h) bars (7 days); either missing, or R = H - L <= 0 -> no signal. k in {4, 16} for tf15 (1h and 4h each side), {4, 12} for tf1h (4h and 12h each side).",
+  "position_in_range": "p = (close_t - L) / R  (p > 1 closed above the high line, p < 0 below the low line)",
+  "fade_rule (F)": "spike and p >= 1 - a -> SHORT; spike and p <= a -> LONG; a = 0.10 for all configs",
+  "breakout_rule (BO)": "spike and p >= 1 (closed above the high line) -> LONG; spike and p <= 0 (closed below the low line) -> SHORT",
+  "tie": "a bar that is both near-high and near-low in the same direction test is skipped"
+ },
+ "trade": {
+  "entry": "open of the bar after the event bar. One position per symbol; signals while that symbol is held are ignored.",
+  "exit": "open of the bar H_bars later (time exit, no stop, no target). H_bars: tf15 {4 = 1h, 16 = 4h}; tf1h {4 = 4h, 24 = 24h}.",
+  "size": "weight 0.05 of capital per position, at most 20 open at once. More candidates than free slots at a bar: highest v first, ties by symbol name; the rest skipped and counted.",
+  "window_end": "an entry whose exit open falls after the last bar of the segment is not opened.",
+  "missing_data": "a missing return interval of a held name earns 0 and is counted; nothing is filled. Funding: the actual settled funding with timestamp f is charged to the interval (open_i, open_i+1] that contains f, long pays positive funding, short receives it."
+ },
+ "grid": {
+  "FADE_ROLL": {"configs": 16, "grid": "tf {15m,1h} x N (2 per tf) x m {2.0, 3.0} x H (2 per tf)"},
+  "FADE_SWING": {"configs": 16, "grid": "tf {15m,1h} x k (2 per tf) x m {2.0, 3.0} x H (2 per tf)"},
+  "BREAKOUT_ROLL": {"configs": 8, "grid": "tf {15m,1h} x N (2 per tf) x m {2.0, 3.0} x the LONGER H of the tf (16 bars / 24 bars)"},
+  "BREAKOUT_SWING": {"configs": 8, "grid": "tf {15m,1h} x k (2 per tf) x m {2.0, 3.0} x the LONGER H of the tf"},
+  "ids": "FR_{tf}_N{N}_m{m}_H{H}, FS_{tf}_k{k}_m{m}_H{H}, BR_{tf}_N{N}_m{m}_H{H}, BS_{tf}_k{k}_m{m}_H{H}",
+  "trials": "exactly 48, each run once. Recorded as 48 DEV evaluations in run/audit/dev_search_trials.jsonl. Any later change of lookback, k, band a, threshold m, hold, universe, exit rule or timeframe is a NEW trial with a new prereg and ADR."
+ },
+ "cost": {
+  "decides": "measured alt cost record run/audit/alt_cost_measured_20261027/estimate_v3_alts.json (ESTIMATED_FROM_PUBLIC_DATA): fee + half spread + impact coefficient * sqrt(10,000 USDT / b) per side on weight, charged at entry and exit. b = quote volume of the 15m bar that closes at the trade's open (the bar just before the open); a missing bar falls back to mean quote volume of the previous 96 15m bars, then to day quote volume/96, counted.",
+  "volume_scaled_row": "volume-scaled low-liquidity cost of ADR 0041 (calibration_v1.json) with q15 = mean daily quote volume of the 30 days to the day before the trade's UTC day / 96. Must stay positive in S1 (flag condition e).",
+  "other_rows": "measured_x2, assumed_public_v1 and cost0 are reported only",
+  "cost_impact_report": "because short bars turn over a lot, for every config report trades per day, mean cost per trade (bp), total cost drag as annual return %, and S1 Sharpe at cost0 / measured / x2, plus a per-timeframe summary (median over its configs)"
+ },
+ "statistics": {
+  "unit": "daily portfolio return on constant capital 1 (sum of the intraday interval returns x weight inside each UTC day, days without a position count 0), annualised with sqrt(365); market = equal-weight universe daily open-to-open return",
+  "report": "per config: S1/S2 trades, long/short split, hit rate, mean gross and net trade return (bp), Sharpe, annual return, max drawdown, t, beta, alpha t, S1 halves, every cost row, share of S1 net P&L from the 10 best days, skipped-for-capacity count, mean holding bars",
+  "dev_flag_not_a_verdict": "DEV_PROMISING only if, under the measured cost: (a) S1 annual Sharpe above the expected maximum of 48 unskilled trials over the S1 length (Bailey et al. 2014, engine_lib.expected_max_sr), (b) S1 beta-adjusted alpha t >= 2, (c) both S1 halves positive, (d) S2 annual Sharpe > 0.5, (e) S1 annual Sharpe under the ADR 0041 volume-scaled cost > 0, (f) at least 200 S1 trades. Anything else is NOT_PROMISING. The flag never opens a window.",
+  "cumulative_trials": "also report the cumulative DEV evaluation count (dev_search_trials.jsonl sum + 48 = 11,742 + 48) and the expected maximum Sharpe at that count for context; this does not change the flag.",
+  "power_note": "S1 is about 2.5 years. A true effect of annual SR 1 will most likely be flagged NOT_PROMISING. Accepted and stated in advance; per-trade means are reported as well."
+ }
+}
