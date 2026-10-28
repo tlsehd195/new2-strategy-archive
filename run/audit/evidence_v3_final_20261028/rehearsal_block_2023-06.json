@@ -1,0 +1,134 @@
+{
+ "x_raw": -0.05763486784637452,
+ "x": -0.05763486784637452,
+ "stop_day": 16,
+ "floored": false,
+ "block_id": "2023-06",
+ "block": [
+  "2023-06-01",
+  "2023-06-30"
+ ],
+ "read_start": "2023-04-02",
+ "diagnostics": {
+  "symbols": {
+   "BTCUSDT": {
+    "dataset_sha256": "c412337c728216c7cccd7c9c2882b7cf16371ca999a8090e08b04b6d275da20e",
+    "bars": 8736
+   },
+   "ETHUSDT": {
+    "dataset_sha256": "fe9beed833f6ac358bd609d892586e6179bfcfdee3f27297e16366d8a87c5993",
+    "bars": 8736
+   },
+   "BNBUSDT": {
+    "dataset_sha256": "aec12fdded448a28589a6319a85cd79675f90f00bcc3b72bfefba3486e667530",
+    "bars": 8736
+   },
+   "XRPUSDT": {
+    "dataset_sha256": "5cd4ca7567dfd455a88312827eff18de0dbb1ba1be07b29c82196240da9685f1",
+    "bars": 8736
+   },
+   "SOLUSDT": {
+    "dataset_sha256": "e021078468a7b2e71bf32e67af47a21c1d4208abf83a83268556ded7302bb7a3",
+    "bars": 8736
+   },
+   "ADAUSDT": {
+    "dataset_sha256": "40ca0d6416f0b401863276449d4706903815a1fcca9d5543170776232b22e34a",
+    "bars": 8736
+   },
+   "DOGEUSDT": {
+    "dataset_sha256": "373f87f50ce8a5f465ec2a410308e4658df9bc243a6d84d6456f8f7d68b62ccd",
+    "bars": 8736
+   },
+   "LTCUSDT": {
+    "dataset_sha256": "3490df1c6336b836eb8f765dc42435d96354314f78b30710df62897c1467dd9c",
+    "bars": 8736
+   },
+   "LINKUSDT": {
+    "dataset_sha256": "fd2a136f566fc1fca719d7e121a920671b62fa8440e91db871202b9f953d7dee",
+    "bars": 8736
+   }
+  },
+  "events": {
+   "S-80fe4b122603f292:BTCUSDT": 3,
+   "S-80fe4b122603f292:ETHUSDT": 3,
+   "S-80fe4b122603f292:BNBUSDT": 1,
+   "S-80fe4b122603f292:XRPUSDT": 5,
+   "S-80fe4b122603f292:SOLUSDT": 3,
+   "S-80fe4b122603f292:ADAUSDT": 2,
+   "S-80fe4b122603f292:DOGEUSDT": 4,
+   "S-80fe4b122603f292:LTCUSDT": 2,
+   "S-80fe4b122603f292:LINKUSDT": 0,
+   "S-db25d24ca1ca4c96:BTCUSDT": 4,
+   "S-db25d24ca1ca4c96:ETHUSDT": 5,
+   "S-db25d24ca1ca4c96:BNBUSDT": 3,
+   "S-db25d24ca1ca4c96:XRPUSDT": 5,
+   "S-db25d24ca1ca4c96:SOLUSDT": 3,
+   "S-db25d24ca1ca4c96:ADAUSDT": 3,
+   "S-db25d24ca1ca4c96:DOGEUSDT": 5,
+   "S-db25d24ca1ca4c96:LTCUSDT": 4,
+   "S-db25d24ca1ca4c96:LINKUSDT": 0,
+   "S-181c15b4139efdd3:BTCUSDT": 2,
+   "S-181c15b4139efdd3:ETHUSDT": 2,
+   "S-181c15b4139efdd3:BNBUSDT": 1,
+   "S-181c15b4139efdd3:XRPUSDT": 2,
+   "S-181c15b4139efdd3:SOLUSDT": 1,
+   "S-181c15b4139efdd3:ADAUSDT": 1,
+   "S-181c15b4139efdd3:DOGEUSDT": 3,
+   "S-181c15b4139efdd3:LTCUSDT": 0,
+   "S-181c15b4139efdd3:LINKUSDT": 0,
+   "S-9d752d63324074cc:BTCUSDT": 7,
+   "S-9d752d63324074cc:ETHUSDT": 5,
+   "S-9d752d63324074cc:BNBUSDT": 4,
+   "S-9d752d63324074cc:XRPUSDT": 8,
+   "S-9d752d63324074cc:SOLUSDT": 6,
+   "S-9d752d63324074cc:ADAUSDT": 4,
+   "S-9d752d63324074cc:DOGEUSDT": 8,
+   "S-9d752d63324074cc:LTCUSDT": 7,
+   "S-9d752d63324074cc:LINKUSDT": 0,
+   "S-b5e5df1c18d5a57d:BTCUSDT": 2,
+   "S-b5e5df1c18d5a57d:ETHUSDT": 2,
+   "S-b5e5df1c18d5a57d:BNBUSDT": 1,
+   "S-b5e5df1c18d5a57d:XRPUSDT": 5,
+   "S-b5e5df1c18d5a57d:SOLUSDT": 2,
+   "S-b5e5df1c18d5a57d:ADAUSDT": 0,
+   "S-b5e5df1c18d5a57d:DOGEUSDT": 4,
+   "S-b5e5df1c18d5a57d:LTCUSDT": 1,
+   "S-b5e5df1c18d5a57d:LINKUSDT": 0
+  },
+  "note": "stopped: entries after the stop day-end are not taken (value frozen there)",
+  "path": [
+   0.0,
+   -0.0008686931789292496,
+   -0.003629330691356936,
+   0.0013631693106781566,
+   -0.0037759989938288543,
+   -0.0017425850557478493,
+   -0.004303096642364813,
+   -0.003922430200848149,
+   -0.004492642922761868,
+   -0.02201539886483532,
+   -0.022666761261487443,
+   -0.023369075704126774,
+   -0.04505669706086415,
+   -0.05044668769136786,
+   -0.052021274989816686,
+   -0.054179304886832196,
+   -0.05763486784637452,
+   -0.06231231640971237,
+   -0.06348591207577588,
+   -0.051605251137083925,
+   -0.03630247329214505,
+   -0.05124741418322832,
+   -0.05300269685900254,
+   -0.056536629497213525,
+   -0.056150206345976734,
+   -0.05836614451822311,
+   -0.05836614451822311,
+   -0.05836614451822311,
+   -0.04983335094755728,
+   -0.025805335683335415
+  ],
+  "k": 2.377809116404246
+ },
+ "cost": "public_estimate:estimate_v3_alts.json"
+}

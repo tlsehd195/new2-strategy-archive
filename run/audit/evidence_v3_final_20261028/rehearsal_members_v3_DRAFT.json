@@ -1,0 +1,290 @@
+{
+ "candidates_seen": 33,
+ "code": {
+  "code_hash": "480ea0365f62377a172d26cd025a4576925681cc7349eddd869bc091b58703e6",
+  "v3_code_sha256": "1a8bfad8a4dcb6c9024d2c4ea6a3e4260f3d714b7d2e42da4a7a53eb4ccae455"
+ },
+ "context_id": "REHEARSAL:r9_candidates_with_specs.json",
+ "family": "walkforward-evalue-family-v3",
+ "flat_if_empty": "no candidate -> every block is flat (X_b = 0)",
+ "frozen_at": "2026-10-28T00:48:34Z",
+ "members": [
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 96
+       },
+       "value": 1.5
+      },
+      {
+       "feature": "taker_share_z",
+       "op": "gt",
+       "params": {
+        "window": 1091
+       },
+       "value": 0.68
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 48,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k+taker_share_z:long",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 48,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-80fe4b122603f292"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 96
+       },
+       "value": 1.5
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 32,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k:long",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 32,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-db25d24ca1ca4c96"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 96
+       },
+       "value": 1.5
+      },
+      {
+       "feature": "ret_z",
+       "op": "gt",
+       "params": {
+        "lookback": 64,
+        "min_history": 0,
+        "window": 128
+       },
+       "value": 2.5
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 192,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k+ret_z:long",
+    "filters": [
+     {
+      "feature": "taker_share_z",
+      "op": "gt",
+      "params": {
+       "window": 1091
+      },
+      "value": 0.68
+     }
+    ],
+    "primary_cell": {
+     "horizon": 192,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-181c15b4139efdd3"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 96
+       },
+       "value": 1.25
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 32,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k:long",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 32,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-9d752d63324074cc"
+  },
+  {
+   "spec": {
+    "data": [
+     "klines"
+    ],
+    "direction": "long",
+    "entry": {
+     "conditions": [
+      {
+       "feature": "breakout_k",
+       "op": "gt",
+       "params": {
+        "window": 96
+       },
+       "value": 1.75
+      },
+      {
+       "feature": "taker_share_z",
+       "op": "gt",
+       "params": {
+        "window": 1091
+       },
+       "value": 0.68
+      }
+     ],
+     "logic": "all"
+    },
+    "exit": {
+     "horizon": 96,
+     "stop_loss_bp": null,
+     "take_profit_bp": null
+    },
+    "family": "spec:breakout_k+taker_share_z:long",
+    "filters": [],
+    "primary_cell": {
+     "horizon": 96,
+     "symbol": "BTCUSDT"
+    },
+    "risk": {
+     "max_concurrent": 2,
+     "max_leverage": 1.0,
+     "risk_per_trade": 0.01,
+     "sizing": "vol_inverse"
+    },
+    "schema": "strategy_spec_v1",
+    "symbols": [
+     "BTCUSDT",
+     "ETHUSDT"
+    ],
+    "timeframe": "15m"
+   },
+   "strategy_id": "S-b5e5df1c18d5a57d"
+  }
+ ],
+ "members_sha256": "708f8173cdd407092d8964469129825e7216d0d7c16b8794fa4f8e6ba5464219",
+ "prereg_sha256": "451865d15dd3c83218a6a560771c1e30cb550fc01c64b1f74703bcb24ec4ef6b",
+ "rule": "take pipeline.validation_candidates() of ONE DEV-only evolve state directory run on the frozen code (default candidate selection config, one per entry signal, ADR 0031/0033), in its own order; the members are the first pipeline.bundle.members (5) of that list. No entry bar (v3 has none). Each member's rule is applied to every universe symbol. Frozen with run/evalue_v3_block.py freeze, then dev-scale seals the vol scale into the same file.",
+ "scale": {
+  "capped": false,
+  "cost": "public_estimate:estimate_v3_alts.json",
+  "dev_daily_sd_bp": 42.05552048316701,
+  "dev_days": 901,
+  "dev_sr_ann": 0.016846426408140044,
+  "k": 2.377809116404246,
+  "k_raw": 2.377809116404246,
+  "note": "computed by dev-scale 2026-10-28 for the same 5 specs, data and cost; re-sealed after a text-only edit of the prereg (e_process.code path)",
+  "stretch": "S1 2021-04-01..2023-09-18",
+  "target": 0.01
+ },
+ "schema": "walkforward_evalue_members_v3",
+ "state_dir": ""
+}

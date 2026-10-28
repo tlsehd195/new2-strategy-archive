@@ -1,0 +1,133 @@
+{
+ "x_raw": -0.03028161224335391,
+ "x": -0.03028161224335391,
+ "stop_day": null,
+ "floored": false,
+ "block_id": "2022-06",
+ "block": [
+  "2022-06-01",
+  "2022-06-30"
+ ],
+ "read_start": "2022-04-02",
+ "diagnostics": {
+  "symbols": {
+   "BTCUSDT": {
+    "dataset_sha256": "5cf5377c11960e00406b4199def2f0a644608aa2036bc9f0cecb96d326255d1b",
+    "bars": 8736
+   },
+   "ETHUSDT": {
+    "dataset_sha256": "1415bea7d214fe8162062d1589a607e44bccbdfd071139e7bd11551c7dc6bab4",
+    "bars": 8736
+   },
+   "BNBUSDT": {
+    "dataset_sha256": "373c284bc733d15bf7442d012afe0a438a9b7faf03eb0724b3c9fc79760bd223",
+    "bars": 8736
+   },
+   "XRPUSDT": {
+    "dataset_sha256": "8e435efbcb855edc63c78e4cf6d2f9aa74b6a578b99c0b4de9eeb63fc41d7c25",
+    "bars": 8544
+   },
+   "SOLUSDT": {
+    "dataset_sha256": "c56b48f750ae8396125ab4f4c2c09211c5617e3d709be8e52ed1d4fd93ce81a8",
+    "bars": 8544
+   },
+   "ADAUSDT": {
+    "dataset_sha256": "8a8b6d7900bb71422048c028eaff1c45076e3ff7b3b76c1a3107ff0fc0679be0",
+    "bars": 8736
+   },
+   "DOGEUSDT": {
+    "dataset_sha256": "3a872cf0b968512bbd3b82c54ec91c1f42853232045464e3c42b5122d85d3cea",
+    "bars": 8736
+   },
+   "LTCUSDT": {
+    "dataset_sha256": "3b336292dfa20dacb86cb4a1c7efbfd02225d9b1c27c89e53c5e2bc65296bad9",
+    "bars": 8544
+   },
+   "LINKUSDT": {
+    "dataset_sha256": "d8639bdc656f7654cab453bf5cc7eb91b96816b6a48b4912490895928e12ff35",
+    "bars": 8736
+   }
+  },
+  "events": {
+   "S-80fe4b122603f292:BTCUSDT": 0,
+   "S-80fe4b122603f292:ETHUSDT": 2,
+   "S-80fe4b122603f292:BNBUSDT": 1,
+   "S-80fe4b122603f292:XRPUSDT": 2,
+   "S-80fe4b122603f292:SOLUSDT": 1,
+   "S-80fe4b122603f292:ADAUSDT": 1,
+   "S-80fe4b122603f292:DOGEUSDT": 2,
+   "S-80fe4b122603f292:LTCUSDT": 1,
+   "S-80fe4b122603f292:LINKUSDT": 2,
+   "S-db25d24ca1ca4c96:BTCUSDT": 0,
+   "S-db25d24ca1ca4c96:ETHUSDT": 2,
+   "S-db25d24ca1ca4c96:BNBUSDT": 1,
+   "S-db25d24ca1ca4c96:XRPUSDT": 2,
+   "S-db25d24ca1ca4c96:SOLUSDT": 1,
+   "S-db25d24ca1ca4c96:ADAUSDT": 2,
+   "S-db25d24ca1ca4c96:DOGEUSDT": 2,
+   "S-db25d24ca1ca4c96:LTCUSDT": 2,
+   "S-db25d24ca1ca4c96:LINKUSDT": 2,
+   "S-181c15b4139efdd3:BTCUSDT": 0,
+   "S-181c15b4139efdd3:ETHUSDT": 1,
+   "S-181c15b4139efdd3:BNBUSDT": 0,
+   "S-181c15b4139efdd3:XRPUSDT": 2,
+   "S-181c15b4139efdd3:SOLUSDT": 1,
+   "S-181c15b4139efdd3:ADAUSDT": 1,
+   "S-181c15b4139efdd3:DOGEUSDT": 0,
+   "S-181c15b4139efdd3:LTCUSDT": 0,
+   "S-181c15b4139efdd3:LINKUSDT": 1,
+   "S-9d752d63324074cc:BTCUSDT": 1,
+   "S-9d752d63324074cc:ETHUSDT": 2,
+   "S-9d752d63324074cc:BNBUSDT": 1,
+   "S-9d752d63324074cc:XRPUSDT": 2,
+   "S-9d752d63324074cc:SOLUSDT": 2,
+   "S-9d752d63324074cc:ADAUSDT": 2,
+   "S-9d752d63324074cc:DOGEUSDT": 3,
+   "S-9d752d63324074cc:LTCUSDT": 2,
+   "S-9d752d63324074cc:LINKUSDT": 4,
+   "S-b5e5df1c18d5a57d:BTCUSDT": 0,
+   "S-b5e5df1c18d5a57d:ETHUSDT": 1,
+   "S-b5e5df1c18d5a57d:BNBUSDT": 1,
+   "S-b5e5df1c18d5a57d:XRPUSDT": 2,
+   "S-b5e5df1c18d5a57d:SOLUSDT": 0,
+   "S-b5e5df1c18d5a57d:ADAUSDT": 1,
+   "S-b5e5df1c18d5a57d:DOGEUSDT": 1,
+   "S-b5e5df1c18d5a57d:LTCUSDT": 1,
+   "S-b5e5df1c18d5a57d:LINKUSDT": 1
+  },
+  "path": [
+   -0.017381517712208697,
+   -0.017469039810039538,
+   -0.017469039810039538,
+   -0.01857442729741531,
+   -0.020293515461314082,
+   -0.015627014283153627,
+   -0.02172260313086713,
+   -0.027173496211832845,
+   -0.021680039687075953,
+   -0.04682263621522687,
+   -0.05105654815543645,
+   -0.053286237681771716,
+   -0.053286237681771716,
+   -0.053286237681771716,
+   -0.04459035640392394,
+   -0.0471227392846494,
+   -0.0471227392846494,
+   -0.0471227392846494,
+   -0.03926539290991098,
+   -0.039277665965777864,
+   -0.036862144112712526,
+   -0.036862144112712526,
+   -0.03417526646432906,
+   -0.029263417343572597,
+   -0.02719936895461359,
+   -0.02552531192579519,
+   -0.02552531192579519,
+   -0.03028161224335391,
+   -0.03028161224335391,
+   -0.03028161224335391
+  ],
+  "k": 2.377809116404246
+ },
+ "cost": "public_estimate:estimate_v3_alts.json"
+}
