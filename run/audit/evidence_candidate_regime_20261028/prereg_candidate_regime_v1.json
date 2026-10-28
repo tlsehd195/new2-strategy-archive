@@ -1,0 +1,31 @@
+{
+ "version": "candidate-regime-prereg-v1",
+ "written": "2026-10-28, before any regime result was computed",
+ "purpose": "Per-regime (bull / side / bear) scorecard of the R9 batch candidates (33) and five bundles. Elimination diagnostic only; not evidence of passing; DEV data is already used for selection so this is not an independent test.",
+ "data": "DEV only: S1 2021-04-01..2023-09-18 (all 9 symbols) and S2 2024-07-15..2025-10-20 (BTC excluded, its paper window), reads checked by strong_search_dev.assert_allowed. No validation / locked / IW1 / paper window.",
+ "symbols": ["BTCUSDT","ETHUSDT","BNBUSDT","XRPUSDT","SOLUSDT","ADAUSDT","DOGEUSDT","LTCUSDT","LINKUSDT"],
+ "candidates": "run/audit/alt_cost_measured_20261027/r9_candidates_with_specs.json (33, R9 order)",
+ "cost": "measured alt cost record run/audit/alt_cost_measured_20261027/estimate_v3_alts.json (PE-ed757f47..., ESTIMATED_FROM_PUBLIC_DATA); extra rows: gross (cost 0) and assumed_public_v1",
+ "series": "basket-average daily net bp (each symbol equal weight, same as ADR 0036/0042). PRIMARY attribution: each trade to the UTC day of its ENTRY (what a live regime switch could know). SECONDARY: exit day.",
+ "regime_index": "equal-weight daily-rebalanced close-to-close index of the segment's symbols (S2 without BTC). Label of day d uses closes up to day d-1 only. Same rules as ADR 0026 so results are comparable.",
+ "regimes": {
+  "R1_trend": "trailing 90-day index return >= +20% BULL, <= -20% BEAR, else SIDE; first 90 days of a segment NA (S2 has only 26 warm-up days so S2 R1 starts about 2024-09-17)",
+  "R2_drawdown": "index <= 75% of its running peak (peak since segment read_start) DD else OK"
+ },
+ "bundles": {
+  "B1_first5": "R9 ranks 1-5 (the ADR 0042 v3 rehearsal members)",
+  "B2_all33": "all 33, equal weight",
+  "B3_top5_S1": "5 candidates with highest S1 net SR under the measured cost (selected on S1, so S1 numbers are inflated; flagged)",
+  "B4_long_only": "the long candidates among the 33 (27), equal weight",
+  "B5_first20": "R9 ranks 1-20 (the IW1 refreeze members)"
+ },
+ "stats": "days, mean bp/day, annual SR (only if >= 60 days in the regime, else 'insufficient'), cumulative bp, trades, trade hit rate; bundles also Newey-West(5) t of mean. Basket buy-and-hold gross mean bp/day per regime as context.",
+ "flags": {
+  "REGIME_ALL3_POS": "S1 mean bp/day > 0 in BULL, SIDE and BEAR (each >= 60 days)",
+  "BEAR_NEG": "S1 mean bp/day <= 0 in R1 BEAR",
+  "DD_NEG": "S1 mean bp/day <= 0 in R2 DD",
+  "ONE_REGIME": "more than 100% of S1 cumulative profit comes from a single R1 regime (i.e. the other two together lose)",
+  "S2_SAME_SIGN": "S2 sign of mean bp/day in each regime with >= 60 days matches S1"
+ },
+ "no_threshold_changes": "Statistical criteria, preregs v2/v3, cost profiles, engine untouched. The scorecard may eliminate candidates in discussion only; it never promotes anything."
+}
