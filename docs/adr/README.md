@@ -49,4 +49,5 @@
 | [0043](0043-hilo-line-volume-spike-dev.md) | 최근 고점·저점 라인 + 거래량 급증 전략(반전 16 + 돌파 거울 1, 일봉, 상위 50, 측정 알트 비용, DEV 전용) 사전등록 후 실행: 17개 모두 NOT_PROMISING, 반전은 비용 전에도 손실 | Accepted (측정) |
 | [0044](0044-candidate-regime-scorecard-dev.md) | R9 후보 33개와 묶음 5개의 장세별(상승·횡보·하락, 하락 국면) 성적표, 측정 비용, DEV 전용: 횡보장이 가장 약하고 S1·S2 장세별 부호가 일관되지 않으며 6칸 모두 양수인 후보는 1개(탈락용 진단, 통과 증거 아님) | Accepted (측정) |
 | [0045](0045-fast-short-horizon-cost-wall-dev.md) | 더 빠른 단기 전략(보유 15분~4시간) 20개 DEV: 거래 수는 쌓이지만 거래당 총수익(−11~+11bp)이 왕복 비용 26.6bp에 못 미침, 전부 탈락. 메이커 낙관 행(검증 불가)도 구간 간 부호 뒤집힘. 손익분기 적중률 표 | Accepted (측정) |
-| [0046](0046-wide-universe-effective-names-dev.md) | 종목 수 확대(상위 200, 거래대금 하한 200만/일)와 유효 독립 종목 수 측정: 5가설×3유니버스 15건 모두 NOT_PROMISING, 이름 2.7배 늘어도 N_eff 3.2→2.7 |
+| [0046](0046-hilo-line-intraday-swing-breakout-dev.md) | 고점·저점 라인 + 거래량 급증을 15분·1시간봉, 롤링/스윙 고저점, 페이드/돌파 48개로 사전등록 후 DEV 실행: 모두 NOT_PROMISING, 비용 0에서도 우위 없음(최고 1.27 < 1.41), 15분봉 연 비용 부담 중앙값 232% | Accepted (측정) |
+| [0047](0047-wide-universe-effective-names-dev.md) | 종목 수 확대(상위 200, 거래대금 하한 200만/일)와 유효 독립 종목 수 측정: 5가설×3유니버스 15건 모두 NOT_PROMISING, 이름 2.7배 늘어도 N_eff 3.2→2.7 |

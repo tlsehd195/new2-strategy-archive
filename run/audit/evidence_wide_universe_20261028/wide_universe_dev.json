@@ -2107,7 +2107,7 @@
  },
  "null_max_sr_ann": {
   "N=15": 1.1086961836449476,
-  "N=11777 (dev_search_trials.jsonl sum + this)": 2.442242964906424
+  "N=11840 (dev_search_trials.jsonl sum + this)": 2.4430521327144756
  },
  "power": {
   "s1_years": 2.5506849315068494,
@@ -2122,13 +2122,13 @@
      "n_eff_S1": 3.151769178122244,
      "periods_per_year": 13.035714285714286,
      "ic_needed_for_null_max": 0.17296886433672837,
-     "ic_needed_for_cumulative_null": 0.3810169082439175
+     "ic_needed_for_cumulative_null": 0.38114314736955096
     },
     "W200": {
      "n_eff_S1": 2.7361104345817377,
      "periods_per_year": 13.035714285714286,
      "ic_needed_for_null_max": 0.18564289178793703,
-     "ic_needed_for_cumulative_null": 0.408935336066032
+     "ic_needed_for_cumulative_null": 0.40907082516939897
     }
    },
    "H2_REV7": {
@@ -2136,13 +2136,13 @@
      "n_eff_S1": 3.151769178122244,
      "periods_per_year": 52.142857142857146,
      "ic_needed_for_null_max": 0.08648443216836418,
-     "ic_needed_for_cumulative_null": 0.19050845412195874
+     "ic_needed_for_cumulative_null": 0.19057157368477548
     },
     "W200": {
      "n_eff_S1": 2.7361104345817377,
      "periods_per_year": 52.142857142857146,
      "ic_needed_for_null_max": 0.09282144589396851,
-     "ic_needed_for_cumulative_null": 0.204467668033016
+     "ic_needed_for_cumulative_null": 0.20453541258469948
     }
    },
    "H3_CARRY7": {
@@ -2150,13 +2150,13 @@
      "n_eff_S1": 3.151769178122244,
      "periods_per_year": 52.142857142857146,
      "ic_needed_for_null_max": 0.08648443216836418,
-     "ic_needed_for_cumulative_null": 0.19050845412195874
+     "ic_needed_for_cumulative_null": 0.19057157368477548
     },
     "W200": {
      "n_eff_S1": 2.7361104345817377,
      "periods_per_year": 52.142857142857146,
      "ic_needed_for_null_max": 0.09282144589396851,
-     "ic_needed_for_cumulative_null": 0.204467668033016
+     "ic_needed_for_cumulative_null": 0.20453541258469948
     }
    },
    "H4_LOWVOL30": {
@@ -2164,13 +2164,13 @@
      "n_eff_S1": 3.151769178122244,
      "periods_per_year": 13.035714285714286,
      "ic_needed_for_null_max": 0.17296886433672837,
-     "ic_needed_for_cumulative_null": 0.3810169082439175
+     "ic_needed_for_cumulative_null": 0.38114314736955096
     },
     "W200": {
      "n_eff_S1": 2.7361104345817377,
      "periods_per_year": 13.035714285714286,
      "ic_needed_for_null_max": 0.18564289178793703,
-     "ic_needed_for_cumulative_null": 0.408935336066032
+     "ic_needed_for_cumulative_null": 0.40907082516939897
     }
    },
    "H5_TAKERFLOW": {
@@ -2178,13 +2178,13 @@
      "n_eff_S1": 3.151769178122244,
      "periods_per_year": 13.035714285714286,
      "ic_needed_for_null_max": 0.17296886433672837,
-     "ic_needed_for_cumulative_null": 0.3810169082439175
+     "ic_needed_for_cumulative_null": 0.38114314736955096
     },
     "W200": {
      "n_eff_S1": 2.7361104345817377,
      "periods_per_year": 13.035714285714286,
      "ic_needed_for_null_max": 0.18564289178793703,
-     "ic_needed_for_cumulative_null": 0.408935336066032
+     "ic_needed_for_cumulative_null": 0.40907082516939897
     }
    }
   }
