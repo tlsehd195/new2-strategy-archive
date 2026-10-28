@@ -52,3 +52,4 @@
 | [0046](0046-hilo-line-intraday-swing-breakout-dev.md) | 고점·저점 라인 + 거래량 급증을 15분·1시간봉, 롤링/스윙 고저점, 페이드/돌파 48개로 사전등록 후 DEV 실행: 모두 NOT_PROMISING, 비용 0에서도 우위 없음(최고 1.27 < 1.41), 15분봉 연 비용 부담 중앙값 232% | Accepted (측정) |
 | [0047](0047-wide-universe-effective-names-dev.md) | 종목 수 확대(상위 200, 거래대금 하한 200만/일)와 유효 독립 종목 수 측정: 5가설×3유니버스 15건 모두 NOT_PROMISING, 이름 2.7배 늘어도 N_eff 3.2→2.7 |
 | [0048](0048-synthetic-null-and-planted-edge-pipeline-check.md) | 합성 데이터(부호 뒤집기 널·엣지 심기)로 탐색 파이프라인 점검: 비용 0이면 우연 최댓값 공식이 맞고(2.36 대 2.31), 비용을 넣으면 약 1.6; 진입 기준 SR≥1.0은 우연에도 거의 항상 통과; 연 샤프 1~2 엣지는 규칙 지목이 안 됨 | Accepted (측정만) |
+| [0049](0049-limit-order-entry-cost-estimate-and-dev-reevaluation.md) | 지정가(메이커) 진입 비용 추정(공개 호가+체결 전수, ESTIMATED): 편도 비용 약 30% 절감(보수 환산 왕복 26.6→약 18.5bp), 메이커 수수료 4bp면 효과 0; 빠른 단기 20개 전부 탈락, R9 진입 기준 통과 1→4개(중복 빼면 3)로 등록 규칙 5개에는 미달 |
