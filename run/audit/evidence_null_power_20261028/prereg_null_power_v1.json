@@ -1,0 +1,160 @@
+{
+ "version": "null-power-prereg-v1",
+ "written_before_any_result": true,
+ "date": "2026-10-28",
+ "purpose": "Check the instrument, not a strategy: error rate (chance pass) and power of the S1 DEV search pipeline (strong_search_dev Track A + Track B, 3,857 trials) on synthetic data. Real market time read: S1 only (2021-01-01..2023-09-18, six IW1-A symbols). No validation, locked, IW1 or paper time.",
+ "pilot_note": "Only these pilots were run before this file: (1) the pipeline on real S1 (reproduces ADR 0019: 3,795+62 trials, best SR 1.04, PBO 0.07) and one day-sign surrogate (best 1.55) to time it; (2) the delta calibration below on pilot seeds 9001-9003 (day-sign). No results of the groups below were seen.",
+ "generators": {
+  "day": "sign of price moves flipped per UTC day, common to all symbols",
+  "bar": "sign flipped per 15m bar, common to all symbols",
+  "bar_ind": "sign flipped per bar and symbol independently",
+  "real": "identity (used only for the reproduction pilot)"
+ },
+ "null_groups": [
+  {
+   "name": "null_day",
+   "generator": "day",
+   "cost_mult": 1.0,
+   "reps": 60,
+   "seed0": 1000
+  },
+  {
+   "name": "null_bar",
+   "generator": "bar",
+   "cost_mult": 1.0,
+   "reps": 40,
+   "seed0": 2000
+  },
+  {
+   "name": "null_barind",
+   "generator": "bar_ind",
+   "cost_mult": 1.0,
+   "reps": 30,
+   "seed0": 3000
+  },
+  {
+   "name": "null_day_gross",
+   "generator": "day",
+   "cost_mult": 0.0,
+   "reps": 40,
+   "seed0": 4000
+  },
+  {
+   "name": "null_bar_gross",
+   "generator": "bar",
+   "cost_mult": 0.0,
+   "reps": 24,
+   "seed0": 5000
+  }
+ ],
+ "planted_rules": {
+  "P1_momentum_burst": {
+   "feature": "ret_z",
+   "params": {
+    "lookback": 96,
+    "window": 2048,
+    "min_history": 0
+   },
+   "op": "gt",
+   "value": 2.0,
+   "direction": "long",
+   "horizon": 96
+  },
+  "P2_short_term_reversal": {
+   "feature": "ret_z",
+   "params": {
+    "lookback": 16,
+    "window": 192,
+    "min_history": 0
+   },
+   "op": "lt",
+   "value": -2.5,
+   "direction": "long",
+   "horizon": 48
+  }
+ },
+ "calibration_targets": [
+  0.5,
+  1.0,
+  1.5,
+  2.0,
+  3.0
+ ],
+ "calibration": {
+  "method": "delta (log bp per trade, side-signed, spread over the holding bars) chosen so the planted rule's own S1 annual SR (equal-weight six symbols, assumed_public_v1 cost) averages the target over day-sign pilot seeds 9001-9003; delta then fixed",
+  "P1_momentum_burst": {
+   "sr_at_zero": -1.18,
+   "0.5": 113.7,
+   "1.0": 150.0,
+   "1.5": 185.6,
+   "2.0": 235.9,
+   "3.0": 351.9
+  },
+  "P2_short_term_reversal": {
+   "sr_at_zero": -4.23,
+   "1.0": 153.5,
+   "2.0": 182.0
+  }
+ },
+ "planted_groups": [
+  {
+   "name": "plant_P1",
+   "rule": "P1_momentum_burst",
+   "generator": "day",
+   "reps": 16,
+   "seed0": 1000,
+   "levels": [
+    {
+     "target_sr": 0.5,
+     "delta_bp": 113.7
+    },
+    {
+     "target_sr": 1.0,
+     "delta_bp": 150.0
+    },
+    {
+     "target_sr": 1.5,
+     "delta_bp": 185.6
+    },
+    {
+     "target_sr": 2.0,
+     "delta_bp": 235.9
+    },
+    {
+     "target_sr": 3.0,
+     "delta_bp": 351.9
+    }
+   ]
+  },
+  {
+   "name": "plant_P2",
+   "rule": "P2_short_term_reversal",
+   "generator": "day",
+   "reps": 12,
+   "seed0": 1000,
+   "levels": [
+    {
+     "target_sr": 1.0,
+     "delta_bp": 153.5
+    },
+    {
+     "target_sr": 2.0,
+     "delta_bp": 182.0
+    }
+   ]
+  }
+ ],
+ "planted_seed_note": "planted run k uses the same sign path as null_day rep k (paired), so detection can be compared with the same noise without the edge",
+ "metrics": {
+  "a_formula_check": "For each null group: mean, median, 5th/95th percentile of the best S1 SR over trials; compare with emax_unit_all (Bailey, N=trials, unit variance, ~2.30) and emax_unit_eff (N=participation-ratio effective trials, ~1.6). Verdict per group: 'conservative' if the empirical 95th percentile < the formula value; 'about right' if the formula value lies between the empirical median and 95th percentile; 'anti-conservative' if the empirical median > the formula value. Gross groups (cost_mult 0) are the like-for-like check of the formula's zero-mean assumption; net groups show the effect of cost.",
+  "a_chance_pass": "Share of null runs (with Wilson 95% CI) whose best SR reaches T for T in {1.0 (v2 entry bar), 1.5, 2.0, 2.8 (IW1 power bar)}; also share with the repo's DSR(all trials) >= 0.95.",
+  "a_real_vs_null": "Percentile of the real S1 best SR (1.04) within each net null group's best-SR distribution.",
+  "b_power": "For each planted level: share of runs with best SR >= 1.0, >= 1.5; share where a series with correlation >= 0.5 to P is in the top 10 by SR (p_like_in_top10); share where P's own rank <= 25; median realized SR of P; 'caught' = p_like_in_top10 AND best SR >= the 95th percentile of null_day best SR (threshold fixed from the null_day group, computed before looking at planted runs).",
+  "limits_to_report": [
+   "surrogates are exchangeable in SIGN only; any real predictability in the true series (it is what we search for) is by construction absent, and the sign-flip null cannot reproduce a real-world non-exchangeable structure (volatility-return leverage effect, trend regimes); the null therefore tests the multiple-testing arithmetic under vol clustering and fat tails, not the market",
+   "the eight earlier human-in-the-loop looks and the evolve engine DEV screen / validation gates are not simulated here; validation power is ADR 0022",
+   "the planted edge is a constant per-trade drift on one rule, the easiest kind of edge to find"
+  ]
+ },
+ "no_effect": "No criterion, cost profile, preregistration v2/v3, gate or window changes. Nothing activated; no validation, locked, IW1 or paper time opened."
+}

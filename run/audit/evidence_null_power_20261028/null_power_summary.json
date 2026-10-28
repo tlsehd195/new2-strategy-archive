@@ -1,0 +1,645 @@
+{
+ "runs_total": 386,
+ "real_s1_best_sr_reference": 1.0380758864949031,
+ "null": {
+  "null_bar": {
+   "runs": 40,
+   "trials_mean": 3859.425,
+   "n_eff_mean": 76.53132146632495,
+   "best_sr": {
+    "mean": 1.6594068245916724,
+    "sd": 0.3690344076409974,
+    "p05": 1.2361756965931892,
+    "median": 1.5923637493467524,
+    "p95": 2.3726870929358608,
+    "max": 2.4002622894790484
+   },
+   "formula_all_trials": 2.30482165522785,
+   "formula_effective_trials": 1.5462870319463977,
+   "verdict_all_trials": "about right",
+   "verdict_effective_trials": "anti-conservative",
+   "share_best_at_least": {
+    "1.0": {
+     "share": 0.975,
+     "k": 39,
+     "wilson95": [
+      0.8712,
+      0.9956
+     ]
+    },
+    "1.5": {
+     "share": 0.6,
+     "k": 24,
+     "wilson95": [
+      0.446,
+      0.7365
+     ]
+    },
+    "2.0": {
+     "share": 0.2,
+     "k": 8,
+     "wilson95": [
+      0.105,
+      0.3476
+     ]
+    },
+    "2.8": {
+     "share": 0.0,
+     "k": 0,
+     "wilson95": [
+      -0.0,
+      0.0876
+     ]
+    }
+   },
+   "share_dsr_all_ge_0.95": 0.0,
+   "share_best_is_track_b": 0.0,
+   "median_n_trials_sr_ge_1.0": 64.0,
+   "median_A_sr_quantiles": {
+    "1": -21.665752165210527,
+    "50": -1.9789451705976124,
+    "90": 0.39022059237765006,
+    "99": 1.0953486658390177
+   },
+   "pbo_median": 0.028999999999999998,
+   "real_best_percentile_in_group": 0.025
+  },
+  "null_bar_gross": {
+   "runs": 24,
+   "trials_mean": 3865.75,
+   "n_eff_mean": 67.32668414002613,
+   "best_sr": {
+    "mean": 2.3616872568777385,
+    "sd": 0.33742421949854556,
+    "p05": 1.899051909410281,
+    "median": 2.287928809695299,
+    "p95": 2.989897741424264,
+    "max": 3.141736172873212
+   },
+   "formula_all_trials": 2.305091516342934,
+   "formula_effective_trials": 1.5117902805519263,
+   "verdict_all_trials": "about right",
+   "verdict_effective_trials": "anti-conservative",
+   "share_best_at_least": {
+    "1.0": {
+     "share": 1.0,
+     "k": 24,
+     "wilson95": [
+      0.862,
+      1.0
+     ]
+    },
+    "1.5": {
+     "share": 1.0,
+     "k": 24,
+     "wilson95": [
+      0.862,
+      1.0
+     ]
+    },
+    "2.0": {
+     "share": 0.9166666666666666,
+     "k": 22,
+     "wilson95": [
+      0.7415,
+      0.9768
+     ]
+    },
+    "2.8": {
+     "share": 0.125,
+     "k": 3,
+     "wilson95": [
+      0.0434,
+      0.31
+     ]
+    }
+   },
+   "share_dsr_all_ge_0.95": 0.0,
+   "share_best_is_track_b": 0.0,
+   "median_n_trials_sr_ge_1.0": 732.0,
+   "median_A_sr_quantiles": {
+    "1": -1.4905646819304894,
+    "50": 0.21581524396427887,
+    "90": 1.2959968611230686,
+    "99": 1.8016759004183254
+   },
+   "pbo_median": 0.38875,
+   "real_best_percentile_in_group": 0.0
+  },
+  "null_barind": {
+   "runs": 30,
+   "trials_mean": 3860.733333333333,
+   "n_eff_mean": 136.88896815441495,
+   "best_sr": {
+    "mean": 1.5450157494638026,
+    "sd": 0.336104094729672,
+    "p05": 1.0606262277945593,
+    "median": 1.5345854592844521,
+    "p95": 2.034421276847538,
+    "max": 2.3044308509332594
+   },
+   "formula_all_trials": 2.304877556391385,
+   "formula_effective_trials": 1.6703321344467166,
+   "verdict_all_trials": "conservative",
+   "verdict_effective_trials": "about right",
+   "share_best_at_least": {
+    "1.0": {
+     "share": 0.9333333333333333,
+     "k": 28,
+     "wilson95": [
+      0.7868,
+      0.9815
+     ]
+    },
+    "1.5": {
+     "share": 0.5,
+     "k": 15,
+     "wilson95": [
+      0.3315,
+      0.6685
+     ]
+    },
+    "2.0": {
+     "share": 0.06666666666666667,
+     "k": 2,
+     "wilson95": [
+      0.0185,
+      0.2132
+     ]
+    },
+    "2.8": {
+     "share": 0.0,
+     "k": 0,
+     "wilson95": [
+      -0.0,
+      0.1135
+     ]
+    }
+   },
+   "share_dsr_all_ge_0.95": 0.0,
+   "share_best_is_track_b": 0.13333333333333333,
+   "median_n_trials_sr_ge_1.0": 22.5,
+   "median_A_sr_quantiles": {
+    "1": -28.988823561155975,
+    "50": -2.6239031880855057,
+    "90": 0.2951592433513657,
+    "99": 0.9163237998667279
+   },
+   "pbo_median": 0.002375,
+   "real_best_percentile_in_group": 0.06666666666666667
+  },
+  "null_day": {
+   "runs": 60,
+   "trials_mean": 3861.516666666667,
+   "n_eff_mean": 79.89349921833053,
+   "best_sr": {
+    "mean": 1.590045595670226,
+    "sd": 0.31017093161707904,
+    "p05": 1.1214042204732402,
+    "median": 1.5615878566701211,
+    "p95": 2.05662074572459,
+    "max": 2.54698146532326
+   },
+   "formula_all_trials": 2.3049109218441077,
+   "formula_effective_trials": 1.556019957481714,
+   "verdict_all_trials": "conservative",
+   "verdict_effective_trials": "anti-conservative",
+   "share_best_at_least": {
+    "1.0": {
+     "share": 1.0,
+     "k": 60,
+     "wilson95": [
+      0.9398,
+      1.0
+     ]
+    },
+    "1.5": {
+     "share": 0.5833333333333334,
+     "k": 35,
+     "wilson95": [
+      0.4573,
+      0.6994
+     ]
+    },
+    "2.0": {
+     "share": 0.1,
+     "k": 6,
+     "wilson95": [
+      0.0466,
+      0.2015
+     ]
+    },
+    "2.8": {
+     "share": 0.0,
+     "k": 0,
+     "wilson95": [
+      -0.0,
+      0.0602
+     ]
+    }
+   },
+   "share_dsr_all_ge_0.95": 0.0,
+   "share_best_is_track_b": 0.0,
+   "median_n_trials_sr_ge_1.0": 40.5,
+   "median_A_sr_quantiles": {
+    "1": -21.996115925263226,
+    "50": -2.014823460977933,
+    "90": 0.3225164859848437,
+    "99": 1.012468303563616
+   },
+   "pbo_median": 0.03,
+   "real_best_percentile_in_group": 0.03333333333333333
+  },
+  "null_day_gross": {
+   "runs": 40,
+   "trials_mean": 3865.175,
+   "n_eff_mean": 69.7337831000343,
+   "best_sr": {
+    "mean": 2.3582316391137703,
+    "sd": 0.2968007721559594,
+    "p05": 2.0401915845965446,
+    "median": 2.285230597971541,
+    "p95": 3.0597014948519625,
+    "max": 3.209259165134851
+   },
+   "formula_all_trials": 2.3050670557787214,
+   "formula_effective_trials": 1.5244067726804005,
+   "verdict_all_trials": "about right",
+   "verdict_effective_trials": "anti-conservative",
+   "share_best_at_least": {
+    "1.0": {
+     "share": 1.0,
+     "k": 40,
+     "wilson95": [
+      0.9124,
+      1.0
+     ]
+    },
+    "1.5": {
+     "share": 1.0,
+     "k": 40,
+     "wilson95": [
+      0.9124,
+      1.0
+     ]
+    },
+    "2.0": {
+     "share": 0.975,
+     "k": 39,
+     "wilson95": [
+      0.8712,
+      0.9956
+     ]
+    },
+    "2.8": {
+     "share": 0.075,
+     "k": 3,
+     "wilson95": [
+      0.0258,
+      0.1986
+     ]
+    }
+   },
+   "share_dsr_all_ge_0.95": 0.0,
+   "share_best_is_track_b": 0.0,
+   "median_n_trials_sr_ge_1.0": 606.5,
+   "median_A_sr_quantiles": {
+    "1": -1.4054485841329107,
+    "50": 0.17939312507708366,
+    "90": 1.2064133452383534,
+    "99": 1.7401336868333483
+   },
+   "pbo_median": 0.399625,
+   "real_best_percentile_in_group": 0.0
+  },
+  "posthoc_null_day_ff": {
+   "runs": 40,
+   "trials_mean": 3863.325,
+   "n_eff_mean": 81.0705117827592,
+   "best_sr": {
+    "mean": 1.654562646720438,
+    "sd": 0.3497932548531357,
+    "p05": 1.115971759101843,
+    "median": 1.6264257359949807,
+    "p95": 2.23330795324756,
+    "max": 2.3487002920758107
+   },
+   "formula_all_trials": 2.3049881498553324,
+   "formula_effective_trials": 1.5593780001958744,
+   "verdict_all_trials": "conservative",
+   "verdict_effective_trials": "anti-conservative",
+   "share_best_at_least": {
+    "1.0": {
+     "share": 1.0,
+     "k": 40,
+     "wilson95": [
+      0.9124,
+      1.0
+     ]
+    },
+    "1.5": {
+     "share": 0.625,
+     "k": 25,
+     "wilson95": [
+      0.4703,
+      0.7578
+     ]
+    },
+    "2.0": {
+     "share": 0.15,
+     "k": 6,
+     "wilson95": [
+      0.0706,
+      0.2907
+     ]
+    },
+    "2.8": {
+     "share": 0.0,
+     "k": 0,
+     "wilson95": [
+      -0.0,
+      0.0876
+     ]
+    }
+   },
+   "share_dsr_all_ge_0.95": 0.0,
+   "share_best_is_track_b": 0.0,
+   "median_n_trials_sr_ge_1.0": 50.0,
+   "median_A_sr_quantiles": {
+    "1": -21.790242935937986,
+    "50": -1.9843985711684256,
+    "90": 0.43729437676034577,
+    "99": 1.0533802081433117
+   },
+   "pbo_median": 0.018875000000000003,
+   "real_best_percentile_in_group": 0.025
+  },
+  "posthoc_null_day_ff_gross": {
+   "runs": 24,
+   "trials_mean": 3864.375,
+   "n_eff_mean": 70.54794042403033,
+   "best_sr": {
+    "mean": 2.599202490977176,
+    "sd": 0.27676433411212786,
+    "p05": 2.235353206845521,
+    "median": 2.5150536856683092,
+    "p95": 3.053349339985413,
+    "max": 3.1104696964150036
+   },
+   "formula_all_trials": 2.3050328668047992,
+   "formula_effective_trials": 1.5275230774063662,
+   "verdict_all_trials": "anti-conservative",
+   "verdict_effective_trials": "anti-conservative",
+   "share_best_at_least": {
+    "1.0": {
+     "share": 1.0,
+     "k": 24,
+     "wilson95": [
+      0.862,
+      1.0
+     ]
+    },
+    "1.5": {
+     "share": 1.0,
+     "k": 24,
+     "wilson95": [
+      0.862,
+      1.0
+     ]
+    },
+    "2.0": {
+     "share": 1.0,
+     "k": 24,
+     "wilson95": [
+      0.862,
+      1.0
+     ]
+    },
+    "2.8": {
+     "share": 0.25,
+     "k": 6,
+     "wilson95": [
+      0.12,
+      0.449
+     ]
+    }
+   },
+   "share_dsr_all_ge_0.95": 0.0,
+   "share_best_is_track_b": 0.0,
+   "median_n_trials_sr_ge_1.0": 765.5,
+   "median_A_sr_quantiles": {
+    "1": -1.5111423295780275,
+    "50": 0.2517605163731061,
+    "90": 1.3236602223120395,
+    "99": 1.8914650589291762
+   },
+   "pbo_median": 0.28325,
+   "real_best_percentile_in_group": 0.0
+  },
+  "posthoc_null_day_nf": {
+   "runs": 24,
+   "trials_mean": 3864.125,
+   "n_eff_mean": 62.75119750604872,
+   "best_sr": {
+    "mean": 1.556801637862149,
+    "sd": 0.28015907955526415,
+    "p05": 1.2067553906383994,
+    "median": 1.4774157267001835,
+    "p95": 2.0317676075391797,
+    "max": 2.1037902726213074
+   },
+   "formula_all_trials": 2.3050222533945406,
+   "formula_effective_trials": 1.5008333213751686,
+   "verdict_all_trials": "conservative",
+   "verdict_effective_trials": "about right",
+   "share_best_at_least": {
+    "1.0": {
+     "share": 1.0,
+     "k": 24,
+     "wilson95": [
+      0.862,
+      1.0
+     ]
+    },
+    "1.5": {
+     "share": 0.4583333333333333,
+     "k": 11,
+     "wilson95": [
+      0.2789,
+      0.6493
+     ]
+    },
+    "2.0": {
+     "share": 0.125,
+     "k": 3,
+     "wilson95": [
+      0.0434,
+      0.31
+     ]
+    },
+    "2.8": {
+     "share": 0.0,
+     "k": 0,
+     "wilson95": [
+      0.0,
+      0.138
+     ]
+    }
+   },
+   "share_dsr_all_ge_0.95": 0.0,
+   "share_best_is_track_b": 0.041666666666666664,
+   "median_n_trials_sr_ge_1.0": 43.0,
+   "median_A_sr_quantiles": {
+    "1": -22.456875016630377,
+    "50": -2.039385203922975,
+    "90": 0.43816534944360574,
+    "99": 1.0184862450905152
+   },
+   "pbo_median": 0.019375,
+   "real_best_percentile_in_group": 0.0
+  }
+ },
+ "planted": {
+  "plant_P1_sr0.5": {
+   "runs": 16,
+   "p_realized_sr_median": 0.1349419790152378,
+   "p_realized_sr_p10_p90": [
+    -0.40929851870287615,
+    1.2725830447535347
+   ],
+   "best_sr_median": 2.0163157652616013,
+   "share_best_ge_1.0": 1.0,
+   "share_best_ge_1.5": 0.8125,
+   "share_best_ge_null95": 0.4375,
+   "share_p_like_in_top10": 0.0,
+   "share_p_rank_le_25": 0.0,
+   "p_rank_median": 796.5,
+   "share_caught": 0.0,
+   "caught_wilson95": [
+    0.0,
+    0.1936
+   ]
+  },
+  "plant_P1_sr1.0": {
+   "runs": 16,
+   "p_realized_sr_median": 0.6269397787224771,
+   "p_realized_sr_p10_p90": [
+    0.06245137633572523,
+    1.5945627323101248
+   ],
+   "best_sr_median": 2.1100003204623903,
+   "share_best_ge_1.0": 1.0,
+   "share_best_ge_1.5": 0.9375,
+   "share_best_ge_null95": 0.625,
+   "share_p_like_in_top10": 0.0,
+   "share_p_rank_le_25": 0.0625,
+   "p_rank_median": 646.0,
+   "share_caught": 0.0,
+   "caught_wilson95": [
+    0.0,
+    0.1936
+   ]
+  },
+  "plant_P1_sr1.5": {
+   "runs": 16,
+   "p_realized_sr_median": 1.1051053171559098,
+   "p_realized_sr_p10_p90": [
+    0.5357365435158714,
+    1.8693081225541417
+   ],
+   "best_sr_median": 2.2711740070789057,
+   "share_best_ge_1.0": 1.0,
+   "share_best_ge_1.5": 0.9375,
+   "share_best_ge_null95": 0.5625,
+   "share_p_like_in_top10": 0.125,
+   "share_p_rank_le_25": 0.0625,
+   "p_rank_median": 478.0,
+   "share_caught": 0.0,
+   "caught_wilson95": [
+    0.0,
+    0.1936
+   ]
+  },
+  "plant_P1_sr2.0": {
+   "runs": 16,
+   "p_realized_sr_median": 1.5287876180972537,
+   "p_realized_sr_p10_p90": [
+    1.098966371062044,
+    2.294810934019158
+   ],
+   "best_sr_median": 2.5965425587027458,
+   "share_best_ge_1.0": 1.0,
+   "share_best_ge_1.5": 0.9375,
+   "share_best_ge_null95": 0.75,
+   "share_p_like_in_top10": 0.125,
+   "share_p_rank_le_25": 0.1875,
+   "p_rank_median": 258.5,
+   "share_caught": 0.0625,
+   "caught_wilson95": [
+    0.0111,
+    0.2833
+   ]
+  },
+  "plant_P1_sr3.0": {
+   "runs": 16,
+   "p_realized_sr_median": 2.478221835093133,
+   "p_realized_sr_p10_p90": [
+    2.262310998439732,
+    3.173596788718924
+   ],
+   "best_sr_median": 3.243383465631406,
+   "share_best_ge_1.0": 1.0,
+   "share_best_ge_1.5": 1.0,
+   "share_best_ge_null95": 1.0,
+   "share_p_like_in_top10": 0.25,
+   "share_p_rank_le_25": 0.3125,
+   "p_rank_median": 54.0,
+   "share_caught": 0.25,
+   "caught_wilson95": [
+    0.1018,
+    0.495
+   ]
+  },
+  "plant_P2_sr1.0": {
+   "runs": 12,
+   "p_realized_sr_median": NaN,
+   "p_realized_sr_p10_p90": [
+    NaN,
+    NaN
+   ],
+   "best_sr_median": 3.5128762210981046,
+   "share_best_ge_1.0": 1.0,
+   "share_best_ge_1.5": 1.0,
+   "share_best_ge_null95": 1.0,
+   "share_p_like_in_top10": 0.0,
+   "share_p_rank_le_25": 0.0,
+   "p_rank_median": 99999.0,
+   "share_caught": 0.0,
+   "caught_wilson95": [
+    0.0,
+    0.2425
+   ]
+  },
+  "plant_P2_sr2.0": {
+   "runs": 12,
+   "p_realized_sr_median": NaN,
+   "p_realized_sr_p10_p90": [
+    NaN,
+    NaN
+   ],
+   "best_sr_median": 4.014640934899765,
+   "share_best_ge_1.0": 1.0,
+   "share_best_ge_1.5": 1.0,
+   "share_best_ge_null95": 1.0,
+   "share_p_like_in_top10": 0.0,
+   "share_p_rank_le_25": 0.0,
+   "p_rank_median": 99999.0,
+   "share_caught": 0.0,
+   "caught_wilson95": [
+    0.0,
+    0.2425
+   ]
+  }
+ },
+ "null_day_best_sr_p95_threshold": 2.05662074572459
+}
