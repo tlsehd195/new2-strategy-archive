@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Summarise runs.jsonl of null_power_sim.py by the metrics fixed in the prereg (ADR 0045).
+"""Summarise runs.jsonl of null_power_sim.py by the metrics fixed in the prereg (ADR 0048).
 
     python3 run/null_power_report.py --runs <dir>/runs.jsonl --out <dir>/null_power_summary.json
 """

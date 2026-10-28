@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Null (no-edge) and planted-edge runs of the DEV search pipeline (ADR 0045).
+"""Null (no-edge) and planted-edge runs of the DEV search pipeline (ADR 0048).
 
 Question (동동, 2026-10-28, option 4 of the data-shortage options): is the
 search pipeline's chance-pass rate and its "expected best by luck" what we
@@ -116,7 +116,7 @@ def surrogate(data: dict, kind: str, seed: int) -> dict:
     """kind: day | bar | bar_ind, optionally +'_ff' (funding rate sign flipped
     with the day sign of its settlement, so shorts get no systematic carry)
     or +'_nf' (funding zero).  The suffixes were added AFTER the first results
-    (post-hoc, ADR 0045 section on the carry artefact)."""
+    (post-hoc, ADR 0048 section on the carry artefact)."""
     base, _, suffix = kind.partition("_ff") if kind.endswith("_ff") else (kind, "", "")
     nf = kind.endswith("_nf")
     if nf:
