@@ -1,0 +1,84 @@
+{
+ "schema": "fast_short_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "2026-10-28T03:00Z",
+ "written_before_any_result": true,
+ "data_state_when_written": "the 15m archive zip (data/alts_2021_2026_binance_um_15m_funding.zip, 15 alts) is unpacked but no signal, return or P&L of any rule below has been computed",
+ "requested_by": "동동, 2026-10-28: option 3 of the data-shortage answers, 'faster strategy': holding minutes-to-hours so trades accumulate quickly; test whether that can beat the cost wall. Option 5 (a substitute for real fills) is a separate thread.",
+ "question": "Does a strategy holding 15 minutes to 4 hours, which collects hundreds to thousands of trades in the DEV segments, earn more gross per trade than the measured round-trip cost on liquid Binance USDT-M alts? If not, what gross edge per trade would be needed?",
+ "scope": "DEV only. No validation, locked, paper or IW1 window. No criteria change, no prereg v2/v3 change. A DEV_PROMISING flag can only lead to a proposal of a NEW preregistered forward window, which needs the user's explicit go.",
+ "universe": {
+  "symbols": ["ADAUSDT", "AVAXUSDT", "BCHUSDT", "BNBUSDT", "DOGEUSDT", "LINKUSDT", "LTCUSDT", "NEARUSDT", "SOLUSDT", "TRXUSDT", "UNIUSDT", "XLMUSDT", "XMRUSDT", "XRPUSDT", "ZECUSDT"],
+  "why": "the 15 alts of the project 15m archive with a full 2021..2026 history (HYPE and SUI start later and are left out; BTC/ETH are not in the archive). A symbol trades only on bars where it has data.",
+  "survivorship_caveat": "the list is today's survivors of the liquid alt set, not a point-in-time list. Survivorship flatters returns, so a negative result is robust and a positive one would be suspect. Stated in advance."
+ },
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "first_entry_from": "2021-03-01", "use": "the only segment that decides anything"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "first_entry_from": "2024-08-19", "use": "reported, and used only in the fixed S2 > 0.5 condition"}
+ },
+ "never_read": [["2000-01-01", "2020-12-31", "IW1"], ["2023-09-19", "2024-06-18", "BTC validation/locked TEST + embargo, all symbols"], ["2025-10-21", "2099-12-31", "ETH validation/locked/paper + embargo, all symbols"]],
+ "clock": {
+  "bars": "15m bars indexed by open time (UTC). A decision is taken at the close of bar j (using bars <= j only) and executed at the OPEN of bar j+1. A trade held for H bars exits at the open of bar j+1+H. P&L is open-to-open: side x (exit open / entry open - 1) + settled funding. An entry whose exit would fall after the last bar of the segment is not opened; a trade whose entry or exit bar is missing is skipped and counted. Missing bars are never filled.",
+  "hour_boundary": "a bar whose open time is minute 45 closes on the full hour; 'hourly decision' means such a bar. 4-hourly decisions are at the close of bars opening 23:45, 03:45, 07:45, 11:45, 15:45, 19:45 UTC.",
+  "one_position_per_symbol": "signals on a symbol that is still held are ignored. Weight 0.05 of capital per position (10,000 USDT at 200,000 capital, as ADR 0040). At most 20 positions open; if more candidates than free slots: largest |score| first, ties by symbol name; the rest skipped and counted."
+ },
+ "families": {
+  "F1_overreaction": {
+   "idea": "after an unusually large 1-hour move, liquidity providers are paid to take the other side (fade) or the move keeps going (follow)",
+   "signal": "r1 = ln(close_j / open_{j-3}) at an hourly decision bar j. sigma = standard deviation of r1 sampled at the previous 168 hourly decision bars (j-4*168 .. j-4, i.e. the current hour excluded); at least 168 samples required. z = r1 / sigma. Signal if |z| >= k.",
+   "grid": {"k": [2.0, 3.0], "hold_bars": [4, 16], "direction": ["fade", "follow"]},
+   "ids": "F1_{fade|follow}_k{k}_H{hold_bars}",
+   "configs": 8
+  },
+  "F2_taker_flow": {
+   "idea": "aggressive-buyer share of volume over the last hour as an order-flow signal: continuation (informed flow) or reversal (flow exhaustion)",
+   "signal": "tb = sum of taker-buy quote volume / sum of quote volume over bars j-3..j (hourly decision bar j; bars with zero volume make the signal missing). mu, sigma = mean and std of tb at the previous 168 hourly decision bars (current hour excluded, 168 samples required). z = (tb - mu) / sigma. Signal if |z| >= 2.0; z >= 2 is buy-heavy.",
+   "grid": {"hold_bars": [4, 16], "direction": ["follow", "fade"]},
+   "ids": "F2_{follow|fade}_H{hold_bars}",
+   "configs": 4
+  },
+  "F3_funding_settlement": {
+   "idea": "around the 00/08/16 UTC funding settlement a position on the paying side of an extreme funding rate earns the funding; the question is whether price and cost leave anything of it",
+   "signal": "f_prev = the previously settled funding rate of the symbol (8h earlier, known). If f_prev >= theta go SHORT (receives positive funding); if f_prev <= -theta go LONG. Funding rounds to the nearest 15 minutes to get the settlement instant t_s. The funding actually credited is the rate settled at t_s (not f_prev), earned when entry_open < t_s < exit_open.",
+   "timing": "entry at the open of the bar starting at t_s - pre, exit at the open of the bar starting at t_s + post.",
+   "grid": {"theta": [0.0003, 0.0006], "window": [{"pre_minutes": 15, "post_minutes": 15, "hold_bars": 2}, {"pre_minutes": 60, "post_minutes": 60, "hold_bars": 8}]},
+   "ids": "F3_th{theta_bp}_w{pre_minutes}",
+   "configs": 4
+  },
+  "F4_intraday_cross_section": {
+   "idea": "intraday cross-sectional reversal (overreaction of the last winners/losers) or momentum, market neutral",
+   "signal": "every 4 hours (decision bars listed under clock) with >= 8 symbols having a valid score: score = ln(close_j / open_{j-L+1}), L bars; long the 3 lowest and short the 3 highest (reversal) or the opposite (momentum); hold 16 bars; the next rebalance comes after the exit, so no overlap.",
+   "grid": {"L_bars": [4, 16], "direction": ["reversal", "momentum"]},
+   "ids": "F4_{reversal|momentum}_L{L_bars}",
+   "configs": 4
+  }
+ },
+ "trials": "exactly 20 configs (8 + 4 + 4 + 4), each run once. Recorded as 20 DEV evaluations in run/audit/dev_search_trials.jsonl and added to the cumulative count. Any change of horizon, threshold, universe, direction rule or the timeframe afterwards is a NEW trial with a new prereg and ADR.",
+ "cost": {
+  "decides": "measured alt cost record run/audit/alt_cost_measured_20261027/estimate_v3_alts.json (PE-ed757f47..., ESTIMATED_FROM_PUBLIC_DATA): per side taker fee 5bp + half spread 7.27bp + 0.0015*sqrt(10,000 USDT / quote volume of the 15m bar immediately before the trade open), charged at entry and at exit on weight x side cost. Every trade is charged as a taker order at both ends (market order assumption).",
+  "volume_scaled_row": "ADR 0041 volume-scaled low-liquidity cost (q15 = mean 15m quote volume of the previous 30 days to the bar before the trade open). Must stay positive in S1 (flag condition e).",
+  "other_rows": "measured_x2, assumed_public_v1 and cost0 are reported only.",
+  "optimistic_maker_rows": {
+   "maker_both": "both entry and exit are assumed to fill as passive limit orders at the quoted price: per side only the 2bp maker fee, no spread, no impact. Perfect fills, no adverse selection, no missed fills.",
+   "maker_entry_taker_exit": "entry as maker (2bp), exit as taker (measured cost).",
+   "status": "NOT VERIFIABLE: the project has no real fill records (no cost VERIFIED). These rows say only what the strategy would earn IF limit orders always filled at the quoted price, which is the most favourable case. They never decide the flag and never count as evidence. Passive fills in reality are filled mostly when the price moves against the order (adverse selection), so the true result lies below these rows.",
+   "fee_source": "Binance USDT-M public base-tier fee schedule: maker 0.02%, taker 0.05% (not re-fetched here, as in ADR 0038)."
+  },
+  "impact_bar": "if the 15m bar before the open has no volume, the symbol's previous valid 15m quote volume is used and counted; if none within 1 day, the trade is skipped and counted.",
+  "funding": "actual settled funding on every position held across a settlement (entry_open < t_s < exit_open); a short receives positive funding."
+ },
+ "break_even_analysis": {
+  "note": "descriptive, no trials, no result-dependent choice. All on the same segments.",
+  "A_horizon_table": "for horizons 15m, 1h, 4h, 8h, 1d (open to open, sampled every bar for horizons <= 1h and every hour otherwise), pooled over all symbols: median and mean of |return| (bp), standard deviation (bp), the measured round-trip cost at the symbol-median volume (2 x per-side), cost / mean|return|, the hit rate p* = 0.5 + cost / (2 x mean|return|) a sign-only predictor must reach to break even, and trades needed for a one-sided t of 2 on a NET edge of 5bp and of 10bp (n = (2 sd / edge)^2, independent trades assumed, so optimistic).",
+  "B_per_config": "for every config: mean gross P&L per trade (bp, funding included) vs mean measured cost per trade; the break-even cost multiplier = gross / cost; the per-side cost (bp) at which S1 net mean is 0; the same for the maker rows. 'Gross edge needed' = mean measured cost per trade.",
+  "C_conditions": "the lowest per-trade cost (bp round trip) among all 20 configs at which the best S1 gross would just break even, and whether any config's cost0 S1 Sharpe even exceeds the null maximum (if the answer is no, no cost level rescues it)."
+ },
+ "statistics": {
+  "unit": "daily portfolio return on constant capital 1: a trade's gross P&L (price + funding) x weight is booked on the UTC day of its EXIT bar, entry cost on the entry day and exit cost on the exit day (realised P&L; intraday paths are not marked). Days without activity count as 0. Market series for beta = equal-weight open-to-open daily return of the symbols that exist that day.",
+  "report": "per config and segment: number of trades, long/short split, hit rate, mean gross and net trade return (bp), annualised Sharpe, annual return, max drawdown, t, beta and correlation to the equal-weight market, beta-adjusted alpha t, S1 halves, every cost row, share of S1 net P&L from the 10 best days, skipped counts, per-trade t (naive, trades assumed independent)",
+  "dev_flag_not_a_verdict": "DEV_PROMISING only if, under the measured (taker) cost: (a) S1 annual Sharpe above the expected maximum of 20 unskilled trials over the S1 length (Bailey et al. 2014, expected_max_sr), (b) S1 beta-adjusted alpha t >= 2, (c) both S1 halves positive, (d) S2 annual Sharpe > 0.5, (e) S1 annual Sharpe under the ADR 0041 volume-scaled cost > 0, (f) at least 300 S1 trades. Anything else is NOT_PROMISING. The maker rows never enter the flag. The flag never opens a window.",
+  "maker_reading": "if some config is positive only in a maker row, the report says 'would need passive fills; unverifiable' and nothing more.",
+  "cumulative_trials": "also report the DEV evaluation count including all earlier ones (dev_search_trials.jsonl sum + 20) and the expected maximum Sharpe under it for context; this does not change the flag.",
+  "power_note": "S1 is about 2.5 years; with a thousand correlated trades a net per-trade edge of a few bp is detectable only if trades are close to independent. Same-hour trades across 15 alts are strongly correlated through the market, so the effective sample is closer to the number of days than the number of trades. Stated in advance."
+ }
+}
