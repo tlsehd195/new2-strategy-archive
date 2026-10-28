@@ -102,14 +102,37 @@ def sign_grid(kind: str, seed: int, sym_index: int, n_bars: int = 120_000) -> np
     raise ValueError(kind)
 
 
+def with_funding(sd, scale: np.ndarray):
+    """Copy of ``sd`` whose funding rates are multiplied by ``scale`` (per settlement)."""
+    new = copy.copy(sd)
+    new.f_rate = sd.f_rate * scale
+    new.f_cum = np.concatenate([[0.0], np.cumsum(new.f_rate)])
+    new.funding = [(t, float(r)) for t, r in zip(sd.f_ts, new.f_rate)]
+    new.feat = {}
+    return new
+
+
 def surrogate(data: dict, kind: str, seed: int) -> dict:
+    """kind: day | bar | bar_ind, optionally +'_ff' (funding rate sign flipped
+    with the day sign of its settlement, so shorts get no systematic carry)
+    or +'_nf' (funding zero).  The suffixes were added AFTER the first results
+    (post-hoc, ADR 0045 section on the carry artefact)."""
+    base, _, suffix = kind.partition("_ff") if kind.endswith("_ff") else (kind, "", "")
+    nf = kind.endswith("_nf")
+    if nf:
+        base = kind[:-3]
     out = {}
     for i, (sym, entry) in enumerate(data.items()):
-        g = sign_grid(kind, seed, i)
+        g = sign_grid(base, seed, i)
         pieces = []
         for sd in entry["pieces"]:
             idx = (sd.ts // S.BAR_MS - GRID0).astype(int)
-            pieces.append(flip(sd, g[idx]))
+            f = flip(sd, g[idx])
+            if kind.endswith("_ff") and len(sd.f_ts):
+                f = with_funding(f, g[(sd.f_ts // S.BAR_MS - GRID0).astype(int)])
+            elif nf and len(sd.f_ts):
+                f = with_funding(f, np.zeros(len(sd.f_ts)))
+            pieces.append(f)
         out[sym] = {"pieces": pieces, "gap_days": entry["gap_days"]}
     return out
 
@@ -209,6 +232,10 @@ def run_pipeline(data1: dict, cost: dict, cost_mult: float = 1.0, stage2_top: in
         "best_sr": float(sr_all[j1]),
         "best_id": ids[j1] if j1 < N_A else f"B{j1 - N_A}",
         "best_events": int(nev[j1]) if j1 < N_A else None,
+        "best_dir": (spec_by[ids[j1]]["direction"] if j1 < N_A else "trackB"),
+        "best_horizon": (spec_by[ids[j1]]["exit"]["horizon"] if j1 < N_A else None),
+        "best_has_funding_term": (j1 < N_A and any(c["feature"] == "funding_z" for c in
+                                  spec_by[ids[j1]]["entry"]["conditions"] + spec_by[ids[j1]]["filters"])),
         "dsr_all": dsr_all["dsr"], "dsr_eff": dsr_eff["dsr"],
         "emax_unit_all": dsr_all["expected_max_sr_ann_null_unit"],
         "emax_unit_eff": dsr_eff["expected_max_sr_ann_null_unit"],
@@ -244,6 +271,10 @@ def p_report(res: dict, spec: dict) -> dict:
 def job_list(pre: dict) -> list:
     jobs = []
     for g in pre["null_groups"]:
+        for r in range(g["reps"]):
+            jobs.append({"group": g["name"], "kind": g["generator"], "cost_mult": g["cost_mult"],
+                         "seed": g["seed0"] + r, "rep": r})
+    for g in pre.get("post_hoc_groups", []):
         for r in range(g["reps"]):
             jobs.append({"group": g["name"], "kind": g["generator"], "cost_mult": g["cost_mult"],
                          "seed": g["seed0"] + r, "rep": r})
