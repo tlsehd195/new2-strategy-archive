@@ -45,3 +45,4 @@
 | [0039](0039-v2-1031-options-and-freeze-date-origin.md) | 10-31 v2 판단 선택지 정리(보류 / 규칙 변경 / v3 e-값 전환)와 동결일 10-31의 출처(ADR 0023 D5), 기준 변경 없음 |
 | [0040](0040-cross-section-v2-five-new-hypotheses-measured-cost.md) | 새 횡단면 가설 5개(크기·거래량 충격·MAX·테이커 흐름·합성, 28일 리밸런싱, 측정 알트 비용, DEV 전용) 사전등록 후 실행: 모두 NOT_PROMISING, 비용은 작아졌지만 비용 전 수익이 약함, 가장 나은 N4도 우연 최대치 미달 | Accepted (측정) |
 | [0041](0041-volume-scaled-low-liquidity-cost-rerun.md) | 저유동 코인용 거래량 비례 비용 보정(측정 10종목 호가를 거래량에 외삽, 결과 보기 전 고정)으로 알트 4개 가설 DEV 재실행, 모두 NOT_PROMISING | Accepted (측정) |
+| [0042](0042-v3-evalue-final-form-first-block-20261201.md) | v3 e-값 누적 검증 최종형 초안(첫 블록 2026-12-01, 측정 비용, 구성원 처음 5개 고정, 하루 끝 손절, 해시 사슬 장부), v2 미등록, v2 몫 알파 유지; 블록 도구와 DEV 리허설, 효력 없음 | Accepted (초안) |
