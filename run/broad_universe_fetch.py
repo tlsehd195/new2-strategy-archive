@@ -13,12 +13,15 @@ Steps (each skips files that already exist):
   funding  funding files of the symbols that ever enter the top-50 universe
   bar2345  the 23:45 UTC 15m bar of each day (quote volume, for the impact
            term) of the same symbols; the 15m zips are streamed and dropped
+  m15      every 15m bar (open time, o, h, l, c, quote volume) of the same
+           symbols as float64 .npy per symbol-month (ADR 0046, intraday lines)
 
 Usage::
 
     python3 run/broad_universe_fetch.py --out <dir> --step daily
     python3 run/broad_universe_fetch.py --out <dir> --step funding --symbols <file>
     python3 run/broad_universe_fetch.py --out <dir> --step bar2345 --symbols <file>
+    python3 run/broad_universe_fetch.py --out <dir> --step m15 --symbols <file>
 """
 
 from __future__ import annotations
@@ -37,6 +40,8 @@ import urllib.parse
 import urllib.request
 import zipfile
 from pathlib import Path
+
+import numpy as np
 
 S3 = "https://s3-ap-northeast-1.amazonaws.com/data.binance.vision"
 BASE = S3 + "/data/futures/um/monthly"
@@ -149,10 +154,23 @@ def job_bar2345(out: Path, sym: str, ym: str) -> str:
     return "ok"
 
 
+def job_m15(out: Path, sym: str, ym: str) -> str:
+    dst = out / "m15" / f"{sym}-15m-{ym}.npy"
+    if dst.exists():
+        return "skip"
+    body = fetch_checked(f"klines/{sym}/15m/{sym}-15m-{ym}.zip")
+    if body is None:
+        return "404"
+    rows = [[float(r[0]), float(r[1]), float(r[2]), float(r[3]), float(r[4]), float(r[7])]
+            for r in csv.reader(io.StringIO(unzip_one(body))) if r and r[0].isdigit()]
+    np.save(dst, np.array(rows, dtype="float64").reshape(-1, 6))
+    return "ok"
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True, type=Path)
-    ap.add_argument("--step", required=True, choices=("daily", "funding", "bar2345"))
+    ap.add_argument("--step", required=True, choices=("daily", "funding", "bar2345", "m15"))
     ap.add_argument("--symbols", type=Path)
     ap.add_argument("--workers", type=int, default=32)
     a = ap.parse_args(argv)
@@ -163,7 +181,7 @@ def main(argv=None) -> int:
         fn = job_daily
     else:
         syms = json.loads(a.symbols.read_text())
-        fn = job_funding if a.step == "funding" else job_bar2345
+        fn = {"funding": job_funding, "bar2345": job_bar2345, "m15": job_m15}[a.step]
     jobs = [(s, ym) for s in syms for ym in months()]
     counts: dict = {}
     errors = []
