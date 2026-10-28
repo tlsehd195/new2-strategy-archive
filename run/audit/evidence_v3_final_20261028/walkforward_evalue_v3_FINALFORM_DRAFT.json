@@ -1,0 +1,185 @@
+{
+ "schema": "walkforward_evalue_prereg_v3",
+ "status": "DRAFT - NOT IN FORCE (ADR 0042). Final-form layout: the schema is the final one and prereg_gate finds no missing required field, but this status line marks it as a draft, so the gate keeps it DRAFT. Before 2026-12-01 00:00Z, after 동동's explicit final confirmation, a NEW file is written from this one (status replaced, pending_at_activation removed); the members are frozen against THAT file's sha256 (run/evalue_v3_block.py freeze, then dev-scale) and it is activated only by a committed prereg_activation_v1 record approved by 동동, all committed before blocks.first_block_start. No block is open; nothing reads this file.",
+ "supersedes": {
+  "file": "run/audit/evidence_evalue_v3_20261022/walkforward_evalue_v3_DRAFT.json",
+  "sha256": "b6f579173e6099c5fe1ce4f1057572fd844ebb8538aa3632edeeed662c486ae1",
+  "changes": [
+   "schema walkforward_evalue_prereg_v3_DRAFT -> walkforward_evalue_prereg_v3 (a _DRAFT schema can never be ACTIVE, ADR 0029); draft kept in the status line; prereg_gate has a required-field rule for it (ADR 0042)",
+   "decisions of 2026-10-28 (decisions_20261028): v2 not registered, v3 finished for 2026-12-01, alpha split kept (v3 0.0091, v2's 0.0213 not moved)",
+   "members rule made mechanical (pipeline.members_rule): first 5 of validation_candidates(), no entry bar; frozen once, the same bundle in every block (pipeline.rerun_rule explains why)",
+   "cost: the draft's cost rule fired: the measured alt record PE-ed757f477622f48d054b4172 (ADR 0038) was sealed 2026-10-27, before the first block",
+   "universe: the 75 bp rule re-applied with the measured record: the liquid 9 unchanged",
+   "sizing made mechanical: vol_target_daily 0.01, scale_max 10, day-end marking for the stop (sizing_and_bounds)",
+   "blocks are calendar months with ids YYYY-MM; first_block_id 2026-12; booking rules and ledger (single_use)",
+   "engine pin: the members file carries code_hash (prereg_gate.research_code_identity) and v3_code_sha256 (evalue_v3.py + evalue_v3_block.py)"
+  ]
+ },
+ "decisions_20261028": {
+  "by": "동동, 2026-10-28 00:31Z, \"추천으로 진행\" (answer to the three 10-31 questions of run/audit/evidence_v2_options_20261027/10-31_선택지.md, relayed by the project coordinator)",
+  "Q1": "A: prereg v2 is NOT registered (1/33 candidates pass the entry bar, the rule needs 5; ADR 0023 D5). Its drafts stay DRAFT and unchanged; nothing is spent.",
+  "Q2": "C: v3 is finished for a first block starting 2026-12-01, bet rule = e_process.bet_rule (decided V3, ADR 0030/0032). Finishing means files and drafts; activation still needs 동동's explicit final confirmation.",
+  "Q3": "alpha split kept: v3 alpha stays 0.0091; v2's share 0.0213 is NOT moved to v3 (it stays unspent)."
+ },
+ "family": "walkforward-evalue-family-v3",
+ "hypothesis": "The strategy that the frozen engine picks using only data up to the start of a block makes money after cost in that block.",
+ "null_H0": "For every block b: E[X_b | everything known before block b starts] <= 0, where X_b is the realised net P&L of block b as a fraction of the capital given to the block (after cost, funding, the in-block stop and the margin floor).",
+ "why_this_null": "The e-process below is valid under this conditional-mean null whatever the dependence, volatility clustering or right tail of returns (Waudby-Smith & Ramdas 2010.09686 Prop. 2-3; Ville). It does NOT need i.i.d. blocks or a model of returns. It needs a LOWER bound on X_b, which is why the stop and the margin floor are part of the hypothesis.",
+ "blocks": {
+  "length": "one calendar month (28-31 days; the simulation used 30)",
+  "first_block_id": "2026-12",
+  "first_block_start": "2026-12-01",
+  "first_block_decided": "2026-12-01 (DECIDED 2026-10-22 by 동동, \"그대로 진행\"). Engine, bundle rule and this file must be frozen and committed with sha256 before it.",
+  "warmup": "the block tool reads 60 days strictly before the block start for feature warm-up; entries only inside the block; an entry whose holding period does not end inside the block is not taken (evaluator rule: exit must be inside the read bars), so every block starts and ends flat",
+  "no_end_date": "the e-process may be monitored after every block and stopped at any time; the error rate holds for any stopping rule (anytime-valid). A block's X_b is booked once, after the block ends, and is never revised.",
+  "booking": "a block is booked once, in order, after its last day and after Binance publishes its monthly files (normally within the first days of the next month), with run/evalue_v3_block.py block (ACTIVE prereg only). A booked X_b is never revised."
+ },
+ "pipeline": {
+  "engine": "pinned in the members file: code.code_hash = prereg_gate.research_code_identity() (DEV pipeline + evaluator files), code.v3_code_sha256 = evalue_v3.v3_code_sha256() (run/discovery/evalue_v3.py + run/evalue_v3_block.py), context_id of the DEV-only state directory. prereg_gate checks the first and evalue_v3.check_members the second before any block is evaluated; a change of either ends the family (no_human_choice).",
+  "rerun_rule": "the draft said: rerun the DEV-only search at each block start on data up to the day before. With the frozen engine this gives the SAME candidates every block, because the engine's DEV reads end at fixed dates (each symbol's validation window and the refused reads of strong_search_dev; anything from 2025-10-21 is refused). Letting it read the new months would read ETH validation / locked TEST / paper data, which is forbidden. So the members are frozen once and the same bundle is traded in every block; at each block the tool re-checks the members file hash and both code pins instead of rerunning. The test is still one hypothesis: this bundle makes money after cost, block after block.",
+  "no_human_choice": "no person may change the engine, the candidate list, the cost profile, the sizing or the selection between blocks. A change ends this family; the e-value at that moment is reported as the final result, and any new design is a new family with its own alpha.",
+  "flat_block": "if the selection rule picks nothing, X_b = 0 for that block (factor 1, no evidence either way)",
+  "bundle": {
+   "decided": "2026-10-22 by 동동 (\"너 선택대로\")",
+   "members": 5,
+   "weights": "equal; fewer than 5 eligible -> the eligible ones equally weighted, none -> flat block (X_b = 0)",
+   "why": "same unit as v2 D3; spreads single-rule noise (ADR 0021: bundles cut volatility); the e-process still tests ONE hypothesis (the pipeline's bundle)"
+  },
+  "members_rule": "take pipeline.validation_candidates() of ONE DEV-only evolve state directory run on the frozen code (default candidate selection config, one per entry signal, ADR 0031/0033), in its own order; the members are the first pipeline.bundle.members (5) of that list. No entry bar (v3 has none). Each member's rule is applied to every universe symbol. Frozen with run/evalue_v3_block.py freeze, then dev-scale seals the vol scale into the same file."
+ },
+ "sizing_and_bounds": {
+  "vol_target": "scale k such that the bundle's DEV daily volatility is vol_target_daily of the block capital",
+  "block_sd": 0.0548,
+  "stop_L": 0.0548,
+  "stop_rule": "if the block's running net P&L reaches -L, close everything and stay flat until the block ends",
+  "floor_B": 0.1095,
+  "floor_rule": "isolated margin of B: a gap through the stop cannot lose more than B of the block capital; the paper evaluation books max(value, -B) and records the raw value",
+  "gap_allowance_c": 0.0027,
+  "gap_allowance_reason": "the margin floor hands the trader the part of a gap below -B, so a no-skill strategy can show a slightly positive mean (simulated: up to +0.066 % per block with GJR + skewed t3 tails, +0.023 % with skewed t4); c = 0.27 % is 4x the worst simulated bias and 12x the t4 bias",
+  "units": "all three numbers are fractions of the block capital; they are fixed here, not estimated later",
+  "vol_target_daily": 0.01,
+  "scale_rule": "DEV series = equal-weight mean over members of the basket-average daily net bp (exit-day booking, the v2 statistic) on the DEV stretch S1 of run/forward_v2_entry_bar_dev.py (2021-04-01..2023-09-18, same refused reads), with this file's cost; k = vol_target_daily * 1e4 / sd(series), capped at scale_max; computed once at freeze (run/evalue_v3_block.py dev-scale) and sealed in the members file. Block P&L fraction = k * bundle bp / 1e4.",
+  "scale_max": 10.0,
+  "scale_max_reason": "a member that is rarely in the market has a tiny DEV volatility; without a cap k would put very large notional on a few trades",
+  "stop_check": "at every UTC day-end of the block: closed events count their net bp, open events are marked at the last 15m close before the day-end minus their whole round-trip cost and their funding pro rata. The first day-end at or below -stop_L closes everything at that value and the block is flat afterwards. The simulation stepped daily too."
+ },
+ "e_process": {
+  "factor": "1 + lam_b * Z_b, Z_b = (X_b - c) / (B + c) >= -1",
+  "bet_rule": "Waudby-Smith & Ramdas (2010.09686 v7) hedged-capital BETTING PRODUCT (Theorem 3, one-sided K+): capital prod(1 + lam_b Z_b) with the predictable plug-in bet of eq. (15)/(26), in Z units, no prior on the edge (wording corrected 2026-10-22, ADR 0032: this was called 'PrPl-EB', but the paper's PrPl-EB is the exponential supermartingale of Theorem 2, a different and much weaker rule; formula, code and numbers are unchanged): lam_b = min(sqrt(2 * ln(2 / alpha) / (s2_{b-1} * b * ln(1 + b))), 0.75), alpha = 0.0091; s2_0 = s0^2, s2_t = (s0^2 + sum_{i<=t} (Z_i - mu_i)^2) / (t + 1), mu_t = sum_{i<=t} Z_i / (t + 1), s0 = block_sd / (B + c). Code: run/evalue_walkforward_sim.py log_e_hedged_prpl_bet (alias log_e_prpl_eb, alpha=0.0091). Changed 2026-10-22 (ADR 0030, decision V3)",
+  "bet_rule_previous": "predictable plug-in: lam_b = clip(mu / (v + mu^2), 0, 0.75) with mu = sum(Z_1..Z_{b-1}) / (b - 1 + 3) and v = (3 * s0^2 + sum Z_i^2) / (b - 1 + 3) (replaced: same type I, lower power; ADR 0027)",
+  "lam_max": 0.75,
+  "E_b": "product of the factors of blocks 1..b (E_0 = 1)",
+  "reject_H0": "the first time E_b >= 1/alpha = 1/0.0091 (about 110)",
+  "prior_from_spent_windows": "NOT USED for the bet (decision V3). Spent BTC/ETH windows and DEV overstate Sharpe by about 3-5x (ADR 0021: H1 1.9-2.5 -> H2 0.44-0.90); simulated 5x overestimate lost half the power at true SR 3; the eq. (15) bet uses no estimate of the edge at all.",
+  "breach": "if a realised X_b < -B ever occurs (margin floor failed, e.g. ADL or exchange failure), the family is VOID: no rejection may be claimed from that block on, and the breach is reported",
+  "code": "run/discovery/evalue_v3.py e_path (same rule as run/evalue_walkforward_sim.py log_e_hedged_prpl_bet; checked equal in run/test_evalue_v3.py)"
+ },
+ "alpha": 0.0091,
+ "alpha_note": "DECIDED 2026-10-22 (동동): Bonferroni split of the forward-window family alpha 0.0304 with prereg v2 (v2 0.0213 + v3 0.0091). 2026-10-28 (Q1, Q3): v2 is not registered and its 0.0213 is NOT moved to v3, so the family spends at most 0.0091. Reject when E_b >= 1/0.0091 (about 110).",
+ "relation_to_v2": "v2 is not registered (decisions_20261028 Q1). v3 alone uses the forward data from 2026-12. If a later v2 window is ever registered on the same data it uses its own 0.0213 share; the sum stays 0.0304.",
+ "cost": {
+  "profile": "public_estimate:estimate_v3_alts.json",
+  "order_value": 10000.0,
+  "record_file": "run/audit/alt_cost_measured_20261027/estimate_v3_alts.json",
+  "record_sha256": "8a118f1a4ccb165750b450a0e5efe40f32a478b47cb8700f670449a35d6acb07",
+  "record_id": "PE-ed757f477622f48d054b4172",
+  "rule_applied": "draft rule: 'assumed_public_v1 unless a measured alt cost is sealed before the first block (same rule as v2 D2)'. The record is ESTIMATED_FROM_PUBLIC_DATA, made with the v3 alt criteria (config/cost_public_estimate_v3_alts.json, sha256 e11e1ccc...) fixed before the collection, sealed 2026-10-27T13:01Z and committed 2026-10-27 (e40e502), before the first block. So the measured profile applies from scratch (vol scale and every block).",
+  "status": "public order-book estimate, NOT VERIFIED (no account fills). Reported as such with every result.",
+  "previous": "assumed_public_v1"
+ },
+ "universe": {
+  "decided": "2026-10-22 by 동동 (\"너 선택대로\")",
+  "symbols": [
+   "BTCUSDT",
+   "ETHUSDT",
+   "BNBUSDT",
+   "XRPUSDT",
+   "SOLUSDT",
+   "ADAUSDT",
+   "DOGEUSDT",
+   "LTCUSDT",
+   "LINKUSDT"
+  ],
+  "rule": "ADR 0024 liquid-9 rule: one-side cost of a 10k USDT order <= 75 bp under assumed_public_v1 (chosen by cost only, not by performance)",
+  "note": "if a measured alt cost is sealed before the first block (cost rule), the 75 bp rule is re-applied with it and the list may change; a symbol that stops trading is kept with zero return afterwards",
+  "measured_recheck": "2026-10-28: the 75 bp rule re-applied with the measured record: one-side cost of a 10,000 USDT order is fee 5 bp + half spread 7.3 bp + impact under 2 bp for every listed symbol, far below 75 bp, so all 9 stay. The record covers the 7 alts of this list (BTC/ETH are more liquid); other alts (AVAX, SUI, ...) are not added because the record does not support them.",
+  "recheck_at_activation": "confirm each symbol still has a trading Binance USD-M perpetual on 2026-12-01; a failing symbol is dropped (not replaced) and listed in the activated file",
+  "delisted_during_family": "a symbol that stops trading keeps zero return afterwards (its slots are 0); the block tool refuses incomplete data otherwise (re-download, never fill in)"
+ },
+ "single_use": "one ledger run/audit/evalue_v3/ledger_v3.jsonl (append-only, each row carries the sha256 of the previous row); blocks booked once and in order; after a rejection or a VOID nothing more is booked. Interim e-values may be looked at any time (anytime-valid); they never change the rules.",
+ "simulated_operating_characteristics": {
+  "source": "sim_results.json (synthetic only, seed 20261022)",
+  "type1_max_over_null_processes_120_blocks": 0.0083,
+  "type1_plugin_max_120_blocks": 0.0021,
+  "power_plugin_garch_t4": {
+   "sr2_by_24": 0.28,
+   "sr2_by_36": 0.62,
+   "sr3_by_24": 0.76,
+   "sr3_by_36": 0.95,
+   "sr4_by_24": 0.94,
+   "sr1_by_60": 0.21
+  },
+  "median_blocks_to_reject_plugin": {
+   "sr2": 31,
+   "sr3": 19,
+   "sr4": 14
+  },
+  "toy_engine": "a 12-rule toy engine on an AR(0.2) asset reached block SR 1.4 and rejected in 57 % of paths by 60 blocks; on martingale assets it never exceeded 0.025 %",
+  "power_at_alpha_0.0091_garch_t4_prpl_eb (this draft's bet rule; ../evidence_paper_faithful_20261022/evalue_v3_alpha_results.json)": {
+   "sr0_by_24": 0.0,
+   "sr0_by_36": 0.0,
+   "sr1_by_24": 0.003,
+   "sr1_by_36": 0.033,
+   "sr2_by_24": 0.146,
+   "sr2_by_36": 0.52,
+   "sr3_by_24": 0.674,
+   "sr3_by_36": 0.94,
+   "sr4_by_24": 0.94,
+   "sr4_by_36": 0.992,
+   "null_max_by_60": 0.0003
+  },
+  "power_at_alpha_0.0091_garch_t4_previous_plugin": {
+   "sr2_by_24": 0.057,
+   "sr2_by_36": 0.366,
+   "sr3_by_24": 0.472,
+   "sr3_by_36": 0.877,
+   "sr4_by_24": 0.84,
+   "sr4_by_36": 0.983
+  },
+  "note": "the other numbers in this block are at alpha 0.0304 (before the split)"
+ },
+ "open_decisions": {
+  "V1": "DECIDED 2026-10-22: share forward data, Bonferroni split 7:3 (v2 0.0213, v3 0.0091), ratio confirmed by 동동. First block 2026-12-01 still a suggestion.",
+  "V2": "DECIDED 2026-10-22: equal-weight bundle of the top 5 (see pipeline.bundle)",
+  "V3": "DECIDED 2026-10-22 by 동동 ('추천하는 걸로 진행', ADR 0030): WS-R eq. (15)/(26) bet as a betting product (Theorem 3 hedged K+; not the paper's Theorem 2 exponential PrPl-EB, ADR 0032), see e_process.bet_rule. Synthetic (GARCH t4, alpha 0.0091): 36-block power SR2 52.0% (plug-in 37.6%), SR3 94.0% (87.5%), null <= 0.03%; run/audit/evidence_paper_faithful_20261022/evalue_v3_alpha_results.json",
+  "V4": "DECIDED 2026-10-22: liquid 9 symbols of ADR 0024 (see universe)",
+  "first_block": "DECIDED 2026-10-22: 2026-12-01",
+  "Q1_Q3_20261028": "DECIDED, see decisions_20261028"
+ },
+ "not_allowed": [
+  "opening IW1, BTC/ETH validation or locked windows for this design",
+  "loosening alpha or replacing the e-process with a fixed-sample test after seeing interim e-values",
+  "clipping block losses after the fact instead of the stop + margin floor (simulated type I 3-24 % at 120 blocks)",
+  "connecting to the NEW2 trading system; this is research and paper evaluation only",
+  "moving v2's unspent alpha share into v3 after seeing any block (Q3 decided: not moved)",
+  "changing members, scale, cost, universe or code after activation (ends the family)"
+ ],
+ "pending_at_activation": {
+  "who": "동동 (explicit final confirmation; merging this file is NOT activation)",
+  "steps": [
+   "1. final read-through of this file and the rehearsal (run/audit/evidence_v3_final_20261028/README.md)",
+   "2. one DEV-only evolve state directory on the code to be frozen (runner.py --mode evolve --dev-only), or reuse R9 if its code is still current",
+   "3. write the activated prereg file from this one (status replaced, this block removed) and commit it",
+   "4. run/evalue_v3_block.py freeze --state-dir <dir> then dev-scale, against the activated file's sha256; commit the members file",
+   "5. prereg_activation_v1 record (approved_by 동동, checklist complete), committed before 2026-12-01 00:00Z",
+   "6. prereg_gate --prereg <activated> --members <members> --activation <record> must say ACTIVE"
+  ],
+  "if_late": "if step 5 is not committed before 2026-12-01, the first block becomes 2027-01 (a new file with first_block_id 2027-01); nothing else changes"
+ },
+ "limitations": [
+  "synthetic evidence only (ADR 0025/0027); the real engine's block P&L distribution differs",
+  "the same bundle every block (pipeline.rerun_rule); DEV Sharpe of the candidates is about 1 at best, so with the simulated power the e-value will most likely not reach 110 within 2-3 years",
+  "cost is a public order-book estimate, not VERIFIED",
+  "day-end marking is coarser than the 15m bars; a stop can be crossed inside a day; the floor and c cover that only as far as simulated"
+ ]
+}

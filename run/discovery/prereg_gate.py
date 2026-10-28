@@ -65,6 +65,17 @@ REQUIRED_FIELDS = {
                    "cost.order_value", "test.method", "test.alpha", "test.bootstrap_B",
                    "test.pass", "single_use"),
     },
+    # walk-forward e-value v3 (ADR 0025, 0042): the members file is the v3 one
+    # (evalue_v3.members_record), same integrity fields as a v2 members file
+    "walkforward_evalue_prereg_v3": {
+        "deadline": "blocks.first_block_start",
+        "fields": ("family", "blocks.first_block_id", "blocks.first_block_start", "pipeline.members_rule",
+                   "pipeline.bundle.members", "universe.symbols", "cost.profile", "cost.order_value",
+                   "sizing_and_bounds.stop_L", "sizing_and_bounds.floor_B",
+                   "sizing_and_bounds.gap_allowance_c", "sizing_and_bounds.vol_target_daily",
+                   "sizing_and_bounds.scale_max", "e_process.bet_rule", "e_process.lam_max",
+                   "e_process.reject_H0", "alpha", "single_use"),
+    },
 }
 
 
