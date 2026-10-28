@@ -1,0 +1,21 @@
+{
+  "schema": "maker_entry_prereg_v1_addendum",
+  "written": "2026-10-28T07:25Z",
+  "written_after": "the cost estimate maker_entry_estimate.json was computed (fill rates, adverse selection, per-side costs) and BEFORE any DEV re-evaluation of the 20 fast configs or the 33 R9 candidates was run",
+  "why": "The like-for-like market-order side cost this method measures (5.2-7.8bp per side incl. 5bp fee, worst symbol DOT 7.8) is about half of the published 13.3bp per side used by the DEV tools (worst-symbol 90% quantile half spread 7.27bp + latency move + impact). Substituting the raw limit-order cost for the published cost would mix 'limit instead of market' with 'a less conservative cost framework'. That would loosen a criterion by the back door, which this project forbids.",
+  "data_deviation": "The 2026-10-27 aggTrades daily file is not yet published on the public mirror, so the tape and every simulated order cover the snapshots up to the end of 2026-10-26 UTC (about 3.4 days, not 4); the method is otherwise unchanged. Orders need the full 600 s tape window after them.",
+  "amendment": {
+    "matched_ratio": "r_X = max over symbols of C_X(symbol) / taker_side(symbol), from the same simulation (rule QUEUE, timeout 120 s, latency 0.5 s, maker fee 2bp, pooled), X in {chase, abandon}. The taker_side is the market order side cost of this same method (fee 5bp + vwap offset + latency drift).",
+    "rows": {
+      "R_A_matched": "entry side = published measured side cost x r_abandon, exit side = published side cost (limit entry with abandon, market exit)",
+      "R_B_matched": "both sides = published measured side cost x r_chase (PRIMARY ROW, replaces the raw R_B of the prereg as the verdict row)",
+      "R_C_matched": "entry side x r_chase, exit side unchanged",
+      "R_B_matched_stress": "same with the ratio taken in the stress slice (top tercile of trailing 5 minute range), replaces 'volume_scaled' in the fast short condition (e) and is the robustness check of the R9 entry bar",
+      "R_B_matched_fee4": "same with maker fee 4bp (descriptive)",
+      "R_B_raw": "raw limit cost from this method, both sides (descriptive only: NOT comparable with the published cost, shown to make the framework gap visible)",
+      "R_mkt_own": "market orders at the own-method side cost (worst symbol), descriptive control for the framework gap"
+    },
+    "criteria": "unchanged. Fast short flag rules (a)-(f) of ADR 0045 and the R9 entry bar S1 SR >= 1.0 with >= 5 of 33 are used as they are; the primary row replaces 'measured', the stress row replaces 'volume_scaled'.",
+    "trials": "53 evaluations (20 + 33) under the primary row, as in the prereg."
+  }
+}
