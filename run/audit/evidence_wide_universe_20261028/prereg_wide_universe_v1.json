@@ -1,0 +1,69 @@
+{
+ "schema": "wide_universe_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "2026-10-28T03:00Z",
+ "written_before_any_result": true,
+ "data_state_when_written": "no data of the wider universe (rank 51+) is on disk and none has been computed; the archive is downloaded only after this file is committed and pushed",
+ "requested_by": "동동, 2026-10-28: 'data is scarce, solve it without waiting' -> option 1 'widen the symbol set' (top 50 -> top 100-300 with a turnover floor).",
+ "question": "Does adding rank 51..200 coins (point-in-time, with a turnover floor) to the cross-section give a cost-surviving long-short edge in five pre-chosen hypotheses, after volume-scaled low-liquidity cost plus an extra conservative cost on thin coins? And how many independent names does the wider universe really add?",
+ "what_the_author_had_already_seen": "ADR 0035/0040/0041 top-50 results (all NOT_PROMISING) for exactly these five signals. No result on ranks 51+ has been seen. The top-50 control is re-run with the same engine so that the widening is the only change.",
+ "scope": "DEV only. No validation, locked, paper or IW1 window. No criteria change. A DEV_PROMISING flag can only lead to a proposal of a NEW preregistered forward window, which needs the user's explicit go.",
+ "universe": {
+  "source": "every USDT-quoted symbol of the public Binance USDT-M archive including later-delisted ones (as ADR 0035)",
+  "point_in_time_rule": "at each rebalance day i (Monday 00:00 UTC): cut-off = bar i-2 (Saturday close). Eligible = >=60 daily bars up to the cut-off, a bar at the open of day i, a 30-day mean daily quote volume (v30) to the cut-off, and v30 >= FLOOR. Ranked by v30 descending, ties by symbol name.",
+  "FLOOR_usdt_per_day": 2000000,
+  "universes": {
+   "U50": "ranks 1..50 of the eligible list (control: same breadth as ADR 0035/0040/0041)",
+   "W200": "ranks 1..200 of the eligible list (the primary widened universe)",
+   "T150": "ranks 51..200 only (tail diagnostic: is there anything in the less liquid names alone)"
+  },
+  "min_universe_size": 30,
+  "long_short_size": "K = floor(n/5) names per side (quintile: K=10 at n=50, K=40 at n=200, K=30 at n=150), equal weight 1/(2K) per name, gross 1, rebalance days with n < 30 are skipped and counted",
+  "segment_rule": "BTCUSDT is not read in S2 (ADR 0019); every symbol obeys never_read"
+ },
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "first_entry_from": "2021-03-01", "use": "the only segment that decides anything"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "first_entry_from": "2024-08-19", "use": "reported, and used only in the fixed S2 > 0.5 condition"}
+ },
+ "never_read": [["2000-01-01", "2020-12-31", "IW1"], ["2023-09-19", "2024-06-18", "BTC validation/locked TEST + embargo, all symbols"], ["2025-10-21", "2099-12-31", "ETH validation/locked/paper + embargo, all symbols"]],
+ "hypotheses": [
+  {"id": "H1_MOM28", "economics": "time-series/cross-sectional momentum", "signal": "close(cut)/close(cut-28)-1", "long": "highest", "hold_days": 28},
+  {"id": "H2_REV7", "economics": "short-term reversal / liquidity provision", "signal": "close(cut)/close(cut-7)-1", "long": "lowest", "hold_days": 7},
+  {"id": "H3_CARRY7", "economics": "funding carry (collect funding, short crowded longs)", "signal": "sum of daily funding of the last 7 days / 21", "long": "lowest", "hold_days": 7},
+  {"id": "H4_LOWVOL30", "economics": "low-volatility anomaly / lottery preference", "signal": "std of 30 daily returns", "long": "lowest", "hold_days": 28},
+  {"id": "H5_TAKERFLOW", "economics": "order-flow imbalance (taker buy share of quote volume, 28 days)", "signal": "sum taker-buy quote volume / sum quote volume over 28 days", "long": "highest", "hold_days": 28}
+ ],
+ "hypothesis_note": "These five are the surviving distinct families of ADR 0035 (H1-H4) and ADR 0040 (N4). N1-N3 and N5 are not repeated. Signal formulas are those of run/broad_universe_dev.py and run/cross_section_v2_dev.py; the only new choices are the hold periods above, fixed now from the signal horizons (not from results). Rebalance days: Mondays every hold_days from the first Monday on/after first_entry_from. Weights drift between rebalances (as ADR 0040); weekly holds therefore equal ADR 0035 up to drift.",
+ "trade": {
+  "entry": "open of rebalance day i, signals from bars <= i-2",
+  "exit": "next rebalance open (full rebalance of the weights to target; cost on the weight change)",
+  "missing_data": "a held name with no bar earns 0 that day, counted; delisted-while-held counted per side. No filling."
+ },
+ "trials": {
+  "primary": "5 hypotheses x U50, W200, T150 = 15 DEV evaluations, each run once. Recorded as 15 in run/audit/dev_search_trials.jsonl and added to the cumulative count. Any change of floor, universe size, K, hold, signal or cost after this commit is a NEW trial with a new prereg and ADR."
+ },
+ "cost": {
+  "decides": "volume-scaled low-liquidity cost of ADR 0041 (run/audit/lowliq_cost_20261027/calibration_v1.json): per side fee 5bp + half spread(q15) + impact_coef(q15)*sqrt(10,000 USDT / quote volume of the 23:45-00:00 UTC 15m bar before the entry), q15 = v30/96 clipped to [10,000, 8.22M]; charged on the weight change at each rebalance (weight x side cost).",
+  "extra_conservative_rows": {
+   "cal_x2": "the whole calibrated cost doubled",
+   "cal_tail_x2": "calibrated cost doubled only for names with q15 below the thinnest measured order book (410,000 USDT per 15m bar), i.e. exactly where the ADR 0041 line is extrapolated; others at 1x",
+   "cost0": "reported only"
+  },
+  "impact_bar": "if the 23:45 bar is missing, day quote volume / 96 is used and counted",
+  "participation": "the share of traded legs with 10,000 / bar quote volume > max_participation (0.05) is counted and reported per universe; it is a feasibility warning, not a filter",
+  "funding": "actual settled funding on every held position; a short receives positive funding"
+ },
+ "effective_independent_names": {
+  "method": "at every rebalance and every universe: take the last 90 daily close-to-close returns up to the cut-off of the universe names that have >=60 valid returns; missing returns = 0; correlation matrix C (n x n); eigenvalues l_k. N_eff = (sum l_k)^2 / sum l_k^2 = n^2 / sum l_k^2 (participation ratio). Also mean pairwise correlation rho and N_rho = n / (1 + (n-1) rho). Reported as the mean over rebalances for each universe and segment (min and max too).",
+  "use_1_breadth_scaling": "Heuristic fundamental-law scaling, reported not tested: for the same per-name information coefficient IC the annual Sharpe of a long-short sort is about IC * sqrt(N_eff * P) with P = 365 / hold_days. Reported: expected SR ratio W200/U50 = sqrt(N_eff_W200 / N_eff_U50) and the IC that W200 needs to reach the null-max Sharpe.",
+  "use_2_power": "Minimum detectable annual Sharpe of the S1 portfolio series: (z_{1-a} + z_{0.80}) / sqrt(T_years) with a = 0.05 / 15 (Bonferroni over this batch), normal approximation, reported for S1. This does not depend on the number of names because the test is on the portfolio return series; it is reported to show that widening cannot remove the time-length limit.",
+  "use_3_criterion": "N_eff enters no flag. The flag is on the portfolio series; N_eff only says how much of the extra names is independent information."
+ },
+ "statistics": {
+  "unit": "daily portfolio return on constant capital 1 (days without a position count as 0)",
+  "report": "per universe x hypothesis: S1/S2 annual Sharpe, annual return, max drawdown, t, beta and correlation to the equal-weight universe, beta-adjusted alpha t, S1 halves, every cost row, mean turnover per rebalance, cost paid (% of capital), participation share, delisted-while-held counts, universe sizes",
+  "dev_flag_not_a_verdict": "DEV_PROMISING only if, under the calibrated cost: (a) S1 annual Sharpe above the expected maximum of 15 unskilled trials over the S1 length (Bailey et al. 2014, engine_lib.expected_max_sr), (b) S1 beta-adjusted alpha t >= 2, (c) both S1 halves positive, (d) S2 annual Sharpe > 0.5, (e) S1 annual Sharpe under cal_x2 > 0, (f) S1 annual Sharpe under cal_tail_x2 > 0. Anything else is NOT_PROMISING. The flag never opens a window.",
+  "cumulative_trials": "also report the cumulative DEV evaluation count (dev_search_trials.jsonl sum + 15) and the expected maximum Sharpe under that count, and each Sharpe against it; this does not change the flag but the ADR states it.",
+  "power_note": "S1 is about 2.6 years. Widening to 200 names lowers idiosyncratic noise (if N_eff grows) but not the number of market regimes seen. A true effect of annual SR 1 will most likely be flagged NOT_PROMISING. Accepted and stated in advance."
+ }
+}
