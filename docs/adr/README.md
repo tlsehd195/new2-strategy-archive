@@ -47,3 +47,4 @@
 | [0041](0041-volume-scaled-low-liquidity-cost-rerun.md) | 저유동 코인용 거래량 비례 비용 보정(측정 10종목 호가를 거래량에 외삽, 결과 보기 전 고정)으로 알트 4개 가설 DEV 재실행, 모두 NOT_PROMISING | Accepted (측정) |
 | [0042](0042-v3-evalue-final-form-first-block-20261201.md) | v3 e-값 누적 검증 최종형 초안(첫 블록 2026-12-01, 측정 비용, 구성원 처음 5개 고정, 하루 끝 손절, 해시 사슬 장부), v2 미등록, v2 몫 알파 유지; 블록 도구와 DEV 리허설, 효력 없음 | Accepted (초안) |
 | [0043](0043-hilo-line-volume-spike-dev.md) | 최근 고점·저점 라인 + 거래량 급증 전략(반전 16 + 돌파 거울 1, 일봉, 상위 50, 측정 알트 비용, DEV 전용) 사전등록 후 실행: 17개 모두 NOT_PROMISING, 반전은 비용 전에도 손실 | Accepted (측정) |
+| [0044](0044-candidate-regime-scorecard-dev.md) | R9 후보 33개와 묶음 5개의 장세별(상승·횡보·하락, 하락 국면) 성적표, 측정 비용, DEV 전용: 횡보장이 가장 약하고 S1·S2 장세별 부호가 일관되지 않으며 6칸 모두 양수인 후보는 1개(탈락용 진단, 통과 증거 아님) | Accepted (측정) |
