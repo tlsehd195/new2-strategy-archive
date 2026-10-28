@@ -1,0 +1,77 @@
+{
+  "schema": "maker_entry_prereg_v1",
+  "status": "DRAFT_FOR_DEV_ONLY (opens no validation, locked, paper or IW1 window; changes no criterion, no prereg v2/v3)",
+  "written": "2026-10-28T07:10Z",
+  "written_before_any_result": true,
+  "data_state_when_written": "orderbook_data_20261023-27.zip unpacked and its record layout inspected (30 s snapshots, 50 levels, aggTrades capped at 100 per snapshot so the in-snapshot tape has gaps); public aggTrades daily files (data.binance.vision S3 mirror) downloaded for the same 10 symbols and 5 days; NO fill, adverse-selection or cost number of any rule below has been computed",
+  "requested_by": "dongdong, 2026-10-28: 'enter with limit orders instead of market orders; that fixes the fee problem that makes strategies negative'",
+  "question": "How much of the ~26.6bp round-trip market cost does a limit-order (maker) entry/exit really remove once non-fills and adverse selection are counted, and is that enough to change any DEV verdict?",
+  "grade": "ESTIMATED_FROM_PUBLIC_DATA. A simulated resting order on a public tape is not a fill: queue position, cancels ahead, hidden liquidity, latency and our own price impact are approximated. Never VERIFIED, never promotable.",
+  "inputs": {
+    "book": "10 symbols x 5 days of 30 s depth snapshots (symbols below), status OK only, book age rule of the cost estimator (max_book_age_ms 5000)",
+    "symbols": ["ADAUSDT", "BNBUSDT", "DOGEUSDT", "LINKUSDT", "LTCUSDT", "SOLUSDT", "XRPUSDT", "AVAXUSDT", "DOTUSDT", "SUIUSDT"],
+    "tape": "public aggTrades daily files for the same symbols, restricted to [first snapshot, last snapshot] of each symbol; the in-snapshot agg_trades (last 100 only) are NOT used for fills",
+    "tape_check": "per symbol the tape must contain >= 99% of the in-snapshot trades by (price, qty, time); a symbol failing it is dropped and reported"
+  },
+  "order_model": {
+    "decision_time": "t0 = depth transaction time T of a snapshot; decision price m0 = mid of that book",
+    "latency_s": 0.5,
+    "latency_sensitivity_s": [0.0, 2.0],
+    "limit_price": "join the best price on our side at t0 (buy: best bid, sell: best ask), 0 ticks back; resting from t0 + latency",
+    "size": "10000 USDT notional (negligible next to the queue; our own quantity is ignored in the queue)",
+    "timeouts_s": [30, 120, 600],
+    "primary_timeout_s": 120,
+    "fill_rules": {
+      "QUEUE (primary)": "buy fills at the first tape time when either a sell-aggressor trade prints strictly below our price, or cumulative sell-aggressor volume at prices <= our price since resting reaches the displayed size at our price in the t0 book (queue ahead = whole displayed size; cancels ahead are ignored, which under-states fills)",
+      "STRICT (conservative bound)": "fill only on a sell-aggressor print strictly below our price",
+      "TOUCH (optimistic bound)": "fill on any sell-aggressor print at or below our price",
+      "mirror": "sell side mirrored with buy-aggressor trades and the ask"
+    },
+    "unfilled_policies": {
+      "ABANDON": "cancel at the timeout and take no trade; per-FILLED-trade cost C_f = entry slip vs m0 (negative = price improvement) + adverse selection + maker fee; the fill rate p is reported and the missed trades are the 'lost trades'",
+      "CHASE": "at the timeout cross the spread with a taker order against the snapshot nearest after timeout + latency (10000 USDT vwap against the book) and pay taker fee 5bp; every trade is executed, so per-trade cost is comparable with the market-order cost"
+    }
+  },
+  "cost_definitions": {
+    "reference": "all slippages are measured against m0 (the decision mid), in bp of m0, signed so positive = worse for us",
+    "adverse_selection_AS_h": "-side * (mid(t_fill + h) - m0) / m0 averaged over filled orders; h in {1m, 5m, 15m, 1h, 4h}; mid from the snapshot nearest at or before t_fill + h, orders whose snapshot is missing or >60 s stale are excluded",
+    "C_f_abandon": "mean entry slip + AS_4h + maker fee",
+    "C_side_chase": "p * (mean slip of fills + maker fee) + (1-p) * (mean (vwap_cross - m0) of non-fills, which already contains the drift that carried price away + taker fee)",
+    "taker_baseline": "market order at t0 + latency: 10000 USDT vwap against that book vs m0, plus taker fee 5bp; reported next to the published 26.6bp (which uses the WORST symbol, a 90% quantile half spread and a median latency move) so the comparison is like for like",
+    "maker_fee_bp_base": 2.0,
+    "maker_fee_bp_sensitivity": [0.0, 1.0, 4.0],
+    "fee_note": "Binance USDT-M regular tier maker 0.0200%, taker 0.0500% (public schedule, not fetchable here; the account tier is UNKNOWN). Only the user's own fills can show the real fee.",
+    "aggregation": "per symbol first; the cost used downstream is the WORST symbol (same convention as the estimator, side_aggregation max); block-bootstrap 95% interval over 2 hour blocks reported for the pooled numbers (only 5 days exist, so intervals are wide)",
+    "stress_slice": "orders whose trailing 5 minute mid range is in the top tercile of the symbol, because strategy signals fire after big moves; reported next to the pooled numbers"
+  },
+  "scenarios_round_trip": {
+    "R_mkt": "market entry + market exit (the 26.6bp measured round trip, unchanged)",
+    "R_A": "limit entry with ABANDON (cost C_f) + market exit (published per-side measured cost)",
+    "R_B": "limit entry CHASE + limit exit CHASE (both sides C_side_chase)",
+    "R_C": "limit entry CHASE + market exit"
+  },
+  "dev_reevaluation": {
+    "scope": "the 20 fast short-horizon configs of ADR 0045 and the 33 R9 candidates of ADR 0038 (liquid 9, prereg v2 entry bar), DEV segments S1 and S2 only, each tool's own unchanged flag rules, with the measured cost replaced by the scenario cost",
+    "primary_row": "R_B at the primary timeout, pooled, maker fee 2bp, worst-symbol per-side cost as a fixed per-side cost plus (1-p) times the measured impact term",
+    "other_rows": "R_A, R_C, stress slice, maker fee 0/4bp: reported, never used for a verdict",
+    "verdict_rules": [
+      "fast short: DEV_PROMISING only under the unchanged six conditions of ADR 0045 with the primary row in place of 'measured' and the stress row in place of 'volume_scaled'",
+      "R9 entry bar: S1 annual SR >= 1.0 under the primary row; prereg v2 needs >= 5 of 33 (still 1 means not registrable); the stress row must also be >= 1.0 for a candidate to be called robust"
+    ],
+    "no_criteria_change": "the DEV pass rules, the multiple-testing null (cumulative DEV trials), the prereg v2/v3 bars are untouched; a better cost does not lower any bar",
+    "trials": "53 re-evaluations (20 + 33) under the primary row are added to dev_search_trials.jsonl; the other rows are descriptive"
+  },
+  "never_read": [
+    ["2000-01-01", "2020-12-31", "IW1"],
+    ["2023-09-19", "2024-06-18", "BTC validation/locked TEST + embargo, all symbols"],
+    ["2025-10-21", "2099-12-31", "ETH validation/locked/paper + embargo, all symbols"]
+  ],
+  "known_limits_stated_in_advance": [
+    "only 4 days of one regime (5 calendar days); the tape and book are public, our order is not",
+    "cancels ahead in the queue are ignored (fills understated) while hidden/iceberg liquidity and our own queue-jumping behaviour are ignored (fills overstated); the STRICT/TOUCH bounds bracket this",
+    "adverse selection is measured on signal-free random times; real strategy entries come after big moves where it is larger, which the stress slice only partly covers",
+    "the signal edge is assumed independent of whether the limit order fills; a signal whose edge is exactly the fast move would lose it on non-fills",
+    "liquid alts only; small coins cost more",
+    "exit limit orders are assumed to behave like entry limit orders mirrored; an exit that must happen at a stop is a market order"
+  ]
+}
