@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Market-factor-residual cross-sectional DEV check (ADR 0050).
+"""Market-factor-residual cross-sectional DEV check (ADR 0051).
 
 Runs the four residual hypotheses x two universes (U50, W200) fixed in
 ``run/audit/evidence_residual_signals_20261029/prereg_residual_signals_v1.json``

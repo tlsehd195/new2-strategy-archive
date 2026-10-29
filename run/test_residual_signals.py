@@ -1,4 +1,4 @@
-"""Tests for the market-factor-residual DEV check (ADR 0050). Needs numpy and pandas."""
+"""Tests for the market-factor-residual DEV check (ADR 0051). Needs numpy and pandas."""
 
 import json
 import sys
