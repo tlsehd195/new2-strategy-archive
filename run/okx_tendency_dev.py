@@ -33,6 +33,7 @@ from broad_universe_dev import expected_max_sr  # noqa: E402
 VERSION = "okx-tendency-dev-v1"
 EVID = HERE / "audit" / "evidence_okx_tendency_20261029"
 PREREG = EVID / "prereg_okx_tendency_v1.json"
+PREREG_U = EVID / "prereg_okx_tendency_addendum_user_method_v1.json"
 SYMBOLS = ["BTCUSDT", "ETHUSDT"] + fs.SYMBOLS
 BTC = SYMBOLS.index("BTCUSDT")
 BARS_DAY = fs.BARS_DAY
@@ -52,6 +53,22 @@ def make_configs() -> list:
     for v in (0, 1):
         for h in (16, 48):
             cfgs.append({"id": f"T2_v{v}_H{h}", "fam": "T2", "lowvol": v, "H": h})
+    return cfgs + make_u_configs()
+
+
+def make_u_configs() -> list:
+    """The user's own method (addendum prereg): long candle near the N-bar line, mild volume, fade."""
+    cfgs = []
+    for n in (96, 672):
+        for m in (2, 3):
+            for h in (4, 16):
+                cfgs.append({"id": f"U_N{n}_m{m}_H{h}", "fam": "U", "N": n, "m": m, "H": h, "prox": 1, "vol": 1, "dir": "fade"})
+    for h in (4, 16):
+        cfgs.append({"id": f"Uv0_N96_m2_H{h}", "fam": "U", "N": 96, "m": 2, "H": h, "prox": 1, "vol": 0, "dir": "fade"})
+    for h in (4, 16):
+        cfgs.append({"id": f"Up0_N96_m2_H{h}", "fam": "U", "N": 96, "m": 2, "H": h, "prox": 0, "vol": 1, "dir": "fade"})
+    for h in (4, 16):
+        cfgs.append({"id": f"Uf_N96_m2_H{h}", "fam": "U", "N": 96, "m": 2, "H": h, "prox": 1, "vol": 1, "dir": "follow"})
     return cfgs
 
 
@@ -117,7 +134,56 @@ def features(a: dict) -> dict:
     return {"pos": pos, "ret4": ret4, "vr": vr, "nb": nb}
 
 
+BODY_WIN, BODY_SHARE, NEAR_HI, NEAR_LO, VOL_WIN, VOL_1D = 96, 0.60, 0.90, 0.10, 16, 96
+
+
+def u_features(a: dict, n: int) -> dict:
+    """Candle/line/volume features for rule U; every window ends at bar j-1 except the candle itself (bar j)."""
+    hi_n = pd.DataFrame(a["high"]).rolling(n, min_periods=int(n * 0.9)).max().shift(1).values
+    lo_n = pd.DataFrame(a["low"]).rolling(n, min_periods=int(n * 0.9)).min().shift(1).values
+    rng = hi_n - lo_n
+    p = np.where(rng > 0, (a["close"] - lo_n) / np.where(rng > 0, rng, 1.0), np.nan)
+    body = np.abs(a["close"] - a["open"])
+    mbody = pd.DataFrame(body).rolling(BODY_WIN, min_periods=int(BODY_WIN * 0.9)).mean().shift(1).values
+    candle_rng = a["high"] - a["low"]
+    dominant = body >= BODY_SHARE * candle_rng
+    qv = pd.DataFrame(a["qv"])
+    vr = a["qv"] / qv.rolling(VOL_WIN, min_periods=VOL_WIN).mean().shift(1).values
+    vr1d = a["qv"] / qv.rolling(VOL_1D, min_periods=int(VOL_1D * 0.9)).mean().shift(1).values
+    return {"p": p, "body": body, "mbody": mbody, "dominant": dominant, "vr": vr, "vr1d": vr1d,
+            "bull": a["close"] > a["open"], "bear": a["close"] < a["open"]}
+
+
+def u_events(cfg: dict, seg: dict) -> list:
+    cache = seg.setdefault("ufeat", {})
+    if cfg["N"] not in cache:
+        cache[cfg["N"]] = u_features(seg["arr"], cfg["N"])
+    f = cache[cfg["N"]]
+    with np.errstate(invalid="ignore"):
+        big = (f["body"] >= cfg["m"] * f["mbody"]) & f["dominant"]
+        if cfg["vol"]:
+            big &= f["vr"] > 1.0
+        bull_ok, bear_ok = f["bull"] & big, f["bear"] & big
+        if cfg["prox"]:
+            bull_ok &= f["p"] >= NEAR_HI
+            bear_ok &= f["p"] <= NEAR_LO
+    s_bull, s_bear = (-1.0, 1.0) if cfg["dir"] == "fade" else (1.0, -1.0)
+    score = f["body"] / np.where(f["mbody"] > 0, f["mbody"], np.nan)
+    ev = []
+    for ok, side in ((bull_ok, s_bull), (bear_ok, s_bear)):
+        ok = ok.copy()
+        ok[: cfg["N"] + 1] = False
+        for j, k in np.argwhere(ok):
+            ev.append((int(j), int(k), side, float(score[j, k]), cfg["H"]))
+    ev.sort(key=lambda e: (e[0], -e[3], SYMBOLS[e[1]]))
+    seg.setdefault("u_overlap", {})[cfg["id"]] = (
+        (len(ev), int(sum(1 for e in ev if f["vr1d"][e[0], e[1]] >= 2.0))))
+    return ev
+
+
 def events_for(cfg: dict, seg: dict) -> list:
+    if cfg["fam"] == "U":
+        return u_events(cfg, seg)
     f = seg.get("feat") or features(seg["arr"])
     seg["feat"] = f
     pos, ret4, vr = f["pos"], f["ret4"], f["vr"]
@@ -166,11 +232,15 @@ def install() -> None:
     fs.make_cost_fns = make_cost_fns
 
 
-def baseline_gross(cfg: dict, seg: dict) -> float:
-    """Mean gross (bp, price only) of the same side/hold at every hourly decision bar after the first-entry day."""
+def baseline_gross(cfg: dict, seg: dict, mean_side: float = 0.0) -> float:
+    """Mean gross (bp, price only) of the same side/hold at every hourly decision bar after the first-entry day.
+
+    For U (both sides) the baseline is the long drift at every 15m bar times the rule's mean side."""
     op = seg["arr"]["open"]
     side = -1.0 if cfg["fam"] == "T1" else 1.0
     j = np.arange(3, seg["nb"], 4)
+    if cfg["fam"] == "U":
+        side, j = mean_side, np.arange(0, seg["nb"])
     e, x = j + 1, j + 1 + cfg["H"]
     keep = (e >= seg["start_bar"]) & (x <= seg["nb"] - 1)
     r = side * (op[x[keep]] / op[e[keep]] - 1.0)
@@ -191,7 +261,7 @@ def main(argv=None) -> int:
     cfgs = make_configs()
     costs = {"measured": bu.load_cost_record(fs.COST_RECORD), "assumed": bu.load_cost(),
              "volume_scaled": bu.load_cost_calibration(fs.CALIBRATION)}
-    out = {"version": VERSION, "prereg_sha256": bu.sha(PREREG), "script_sha256": bu.sha(Path(__file__)),
+    out = {"version": VERSION, "prereg_sha256": bu.sha(PREREG), "prereg_addendum_sha256": bu.sha(PREREG_U), "script_sha256": bu.sha(Path(__file__)),
            "engine_sha256": bu.sha(HERE / "fast_short_dev.py"), "helper_sha256": bu.sha(HERE / "broad_universe_dev.py"),
            "cost_record_sha256": bu.sha(fs.COST_RECORD), "calibration_sha256": bu.sha(fs.CALIBRATION),
            "segments": {}, "configs": {}}
@@ -217,7 +287,11 @@ def main(argv=None) -> int:
             d["trades"] = fs.trade_stats(run["trades"])
             d["trades"]["mean_net_bp_by_row"] = {c: float((np.array([t["gross"] - t["cost"][c] for t in run["trades"]])).mean() * 1e4)
                                                  for c in COST_ROWS} if run["trades"] else {}
-            d["baseline_gross_bp_every_hour"] = baseline_gross(cfg, r["seg"])
+            ms = float(np.mean([t["side"] for t in run["trades"]])) if run["trades"] else 0.0
+            d["baseline_gross_bp_every_hour"] = baseline_gross(cfg, r["seg"], ms)
+            if cfg["fam"] == "U":
+                n_ev, n_spike = r["seg"]["u_overlap"][cfg["id"]]
+                d["events_total"], d["events_also_1d_volume_spike_ge2"] = n_ev, n_spike
             if run["trades"]:
                 d["gross_minus_baseline_bp"] = d["trades"]["mean_gross_bp"] - d["baseline_gross_bp_every_hour"]
             d["skipped"] = {k: run[k] for k in ("skipped_capacity", "skipped_invalid", "participation_over_max")}
