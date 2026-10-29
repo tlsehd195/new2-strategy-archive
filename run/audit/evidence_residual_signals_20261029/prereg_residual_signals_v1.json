@@ -1,0 +1,66 @@
+{
+ "schema": "residual_signals_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "2026-10-29T03:30Z",
+ "written_before_any_result": true,
+ "data_state_when_written": "no data is on disk in this session and no residual signal has been computed; the public archive is downloaded only after this file is committed and pushed",
+ "requested_by": "동동, 2026-10-29: 'test an idea that can start, as a new preregistration' -> market-factor-removed residual signals (ADR 0047 conclusion: coins move on one factor, effective independent names ~3).",
+ "question": "After removing the common market factor from each coin's daily return, does a residual-return-based cross-sectional long-short sort show a cost-surviving edge in four pre-chosen economically motivated hypotheses, on the top-50 (U50) and top-200 turnover-floor (W200) point-in-time universes?",
+ "what_the_author_had_already_seen": "ADR 0035/0040/0041/0047 results of the RAW (non-residual) siblings: MOM28, REV7, LOWVOL30, TAKERFLOW, MAX on U50/W200/T150 were all NOT_PROMISING (best S1 SR 0.66 vs null 1.11). No residual-signal result has been seen. Residual signals are correlated with their raw siblings, so the 8 trials are not independent; they are all counted anyway.",
+ "scope": "DEV only. No validation, locked, paper or IW1 window. No criteria change. A DEV_PROMISING flag can only lead to a proposal of a NEW preregistered forward window, which needs the user's explicit go. No preregistration (v2/v3) is activated.",
+ "universe": {
+  "source": "as ADR 0047 (every USDT-quoted symbol of the public Binance USDT-M archive including later-delisted ones)",
+  "point_in_time_rule": "identical to ADR 0047: at each rebalance day i (Monday 00:00 UTC) cut-off = bar i-2; eligible = >=60 daily bars, a bar at the open of day i, 30-day mean daily quote volume v30 >= 2,000,000 USDT; ranked by v30 descending, ties by symbol name.",
+  "universes": {"U50": "ranks 1..50", "W200": "ranks 1..200"},
+  "dropped_from_adr_0047": "T150 (tail-only) is not repeated: it was NOT_PROMISING for all raw siblings and is dominated by cost",
+  "min_universe_size": 30,
+  "long_short_size": "K = floor(n/5) per side, equal weight 1/(2K), gross 1, net 0 (as ADR 0047)",
+  "segment_rule": "BTCUSDT is not read in S2 (ADR 0019); every symbol obeys never_read"
+ },
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "first_entry_from": "2021-03-01", "use": "the only segment that decides anything"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "first_entry_from": "2024-08-19", "use": "reported, and used only in the fixed S2 > 0.5 condition"}
+ },
+ "never_read": [["2000-01-01", "2020-12-31", "IW1"], ["2023-09-19", "2024-06-18", "BTC validation/locked TEST + embargo, all symbols"], ["2025-10-21", "2099-12-31", "ETH validation/locked/paper + embargo, all symbols"]],
+ "residual_definition": {
+  "market_factor": "m_t = cross-sectional mean of daily close-to-close returns (NaN skipped) of the U50 members eligible at rebalance day i, over the 90 daily returns ending at the cut-off (bar i-2). BTC is not used because BTC is not read in S2. The U50 member set is the one at day i (point in time, uses only data up to the cut-off).",
+  "beta": "OLS slope of the coin's daily return r on m over the same 90 days with intercept; requires >= 60 valid return days, else the coin has no signal that day.",
+  "residual": "e_t = r_t - beta * m_t (no intercept subtracted). The same 90-day window is used to estimate beta and to form the signal (standard in the residual-momentum literature, Blitz-Huij-Martens 2011); the beta estimate therefore uses the signal days, stated as a limit.",
+  "same_factor_for_both_universes": "W200 coins are residualised on the U50 factor as well (one market definition)."
+ },
+ "hypotheses": [
+  {"id": "R1_RESMOM28", "economics": "residual (idiosyncratic) momentum: continuation of firm-specific news, less crash-prone than total-return momentum (Blitz-Huij-Martens 2011; Gutierrez-Prinsky 2007)", "signal": "sum of e_t over the last 28 daily returns up to the cut-off divided by the std of e_t over the same 28 days (needs 28 valid days)", "long": "highest", "hold_days": 28},
+  {"id": "R2_RESREV7", "economics": "residual short-term reversal: liquidity-provision reversal that is stronger once the market move is removed (Blitz-Hanauer-Vidojevic-van Vliet 2013)", "signal": "sum of e_t over the last 7 daily returns up to the cut-off (needs 7 valid days)", "long": "lowest", "hold_days": 7},
+  {"id": "R3_IDIOVOL30", "economics": "idiosyncratic-volatility anomaly: high residual risk coins are overpriced by lottery demand under limits to arbitrage (Ang-Hodrick-Xing-Zhang 2006)", "signal": "std of e_t over the last 30 daily returns up to the cut-off (needs 30 valid days)", "long": "lowest", "hold_days": 28},
+  {"id": "R4_RESMAX28", "economics": "residual lottery demand: coins with the largest single idiosyncratic jump in the month are overpriced (Bali-Cakici-Whitelaw 2011 applied to residuals)", "signal": "max of e_t over the last 28 daily returns up to the cut-off (needs 28 valid days)", "long": "lowest", "hold_days": 28}
+ ],
+ "hypothesis_note": "Hold periods and directions are fixed now from the literature, not from any result. Rebalance days: Mondays every hold_days from the first Monday on/after first_entry_from (as ADR 0047). R3 and R4 are expected to overlap with the raw LOWVOL30 and MAX siblings; this is stated in advance. No beta-sorted (BAB) hypothesis is included: it is a beta signal, not a residual one, and needs a beta-neutral weighting that is not in this engine.",
+ "trade": {
+  "entry": "open of rebalance day i, signals from bars <= i-2",
+  "exit": "next rebalance open (full rebalance of the weights to target; cost on the weight change)",
+  "weights_between_rebalances": "drift with price (as ADR 0040/0047)",
+  "missing_data": "a held name with no bar earns 0 that day, counted; delisted-while-held counted per side. No filling."
+ },
+ "trials": {
+  "primary": "4 hypotheses x 2 universes (U50, W200) = 8 DEV evaluations, each run once. Recorded as 8 in run/audit/dev_search_trials.jsonl and added to the cumulative count. Any change of window length (90/28/7/30), factor definition, floor, K, hold, signal or cost after this commit is a NEW trial with a new prereg and ADR."
+ },
+ "cost": {
+  "decides": "measured/calibrated cost of ADR 0041 (run/audit/lowliq_cost_20261027/calibration_v1.json), unchanged from ADR 0047: per side taker fee 5bp (default tier; maker 2bp is NOT used) + half spread(q15) + impact_coef(q15)*sqrt(10,000 USDT / quote volume of the 23:45 bar), charged on the weight change.",
+  "extra_rows": {
+   "cal_x2": "whole calibrated cost doubled (in the flag)",
+   "cal_tail_x2": "doubled only for names with q15 below 410,000 USDT (in the flag)",
+   "cost0": "reported only",
+   "cal_limit070": "calibrated cost x 0.70 (ADR 0049 limit-order ratio, ESTIMATED_FROM_PUBLIC_DATA and unverifiable); reference only, never in the flag"
+  },
+  "funding": "actual settled funding on every held position",
+  "participation": "share of traded legs with 10,000 / bar quote volume > 0.05 counted and reported; warning only"
+ },
+ "statistics": {
+  "unit": "daily portfolio return on constant capital 1 (days without a position count as 0)",
+  "report": "per universe x hypothesis: S1/S2 annual Sharpe, annual return, max drawdown, t, beta and correlation to the equal-weight universe, beta-adjusted alpha t (vs the equal-weight mean return of the universe held), S1 halves, every cost row, mean turnover, cost paid (% of capital), participation share",
+  "dev_flag_not_a_verdict": "DEV_PROMISING only if, under the calibrated cost: (a) S1 annual Sharpe above the expected maximum of 8 unskilled trials over the S1 length (Bailey et al. 2014, engine_lib.expected_max_sr; ~1.0-1.6 range with the cumulative count stated alongside), (b) S1 beta-adjusted alpha t >= 2, (c) both S1 halves positive, (d) S2 annual Sharpe > 0.5, (e) S1 annual Sharpe under cal_x2 > 0, (f) S1 annual Sharpe under cal_tail_x2 > 0. Anything else is NOT_PROMISING. No criterion is relaxed.",
+  "cumulative_trials": "also report the cumulative DEV evaluation count (dev_search_trials.jsonl sum + 8) and the expected maximum Sharpe under that count (chance maximum ~1.6-2.4 cited by the requester), and each S1 Sharpe against it; the ADR states it.",
+  "diagnostics_reported_not_flagged": "(1) correlation of each residual portfolio's daily return with its raw sibling's is NOT computed (raw siblings are not rerun); instead the market beta of the residual portfolio is reported to show how much market exposure the residualisation removed; (2) the mean cross-sectional rank correlation between each residual signal and the raw sibling signal (R1~H1 total-return 28d, R2~H2 7d, R3~H4 30d total vol, R4~raw 28d max), computed from the same data, to show how different the residual signal really is",
+  "power_note": "S1 is about 2.6 years; minimum detectable annual Sharpe at 80% power with 8 Bonferroni tests is ~2.1 (normal approximation). A true effect of Sharpe 1 will most likely be NOT_PROMISING. Accepted and stated in advance."
+ }
+}
