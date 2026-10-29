@@ -1,0 +1,45 @@
+{
+ "schema": "okx_tendency_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "2026-10-29T04:50Z",
+ "written_before_any_result": true,
+ "data_state_when_written": "the 15m archive (15 alts) and the BTC/ETH 15m upload are unpacked; no signal, return or P&L of any rule below has been computed",
+ "requested_by": "동동, 2026-10-29 ('ㅇㅇ' approving the coordinator proposal): turn two weak tendencies seen in the user's OKX paper-trading record into preregistered rules and test them on DEV only.",
+ "hypothesis_source_not_evidence": "the OKX paper record (16 trades with a stated rationale; the two trades with PnL >= 30% of margin were entered without a reason and are excluded) is ONLY where the two ideas came from. 16 in-sample paper trades with no costs are not evidence for anything and nothing from that file enters the test or the flag. Tendency 1: shorts opened in the upper part of the 24h range (about 78% or higher), also after a preceding fall. Tendency 2: longs opened in the middle-to-lower part of the 24h range (about 30-45%). Variant: the same with volume below its usual level.",
+ "scope": "DEV only. No validation, locked, paper or IW1 window; no criteria change; no prereg v2/v3 change. A DEV_PROMISING flag can only lead to a PROPOSAL of a new preregistered forward window, which needs the user's explicit go.",
+ "universe": {
+  "symbols": ["BTCUSDT", "ETHUSDT", "ADAUSDT", "AVAXUSDT", "BCHUSDT", "BNBUSDT", "DOGEUSDT", "LINKUSDT", "LTCUSDT", "NEARUSDT", "SOLUSDT", "TRXUSDT", "UNIUSDT", "XLMUSDT", "XMRUSDT", "XRPUSDT", "ZECUSDT"],
+  "why": "BTC/ETH (the OKX record is BTC) plus the 15 full-history alts of the project 15m archive. A point-in-time liquid-alt 15m archive does not exist in the project; the 15 are today's survivors, so survivorship flatters returns: a negative result is robust, a positive one would be suspect. Stated in advance.",
+  "btc_in_S2": "BTCUSDT is excluded from S2 (its 2024 validation/locked windows overlap S2's span in the project's data policy, same as the daily tools). BTC is in S1 only."
+ },
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "first_entry_from": "2021-03-01", "use": "selection: the only segment that decides anything"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "first_entry_from": "2024-08-19", "use": "reported, and used only in the fixed S2 > 0.5 condition"}
+ },
+ "never_read": [["2000-01-01", "2020-12-31", "IW1"], ["2023-09-19", "2024-06-18", "validation/locked + embargo"], ["2025-10-21", "2099-12-31", "validation/locked/paper + embargo"]],
+ "clock": "same as ADR 0045: 15m bars by open time (UTC); decision at the close of an hourly decision bar j (bar opening at minute 45) using bars <= j only; executed at the OPEN of bar j+1; exit at the open of bar j+1+H; open-to-open price P&L plus actually settled funding; one position per symbol; weight 0.05 of capital; at most 20 open; capacity ties by score then symbol name; missing bars never filled.",
+ "features": {
+  "pos24": "(close_j - L) / (Hh - L), Hh = max high and L = min low over the 96 bars j-95..j (24h, current bar included); needs >= 90 valid bars and Hh > L.",
+  "ret4h": "close_j / open_{j-15} - 1 (the 4h before the decision).",
+  "volratio": "sum of quote volume of bars j-3..j divided by the mean of the same 4-bar sum taken at 24 earlier offsets (j-4k-3..j-4k, k = 1..24); needs all 24 offsets valid."
+ },
+ "rules": {
+  "T1_short_upper": {"side": "short", "entry": "pos24 >= 0.78", "grid": {"after_drop": [0, 1], "low_volume": [0, 1], "hold_bars": [16, 48]}, "after_drop": "1 adds ret4h < 0", "low_volume": "1 adds volratio < 0.70", "ids": "T1_d{after_drop}_v{low_volume}_H{hold_bars}", "configs": 8, "score": "pos24"},
+  "T2_long_mid_low": {"side": "long", "entry": "0.30 <= pos24 <= 0.45", "grid": {"low_volume": [0, 1], "hold_bars": [16, 48]}, "ids": "T2_v{low_volume}_H{hold_bars}", "configs": 4, "score": "1.0 (ties by symbol name)"},
+  "exit": "fixed hold only (16 bars = 4h, 48 bars = 12h; the OKX median hold was about 4h); no stop, no target. Other exit methods, thresholds or holds afterwards are NEW trials with a new prereg and ADR."
+ },
+ "trials": "exactly 12 configs, each run once; recorded as 12 DEV evaluations in run/audit/dev_search_trials.jsonl and added to the cumulative count (about 11,878 + 1 earlier + 12). The thresholds 0.78 / 0.30-0.45 / 0.70 were set before any data was read and are not tuned.",
+ "cost": {
+  "decides": "measured alt cost record run/audit/alt_cost_measured_20261027/estimate_v3_alts.json (ESTIMATED_FROM_PUBLIC_DATA; taker fee 5bp + half spread 7.27bp + impact), charged taker at both ends, as in ADR 0045. Round trip about 15-27bp depending on volume.",
+  "volume_scaled_row": "ADR 0041 volume-scaled cost; must stay positive in S1 (flag condition e).",
+  "reported_only": "measured_x2, assumed_public_v1, cost0; maker_both and maker_entry_taker_exit (maker fee 2bp default, UNVERIFIABLE, never in the flag); limit_ratio070 = 0.70 x the measured per-side cost (ADR 0049 limit-entry ratio, a reference only, the account fee tier is unknown; never in the flag).",
+  "fees": "defaults maker 2bp / taker 5bp (public base tier)."
+ },
+ "descriptive_baseline": "for every config also the mean gross (bp) of the SAME side and hold taken at EVERY hourly decision bar of the same symbols and segment (market drift + noise baseline), and the conditional minus baseline difference. Descriptive, no extra trials, does not enter the flag.",
+ "statistics": {
+  "unit": "as ADR 0045: daily portfolio return on constant capital 1, realised P&L booked on the day of the exit (gross) and entry/exit days (costs); beta and alpha against the equal-weight daily open-to-open return of the existing symbols.",
+  "dev_flag_not_a_verdict": "DEV_PROMISING only if, under the measured (taker) cost: (a) S1 annual Sharpe above the expected maximum of 12 unskilled trials over the S1 length (Bailey et al. 2014, expected_max_sr), (b) S1 beta-adjusted alpha t >= 2, (c) both S1 halves positive, (d) S2 annual Sharpe > 0.5, (e) S1 annual Sharpe under the ADR 0041 volume-scaled cost > 0, (f) at least 300 S1 trades. Anything else is NOT_PROMISING. No criterion is relaxed.",
+  "chance_reference": "also reported: the expected maximum Sharpe under the cumulative DEV trial count (dev_search_trials.jsonl sum + 12) and whether the best config clears it. Any DEV_PROMISING that does not clear the cumulative reference is described as 'not distinguishable from the accumulated search'.",
+  "power_note": "trades across 17 symbols in the same hour are strongly correlated through the market, so the effective sample is closer to the number of days than the number of trades. Stated in advance."
+ }
+}
