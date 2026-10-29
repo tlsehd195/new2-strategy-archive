@@ -112,7 +112,7 @@ def index_and_regimes(data_dir: Path) -> dict:
             if idx[p] <= DD_LEVEL * peak[p]:
                 r2[j] = "DD"
         res[name] = {"d0": d0, "d1": d1, "r1": r1[d0 - r0:], "r2": r2[d0 - r0:], "mean_r": mean_r[d0 - r0 - 1:],
-                     "symbols": list(seg_data)}
+                     "idx": idx, "r0": r0, "symbols": list(seg_data)}
     return res
 
 

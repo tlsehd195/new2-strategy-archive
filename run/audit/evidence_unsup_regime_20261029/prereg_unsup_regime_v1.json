@@ -1,0 +1,32 @@
+{
+ "version": "unsup-regime-prereg-v1",
+ "written": "2026-10-29, before any classifier was trained or any result computed",
+ "purpose": "Candidate diagnostic: an unsupervised (k-means) market-regime classifier trained on DEV S1 only, frozen, then applied to S2 without refitting. Compares its regime scorecard with the human-set rules of ADR 0044 (R1 trailing-90d band, R2 drawdown). Elimination diagnostic only; never evidence of passing; DEV was used to pick the candidates, so not an independent test.",
+ "data": "DEV only: S1 2021-04-01..2023-09-18 (9 symbols) and S2 2024-07-15..2025-10-20 (BTC excluded), reads guarded by strong_search_dev.assert_allowed. Candidate daily series are the saved ones from ADR 0044 (candidate_daily_series.json.gz; measured alt cost PE-ed757f47..., entry-day attribution). No validation / locked / IW1 / paper window, no preregistration activated.",
+ "index": "equal-weight daily-rebalanced close-to-close index of the segment's symbols (same as ADR 0026/0044). Label of day d uses closes through day d-1 only.",
+ "features": {
+  "f1_ret30": "index[p]/index[p-30]-1",
+  "f2_vol30": "standard deviation of the 30 daily index returns ending at p",
+  "f3_dist_high60": "index[p]/max(index[p-59..p])-1 (<=0)",
+  "valid_from": "p >= 60 days after the segment's read start; earlier days are label NA",
+  "standardise": "z-score with the mean and std of the S1 training days only; frozen and reused for S2"
+ },
+ "classifier": {
+  "algorithm": "k-means, Euclidean, k=3 (single configuration, no other k tried), k-means++ seeding, rng numpy default_rng(20261029), 50 restarts, 200 Lloyd iterations max, keep lowest inertia",
+  "training": "all valid S1 days ONLY. After training the centroids, scaler and label order are written to the evidence folder and frozen; S2 is labelled by nearest frozen centroid, no refit, no re-tuning, no look at S2 before freeze",
+  "label_order": "clusters sorted by centroid f1_ret30 ascending: U1 (weakest/falling), U2, U3 (strongest/rising)",
+  "trials_counted": "1 new classifier configuration is added to the project trial count (k=3). If k=3 is judged unusable the result is reported as such; k is NOT changed afterwards."
+ },
+ "evaluation": {
+  "cells": "bundles B1_first5, B2_all33, B3_top5_S1 (S1 inflated, flagged), B4_long_only, B5_first20 (same definitions as ADR 0044) and the 33 candidates, per cluster U1..U3 and per segment: days, mean bp/day, annual SR (only if >=60 days), trades, Newey-West(5) t for bundles. Human rules R1_BULL/SIDE/BEAR and R2_DD recomputed on the same series as the comparison column.",
+  "persistence": "median run length of a label (days) and number of label switches per year, S1 and S2; confusion table of the unsupervised clusters against human R1 labels",
+  "stability_stats": "over the 33 candidates and the 3 clusters (cells with >=60 days in BOTH segments): A_same = number of cells whose mean bp/day has the same sign in S1 and S2; M_pos = number of cells positive in both. Same statistics for human R1 (BULL/SIDE/BEAR).",
+  "null": "2000 circular shifts of the label sequences (S1 and S2 shifted independently by uniform random offsets, label persistence kept, cluster sizes kept); report the null mean of A_same and M_pos and the fraction of draws >= observed, for the unsupervised labels and for human R1 under the same shifts. The fraction is a descriptive reference, not a pass test."
+ },
+ "verdict_rule": {
+  "USEFUL_AS_DIAGNOSTIC": "all of: (a) null fraction for A_same <= 0.05; (b) unsupervised A_same > human R1 A_same; (c) median run length >= 5 days in both segments; (d) every cluster has >=60 days in both segments",
+  "otherwise": "NOT_USEFUL (the human rules remain the only regime tool and neither promotes anything)",
+  "even_if_useful": "carries no strategy forward by itself: no regime filter is tried here (it would add trials), no candidate is promoted, no window is opened"
+ },
+ "no_threshold_changes": "Statistical criteria, preregs v2/v3, cost profiles, engine untouched. Measured cost, default fees, no relaxed criteria."
+}
