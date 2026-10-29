@@ -54,3 +54,4 @@
 | [0048](0048-synthetic-null-and-planted-edge-pipeline-check.md) | 합성 데이터(부호 뒤집기 널·엣지 심기)로 탐색 파이프라인 점검: 비용 0이면 우연 최댓값 공식이 맞고(2.36 대 2.31), 비용을 넣으면 약 1.6; 진입 기준 SR≥1.0은 우연에도 거의 항상 통과; 연 샤프 1~2 엣지는 규칙 지목이 안 됨 | Accepted (측정만) |
 | [0049](0049-limit-order-entry-cost-estimate-and-dev-reevaluation.md) | 지정가(메이커) 진입 비용 추정(공개 호가+체결 전수, ESTIMATED): 편도 비용 약 30% 절감(보수 환산 왕복 26.6→약 18.5bp), 메이커 수수료 4bp면 효과 0; 빠른 단기 20개 전부 탈락, R9 진입 기준 통과 1→4개(중복 빼면 3)로 등록 규칙 5개에는 미달 |
 | [0050](0050-unsupervised-regime-classifier-dev.md) | DEV(S1)로만 학습해 고정한 비지도 장세 분류기(k-means 3군집) 시험: 라벨은 사람 규칙보다 덜 흔들리나(지속 6일 대 2일) S2에서 급락 군집이 29일뿐이고 S1·S2 부호 일치는 무작위 대조와 구분 안 됨(비율 0.19), 사전등록 판정 NOT_USEFUL; 후보 33개는 강한 상승 군집에서만 양수(상승장 노출) | Accepted (측정만) |
+| [0051](0051-market-residual-signals-dev.md) | 시장 요인을 뺀 잔차 신호 4개(모멘텀·반전·고유변동성·MAX)×U50/W200 사전등록 후 DEV 실행: 8건 모두 NOT_PROMISING, 잔차 신호와 원신호의 순위 상관 0.84~0.93이라 새 정보가 거의 없음 | Accepted (측정) |
