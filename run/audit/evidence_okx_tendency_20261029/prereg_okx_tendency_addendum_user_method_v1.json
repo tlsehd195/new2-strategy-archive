@@ -1,0 +1,33 @@
+{
+ "schema": "okx_tendency_prereg_addendum_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "2026-10-29T05:05Z",
+ "written_before_any_result": true,
+ "data_state_when_written": "the 12 T1/T2 configs of prereg_okx_tendency_v1.json have been run (all NOT_PROMISING). No signal, return or P&L of any rule 'U' below has been computed.",
+ "requested_by": "동동, 2026-10-29 (own words): '15분봉으로 보고 최근 저점과 고점에 옆으로 선을 긋고, 고점에 가까워지거나 큰 변동성이 나오면 긴 장대양봉 나오면 숏, 반대는 롱. 들어갈지 말지는 거래량이 최근보다 약간이라도 많으면'. This is the user's actual method and is the PRIMARY hypothesis of this thread; the T1/T2 range-position rules stay as auxiliary hypotheses.",
+ "scope_and_data": "identical to prereg_okx_tendency_v1.json (same universe, S1 choose / S2 report, never-read ranges, clock, cost decides, reported-only cost rows, descriptive baseline).",
+ "rules_U": {
+  "bars": "15m, decision at the close of EVERY 15m bar j (bars <= j only), executed at the open of j+1, exit at the open of j+1+H.",
+  "line": "hi_N / lo_N = highest high / lowest low of the N bars j-N..j-1 (current bar excluded), N in {96 (24h), 672 (7d)}. p = (close_j - lo_N) / (hi_N - lo_N); near the high means p >= 0.90, near the low p <= 0.10 (same tolerance as ADR 0046; a close beyond the line counts as near).",
+  "long_candle": "body_j = |close_j - open_j| >= m x mean body of the 96 bars j-96..j-1, m in {2, 3}, AND body_j >= 0.60 x (high_j - low_j) (a candle with a dominant body; 0.60 fixed, not varied). Bullish candle = close > open.",
+  "volume_mild": "quote volume of bar j divided by the mean quote volume of the 16 bars j-16..j-1 (the last 4 hours) is strictly > 1.00 ('even slightly more than recent'). Not 2x/3x.",
+  "fade (the user's rule)": "bullish long candle with p >= 0.90 -> SHORT; bearish long candle with p <= 0.10 -> LONG. With proximity off ('or big volatility anywhere'): any bullish long candle -> SHORT, any bearish -> LONG.",
+  "follow_control": "the mirror direction (bullish near-high -> LONG, bearish near-low -> SHORT), run only for N=96, m=2, volume on, proximity on.",
+  "score": "body_j / mean body (larger first), ties by symbol name.",
+  "exit": "fixed hold H in {4, 16} bars (1h, 4h); no stop, no target."
+ },
+ "grid_U": {
+  "main (volume on, proximity on, fade)": "N {96, 672} x m {2, 3} x H {4, 16} = 8 -> ids U_N{N}_m{m}_H{H}",
+  "ablation_no_volume_condition": "N 96, m 2, proximity on, volume off, H {4, 16} = 2 -> ids Uv0_N96_m2_H{H}",
+  "ablation_no_proximity": "N 96, m 2, volume on, proximity off, H {4, 16} = 2 -> ids Up0_N96_m2_H{H}",
+  "follow_control": "N 96, m 2, volume on, proximity on, follow, H {4, 16} = 2 -> ids Uf_N96_m2_H{H}",
+  "configs": 14
+ },
+ "relation_to_ADR_0046": {
+  "overlap": "ADR 0046 tested lines (rolling and swing) with a volume SPIKE (>= 2x or 3x the 1-day average) on 15m and 1h bars, top-50 point-in-time universe, fade at p>=0.9/<=0.1 and breakout, 48 configs, all NOT_PROMISING, cost-0 best S1 SR 1.27 (below its null 1.41).",
+  "differences": "(1) U requires a LONG candle (body >= m x average body, body >= 60% of range) and its colour decides the direction; 0046 used no candle condition. (2) U's volume condition is mild (> 1.0x the last 4h) instead of a spike (>= 2x the last day). (3) U adds a proximity-off variant (volatility alone). (4) Universe is BTC/ETH + 15 alts, not top-50. (5) Rolling lines with N 96/672 bars match 0046's 15m rolling N 96/672, so line definitions overlap.",
+  "counting": "no U config is identical to a 0046 config (candle condition and volume rule differ), so all 14 are counted as NEW trials (+14 here, +12 for T1/T2, +26 for this thread in total). Overlap is reported descriptively: the share of U entry events whose volume is also >= 2x the previous 1-day mean (the 0046 spike condition)."
+ },
+ "flag": "same six conditions as prereg_okx_tendency_v1.json, but the chance reference for (a) is the expected maximum Sharpe of ALL 26 configs of this thread (stricter than 14 or 12 alone); the cumulative reference (dev_search_trials sum + 14 + 12) is also reported. No criterion relaxed. Capacity (20 open, weight 0.05) applies.",
+ "trials": "exactly 14 more configs, each run once; recorded as 14 DEV evaluations (the 12 already recorded stay)."
+}
