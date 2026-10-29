@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""OKX paper-record tendencies as preregistered DEV rules (ADR 0051).
+"""OKX paper-record tendencies as preregistered DEV rules (ADR 0052).
 
 Runs the 12 configs fixed in
 ``run/audit/evidence_okx_tendency_20261029/prereg_okx_tendency_v1.json``

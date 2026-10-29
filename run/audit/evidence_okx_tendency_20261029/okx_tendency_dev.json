@@ -2,7 +2,7 @@
  "version": "okx-tendency-dev-v1",
  "prereg_sha256": "ba3b01357f29173fced47e102c45fa0f486e438bc5e72252537201380964aaf8",
  "prereg_addendum_sha256": "a8fb1922714482aa38f0c13d269897e9850cef0cf82cfb0a0803f4eacbbd01f2",
- "script_sha256": "f27f8062576300caf6113111aaa1b5ffc1a3e5c6c8b9e14137ddaeff31f7daa3",
+ "script_sha256": "90eb8a7e6dcabc0a56673df083323f70b90b7eb1c613da116607b1410f0ed826",
  "engine_sha256": "bce5d3cedcdf8b316aba0700f1acf0c901c940cca96fbc0d7aa1a7aa5bef1e58",
  "helper_sha256": "488b76073b55fdbd99544ae29b236658178955d6c74e35e93654b94f87766827",
  "cost_record_sha256": "8a118f1a4ccb165750b450a0e5efe40f32a478b47cb8700f670449a35d6acb07",
@@ -6871,7 +6871,7 @@
  },
  "null_max_sr_ann": {
   "N=26": 1.2602052473283547,
-  "N=11916 (cumulative)": 2.442710720154168
+  "N=11938 (cumulative)": 2.442990172443373
  },
  "best_s1_measured": {
   "id": "T1_d1_v1_H48",

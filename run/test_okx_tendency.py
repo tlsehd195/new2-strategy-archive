@@ -1,4 +1,4 @@
-"""Tests for the OKX-tendency DEV rules (ADR 0051). Needs numpy and pandas."""
+"""Tests for the OKX-tendency DEV rules (ADR 0052). Needs numpy and pandas."""
 
 import json
 import sys
