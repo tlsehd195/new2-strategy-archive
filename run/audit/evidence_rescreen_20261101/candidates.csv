@@ -1,0 +1,33 @@
+id,adr,family,cost_basis,s1_net,s1_cost0,s2,half1,half2,alpha_t,x2_pos,chance_max,note
+R19a,0019,best single rule (6 syms),assumed_public_v1,1.04,,,,,,,2.30,DSR~0; PBO 0.07 but OOS rank corr -0.08; profit = long exposure
+R24a,0024,best single rule (9 liquid),assumed_public_v1,1.29,,-0.02,,,,,1.72,rank-1 rule S2 -0.02
+B24,0024/0026,top-5 bundle (selected on S1),assumed_public_v1,2.16,,2.46,,,0.5,,,92% of profit in 154 non-drawdown days; DD-regime alpha t 0.5; S2 buy&hold 1.0
+B21,0021,bundle B1 equal-weight (R9-era 64 cand),estimate_v1,,,,2.05,0.81,,0,,H2 negative under IW1 cost; rank corr H1->H2 -0.37
+B28L,0028,long top-5 bundle,estimate_v1,1.79,,,1.93,1.87,,0,3.94,2/5 are BTC 25bp take-profit scalps that die under stress cost
+CC1,0020,funding harvest (spot long+perp short) upper bound,assumed_public_v1,1.58,,1.42,,,,,1.24,basis not measured; last 3/5 S1 pieces negative funding
+R9a,0038,R9 candidate S-ed2d1c8e (only entry pass),measured_alt,1.009,,-0.04,,,,,,1/33 pass; flips sign in S2 regimes (ADR 0044)
+R9b,0038,R9 candidate #2 by S1,measured_alt,0.91,,,,,,,,
+R9c,0038,R9 candidate #3 by S1,measured_alt,0.87,,,,,,,,
+H1m,0038,28d momentum U50-like (ADR0035 H1),measured_alt,0.37,0.59,1.56,0.60,0.06,,,0.66,
+H3m,0038,7d funding carry (ADR0035 H3),measured_alt,0.60,0.93,0.69,1.11,-0.10,,,0.66,
+H1c,0041,28d momentum calibrated cost,lowliq_calibrated,0.28,0.59,1.37,0.61,-0.18,0.44,,0.66,
+H3c,0041,7d funding carry calibrated cost,lowliq_calibrated,0.46,0.93,0.52,1.13,-0.40,0.74,,0.66,
+N1,0040,size/illiquidity,measured_alt,0.33,0.40,-2.27,0.45,0.14,0.60,1,0.75,
+N3,0040,MAX lottery,measured_alt,0.52,0.62,-0.74,0.31,0.89,0.81,1,0.75,
+N4,0040,taker-buy flow,measured_alt,0.50,0.61,1.23,0.65,0.31,0.79,1,0.75,passes c d e; fails a b
+N5,0040,N1-N4 composite,measured_alt,0.30,0.40,0.06,-0.14,0.99,0.48,1,0.75,
+B43,0043,hi/lo line breakout mirror,measured_alt,0.10,,0.81,0.31,-0.21,0.18,0,1.14,
+U50H3,0047,carry U50,calibrated,0.66,1.14,,,,,,1.11,
+U50H4,0047,low-vol U50,calibrated,0.43,0.62,,,,,,1.11,
+U50H5,0047,taker flow U50,calibrated,0.37,0.61,,,,,,1.11,
+W200H3,0047,carry W200,calibrated,0.05,1.33,,,,,,1.11,half1 1.6 half2 -1.8
+W200H4,0047,low-vol W200,calibrated,0.11,0.47,,,,,,1.11,
+W200H5,0047,taker flow W200,calibrated,0.21,0.70,,,,,,1.11,
+T150H5,0047,taker flow T150,calibrated,0.37,0.80,,1.3,-1.0,,,1.11,
+R3U,0051,idiosyncratic vol U50,calibrated,0.12,0.35,0.00,-0.02,0.31,0.16,0,0.91,
+R3W,0051,idiosyncratic vol W200,calibrated,0.02,0.59,0.25,0.71,-0.80,0.03,0,0.91,
+R4W,0051,residual MAX W200,calibrated,0.81,1.36,0.17,1.07,0.48,1.31,1,0.91,closest single: passes c; fails a b d; thin-coin costs 20-59% of capital
+A006,0054,alpha#6,measured_alt,0.42,0.82,0.20,0.91,-0.31,,,0.91,
+A053,0054,alpha#53,measured_alt,0.47,0.94,-1.95,1.27,-0.70,,,0.91,
+A054,0054,alpha#54,measured_alt,0.33,0.76,-0.68,0.47,0.11,,,0.91,
+A101,0054,alpha#101,measured_alt,0.19,0.65,1.24,0.29,0.05,,,0.91,
