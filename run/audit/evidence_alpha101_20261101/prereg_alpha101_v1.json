@@ -1,0 +1,53 @@
+{
+ "schema": "cross_section_prereg_v2",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "2026-11-01T12:45Z",
+ "written_before_any_result": true,
+ "data_state_when_written": "no data for these signals downloaded or computed in this session; the broad-universe archive is NOT on disk here and is downloaded only after this file is committed",
+ "requested_by": "동동, 2026-11-01 '해외 퀀트 대회에서 공개된 고수익 전략 찾아 적용해봐' -> survey reports/QUANT_COMPETITIONS_SURVEY_20261101.md -> decision card option '101 Alphas 일부 DEV 시험'",
+ "question": "Do eight publicly disclosed WorldQuant formulaic alphas (Kakushadze 2016, '101 Formulaic Alphas', Wilmott 84, arXiv 1601.00991) that need only daily OHLCV and VWAP earn a positive, beta-adjusted return after the measured alt cost on a point-in-time top-50 Binance USDT-M universe, rebalanced weekly, on DEV data only?",
+ "what_the_author_had_already_seen": "ADR 0035/0040/0041/0047/0051 cross-sectional results on the same universe and segments (all NOT_PROMISING), including 7-day reversal (REV7) and taker flow. Several 101 alphas are short-horizon reversal / volume-price correlation signals and are expected to correlate with REV7; this is disclosed. No result of any 101 alpha on crypto data has been computed by this project. Public blog posts claim 101 alphas work on crypto, mostly without costs; not used to choose the eight.",
+ "selection_of_the_eight": "fixed before data: alphas whose formula uses only open/high/low/close/volume/vwap of the name itself (no industry neutralisation, no market cap, no adv beyond volume), with lookbacks <= 10 days, chosen to cover the paper's main shapes (intraday bar shape, volume-price correlation, short reversal). Chosen: #2, #6, #12, #33, #41, #53, #54, #101. No other alpha will be run under this prereg.",
+ "scope": "DEV only. No validation, locked, paper or IW1 window. No criteria change, no prereg v2/v3 change. A DEV_PROMISING flag can only lead to a proposal of a NEW preregistered forward window, which needs the user's explicit go.",
+ "universe": {
+  "source": "every USDT-quoted symbol under data/futures/um/monthly/klines/ of the public Binance archive, including symbols delisted later; same listing rule and exclusions as prereg_broad_universe_v1.json",
+  "point_in_time_rule": "at each rebalance: symbols with at least 60 complete daily bars before the signal cut-off and a bar at the rebalance open, ranked by mean daily quote volume over the 30 days to the cut-off; keep the top 50 (identical to ADR 0035/0040)",
+  "segment_rule": "BTCUSDT is not read in S2 (ADR 0019); every symbol obeys never_read"
+ },
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "first_rebalance_from": "2021-03-01", "use": "the only segment that decides anything"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "first_rebalance_from": "2024-08-19", "use": "reported, and used only in the fixed S2 > 0.5 condition of the flag"}
+ },
+ "never_read": [["2000-01-01", "2020-12-31", "IW1"], ["2023-09-19", "2024-06-18", "BTC validation/locked TEST + embargo, all symbols"], ["2025-10-21", "2099-12-31", "ETH validation/locked/paper + embargo, all symbols"]],
+ "timing": "rebalance every Monday (first Monday on/after first_rebalance_from) at the 00:00 UTC daily open; positions held 7 days. Signals use daily bars that closed by Sunday 00:00 UTC (the Sunday bar is skipped, same lag as ADR 0040). The paper's alphas are daily-rebalanced; weekly is a deliberate cost-driven deviation fixed here.",
+ "portfolio": "long 10 and short 10 of the 50 by alpha value (paper convention: the alpha value is the desired position, so the HIGHEST values are long), equal target weight +-1/20 (gross 1, net 0), ties by symbol name. Weights drift between rebalances; traded amount is |target - drifted weight|. Identical engine to ADR 0040 (cross_section_v2_dev.run_segment).",
+ "missing_data": "never filled; a name missing any input in the alpha's window gets no value and cannot be picked. Held names without a bar earn 0 and are counted.",
+ "definitions": {
+  "vwap": "daily quote volume / daily base volume (kline columns 8 and 6); if base volume is 0 the value is missing",
+  "rank(x)": "cross-sectional percentile rank among the 50 universe names on that day",
+  "ts operators": "delta(x,d)=x_t-x_{t-d}; correlation(x,y,d)=Pearson over the last d days; computed per name on daily bars ending at the cut-off",
+  "time-series of ranks": "for alphas that correlate ranks over time (#2), rank is taken cross-sectionally within the current 50 names on each of the window days"
+ },
+ "hypotheses": [
+  {"id": "A002", "formula": "-1 * correlation(rank(delta(log(volume), 2)), rank((close - open) / open), 6)"},
+  {"id": "A006", "formula": "-1 * correlation(open, volume, 10)"},
+  {"id": "A012", "formula": "sign(delta(volume, 1)) * (-1 * delta(close, 1)); deviation: delta(close,1) divided by close_{t-1} so the cross-section is not dominated by price level"},
+  {"id": "A033", "formula": "rank(-1 * (1 - (open / close)))"},
+  {"id": "A041", "formula": "((high * low)^0.5) - vwap; deviation: divided by vwap so the cross-section is not dominated by price level"},
+  {"id": "A053", "formula": "-1 * delta((((close - low) - (high - close)) / (close - low)), 9); a day with close == low gives a missing value"},
+  {"id": "A054", "formula": "(-1 * ((low - close) * (open^5))) / ((low - high) * (close^5)); a day with high == low gives a missing value"},
+  {"id": "A101", "formula": "((close - open) / ((high - low) + .001)); deviation: the .001 constant is replaced by 0.001*close so it is scale-free"}
+ ],
+ "trials": "exactly these 8, each run once. Recorded as 8 DEV evaluations in run/audit/dev_search_trials.jsonl. Any change of formula, holding period, universe, side size or direction afterwards is a NEW trial with a new prereg and ADR.",
+ "cost": {
+  "decides": "measured alt cost record run/audit/alt_cost_measured_20261027/estimate_v3_alts.json (PE-ed757f47..., ESTIMATED_FROM_PUBLIC_DATA): per side fee 5bp + half spread 7.27bp + 0.0015*sqrt(10,000 USDT / quote volume of the 23:45-00:00 UTC 15m bar before the Monday open), charged on every traded weight",
+  "funding": "actual settled funding on every held position",
+  "rows": {"measured": "decides", "measured_x2": "must stay positive", "assumed_public_v1": "reported only", "cost0": "reported only"}
+ },
+ "statistics": {
+  "unit": "daily portfolio return on constant capital 1, simple sum",
+  "report": "same as ADR 0040 plus the S1 daily correlation of each alpha with REV7-style 7-day reversal is NOT computed (not preregistered); pairwise correlation of the eight S1 series is reported",
+  "dev_flag_not_a_verdict": "DEV_PROMISING only if, under the measured cost: (a) S1 annual Sharpe above the expected maximum of 8 unskilled trials over the S1 length (Bailey et al. 2014), (b) S1 beta-adjusted mean t >= 2, (c) both S1 halves positive, (d) S2 annual Sharpe > 0.5, (e) S1 annual Sharpe under measured_x2 > 0. Anything else NOT_PROMISING. The cumulative-trial null (~2.44 gross, ADR 0048) is reported next to it. The flag never opens a window.",
+  "power_note": "S1 is about 2.5 years; a true SR-1 effect will most likely be flagged NOT_PROMISING. Accepted in advance."
+ }
+}
