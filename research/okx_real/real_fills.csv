@@ -1,2 +1,2 @@
 no,venue,symbol,side,leverage,margin_mode,open_time_app,close_time_app,entry,exit,notional_usdt,realized_pnl_usdt,fee_usdt,funding_usdt,entry_liquidity,exit_liquidity,source,note
-1,OKX,BTCUSDT-PERP,Long,20,isolated,2026-10-30 17:37:26,2026-11-02 13:51:55,77303.12,78363.2,4491.31,54.81,,,,,position_screenshot,Linked orders(분할 체결) 정보 없음; 수수료·펀딩 분리 불가
+1,OKX,BTCUSDT-PERP,Long,20,isolated,2026-10-30 17:37:26,2026-11-02 13:51:55,77303.12,78363.2,4491.31,54.81,3.17471334,3.6,maker,taker,position_detail_screenshot,진입 3회 분할(17:37:26 첫 체결은 화면 잘림→fills 파일에서 역산); 수수료=진입 메이커 2bp·청산 테이커 5bp; 펀딩 3.6은 보유시간 비례라 거래비용과 분리

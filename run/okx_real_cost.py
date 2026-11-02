@@ -22,6 +22,8 @@ def analyze(row):
         out["fee_bp"] = fee / n * 1e4
     if fund is not None:
         out["funding_bp"] = fund / n * 1e4
+    if fee is not None and fund is not None:
+        out["resid_bp"] = (cost - fee - fund) / n * 1e4   # 슬리피지 등 설명 안 되는 잔차
     return out
 
 def main(path):
@@ -31,8 +33,22 @@ def main(path):
     by = {}
     for r in rows:
         by.setdefault(r["symbol"], []).append(r["cost_bp"])
+    try:
+        fee_rates()
+    except FileNotFoundError:
+        pass
     for s, v in by.items():
         print(f"{s}: n={len(v)} 평균 {st.mean(v):.1f}bp 중앙 {st.median(v):.1f}bp 필요(검증용) 200건, 부족 {max(0,200-len(v))}")
+
+def fee_rates(path="research/okx_real/real_fills_detail.csv"):
+    """체결 단위 수수료율(bp)을 maker/taker별로 요약(역산(inferred=yes) 행은 제외)."""
+    by = {}
+    for r in csv.DictReader(open(path, encoding="utf-8")):
+        if r["inferred"] == "yes":
+            continue
+        by.setdefault(r["liquidity"], []).append(float(r["fee_usdt"]) / float(r["notional_usdt"]) * 1e4)
+    for k, v in by.items():
+        print(f"수수료율 {k}: n={len(v)} 평균 {st.mean(v):.2f}bp")
 
 if __name__ == "__main__":
     main(sys.argv[1] if len(sys.argv) > 1 else "research/okx_real/real_fills.csv")
