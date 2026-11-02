@@ -1,4 +1,5 @@
-"""실거래 체결 기록(research/okx_real/real_fills.csv)에서 왕복 비용을 역산한다.
+"""체결 기록 CSV에서 왕복 비용을 역산한다. 기본은 실계좌 기록(research/okx_real/real_fills.csv).
+모의투자 기록(research/okx_demo/)은 비용 근거가 아니므로 건수에 세지 않는다(ADR 0058). 연습으로 돌릴 때만 경로를 지정.
 연구 전용: 자료는 사용자가 올린 본인 체결 기록뿐이며 어떤 시장 구간도 열지 않는다.
 사용: python run/okx_real_cost.py [csv경로]
 """
@@ -34,13 +35,13 @@ def main(path):
     for r in rows:
         by.setdefault(r["symbol"], []).append(r["cost_bp"])
     try:
-        fee_rates()
+        fee_rates(path.replace("_fills.csv", "_fills_detail.csv"))
     except FileNotFoundError:
         pass
     for s, v in by.items():
         print(f"{s}: n={len(v)} 평균 {st.mean(v):.1f}bp 중앙 {st.median(v):.1f}bp 필요(검증용) 200건, 부족 {max(0,200-len(v))}")
 
-def fee_rates(path="research/okx_real/real_fills_detail.csv"):
+def fee_rates(path):
     """체결 단위 수수료율(bp)을 maker/taker별로 요약(역산(inferred=yes) 행은 제외)."""
     by = {}
     for r in csv.DictReader(open(path, encoding="utf-8")):
