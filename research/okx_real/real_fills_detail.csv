@@ -1,5 +1,5 @@
 trade_no,fill_time_app,action,notional_usdt,price,fee_usdt,liquidity,inferred,source
-1,2026-10-30 17:37:26,open_long,996.84,,0.19936769,maker,yes,총 명목 4491.31에서 나머지 두 진입을 뺀 값; 수수료는 총 수수료에서 나머지 3건을 뺀 값(=2.0bp); 가격 미확인(사용자가 스크롤 화면 제공 시 확정)
+1,2026-10-30 17:37:26,open_long,996.84,77878,0.19936768,maker,no,order_history_screenshot
 1,2026-10-30 19:06:11,open_long,1994.65,77312,0.39892992,maker,no,order_history_screenshot
 1,2026-10-30 20:57:15,open_long,1499.82,76914,0.2999646,maker,no,order_history_screenshot
 1,2026-11-02 13:51:55,close_long,4552.9,78363.20588641,2.27645113,taker,no,order_history_screenshot
