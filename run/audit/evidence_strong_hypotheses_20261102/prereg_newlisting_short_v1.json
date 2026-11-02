@@ -1,0 +1,37 @@
+{
+ "schema": "event_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "2026-11-02T05:20Z",
+ "written_before_any_result": true,
+ "data_state_when_written": "no new-listing data downloaded or computed in this session",
+ "requested_by": "동동, 2026-11-02 '1 2 진행' (find strong hypotheses: cost-0 gross >= 3x round-trip cost; new information sources; DEV only for the top candidate)",
+ "id": "H_LIST",
+ "hypothesis": "Newly listed Binance USDT-M perpetuals drift down after the first-day attention peak (economic story: listing hype, early-holder selling, thin float, declining attention). A short opened after the first full day earns, per listing, a cost-0 return of at least 3x the measured round-trip cost.",
+ "what_the_author_had_already_seen": "ADR 0035-0057: universes were point-in-time top-50 by 30-day volume with >=60 bars of history, so symbols younger than 60 days were never traded. No listing-event statistic has been computed. The author believes from general knowledge that new listings tend to fall; this is disclosed, not tested.",
+ "events": "every USDT perpetual (stable/fiat bases excluded as in broad_universe_fetch.py) whose first 1d bar D0 lies in the DEV segments (S1 first bar >= 2021-01-02 and <= 2023-09-18; S2 first bar >= 2024-06-19 and <= 2025-10-20). A symbol whose first bar is 2021-01-01 is treated as already listed and excluded. Listing day D0 is partial and is never traded.",
+ "configs": [
+  {"id": "L1_E1_H7",  "entry_day": 1, "hold_days": 7},
+  {"id": "L2_E1_H14", "entry_day": 1, "hold_days": 14},
+  {"id": "L3_E1_H30", "entry_day": 1, "hold_days": 30},
+  {"id": "L4_E3_H7",  "entry_day": 3, "hold_days": 7},
+  {"id": "L5_E3_H14", "entry_day": 3, "hold_days": 14},
+  {"id": "L6_E3_H30", "entry_day": 3, "hold_days": 30}
+ ],
+ "trade": "SHORT at the open of day D0+entry_day, close at the open of D0+entry_day+hold_days. Return = -(open_exit/open_entry - 1) + sum of actual funding rates settled in the window (short receives positive funding). No stop. An event whose window would end after the segment end is dropped and counted.",
+ "cost": "ADR 0041 volume-scaled measured alt cost (run/audit/lowliq_cost_20261027/calibration_v1.json), 10,000 USDT order, two sides. q15 and b = mean daily quote volume of days D0..entry-1 divided by 96 (flagged fallback: no 15m bars downloaded). Rows: measured, measured_x2, assumed_public_v1, cost0.",
+ "market_adjustment": "excess = short return + equal-weight open-to-open return of all symbols older than 60 bars over the same window (beta = 1 assumed, reported next to raw; S2 never uses BTCUSDT).",
+ "criteria_DEV_PROMISING_all_required": [
+  "a) cost-0 mean short return per event >= 3.0 x mean measured round-trip cost, in S1 and in S2 separately (the coordinator's 3x bar)",
+  "b) measured-cost net mean > 0 in S1 and in S2",
+  "c) pooled net mean t-stat >= 2.6 using month-clustered standard errors (6 configs: Bonferroni-like 0.05/6)",
+  "d) net mean > 0 in both halves of S1 (split at the median event date)",
+  "e) net mean > 0 at measured_x2 cost",
+  "f) mean after dropping the 3 best events > 0 (not carried by a few collapses)",
+  "g) market-excess cost-0 mean > 0 in S1 and S2 (not just alt-beta in a bear market)",
+  "h) 5% worst event loss and count of events with adverse move > +100% reported; if any config has > 5% of events adverse > +100% (liquidation at 1x) it is NOT_PROMISING regardless"
+ ],
+ "verdict_rule": "DEV_PROMISING if a)-h) all hold for a config; otherwise NOT_PROMISING. DEV_PROMISING only means a prereg v-next draft may be written; it never activates anything and needs the user's explicit final confirmation.",
+ "trials_added": 6,
+ "reads_never": "2020 (IW1), 2023-09-19..2024-06-18, 2025-10-21 onwards; BTCUSDT in S2.",
+ "other_candidates": "see docs/adr ADR 0058 for the ranked list; only candidates with a documented gross >= 3x basis may get a DEV test"
+}
