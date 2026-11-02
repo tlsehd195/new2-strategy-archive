@@ -26,6 +26,7 @@ import json
 import math
 import re
 import sys
+import urllib.parse
 from pathlib import Path
 
 import numpy as np
@@ -47,7 +48,8 @@ def first_months(data: Path) -> dict:
     out = {}
     syms = json.loads((data / "symbols_listed.json").read_text())
     for s in syms:
-        x = bf.get(bf.S3 + "?delimiter=/&prefix=" + f"data/futures/um/monthly/klines/{s}/1d/").decode()
+        pfx = urllib.parse.quote(f"data/futures/um/monthly/klines/{s}/1d/")
+        x = urllib.parse.unquote(bf.get(bf.S3 + "?delimiter=/&prefix=" + pfx).decode())
         ms_ = sorted(set(re.findall(rf"{re.escape(s)}-1d-(\d{{4}}-\d{{2}})\.zip<", x)))
         out[s] = ms_[0] if ms_ else None
     (data / "first_month.json").write_text(json.dumps(out))
