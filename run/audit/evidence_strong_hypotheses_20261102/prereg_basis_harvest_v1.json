@@ -1,0 +1,29 @@
+{
+ "schema": "carry_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "2026-11-02T05:40Z",
+ "written_before_any_result": true,
+ "data_state_when_written": "no index-price kline downloaded or used in this session; perp daily klines and funding for these symbols are downloaded for H_LIST at this time but not yet used for this hypothesis",
+ "id": "H_BASIS",
+ "hypothesis": "A market-neutral long-spot / short-perp book (funding harvest) on 16 liquid USDT perpetuals earns, after one-time entry/exit cost, a return that is (a) at least 3x its round-trip cost per year at cost 0 and (b) above a cash-like hurdle. ADR 0020 CC1 measured funding only and set the basis P&L to 0 (its stated limit); this closes that gap using Binance index price (composite spot index) as the spot leg.",
+ "what_the_author_had_already_seen": "ADR 0020: CC1 funding income 6.5%/yr gross, 4.0% net S1, 2.6% S2 for 15 alts (basis assumed 0); later S1 pieces had negative funding. This is disclosed. Basis noise was not seen.",
+ "symbols": ["ETHUSDT","ADAUSDT","AVAXUSDT","BCHUSDT","BNBUSDT","DOGEUSDT","LINKUSDT","LTCUSDT","NEARUSDT","SOLUSDT","TRXUSDT","UNIUSDT","XLMUSDT","XMRUSDT","XRPUSDT","ZECUSDT"],
+ "configs": [
+  {"id": "B1_always_on", "rule": "always long index / short perp, equal weight per symbol that has data, daily open-to-open P&L, one entry and one exit per symbol per segment"},
+  {"id": "B2_funding_gate", "rule": "hold a symbol only while its trailing 7-day mean funding (known at the day open) is > 0; entering or leaving pays cost each time"}
+ ],
+ "pnl": "per day per symbol: ret_index_open_to_open - ret_perp_open_to_open + funding settled that day (short receives positive). Leg notional 1 each; capital = 2 (spot cash + perp margin at 1x), reported per capital.",
+ "cost": "perp side: ADR 0041 volume-scaled measured cost at the entry/exit bar; spot side: 15bp per side assumed (taker 10bp + 5bp, same as ADR 0020), rows measured, spot_x2, cost0. Index vs real spot difference is NOT measured (limitation).",
+ "hurdle": "cash-like 4.0%/yr on capital (assumed stablecoin lending rate, disclosed assumption; not a measurement)",
+ "criteria_DEV_PROMISING_all_required_per_config": [
+  "a) cost-0 annual return per capital >= 3 x annualized round-trip cost (B1: one round trip per segment; B2: all its entries/exits), in S1 and S2 separately",
+  "b) net annual return per capital > hurdle 4.0% in S1 and S2",
+  "c) net annualized Sharpe >= 1.0 in S1 and S2",
+  "d) net return positive in both halves of S1",
+  "e) worst 30-day drawdown reported; max drawdown <= 10% of capital in both segments",
+  "f) net return positive at spot_x2 cost"
+ ],
+ "verdict_rule": "DEV_PROMISING only means a note may say the premium is real after cost; it is a risk premium, not alpha, and activates nothing.",
+ "trials_added": 2,
+ "reads_never": "2020, 2023-09-19..2024-06-18, 2025-10-21 onwards, BTCUSDT in S2 (BTCUSDT not used at all)."
+}

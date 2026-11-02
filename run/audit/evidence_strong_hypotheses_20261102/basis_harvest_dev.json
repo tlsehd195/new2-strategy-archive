@@ -1,0 +1,163 @@
+{
+ "version": "basis-harvest-dev-v1",
+ "prereg_sha256": "9f1648eef7e9351a2dcbfcdcf721f20380effab91ced2cd112d466a1b170314a",
+ "script_sha256": "8a39b02ccf47426912792a0e49934aae7336c9faccbbbd3db0f4399c9a803a09",
+ "spot_side_assumed": 0.0015,
+ "hurdle": 0.04,
+ "configs": {
+  "B1_always_on": {
+   "S1": {
+    "cost0": {
+     "annual_return_per_capital": 0.05840998608751473,
+     "sharpe": 1.4317094597161912,
+     "max_drawdown": 0.036234057437787154,
+     "worst_30d": -0.01963787067409595,
+     "positive_months_share": 0.6666666666666666
+    },
+    "measured": {
+     "annual_return_per_capital": 0.0526879164186245,
+     "sharpe": 1.288378499304609,
+     "max_drawdown": 0.040411844551709986,
+     "worst_30d": -0.019637870674095954,
+     "positive_months_share": 0.6060606060606061
+    },
+    "spot_x2": {
+     "annual_return_per_capital": 0.049647237811157284,
+     "sharpe": 1.2106438533501613,
+     "max_drawdown": 0.04376253361022367,
+     "worst_30d": -0.01963787067409595,
+     "positive_months_share": 0.5757575757575758
+    },
+    "measured_half_sums": [
+     0.17771867434950184,
+     -0.03476528579137215
+    ],
+    "annual_cost_per_capital": 0.005722069668890234,
+    "cost_split": {
+     "perp": 0.007275177390472886,
+     "spot": 0.00825
+    },
+    "flips": 176,
+    "gross_over_cost": 10.207842523323043,
+    "mean_active_symbols": 15.801210898082745,
+    "basis_change_daily_std": 0.005444497427537509,
+    "funding_mean_annual_when_on": 0.1290090633416885
+   },
+   "S2": {
+    "cost0": {
+     "annual_return_per_capital": 0.021033857850975828,
+     "sharpe": 5.451639669928363,
+     "max_drawdown": 0.005129042749317872,
+     "worst_30d": -0.004856294907631983,
+     "positive_months_share": 0.8823529411764706
+    },
+    "measured": {
+     "annual_return_per_capital": 0.018895293447044777,
+     "sharpe": 4.438718801318777,
+     "max_drawdown": 0.0051290427493178685,
+     "worst_30d": -0.004856294907631984,
+     "positive_months_share": 0.7647058823529411
+    },
+    "spot_x2": {
+     "annual_return_per_capital": 0.01777489467403864,
+     "sharpe": 3.7681843533520776,
+     "max_drawdown": 0.00512904274931787,
+     "worst_30d": -0.004856294907631983,
+     "positive_months_share": 0.7647058823529411
+    },
+    "measured_half_sums": [
+     0.020201423741973416,
+     0.00509576584216045
+    ],
+    "annual_cost_per_capital": 0.0021385644039310526,
+    "cost_split": {
+     "perp": 0.001363129345714674,
+     "spot": 0.0015000000000000002
+    },
+    "flips": 32,
+    "gross_over_cost": 9.835503580024032,
+    "mean_active_symbols": 15.967280163599183,
+    "basis_change_daily_std": 0.0008714005683527832,
+    "funding_mean_annual_when_on": 0.043566962461898055
+   },
+   "verdict": "NOT_PROMISING"
+  },
+  "B2_funding_gate": {
+   "S1": {
+    "cost0": {
+     "annual_return_per_capital": 0.0765624620430527,
+     "sharpe": 1.9603759118891106,
+     "max_drawdown": 0.036234057437787154,
+     "worst_30d": -0.016246187972772635,
+     "positive_months_share": 0.9696969696969697
+    },
+    "measured": {
+     "annual_return_per_capital": 0.055656209823915184,
+     "sharpe": 1.4203401361057888,
+     "max_drawdown": 0.036234057437787154,
+     "worst_30d": -0.01689765850535189,
+     "positive_months_share": 0.5454545454545454
+    },
+    "spot_x2": {
+     "annual_return_per_capital": 0.04446098404187684,
+     "sharpe": 1.1310054386684119,
+     "max_drawdown": 0.04100926353080654,
+     "worst_30d": -0.017272658505351892,
+     "positive_months_share": 0.5151515151515151
+    },
+    "measured_half_sums": [
+     0.1660104377329248,
+     -0.015003445438605956
+    ],
+    "annual_cost_per_capital": 0.020906252219137524,
+    "cost_split": {
+     "perp": 0.02634805530230058,
+     "spot": 0.030375
+    },
+    "flips": 648,
+    "gross_over_cost": 3.6621801574252335,
+    "mean_active_symbols": 11.762865792129162,
+    "basis_change_daily_std": 0.005444497427537509,
+    "funding_mean_annual_when_on": 0.2129111214163164
+   },
+   "S2": {
+    "cost0": {
+     "annual_return_per_capital": 0.029575880859570403,
+     "sharpe": 9.922448591111708,
+     "max_drawdown": 0.0007703815994002453,
+     "worst_30d": 0.00042220240799651255,
+     "positive_months_share": 1.0
+    },
+    "measured": {
+     "annual_return_per_capital": 0.0074212695842789484,
+     "sharpe": 2.002689194496346,
+     "max_drawdown": 0.010056285329946776,
+     "worst_30d": -0.0032715718943620996,
+     "positive_months_share": 0.5294117647058824
+    },
+    "spot_x2": {
+     "annual_return_per_capital": -0.004342917532285468,
+     "sharpe": -0.9956617951573601,
+     "max_drawdown": 0.018041150277766444,
+     "worst_30d": -0.0055666797561531225,
+     "positive_months_share": 0.4117647058823529
+    },
+    "measured_half_sums": [
+     0.012180166798697191,
+     -0.002244504028779584
+    ],
+    "annual_cost_per_capital": 0.022154611275291454,
+    "cost_split": {
+     "perp": 0.013910793740225934,
+     "spot": 0.01575
+    },
+    "flips": 336,
+    "gross_over_cost": 1.3349762941927907,
+    "mean_active_symbols": 12.374233128834355,
+    "basis_change_daily_std": 0.0008714005683527832,
+    "funding_mean_annual_when_on": 0.07581341051437779
+   },
+   "verdict": "NOT_PROMISING"
+  }
+ }
+}
