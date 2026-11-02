@@ -1,0 +1,5 @@
+trade_no,fill_time_app,action,notional_usdt,price,fee_usdt,liquidity,inferred,source
+1,2026-10-30 17:37:26,open_long,996.84,77878,0.19936768,maker,no,demo_order_history_screenshot
+1,2026-10-30 19:06:11,open_long,1994.65,77312,0.39892992,maker,no,demo_order_history_screenshot
+1,2026-10-30 20:57:15,open_long,1499.82,76914,0.2999646,maker,no,demo_order_history_screenshot
+1,2026-11-02 13:51:55,close_long,4552.9,78363.20588641,2.27645113,taker,no,demo_order_history_screenshot
