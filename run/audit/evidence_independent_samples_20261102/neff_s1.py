@@ -1,4 +1,4 @@
-"""Effective number of independent symbols, measured on DEV S1 only (ADR 0058).
+"""Effective number of independent symbols, measured on DEV S1 only (ADR 0059).
 
 Reads ONLY 2021-01-01..2023-09-18 bars of the alt archive (the S1 selection window,
 already spent as DEV).  Computes daily close-to-close returns, the correlation

@@ -1,6 +1,6 @@
 """Download Binance SPOT 15m monthly klines for 2017-08..2019-12 (public, keyless).
 
-Purpose (ADR 0058): a block of real market data that this archive has never
+Purpose (ADR 0059): a block of real market data that this archive has never
 read (engine READ_START is 2021-01-01).  This tool ONLY downloads, verifies the
 published SHA-256 CHECKSUM, and counts rows / gaps / duplicates.  It computes no
 return, volatility or correlation statistic, so the block stays unread.

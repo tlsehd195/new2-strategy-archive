@@ -1,0 +1,2 @@
+no,venue,symbol,side,leverage,margin_mode,open_time_app,close_time_app,entry,exit,notional_usdt,realized_pnl_usdt,fee_usdt,funding_usdt,entry_liquidity,exit_liquidity,source,note
+,OKX,BTCUSDT-PERP,Long|Short,,isolated,YYYY-MM-DD HH:MM:SS,YYYY-MM-DD HH:MM:SS,,,,,,,maker|taker|mixed,maker|taker|mixed,position_screenshot|trading_history|csv_export,

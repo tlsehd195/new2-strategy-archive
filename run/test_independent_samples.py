@@ -1,4 +1,4 @@
-"""Synthetic tests for the independent-sample accounting tool (ADR 0058). No market data."""
+"""Synthetic tests for the independent-sample accounting tool (ADR 0059). No market data."""
 import os
 import sys
 import unittest
