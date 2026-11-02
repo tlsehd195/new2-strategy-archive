@@ -1,0 +1,2 @@
+trade_no,fill_time_app,action,notional_usdt,price,fee_usdt,liquidity,inferred,source
+,YYYY-MM-DD HH:MM:SS,open_long|close_long|open_short|close_short,,,,maker|taker,no,order_history_screenshot

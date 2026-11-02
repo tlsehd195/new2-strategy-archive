@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Spot-index long / perp short basis harvest, DEV only (ADR 0058).
+"""Spot-index long / perp short basis harvest, DEV only (ADR 0059).
 
 Runs exactly the two configs of
 ``run/audit/evidence_strong_hypotheses_20261102/prereg_basis_harvest_v1.json``

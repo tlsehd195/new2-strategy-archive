@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""New-listing short event study, DEV only (ADR 0058).
+"""New-listing short event study, DEV only (ADR 0059).
 
 Runs exactly the six configs of
 ``run/audit/evidence_strong_hypotheses_20261102/prereg_newlisting_short_v1.json``
