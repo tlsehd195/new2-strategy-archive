@@ -1,0 +1,2786 @@
+{
+ "version": "maker-rescore-dev-v1",
+ "prereg_sha256": "7c4fa2bf58f4526b5bda23d6b0abf230b73e24acbba8696af6767c2d09d83e29",
+ "script_sha256": "38afa6ed6a223742d26f11df274fd98ca6cb8a655f1cae86300b8af5f93da608",
+ "inputs_sha256": {
+  "broad_universe_lowliq.json": "ebd40b57068c29c913ae50debeb57e4481cc6338678883d0821d1574fff8b09e",
+  "cross_section_v2_dev.json": "3b05f48750a0e98732b21cc5b6b5bf5169a7cc9626a7e07cad43e45fbf9cca12",
+  "alpha101_dev.json": "35b8d25a322f27579c1dea1f04d32a440ebcbd6745e5731d99f2bb362bb0758e",
+  "residual_signals_dev.json": "086a13f03024b21c7e584f1b9b2024cbae4d208cbc79c7f68ffd2d8e17cc6393"
+ },
+ "scenarios_def": {
+  "BREAKEVEN_FEE": [
+   1.0,
+   0.0
+  ],
+  "OPTIMISTIC": [
+   0.47,
+   0.0
+  ],
+  "CENTRAL": [
+   0.7,
+   0.0
+  ],
+  "CONSERVATIVE": [
+   0.79,
+   0.34
+  ]
+ },
+ "focus": [
+  "lowliq:H1_MOM28",
+  "cs_v2:N4_TAKERFLOW",
+  "alpha101:A101",
+  "residual:W200:R4_RESMAX28"
+ ],
+ "summary": {
+  "BREAKEVEN_FEE": {
+   "n": 25,
+   "S1_pos": 13,
+   "pos_both": 8,
+   "promising": 0
+  },
+  "OPTIMISTIC": {
+   "n": 25,
+   "S1_pos": 15,
+   "pos_both": 9,
+   "promising": 0
+  },
+  "CENTRAL": {
+   "n": 25,
+   "S1_pos": 13,
+   "pos_both": 9,
+   "promising": 0
+  },
+  "CONSERVATIVE": {
+   "n": 25,
+   "S1_pos": 12,
+   "pos_both": 7,
+   "promising": 0
+  }
+ },
+ "rows": [
+  {
+   "id": "lowliq:H1_MOM28",
+   "file": "broad_universe_lowliq.json",
+   "chance_small": 0.6587764017872829,
+   "chance_cum": 2.4173787135068143,
+   "base_s1": 0.27588081264325665,
+   "base_s2": 1.3702553986654198,
+   "cost_pct_capital": 24.623888408725414,
+   "cost0_s1": 0.5910828982934457,
+   "cost0_s2": 1.7392833645219652,
+   "halves_base": [
+    0.6089968231387302,
+    -0.17827560252896643
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": 0.2799619909240168,
+     "S2": 1.4004628293701242,
+     "alpha_t": 0.44415361337177944,
+     "halves": [
+      0.6130780014194903,
+      -0.17419442424820628
+     ],
+     "x2_S1": -0.031158916445412195,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": false
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": 0.4448560718298141,
+     "S2": 1.5800377130006,
+     "alpha_t": 0.7091034253840358,
+     "halves": [
+      0.7779720823252876,
+      -0.009300343342408951
+     ],
+     "x2_S1": 0.2986292453661825,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": true
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": 0.3732982631348455,
+     "S2": 1.5021089899156765,
+     "alpha_t": 0.5941252050768302,
+     "halves": [
+      0.706414273630319,
+      -0.08085815203737759
+     ],
+     "x2_S1": 0.15551362797624518,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": true
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": 0.1443291960518253,
+     "S2": 0.8802587978145424,
+     "alpha_t": 0.228153695086519,
+     "halves": [
+      0.47744520654729883,
+      -0.3098272191203978
+     ],
+     "x2_S1": -0.10145632077002362,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": false
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": -0.031158916445412195,
+     "S1_pub": -0.029364437700668797,
+     "S2_pred": 1.0616422942182833,
+     "S2_pub": 0.9809000049257565
+    }
+   },
+   "breakeven_lambda_S1": 1.8998494935333494,
+   "breakeven_lambda_S2": 5.133346961223919
+  },
+  {
+   "id": "lowliq:H2_REV7",
+   "file": "broad_universe_lowliq.json",
+   "chance_small": 0.6587764017872829,
+   "chance_cum": 2.4173787135068143,
+   "base_s1": -0.6842512899874538,
+   "base_s2": -2.4968114829581136,
+   "cost_pct_capital": 28.035818724891783,
+   "cost0_s1": -0.3250366639870421,
+   "cost0_s2": -2.117918893185124,
+   "halves_base": [
+    -0.7874783891282285,
+    -0.5625146805410489
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": -0.6850013939137644,
+     "S2": -2.5268794284693548,
+     "alpha_t": -1.0961300112215078,
+     "halves": [
+      -0.7882284930545391,
+      -0.5632647844673595
+     ],
+     "x2_S1": -1.0449661238404866,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": -0.49422008705260156,
+     "S2": -2.3101303447687123,
+     "alpha_t": -0.7889105125932079,
+     "halves": [
+      -0.5974471861933763,
+      -0.3724834776061967
+     ],
+     "x2_S1": -0.663403510118161,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": -0.5770119749357477,
+     "S2": -2.4041912678840855,
+     "alpha_t": -0.9222321818092626,
+     "halves": [
+      -0.6802390740765225,
+      -0.4552753654893429
+     ],
+     "x2_S1": -0.8289872858844533,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": -0.49889633487355833,
+     "S2": -1.720905292376724,
+     "alpha_t": -0.7988015334848347,
+     "halves": [
+      -0.6021234340143331,
+      -0.3771597254271535
+     ],
+     "x2_S1": -0.7832684715156689,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": -1.0449661238404866,
+     "S1_pub": -1.0404043554281965,
+     "S2_pred": -2.935839963753586,
+     "S2_pub": -2.77029554155858
+    }
+   },
+   "breakeven_lambda_S1": null,
+   "breakeven_lambda_S2": null
+  },
+  {
+   "id": "lowliq:H3_CARRY7",
+   "file": "broad_universe_lowliq.json",
+   "chance_small": 0.6587764017872829,
+   "chance_cum": 2.4173787135068143,
+   "base_s1": 0.46357979880935046,
+   "base_s2": 0.5221042619711783,
+   "cost_pct_capital": 26.68660092331277,
+   "cost0_s1": 0.9296843357323071,
+   "cost0_s2": 0.8739705968295364,
+   "halves_base": [
+    1.1333510447499244,
+    -0.4036262159410702
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": 0.4762308617898999,
+     "S2": 0.5330859482049755,
+     "alpha_t": 0.7628197628299965,
+     "halves": [
+      1.1460021077304738,
+      -0.39097515296052077
+     ],
+     "x2_S1": 0.02277738784749274,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": true
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": 0.7165612029793758,
+     "S2": 0.7137548119759927,
+     "alpha_t": 1.14660341735554,
+     "halves": [
+      1.3863324489199498,
+      -0.15064481177104488
+     ],
+     "x2_S1": 0.5034380702264444,
+     "pos_both": true,
+     "conds": {
+      "a": true,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": true
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": 0.6122669039726221,
+     "S2": 0.6353513427923438,
+     "alpha_t": 0.9800557936935117,
+     "halves": [
+      1.282038149913196,
+      -0.25493911077779857
+     ],
+     "x2_S1": 0.2948494722129371,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": true
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": 0.25536341716882094,
+     "S2": 0.30752172149409074,
+     "alpha_t": 0.4093254300936076,
+     "halves": [
+      0.9251346631093949,
+      -0.6118425975815998
+     ],
+     "x2_S1": -0.10286482724568076,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": 0.02277738784749274,
+     "S1_pub": 0.02052027216704434,
+     "S2_pred": 0.19220129958041454,
+     "S2_pub": 0.17820490672731137
+    }
+   },
+   "breakeven_lambda_S1": 2.0502309258973406,
+   "breakeven_lambda_S2": 2.5638309039610014
+  },
+  {
+   "id": "lowliq:H4_LOWVOL30",
+   "file": "broad_universe_lowliq.json",
+   "chance_small": 0.6587764017872829,
+   "chance_cum": 2.4173787135068143,
+   "base_s1": -0.5205115591760796,
+   "base_s2": -0.28743142019292944,
+   "cost_pct_capital": 17.821983977388438,
+   "cost0_s1": -0.30111641885909907,
+   "cost0_s2": -0.06873626271437634,
+   "halves_base": [
+    -0.11993848223995712,
+    -1.0133036008799978
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": -0.5299119245414137,
+     "S2": -0.29130113619350906,
+     "alpha_t": -0.9425899412621828,
+     "halves": [
+      -0.12933884760529119,
+      -1.0227039662453319
+     ],
+     "x2_S1": -0.7587074302237283,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": -0.40865030652978696,
+     "S2": -0.17334175324956871,
+     "alpha_t": -0.7322457220014889,
+     "halves": [
+      -0.00807722959366447,
+      -0.9014423482337052
+     ],
+     "x2_S1": -0.5161841942004748,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": -0.4612732728367194,
+     "S2": -0.22453167414976924,
+     "alpha_t": -0.823527175642922,
+     "halves": [
+      -0.06070019590059689,
+      -0.9540653145406376
+     ],
+     "x2_S1": -0.6214301268143395,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": -0.379485285936034,
+     "S2": -0.22119218344000321,
+     "alpha_t": -0.6737032263347202,
+     "halves": [
+      0.021087791000088507,
+      -0.8722773276399522
+     ],
+     "x2_S1": -0.5602337354250626,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": -0.7587074302237283,
+     "S1_pub": -0.7107704045356201,
+     "S2_pred": -0.5138660096726418,
+     "S2_pub": -0.487835333916283
+    }
+   },
+   "breakeven_lambda_S1": null,
+   "breakeven_lambda_S2": null
+  },
+  {
+   "id": "cs_v2:N1_SIZE",
+   "file": "cross_section_v2_dev.json",
+   "chance_small": 0.7467310533701201,
+   "chance_cum": 0.7467310533701201,
+   "base_s1": 0.3303278328908426,
+   "base_s2": -2.268632850711309,
+   "cost_pct_capital": 5.502714824587955,
+   "cost0_s1": 0.4036044660824724,
+   "cost0_s2": -2.1954412121753752,
+   "halves_base": [
+    0.45398640245699196,
+    0.1417135870909145
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": 0.3307058191077611,
+     "S2": -2.270656490659789,
+     "alpha_t": 0.6007256143203938,
+     "halves": [
+      0.45436438867391044,
+      0.14209157330783298
+     ],
+     "x2_S1": 0.2578071721330498,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": 0.36934210200435813,
+     "S2": -2.2307923930630498,
+     "alpha_t": 0.6649636509612475,
+     "halves": [
+      0.4930006715705075,
+      0.18072785620443002
+     ],
+     "x2_S1": 0.3350797379262438,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": 0.3525754132001745,
+     "S2": -2.248091907114465,
+     "alpha_t": 0.6370867671359715,
+     "halves": [
+      0.47623398276632384,
+      0.16396116740024638
+     ],
+     "x2_S1": 0.3015463603178766,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": 0.2087890165044098,
+     "S2": -1.5084112700384344,
+     "alpha_t": 0.3807224058980429,
+     "halves": [
+      0.33244758607055913,
+      0.020174770704481704
+     ],
+     "x2_S1": 0.15119908539438792,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": 0.2578071721330498,
+     "S1_pub": 0.2571125350628565,
+     "S2_pred": -2.345871769144203,
+     "S2_pub": -2.3399923521242982
+    }
+   },
+   "breakeven_lambda_S1": 5.53651518693459,
+   "breakeven_lambda_S2": null
+  },
+  {
+   "id": "cs_v2:N2_VOLSHOCK",
+   "file": "cross_section_v2_dev.json",
+   "chance_small": 0.7467310533701201,
+   "chance_cum": 0.7467310533701201,
+   "base_s1": -0.9353869356573011,
+   "base_s2": 0.9738918354433272,
+   "cost_pct_capital": 7.897642776519788,
+   "cost0_s1": -0.8463490645725532,
+   "cost0_s2": 1.0616652297535634,
+   "halves_base": [
+    -1.391994755402796,
+    -0.12912643023762627
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": -0.9362806559126114,
+     "S2": 0.9740821007069347,
+     "alpha_t": -1.4972809756844279,
+     "halves": [
+      -1.3928884756581064,
+      -0.13002015049293658
+     ],
+     "x2_S1": -1.0262122472526698,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": false
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": -0.8886169125023806,
+     "S2": 1.0205011591016477,
+     "alpha_t": -1.4210749740199364,
+     "halves": [
+      -1.3452247322478756,
+      -0.08235640708270575
+     ],
+     "x2_S1": -0.930884760432208,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": false
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": -0.909301178510594,
+     "S2": 1.0003570394209234,
+     "alpha_t": -1.4541455030441497,
+     "halves": [
+      -1.365908998256089,
+      -0.10304067309091913
+     ],
+     "x2_S1": -0.9722532924486347,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": false
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": -0.6296363397765311,
+     "S2": 0.6315083796905151,
+     "alpha_t": -1.0068974820958427,
+     "halves": [
+      -1.086244159522026,
+      0.17662416564314376
+     ],
+     "x2_S1": -0.700682296935177,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": false
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": -1.0262122472526698,
+     "S1_pub": -1.0236149686933784,
+     "S2_pred": 0.8864989716603061,
+     "S2_pub": 0.885654272544029
+    }
+   },
+   "breakeven_lambda_S1": null,
+   "breakeven_lambda_S2": 12.121800640261906
+  },
+  {
+   "id": "cs_v2:N3_MAX",
+   "file": "cross_section_v2_dev.json",
+   "chance_small": 0.7467310533701201,
+   "chance_cum": 0.7467310533701201,
+   "base_s1": 0.5175113384681843,
+   "base_s2": -0.7354158750494459,
+   "cost_pct_capital": 7.346852717745785,
+   "cost0_s1": 0.6191430397294199,
+   "cost0_s2": -0.6616221354168703,
+   "halves_base": [
+    0.30747150847960697,
+    0.8893942200173972
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": 0.5177992653469861,
+     "S2": -0.7362145812867883,
+     "alpha_t": 0.807083851425693,
+     "halves": [
+      0.3077594353584087,
+      0.889682146896199
+     ],
+     "x2_S1": 0.4164554909645522,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": 0.571511465769676,
+     "S2": -0.6966805849757318,
+     "alpha_t": 0.894863921243348,
+     "halves": [
+      0.3614716357810987,
+      0.9433943473188889
+     ],
+     "x2_S1": 0.5238798918099321,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": 0.5482023976617162,
+     "S2": -0.7138368475258129,
+     "alpha_t": 0.8567706833979505,
+     "halves": [
+      0.33816256767313885,
+      0.9200852792109291
+     ],
+     "x2_S1": 0.4772617555940125,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": 0.3285728244592943,
+     "S2": -0.49559864161236955,
+     "alpha_t": 0.5111443814196458,
+     "halves": [
+      0.11853299447071697,
+      0.7004557060085073
+     ],
+     "x2_S1": 0.2485112426971716,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": 0.4164554909645522,
+     "S1_pub": 0.41555660089138946,
+     "S2_pred": -0.8108070271567062,
+     "S2_pub": -0.8084959750926678
+    }
+   },
+   "breakeven_lambda_S1": 6.109334722358017,
+   "breakeven_lambda_S2": null
+  },
+  {
+   "id": "cs_v2:N4_TAKERFLOW",
+   "file": "cross_section_v2_dev.json",
+   "chance_small": 0.7467310533701201,
+   "chance_cum": 0.7467310533701201,
+   "base_s1": 0.5047148400479416,
+   "base_s2": 1.2251124010919636,
+   "cost_pct_capital": 7.189884484416013,
+   "cost0_s1": 0.6137066430170022,
+   "cost0_s2": 1.3120683527522201,
+   "halves_base": [
+    0.6532743175614223,
+    0.313299694905753
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": 0.5046636223421609,
+     "S2": 1.2251019406311556,
+     "alpha_t": 0.7856244175115653,
+     "halves": [
+      0.6532230998556415,
+      0.31324847719997223
+     ],
+     "x2_S1": 0.3956206016673196,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": true,
+      "e": true
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": 0.5624564232998268,
+     "S2": 1.2711941390553199,
+     "alpha_t": 0.8800417060954349,
+     "halves": [
+      0.7110159008133075,
+      0.37104127815763815
+     ],
+     "x2_S1": 0.5112062035826513,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": true,
+      "e": true
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": 0.5373765285446133,
+     "S2": 1.251191864267475,
+     "alpha_t": 0.8390681657665857,
+     "halves": [
+      0.6859360060580939,
+      0.3459613834024246
+     ],
+     "x2_S1": 0.4610464140722244,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": true,
+      "e": true
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": 0.3189023980580968,
+     "S2": 0.7972616472408242,
+     "alpha_t": 0.4953531579804575,
+     "halves": [
+      0.4674618755715774,
+      0.12748725291590812
+     ],
+     "x2_S1": 0.2327584117249721,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": true,
+      "e": true
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": 0.3956206016673196,
+     "S1_pub": 0.3952027124076695,
+     "S2_pred": 1.1381355285100911,
+     "S2_pub": 1.1371236142866983
+    }
+   },
+   "breakeven_lambda_S1": 5.628114841453564,
+   "breakeven_lambda_S2": 15.08707006247092
+  },
+  {
+   "id": "cs_v2:N5_COMPOSITE",
+   "file": "cross_section_v2_dev.json",
+   "chance_small": 0.7467310533701201,
+   "chance_cum": 0.7467310533701201,
+   "base_s1": 0.29948044968044324,
+   "base_s2": 0.0566237898297464,
+   "cost_pct_capital": 6.717553632254984,
+   "cost0_s1": 0.4049339229247974,
+   "cost0_s2": 0.11438853186008567,
+   "halves_base": [
+    -0.13743576948053848,
+    0.988607134701591
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": 0.2998218644341253,
+     "S2": 0.05664158220203663,
+     "alpha_t": 0.4764766966179127,
+     "halves": [
+      -0.13709435472685644,
+      0.988948549455273
+     ],
+     "x2_S1": 0.1947098059434531,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": 0.35553125543418157,
+     "S2": 0.08724746552080263,
+     "alpha_t": 0.5655109095580795,
+     "halves": [
+      -0.08138496372680015,
+      1.0446579404553293
+     ],
+     "x2_S1": 0.3061285879435656,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": 0.3313554819813269,
+     "S2": 0.07396566709945135,
+     "alpha_t": 0.5268734209236675,
+     "halves": [
+      -0.1055607371796548,
+      1.0204821670024746
+     ],
+     "x2_S1": 0.2577770410378564,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": 0.1842178629227353,
+     "S2": 0.029876340797797794,
+     "alpha_t": 0.29263603923532866,
+     "halves": [
+      -0.25269835623824644,
+      0.873344547943883
+     ],
+     "x2_S1": 0.10117933671510429,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": 0.1947098059434531,
+     "S1_pub": 0.1941021124125297,
+     "S2_pred": -0.0011053674560124126,
+     "S2_pub": -0.0011044066092065835
+    }
+   },
+   "breakeven_lambda_S1": 3.8524021766801573,
+   "breakeven_lambda_S2": 1.980858426937563
+  },
+  {
+   "id": "alpha101:A002",
+   "file": "alpha101_dev.json",
+   "chance_small": 0.9135473748844105,
+   "chance_cum": 2.4440731200913697,
+   "base_s1": -0.8678199384188565,
+   "base_s2": -0.3823263989316058,
+   "cost_pct_capital": 29.35678187069626,
+   "cost0_s1": -0.36539985508921236,
+   "cost0_s2": -0.04652553952129579,
+   "halves_base": [
+    -1.151297761100718,
+    -0.4949313862065192
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": -0.8706647468408256,
+     "S2": -0.3823124193620367,
+     "alpha_t": -1.392968979371463,
+     "halves": [
+      -1.154142569522687,
+      -0.4977761946284883
+     ],
+     "x2_S1": -1.3759296385924389,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": -0.6028743542124706,
+     "S2": -0.20434537304644398,
+     "alpha_t": -0.9651039107809571,
+     "halves": [
+      -0.8863521768943321,
+      -0.2299858020001333
+     ],
+     "x2_S1": -0.8403488533357288,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": -0.7190852793153417,
+     "S2": -0.2815763554098144,
+     "alpha_t": -1.1507812046975918,
+     "halves": [
+      -1.0025631019972032,
+      -0.3461967271030044
+     ],
+     "x2_S1": -1.0727707035414709,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": -0.6403231688426546,
+     "S2": -0.2959784911582406,
+     "alpha_t": -1.0243075620771764,
+     "halves": [
+      -0.9238009915245161,
+      -0.2674346166303173
+     ],
+     "x2_S1": -1.0394824333264292,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": -1.3759296385924389,
+     "S1_pub": -1.3611912721518487,
+     "S2_pred": -0.7180992992027777,
+     "S2_pub": -0.71679009274887
+    }
+   },
+   "breakeven_lambda_S1": null,
+   "breakeven_lambda_S2": null
+  },
+  {
+   "id": "alpha101:A006",
+   "file": "alpha101_dev.json",
+   "chance_small": 0.9135473748844105,
+   "chance_cum": 2.4440731200913697,
+   "base_s1": 0.41586623676370943,
+   "base_s2": 0.2018658528282847,
+   "cost_pct_capital": 29.032947585505603,
+   "cost0_s1": 0.8225533104148041,
+   "cost0_s2": 0.5579259239324443,
+   "halves_base": [
+    0.9080488188454747,
+    -0.30968095282305264
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": 0.41579428358963566,
+     "S2": 0.20153911477178335,
+     "alpha_t": 0.6651344764069925,
+     "halves": [
+      0.9079768656714009,
+      -0.3097529059971264
+     ],
+     "x2_S1": 0.009035256764467295,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": 0.6313765678069749,
+     "S2": 0.3904241236269337,
+     "alpha_t": 1.0094384047156872,
+     "halves": [
+      1.1235591498887403,
+      -0.09417062177978713
+     ],
+     "x2_S1": 0.4401998251991458,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": 0.5378219916371861,
+     "S2": 0.3084551575199817,
+     "alpha_t": 0.860023492430782,
+     "halves": [
+      1.0300045737189514,
+      -0.18772519794957593
+     ],
+     "x2_S1": 0.2530906728595683,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": 0.22154555368188755,
+     "S2": 0.08668553055849103,
+     "alpha_t": 0.3545368474849728,
+     "halves": [
+      0.7137281357636529,
+      -0.5040016359048745
+     ],
+     "x2_S1": -0.09979407750999549,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": 0.009035256764467295,
+     "S1_pub": 0.00901317656182645,
+     "S2_pred": -0.1548476943888776,
+     "S2_pub": -0.15501791974253168
+    }
+   },
+   "breakeven_lambda_S1": 2.0222127996396027,
+   "breakeven_lambda_S2": 1.565506661838678
+  },
+  {
+   "id": "alpha101:A012",
+   "file": "alpha101_dev.json",
+   "chance_small": 0.9135473748844105,
+   "chance_cum": 2.4440731200913697,
+   "base_s1": -0.5985797263272653,
+   "base_s2": 1.6052641084720884,
+   "cost_pct_capital": 28.900511560430044,
+   "cost0_s1": -0.17958600965098026,
+   "cost0_s2": 1.892361716401618,
+   "halves_base": [
+    -1.1414888829797183,
+    0.173665558946738
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": -0.6006760616664727,
+     "S2": 1.6080918531390358,
+     "alpha_t": -0.96871406305105,
+     "halves": [
+      -1.1435852183189257,
+      0.1715692236075306
+     ],
+     "x2_S1": -1.0217661136819651,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": false
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": -0.3774983340982617,
+     "S2": 1.7587548806682043,
+     "alpha_t": -0.6107152213370216,
+     "halves": [
+      -0.9204074907507147,
+      0.39474695117574155
+     ],
+     "x2_S1": -0.5754106585455432,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": false
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": -0.474349046061825,
+     "S2": 1.6933728121178107,
+     "alpha_t": -0.7660732092506567,
+     "halves": [
+      -1.017258202714278,
+      0.29789623921217834
+     ],
+     "x2_S1": -0.7691120824726696,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": false
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": -0.45118790746188603,
+     "S2": 1.024385540847628,
+     "alpha_t": -0.7271623182605302,
+     "halves": [
+      -0.994097064114339,
+      0.3210573778121173
+     ],
+     "x2_S1": -0.7838490485541251,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": false
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": -1.0217661136819651,
+     "S1_pub": -1.0116811732420807,
+     "S2_pred": 1.3238219898764538,
+     "S2_pub": 1.3173988607642402
+    }
+   },
+   "breakeven_lambda_S1": null,
+   "breakeven_lambda_S2": 6.656919923494071
+  },
+  {
+   "id": "alpha101:A033",
+   "file": "alpha101_dev.json",
+   "chance_small": 0.9135473748844105,
+   "chance_cum": 2.4440731200913697,
+   "base_s1": -0.6892772017520672,
+   "base_s2": -1.8784806707739394,
+   "cost_pct_capital": 29.06655881834308,
+   "cost0_s1": -0.2773519782962467,
+   "cost0_s2": -1.6099586591086683,
+   "halves_base": [
+    -0.743479581342299,
+    -0.6305500878550951
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": -0.6890065793808924,
+     "S2": -1.8836322399550265,
+     "alpha_t": -1.1037411828884645,
+     "halves": [
+      -0.7432089589711242,
+      -0.6302794654839203
+     ],
+     "x2_S1": -1.100661180465538,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": -0.4708296408060301,
+     "S2": -1.7385852421064567,
+     "alpha_t": -0.7518232868357861,
+     "halves": [
+      -0.525032020396262,
+      -0.4121025269090581
+     ],
+     "x2_S1": -0.6643073033158136,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": -0.5655101990554986,
+     "S2": -1.801530165701119,
+     "alpha_t": -0.9045423738020427,
+     "halves": [
+      -0.6197125786457304,
+      -0.5067830851585265
+     ],
+     "x2_S1": -0.8536684198147506,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": -0.5082594405323929,
+     "S2": -1.278774843880344,
+     "alpha_t": -0.8147886646438358,
+     "halves": [
+      -0.5624618201226247,
+      -0.44953232663542086
+     ],
+     "x2_S1": -0.8334665753892629,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": -1.100661180465538,
+     "S1_pub": -1.098376181027354,
+     "S2_pred": -2.1573058208013847,
+     "S2_pub": -2.1428715759262555
+    }
+   },
+   "breakeven_lambda_S1": null,
+   "breakeven_lambda_S2": null
+  },
+  {
+   "id": "alpha101:A041",
+   "file": "alpha101_dev.json",
+   "chance_small": 0.9135473748844105,
+   "chance_cum": 2.4440731200913697,
+   "base_s1": -0.1614531016128947,
+   "base_s2": -1.8002260209615095,
+   "cost_pct_capital": 29.22546857891975,
+   "cost0_s1": 0.28448755505316425,
+   "cost0_s2": -1.5096490347918738,
+   "halves_base": [
+    -0.20242112639862878,
+    -0.10991028310811159
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": -0.16142060721193238,
+     "S2": -1.8021602954465656,
+     "alpha_t": -0.25634451744596415,
+     "halves": [
+      -0.20238863199766646,
+      -0.10987778870714927
+     ],
+     "x2_S1": -0.6073287694770291,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": 0.07491071878856882,
+     "S2": -1.6471293272995793,
+     "alpha_t": 0.12116186924154028,
+     "halves": [
+      0.033942694002834756,
+      0.12645353729335196
+     ],
+     "x2_S1": -0.13466611747602658,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": -0.0276481585324034,
+     "S2": -1.7144069172501584,
+     "alpha_t": -0.04266165705681069,
+     "halves": [
+      -0.06861618331813749,
+      0.023894659972379703
+     ],
+     "x2_S1": -0.33978387211797106,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": -0.16450566185433796,
+     "S2": -1.227452258879843,
+     "alpha_t": -0.26178328768296955,
+     "halves": [
+      -0.20547368664007204,
+      -0.11296284334955485
+     ],
+     "x2_S1": -0.5167731100437642,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": -0.6073287694770291,
+     "S1_pub": -0.6055428844268793,
+     "S2_pred": -2.0946715561012574,
+     "S2_pub": -2.087200348332695
+    }
+   },
+   "breakeven_lambda_S1": 0.6379958456199636,
+   "breakeven_lambda_S2": null
+  },
+  {
+   "id": "alpha101:A053",
+   "file": "alpha101_dev.json",
+   "chance_small": 0.9135473748844105,
+   "chance_cum": 2.4440731200913697,
+   "base_s1": 0.47254187938673137,
+   "base_s2": -1.9503699993288748,
+   "cost_pct_capital": 29.377711839014164,
+   "cost0_s1": 0.9401032082899744,
+   "cost0_s2": -1.681022378081775,
+   "halves_base": [
+    1.2680302904986183,
+    -0.7014367349211865
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": 0.4736578120758579,
+     "S2": -1.9551498696916616,
+     "alpha_t": 0.7561862309932226,
+     "halves": [
+      1.2691462231877448,
+      -0.70032080223206
+     ],
+     "x2_S1": 0.007212415861741283,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": 0.7208738720693396,
+     "S2": -1.8098622991384217,
+     "alpha_t": 1.1509783225197625,
+     "halves": [
+      1.5163622831812265,
+      -0.4531047422385783
+     ],
+     "x2_S1": 0.5016445358487049,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": 0.6135914309400928,
+     "S2": -1.8729116222086954,
+     "alpha_t": 0.9796534526120187,
+     "halves": [
+      1.4090798420519797,
+      -0.5603871833678251
+     ],
+     "x2_S1": 0.28707965359021126,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": 0.251976254462231,
+     "S2": -1.3260354879057819,
+     "alpha_t": 0.4022471164207151,
+     "halves": [
+      1.0474646655741178,
+      -0.9220023598456869
+     ],
+     "x2_S1": -0.11651560854692113,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": 0.007212415861741283,
+     "S1_pub": 0.007152444114099025,
+     "S2_pred": -2.229277361301548,
+     "S2_pub": -2.215639547725733
+    }
+   },
+   "breakeven_lambda_S1": 2.015462508409946,
+   "breakeven_lambda_S2": null
+  },
+  {
+   "id": "alpha101:A054",
+   "file": "alpha101_dev.json",
+   "chance_small": 0.9135473748844105,
+   "chance_cum": 2.4440731200913697,
+   "base_s1": 0.32618282114229963,
+   "base_s2": -0.6809859840608404,
+   "cost_pct_capital": 29.01902276222261,
+   "cost0_s1": 0.756848413936049,
+   "cost0_s2": -0.3763979812010814,
+   "halves_base": [
+    0.47031443671473167,
+    0.11193331112432461
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": 0.32626000312390674,
+     "S2": -0.6809119729481183,
+     "alpha_t": 0.5250940946481668,
+     "halves": [
+      0.4703916186963388,
+      0.11201049310593172
+     ],
+     "x2_S1": -0.10432840768823548,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": 0.5544718608543421,
+     "S2": -0.5195195573221887,
+     "alpha_t": 0.8901161482840662,
+     "halves": [
+      0.6986034764267741,
+      0.3402223508363671
+     ],
+     "x2_S1": 0.3520953077726353,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": 0.45543652636754944,
+     "S2": -0.5895577754240073,
+     "alpha_t": 0.7317103514232043,
+     "halves": [
+      0.5995681419399814,
+      0.24118701634957443
+     ],
+     "x2_S1": 0.15402463879904987,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": 0.15935510865619984,
+     "S2": -0.48898872107287283,
+     "alpha_t": 0.25702839119860715,
+     "halves": [
+      0.3034867242286319,
+      -0.054894401361775175
+     ],
+     "x2_S1": -0.18080973588539254,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": -0.10432840768823548,
+     "S1_pub": -0.10395247912520515,
+     "S2_pred": -0.9854259646951553,
+     "S2_pub": -0.9841030212824758
+    }
+   },
+   "breakeven_lambda_S1": 1.757707348668629,
+   "breakeven_lambda_S2": null
+  },
+  {
+   "id": "alpha101:A101",
+   "file": "alpha101_dev.json",
+   "chance_small": 0.9135473748844105,
+   "chance_cum": 2.4440731200913697,
+   "base_s1": 0.18900157094418493,
+   "base_s2": 1.2375237566519282,
+   "cost_pct_capital": 29.468050433421393,
+   "cost0_s1": 0.6492830253658134,
+   "cost0_s2": 1.539172065811853,
+   "halves_base": [
+    0.2931980040987909,
+    0.05072200975784576
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": 0.18967640789742177,
+     "S2": 1.2352587688499008,
+     "alpha_t": 0.29955288576145284,
+     "halves": [
+      0.2938728410520277,
+      0.05139684671108259
+     ],
+     "x2_S1": -0.2699302095709699,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": true,
+      "e": false
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": 0.4332679151556693,
+     "S2": 1.3963328162397355,
+     "alpha_t": 0.6899368750309381,
+     "halves": [
+      0.5374643483102752,
+      0.29498835396933015
+     ],
+     "x2_S1": 0.21725280494552526,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": true,
+      "e": true
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": 0.3275583931379393,
+     "S2": 1.3264327579384865,
+     "alpha_t": 0.5205249551592748,
+     "halves": [
+      0.43175482629254525,
+      0.1892788319516001
+     ],
+     "x2_S1": 0.005833760910065118,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": true,
+      "e": true
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": 0.06543756894140737,
+     "S2": 0.7757620588358806,
+     "alpha_t": 0.10195034119683587,
+     "halves": [
+      0.16963400209601331,
+      -0.0728419922449318
+     ],
+     "x2_S1": -0.29765165885862205,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": false
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": -0.2699302095709699,
+     "S1_pub": -0.2670815439111291,
+     "S2_pred": 0.9313454718879484,
+     "S2_pub": 0.9333110229995523
+    }
+   },
+   "breakeven_lambda_S1": 1.4126929436790938,
+   "breakeven_lambda_S2": 5.064510441622914
+  },
+  {
+   "id": "residual:U50:R1_RESMOM28",
+   "file": "residual_signals_dev.json",
+   "chance_small": 0.9135473748844105,
+   "chance_cum": 2.4436400871967314,
+   "base_s1": -0.17752570081515406,
+   "base_s2": 0.5099302480134095,
+   "cost_pct_capital": 7.000255953785476,
+   "cost0_s1": -0.07711251859150321,
+   "cost0_s2": 0.7945701314090092,
+   "halves_base": [
+    0.21675940739791655,
+    -0.8202848981901026
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": -0.17760281859041757,
+     "S2": 0.5195869587025693,
+     "alpha_t": -0.2810172968723472,
+     "halves": [
+      0.21668228962265304,
+      -0.8203620159653662
+     ],
+     "x2_S1": -0.27809311858933194,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": false
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": -0.12434295959099297,
+     "S2": 0.6653280402369824,
+     "alpha_t": -0.19592289859863818,
+     "halves": [
+      0.26994214862207766,
+      -0.7671021569659415
+     ],
+     "x2_S1": -0.1715734005904827,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": false
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": -0.14745572859074327,
+     "S2": 0.6020819105145013,
+     "alpha_t": -0.23285065634005905,
+     "halves": [
+      0.24682937962232734,
+      -0.7902149259656919
+     ],
+     "x2_S1": -0.21779893858998325,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": false
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": -0.13028159926953445,
+     "S2": 0.3071795802918586,
+     "alpha_t": -0.206343626833074,
+     "halves": [
+      0.2640035089435362,
+      -0.773040796644483
+     ],
+     "x2_S1": -0.20966893626867678,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": -0.27809311858933194,
+     "S1_pub": -0.2776258455150126,
+     "S2_pred": 0.24460378599612947,
+     "S2_pub": 0.22535640275936916
+    },
+    "limit070": {
+     "S1_pred": -0.14745572859074327,
+     "S1_pub": -0.14742351736078915,
+     "S2_pred": 0.6020819105145013,
+     "S2_pub": 0.597295690077167
+    }
+   },
+   "breakeven_lambda_S1": null,
+   "breakeven_lambda_S2": 2.889522742750728
+  },
+  {
+   "id": "residual:W200:R1_RESMOM28",
+   "file": "residual_signals_dev.json",
+   "chance_small": 0.9135473748844105,
+   "chance_cum": 2.4436400871967314,
+   "base_s1": -0.5129330380824594,
+   "base_s2": -0.3711871249641331,
+   "cost_pct_capital": 19.847715280194265,
+   "cost0_s1": -0.17285468628670292,
+   "cost0_s2": 0.39702989028353725,
+   "halves_base": [
+    0.11123829261486448,
+    -1.761319479899699
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": -0.5225183893922255,
+     "S2": -0.38911805761458435,
+     "alpha_t": -0.834549528932642,
+     "halves": [
+      0.10165294130509836,
+      -1.770904831209465
+     ],
+     "x2_S1": -0.8721820924977479,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": -0.33719662674629847,
+     "S2": 0.0275403547714201,
+     "alpha_t": -0.5385601158632692,
+     "halves": [
+      0.2869747039510254,
+      -1.5855830685635381
+     ],
+     "x2_S1": -0.5015385672058941,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": -0.4176192784605686,
+     "S2": -0.15327367324514787,
+     "alpha_t": -0.6670083517235631,
+     "halves": [
+      0.20655205223675524,
+      -1.6660057202778082
+     ],
+     "x2_S1": -0.6623838706344344,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": -0.3903184184025867,
+     "S2": -0.35901715125238154,
+     "alpha_t": -0.6234038658861445,
+     "halves": [
+      0.23385291229473718,
+      -1.6387048602198262
+     ],
+     "x2_S1": -0.6665527438559495,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": -0.8721820924977479,
+     "S1_pub": -0.805557162971992,
+     "S2_pred": -1.175266005512706,
+     "S2_pub": -1.0034883165337865
+    },
+    "limit070": {
+     "S1_pred": -0.4176192784605686,
+     "S1_pub": -0.41426853398778307,
+     "S2_pred": -0.15327367324514787,
+     "S2_pub": -0.14950736253880617
+    }
+   },
+   "breakeven_lambda_S1": null,
+   "breakeven_lambda_S2": 0.5050320252632512
+  },
+  {
+   "id": "residual:U50:R2_RESREV7",
+   "file": "residual_signals_dev.json",
+   "chance_small": 0.9135473748844105,
+   "chance_cum": 2.4436400871967314,
+   "base_s1": -0.6795519198238443,
+   "base_s2": -2.6108756990182505,
+   "cost_pct_capital": 26.60621504084287,
+   "cost0_s1": -0.3439887137710275,
+   "cost0_s2": -2.265897361684303,
+   "halves_base": [
+    -0.24439600647338164,
+    -1.4119204407671495
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": -0.6802162299560695,
+     "S2": -2.643939274234704,
+     "alpha_t": -1.0857940409833555,
+     "halves": [
+      -0.24506031660560676,
+      -1.4125847508993745
+     ],
+     "x2_S1": -1.0164437461411113,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": -0.5020156463779972,
+     "S2": -2.4435770605829914,
+     "alpha_t": -0.8000978214228138,
+     "halves": [
+      -0.06685973302753453,
+      -1.2343841673213025
+     ],
+     "x2_S1": -0.6600425789849669,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": -0.5793479751005569,
+     "S2": -2.5305267004695837,
+     "alpha_t": -0.9240791997226716,
+     "halves": [
+      -0.14419206175009422,
+      -1.311716496043862
+     ],
+     "x2_S1": -0.8147072364300861,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": -0.4926522888750613,
+     "S2": -1.7941453696264567,
+     "alpha_t": -0.7867004982619776,
+     "halves": [
+      -0.0574963755245986,
+      -1.2250208098183664
+     ],
+     "x2_S1": -0.7582720266612444,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": -1.0164437461411113,
+     "S1_pub": -1.0124527080674917,
+     "S2_pred": -3.0219811867851054,
+     "S2_pub": -2.853296354134585
+    },
+    "limit070": {
+     "S1_pred": -0.5793479751005569,
+     "S1_pub": -0.579072805025744,
+     "S2_pred": -2.5305267004695837,
+     "S2_pub": -2.5174547718498412
+    }
+   },
+   "breakeven_lambda_S1": null,
+   "breakeven_lambda_S2": null
+  },
+  {
+   "id": "residual:W200:R2_RESREV7",
+   "file": "residual_signals_dev.json",
+   "chance_small": 0.9135473748844105,
+   "chance_cum": 2.4436400871967314,
+   "base_s1": -0.6923173433024038,
+   "base_s2": -2.6643446522338188,
+   "cost_pct_capital": 58.615383666985146,
+   "cost0_s1": 0.2823265853182763,
+   "cost0_s2": -1.7869759099269118,
+   "halves_base": [
+    0.09498536939444155,
+    -2.096454603969955
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": -0.7209169543405093,
+     "S2": -2.722432676927647,
+     "alpha_t": -1.1760375068237052,
+     "halves": [
+      0.06638575835633606,
+      -2.1250542150080607
+     ],
+     "x2_S1": -1.724160493999295,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": -0.1891978783213529,
+     "S2": -2.2266405904172575,
+     "alpha_t": -0.3216136013977889,
+     "halves": [
+      0.5981048343754924,
+      -1.593335138988904
+     ],
+     "x2_S1": -0.6607223419609821,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": -0.4199438924428735,
+     "S2": -2.4417956468274262,
+     "alpha_t": -0.6924013339411109,
+     "halves": [
+      0.3673588202539718,
+      -1.8240811531104246
+     ],
+     "x2_S1": -1.1222143702040233,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": -0.6062268500203783,
+     "S2": -1.9184149464823423,
+     "alpha_t": -0.9857604294194362,
+     "halves": [
+      0.181075862676467,
+      -2.0103641106879295
+     ],
+     "x2_S1": -1.398789246350819,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": -1.724160493999295,
+     "S1_pub": -1.4989736056183383,
+     "S2_pred": -3.657889443928382,
+     "S2_pub": -3.395839536904298
+    },
+    "limit070": {
+     "S1_pred": -0.4199438924428735,
+     "S1_pub": -0.4112317750216153,
+     "S2_pred": -2.4417956468274262,
+     "S2_pub": -2.4138580245402226
+    }
+   },
+   "breakeven_lambda_S1": 0.2814138084699741,
+   "breakeven_lambda_S2": null
+  },
+  {
+   "id": "residual:U50:R3_IDIOVOL30",
+   "file": "residual_signals_dev.json",
+   "chance_small": 0.9135473748844105,
+   "chance_cum": 2.4436400871967314,
+   "base_s1": 0.12054314274965348,
+   "base_s2": -0.004873039304339428,
+   "cost_pct_capital": 14.740825161829662,
+   "cost0_s1": 0.348181624213811,
+   "cost0_s2": 0.4199783232575633,
+   "halves_base": [
+    -0.015450604580170356,
+    0.3067803725290034
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": 0.12372864678546987,
+     "S2": -0.0051169910758506075,
+     "alpha_t": 0.16000242885971233,
+     "halves": [
+      -0.012265100544353973,
+      0.3099658765648198
+     ],
+     "x2_S1": -0.10072433064287126,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": 0.24268872482249068,
+     "S2": 0.22018352552085876,
+     "alpha_t": 0.35555575604990536,
+     "halves": [
+      0.10669497749266685,
+      0.42892595460184063
+     ],
+     "x2_S1": 0.13719582543117037,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": 0.19106454001397222,
+     "S2": 0.1224116032241736,
+     "alpha_t": 0.270692991420199,
+     "halves": [
+      0.05507079268414838,
+      0.37730176979332214
+     ],
+     "x2_S1": 0.03394745581413345,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": 0.05248201981272573,
+     "S2": -0.05863960497340524,
+     "alpha_t": 0.057635692604532496,
+     "halves": [
+      -0.08351172751709812,
+      0.23871924959207566
+     ],
+     "x2_S1": -0.12483583235566378,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": -0.10072433064287126,
+     "S1_pub": -0.09180168203025753,
+     "S2_pred": -0.43021230540926453,
+     "S2_pub": -0.36726400912017726
+    },
+    "limit070": {
+     "S1_pred": 0.19106454001397222,
+     "S1_pub": 0.18850611158301214,
+     "S2_pred": 0.1224116032241736,
+     "S2_pub": 0.11921681579571741
+    }
+   },
+   "breakeven_lambda_S1": 1.5512452906755112,
+   "breakeven_lambda_S2": 0.9879627205868536
+  },
+  {
+   "id": "residual:W200:R3_IDIOVOL30",
+   "file": "residual_signals_dev.json",
+   "chance_small": 0.9135473748844105,
+   "chance_cum": 2.4436400871967314,
+   "base_s1": 0.01819165288210583,
+   "base_s2": 0.2495644224062105,
+   "cost_pct_capital": 27.01034958256299,
+   "cost0_s1": 0.5855154039738755,
+   "cost0_s2": 1.106440017465492,
+   "halves_base": [
+    0.7063175018190981,
+    -0.8017057189529573
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": 0.019766360010300087,
+     "S2": 0.26800784698449276,
+     "alpha_t": 0.03149678034816549,
+     "halves": [
+      0.7078922089472924,
+      -0.800131011824763
+     ],
+     "x2_S1": -0.5459826839532752,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": 0.31961335331099505,
+     "S2": 0.7123768973394224,
+     "alpha_t": 0.5151461220810644,
+     "halves": [
+      1.0077392022479874,
+      -0.500284018524068
+     ],
+     "x2_S1": 0.05371130264811467,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": true
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": 0.18949107319937275,
+     "S2": 0.5195374981287926,
+     "alpha_t": 0.3052605586875422,
+     "halves": [
+      0.877616922136365,
+      -0.6304062986356904
+     ],
+     "x2_S1": -0.20653325757512994,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": true,
+      "e": false
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": -0.06050157810846684,
+     "S2": 0.06788899684723515,
+     "alpha_t": -0.09784309558394079,
+     "halves": [
+      0.6276242708285255,
+      -0.88039894994353
+     ],
+     "x2_S1": -0.5074433228396914,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": -0.5459826839532752,
+     "S1_pub": -0.4201233275208094,
+     "S2_pred": -0.5704243234965065,
+     "S2_pub": -0.45887394587600094
+    },
+    "limit070": {
+     "S1_pred": 0.18949107319937275,
+     "S1_pub": 0.18133100411143807,
+     "S2_pred": 0.5195374981287926,
+     "S2_pub": 0.49941278606290823
+    }
+   },
+   "breakeven_lambda_S1": 1.034938388709982,
+   "breakeven_lambda_S2": 1.3196535825083378
+  },
+  {
+   "id": "residual:U50:R4_RESMAX28",
+   "file": "residual_signals_dev.json",
+   "chance_small": 0.9135473748844105,
+   "chance_cum": 2.4436400871967314,
+   "base_s1": -0.06764418507271881,
+   "base_s2": -0.18826375464778672,
+   "cost_pct_capital": 15.40209053896358,
+   "cost0_s1": 0.1519690667736236,
+   "cost0_s2": 0.06413925411557837,
+   "halves_base": [
+    0.010753159891991352,
+    -0.19036603224581258
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": -0.06932504651706921,
+     "S2": -0.19444176104231148,
+     "alpha_t": -0.15516188887266635,
+     "halves": [
+      0.009072298447640957,
+      -0.19204689369016298
+     ],
+     "x2_S1": -0.29061915980776204,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": 0.04796083352699798,
+     "S2": -0.05739382300862985,
+     "alpha_t": 0.03731428733073697,
+     "halves": [
+      0.12635817849170813,
+      -0.07476101364609579
+     ],
+     "x2_S1": -0.05604739971962764,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": -0.0029368125298613553,
+     "S2": -0.11686745649494451,
+     "alpha_t": -0.04621310988960787,
+     "halves": [
+      0.0754605324348488,
+      -0.12565865970295514
+     ],
+     "x2_S1": -0.15784269183334632,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": -0.07452276542905577,
+     "S2": -0.16194709425845127,
+     "alpha_t": -0.14961798421528513,
+     "halves": [
+      0.003874579535654397,
+      -0.19724461260214954
+     ],
+     "x2_S1": -0.2493451149287031,
+     "pos_both": false,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": false,
+      "d": false,
+      "e": false
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": -0.29061915980776204,
+     "S1_pub": -0.26665051295341513,
+     "S2_pred": -0.45302277620020137,
+     "S2_pub": -0.4088757345602663
+    },
+    "limit070": {
+     "S1_pred": -0.0029368125298613553,
+     "S1_pub": -0.002899275858180322,
+     "S2_pred": -0.11686745649494451,
+     "S2_pub": -0.11477432953623862
+    }
+   },
+   "breakeven_lambda_S1": 0.6867289170679224,
+   "breakeven_lambda_S2": 0.2480431677337753
+  },
+  {
+   "id": "residual:W200:R4_RESMAX28",
+   "file": "residual_signals_dev.json",
+   "chance_small": 0.9135473748844105,
+   "chance_cum": 2.4436400871967314,
+   "base_s1": 0.8143627759861768,
+   "base_s2": 0.16639716734634072,
+   "cost_pct_capital": 22.289429289952135,
+   "cost0_s1": 1.3601570327230255,
+   "cost0_s2": 0.9897624965463111,
+   "halves_base": [
+    1.0702346667294287,
+    0.47913859113166835
+   ],
+   "scenarios": {
+    "BREAKEVEN_FEE": {
+     "S1": 0.8698110636029461,
+     "S2": 0.17891847770134692,
+     "alpha_t": 1.394987935171938,
+     "halves": [
+      1.125682954346198,
+      0.5345868787484377
+     ],
+     "x2_S1": 0.37946509448286675,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "OPTIMISTIC": {
+     "S1": 1.129694427236588,
+     "S2": 0.608665807689178,
+     "alpha_t": 1.8118746818730027,
+     "halves": [
+      1.38556631797984,
+      0.7944702423820796
+     ],
+     "x2_S1": 0.8992318217501508,
+     "pos_both": true,
+     "conds": {
+      "a": true,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": true,
+      "e": true
+     },
+     "promising": false
+    },
+    "CENTRAL": {
+     "S1": 1.01691485433897,
+     "S2": 0.42217168335483624,
+     "alpha_t": 1.6309615653800882,
+     "halves": [
+      1.2727867450822221,
+      0.6816906694844617
+     ],
+     "x2_S1": 0.6736726759549144,
+     "pos_both": true,
+     "conds": {
+      "a": true,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    },
+    "CONSERVATIVE": {
+     "S1": 0.510330325992334,
+     "S2": 0.01267647283304342,
+     "alpha_t": 0.8184367974566141,
+     "halves": [
+      0.7662022167355859,
+      0.17510614113782552
+     ],
+     "x2_S1": 0.1229570103874713,
+     "pos_both": true,
+     "conds": {
+      "a": false,
+      "a_cum": false,
+      "b": false,
+      "c": true,
+      "d": false,
+      "e": true
+     },
+     "promising": false
+    }
+   },
+   "validation": {
+    "x2": {
+     "S1_pred": 0.37946509448286675,
+     "S1_pub": 0.30541413025524866,
+     "S2_pred": -0.6319255411436173,
+     "S2_pub": -0.5092484848547809
+    },
+    "limit070": {
+     "S1_pred": 1.01691485433897,
+     "S1_pub": 0.982606990499369,
+     "S2_pred": 0.42217168335483624,
+     "S2_pub": 0.4052184211913406
+    }
+   },
+   "breakeven_lambda_S1": 2.7738721604336076,
+   "breakeven_lambda_S2": 1.2206570851397704
+  }
+ ]
+}
