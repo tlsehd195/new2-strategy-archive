@@ -1,0 +1,24 @@
+{
+ "schema": "event_prereg_v1",
+ "status": "DRAFT_FORWARD_ONLY_NOT_ACTIVE (needs the user's explicit final confirmation; never reads validation, locked, paper or IW1 data; no DEV use)",
+ "written": "2026-11-02",
+ "written_before_any_result": true,
+ "data_state_when_written": "no forward listing has been recorded yet; the collector (run/discovery/newlisting_collect.py, ADR 0061) has not run anywhere",
+ "origin": "Rule D1 of STRONG_HYPOTHESES_20261102.md. The stop and size cap were designed AFTER seeing the DEV result of H_LIST (ADR 0060), so the DEV window is NOT evidence for this rule and is never re-tested with it.",
+ "id": "H_LIST_v2_forward",
+ "hypothesis": "Shorting a newly listed USDT perpetual at the open of D0+3 and holding 30 days, with a +50% fill-based stop and a per-event size cap, earns a positive per-event net return after real order-book cost, with no liquidation.",
+ "events": "every USDT PERPETUAL first seen by the collector after the baseline snapshot (late_start symbols are excluded). D0 = onboardDate.",
+ "trade": "SHORT at the first recorded price at or after D0+3 days 00:00 UTC (recorded 1m kline open). Exit at D0+33 days or at the first 1m kline whose high >= 1.5 x entry (exit at that stop level plus the recorded slippage to the next trade), whichever is first. Funding actually settled is added.",
+ "size": "at most 0.5% of capital per event (paper accounting only; no real orders are implied by this draft)",
+ "cost": "round trip from the recorded depth snapshots at the entry and exit times (walk the book for the order size). Labelled ESTIMATED_FROM_PUBLIC_DATA, not VERIFIED, until the user's real-account fills exist.",
+ "criteria_all_required": [
+  "a) at least 30 forward events (about 4-5 months at 7-10 listings per month)",
+  "b) month-clustered t of the per-event net return >= 2.0",
+  "c) mean net per event > 0 and mean after stop > 3 x mean cost",
+  "d) no event with a loss larger than the stop plus 5 percentage points of slippage; worst 5% of events reported",
+  "e) result also reported at 2 x cost"
+ ],
+ "trials": 1,
+ "stop_rule": "no peeking: the analysis runs once, when criterion a) is reached; interim looks are descriptive and cannot trigger or stop anything",
+ "not_done": "no activation, no window opened, no DEV re-run, no change of criteria or cost model"
+}
