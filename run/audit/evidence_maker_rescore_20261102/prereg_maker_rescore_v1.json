@@ -1,0 +1,23 @@
+{
+  "schema": "maker_rescore_prereg_v1",
+  "status": "DRAFT_FOR_DEV_ONLY (opens no validation, locked, paper or IW1 window; changes no criterion, no prereg v2/v3)",
+  "written": "2026-11-02",
+  "written_before_any_result": true,
+  "requested_by": "dongdong, 2026-11-02: re-run the earlier NOT_PROMISING candidates under the limit-order (maker) entry cost of ADR 0049, with non-fill and adverse-selection corrections, conservative and optimistic scenarios, DEV only, no S2 cherry-picking",
+  "question": "If the ADR 0049 limit-order cost ratio is applied to the slow daily/weekly cross-sectional candidates, how many are positive after cost on DEV, and do any pass the ADR 0040 conditions a-e?",
+  "method": "Cost re-pricing of already published DEV daily series. No new market data is read. For each candidate and segment, annualised return R(lambda) = R_cost0 - lambda*(R_cost0 - R_base), where cost0 and base rows come from the published JSON and lambda is the multiplier on the candidate's own cost. Volatility is taken from the cost0 row (sigma = R_cost0/SR_cost0 in return units) so SR(lambda) = R(lambda)/sigma. alpha_t and halves are shifted by the same linear rule (halves approximate). Linearity is validated BEFORE use against the published x2 rows (lambda=2) and, for residual signals, against the published cal_limit070 row (lambda=0.70).",
+  "candidate_set": "ALL hypotheses in the four published files, no selection by S1 or S2: broad_universe_lowliq.json (H1-H4, base=assumed row calibrated cost, cost0x, cost2x), cross_section_v2_dev.json (N1-N5, base=measured), alpha101_dev.json (A002..A101, base=measured), residual_signals_dev.json (8 rows, base=cal, cost2x=cal_x2). 25 candidates. The named focus in the request (H1, N4, A101, W200 R4) is reported first but judged by the same rules as the rest.",
+  "scenarios": {
+    "BREAKEVEN_FEE": "lambda=1.00: maker fee 4bp or more, no saving (ADR 0049); equals the published base row",
+    "OPTIMISTIC": "lambda=0.47 (ADR 0049 TOUCH boundary: fill on touch), no fill loss",
+    "CENTRAL": "lambda=0.70 (ADR 0049 base: QUEUE, 120 s, maker 2bp, unfilled orders CHASED with a taker order so every trade executes); no fill loss",
+    "CONSERVATIVE": "lambda=0.79 (ADR 0049 entry-limit/exit-market ABANDON ratio) AND fill-loss drag: gross return scaled by (1-h) with h=0.34 (worst-symbol non-fill rate at 120 s, ADA 66% fill) while the cost is NOT reduced for the missed legs; missed legs are the ones whose price ran away, so forgone gross is at least proportional. This is a bound, deliberately harsher than reality",
+    "sensitivity": "the lambda at which S1 net SR equals zero (cost break-even) is reported per candidate"
+  },
+  "positive_after_cost": "S1 net SR > 0 AND S2 net SR > 0 in the scenario. Reported per scenario for all 25.",
+  "judgement_conditions": "same as ADR 0040: a = S1 > chance maximum (null_max_sr_ann of the file: small-N value AND the cumulative-trials reference value), b = alpha t >= 2, c = both S1 halves positive, d = S2 > 0.5, e = x2-cost S1 > 0 (cost multiplier 2*lambda). A candidate is PROMISING only if a-e all hold in the CONSERVATIVE scenario; otherwise NOT_PROMISING. Nothing is relaxed; ADR 0055 found relaxed survivors are noise level.",
+  "adverse_selection_note": "ADR 0049 ratios were measured at a random-time order (and a top-tercile-volatility stress slice, ratio 0.67). Signals fire after large moves so real adverse selection can be worse; the conservative scenario carries that risk through h and lambda=0.79, and the break-even lambda shows how much worse it would have to be.",
+  "trials": "25 candidates are counted as 25 new DEV evaluations in dev_search_trials.jsonl (conservative; no new data, same series).",
+  "not_opened": ["validation", "locked", "IW1", "paper", "any prereg activation"],
+  "grade": "ESTIMATED_FROM_PUBLIC_DATA (cost ratio from ADR 0049) applied to DEV; never VERIFIED, never promotable."
+}
