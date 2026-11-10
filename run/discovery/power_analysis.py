@@ -106,6 +106,18 @@ def _dsr_best_of_null(rng: random.Random, n_dev: int, trials: int, min_dsr: floa
     return math.isfinite(d) and d >= min_dsr
 
 
+def wilson(k: int, n: int, z: float = 1.959963984540054) -> Optional[list]:
+    """95% Wilson score interval of a simulated pass rate k/n (ADR 0069): with
+    n_sims = 40 a rate is uncertain by up to ~0.15, and the interval says so."""
+    if n <= 0:
+        return None
+    p = k / n
+    den = 1 + z * z / n
+    c = (p + z * z / (2 * n)) / den
+    h = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / den
+    return [max(0.0, c - h), min(1.0, c + h)]
+
+
 def simulate(cfg: Mapping, promo: Mapping, *, progress=None) -> dict:
     from stats_mc import default_q, spending_alpha, stepm
     from strategy_spec import SUPPORTED_SYMBOLS
@@ -156,6 +168,12 @@ def simulate(cfg: Mapping, promo: Mapping, *, progress=None) -> dict:
             if sr == 0:
                 row["pass_dsr_best_of_null"] = dsr_best_null / n
             row["type2_all"] = 1.0 - row["power_all"]
+            # simulation uncertainty (ADR 0069): Wilson 95% per stage; for the product
+            # ALL = (V and CI) x DSR the interval multiplies the component bounds
+            ci_v, ci_vc, ci_d = wilson(v_pass, n), wilson(vc_pass, n), wilson(dsr_pass, n)
+            row["mc_ci95"] = {"power_validation_stepm": ci_v, "pass_ci": wilson(ci_pass, n),
+                              "pass_dsr": ci_d, "fwer_validation": wilson(any_null, n),
+                              "power_all": [ci_vc[0] * ci_d[0], ci_vc[1] * ci_d[1]]}
             rows.append(row)
             if progress:
                 progress(sc["name"], row)
@@ -176,7 +194,15 @@ def simulate(cfg: Mapping, promo: Mapping, *, progress=None) -> dict:
                        "pass_dsr_best_of_null": null["pass_dsr_best_of_null"]} if null else None),
             "min_detectable_sr_at_80pct_all_gates": mde,
             "validation_days_for_80pct_stepm_power_normal_approx": need,
-            "status": "OK" if mde is not None else "UNDETERMINED_POWER"})
+            "status": "OK" if mde is not None else "UNDETERMINED_POWER",
+            # gates NOT simulated here (cost stress, regimes, neighbourhood, walk-forward,
+            # concentration, PBO, portfolio layer): the power above is an UPPER bound
+            "gates_not_simulated": ["cost_stress", "regimes", "drawdown", "concentration",
+                                    "parameter_neighbourhood", "walk_forward", "pbo", "locked",
+                                    "portfolio_validation"],
+            "bootstrap_B_used": {"stepm": int(cfg["stepm_B"]), "ci": int(cfg["ci_B"]),
+                                 "pipeline_stepm": int(val["bootstrap_B"]),
+                                 "pipeline_ci": int(rob.get("ci_bootstrap_B", 500))}})
     return out
 
 

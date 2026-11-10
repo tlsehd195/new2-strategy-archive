@@ -178,6 +178,14 @@ def verify_rerun(bundle: Mapping, result: Mapping) -> list[str]:
                 out.append(f"{k} differs")
         if bundle.get("context_id") != result.get("context_id"):
             out.append("context differs (code, data, cost or config changed)")
+        # ADR 0070: equal counts are not a reproduction — the evaluation records
+        # themselves must match (which candidate passed, not only how many)
+        bl, rl = bundle.get("ledgers") or {}, result.get("ledgers") or {}
+        for n in ("evaluations.jsonl", "statuses.jsonl"):
+            if bl.get(n) is not None and rl.get(n) is not None and bl[n] != rl[n]:
+                out.append(f"{n} sha256 differs")
+            elif bl.get(n) is not None and rl.get(n) is None:
+                out.append(f"{n} missing from the re-run")
     else:
         out.append(f"unknown bundle kind {bundle.get('kind')!r}")
     return out

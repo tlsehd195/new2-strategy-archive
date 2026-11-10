@@ -102,6 +102,26 @@ COLUMN_ALIASES = {
     "maker": "maker", "role": "role", "liquidity": "role",
 }
 REQUIRED = ("symbol", "time", "side", "price", "qty", "order_id", "trade_id", "fee", "fee_asset")
+#: text that marks a non-real account inside an export (ADR 0069); case-insensitive
+NON_REAL_MARKERS = (b"demo trading", b"demo account", b"simulated trading", b"paper trading",
+                    b"testnet", b"mock trading", "\ubaa8\uc758\ud22c\uc790".encode("utf-8"),
+                    "\ubaa8\uc758 \uac70\ub798".encode("utf-8"))
+
+
+def real_fill_evidence_status(records) -> dict:
+    """NO_REAL_FILL_EVIDENCE until at least one cost-verification record built
+    from a declared real account exists; otherwise the counts per account kind
+    (a declared kind is still only a declaration — VERIFIED needs every check of
+    cost_calibration on top)."""
+    kinds: dict = {}
+    for r in records or []:
+        k = ((r.get("import") or {}).get("account_kind") or r.get("account_kind") or "unknown")
+        kinds[k] = kinds.get(k, 0) + int((r.get("import") or {}).get("valid_fills") or r.get("n_observations") or 0)
+    real = kinds.get("real", 0)
+    return {"status": "NO_REAL_FILL_EVIDENCE" if real == 0 else "REAL_FILLS_DECLARED",
+            "fills_by_account_kind": kinds,
+            "note": "demo / paper / unknown / synthetic fills never count; 'real' is the user's "
+                    "declaration checked only against export markers, not proof"}
 
 
 class FillImportError(ValueError):
@@ -673,6 +693,13 @@ def import_fills(path: Path, *, fmt: Optional[str] = None, policy_path: Optional
     policy, phash = load_import_policy(policy_path)
     raw = Path(path).read_bytes()
     sha = hashlib.sha256(raw).hexdigest()
+    if account_kind == "real":
+        # the declared kind is not proof (ADR 0069): an export whose own text says it
+        # comes from a demo / paper / testnet account is never imported as real
+        hit = sorted(m.decode() for m in NON_REAL_MARKERS if m in raw.lower())
+        if hit:
+            raise FillImportError(f"account_kind 'real' contradicts the export content ({hit}); "
+                                  "demo, paper and testnet fills are never real-account evidence")
     fmt = fmt or detect_format(path)
     report = {"import_version": IMPORT_VERSION, "policy_hash": phash, "source_sha256": sha,
               "source_format": fmt, "source_bytes": len(raw), "data_origin": data_origin,

@@ -144,12 +144,14 @@ class ReverifyQueue:
         for i, item in enumerate(self._items):
             nxt = item.get("next_retry_after_ts", 0)
             if now >= float(nxt or 0):
-                self._items.pop(i)
-                self.save()
-                # REVERIFY_PENDING -> PENDING is the only legal promotion
+                # promote FIRST, then drop the item (ADR 0070): a crash between
+                # the two leaves a PENDING candidate with a stale item (dropped
+                # by reconcile) instead of a REVERIFY_PENDING one with no item
                 cur = self.store.entry(item["strategy_id"])
                 if CandidateState(cur.state) is CandidateState.REVERIFY_PENDING:
                     self.store.set(item["strategy_id"], CandidateState.PENDING)
+                self._items.pop(i)
+                self.save()
                 return item
         return None
 
@@ -317,7 +319,18 @@ def reconcile(store: CandidateStore, queue: ReverifyQueue, ledger: Ledger,
             # PASS (final) or RUNNING (in flight): queue must not resurrect
             report["dropped_queue_items"].append(sid)
             continue
-    if len(keep) != len(queue.items()):
+    changed = len(keep) != len(queue.items())
+    # ADR 0070: a REVERIFY_PENDING candidate without a queue item (a crash after
+    # an item was removed, or a lost queue file) would never be evaluated again
+    queued = {i.get("strategy_id") for i in keep}
+    report["orphans_requeued"] = []
+    for sid in sorted(store.all_states()):
+        if sid not in queued and CandidateState(store.entry(sid).state) is CandidateState.REVERIFY_PENDING:
+            keep.append({"strategy_id": sid, "reason": "orphan_requeue (no queue item)",
+                         "queued_at": iso_now(), "next_retry_after_ts": 0})
+            report["orphans_requeued"].append(sid)
+            changed = True
+    if changed:
         queue._items = keep
         queue.save()
     return report
