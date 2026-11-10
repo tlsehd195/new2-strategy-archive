@@ -22,8 +22,9 @@ IW2 = DISC.parent / "audit" / "evidence_paper_faithful_20261022" / "independent_
 
 
 class PromoV4Test(unittest.TestCase):
-    def test_v3_is_still_the_default(self):
-        self.assertEqual(pipeline.DEFAULT_PROMOTION_CONFIG.name, "promotion_v3.json")
+    def test_v5_is_the_default_and_v3_unchanged(self):
+        # ADR 0064: the default moved from v3 to v5 (= v4 + DSR / CI gates)
+        self.assertEqual(pipeline.DEFAULT_PROMOTION_CONFIG.name, "promotion_v5.json")
         self.assertNotIn("studentize", V3["validation"])
 
     def test_v4_loads_and_is_a_draft(self):

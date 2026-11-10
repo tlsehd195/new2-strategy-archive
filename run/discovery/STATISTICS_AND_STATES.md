@@ -219,6 +219,10 @@ promotable.
 - **Robustness filters** (cost ×1.5/×2, regimes, MDD, concentration, DEV
   parameter neighbours, walk-forward, sample size, PBO/CSCV over all DEV
   trials) only remove candidates; an uncomputable PBO is `BLOCKED_STATISTICS`.
+  Under `promotion_v5.json` (default, §10.4) the deflated Sharpe ratio
+  (DSR ≥ 0.95) and the stationary-bootstrap CI of the validation mean
+  (lower bound > 0) are gates as well; before v5 they were recorded as
+  informational and never removed a candidate.
 - **Locked windows = campaigns** (`state/locked_window_campaigns.jsonl`,
   shared with the legacy path): members and alpha fixed before access;
   campaign c on a window gets `alpha_total·6/π²/c²`, Bonferroni inside; at
@@ -386,3 +390,29 @@ near group, counting batches already preregistered in the context.  Lineage
 records candidate id, parents, generation, operator, changed parameters, seed
 and fingerprint version.  The evolution report shows representative,
 duplicate and reason per decision.
+
+### 10.4 DSR and bootstrap CI gate; one default policy (`promotion_v5.json`, ADR 0064)
+
+Up to v4 `robustness()` stored DSR and the bootstrap CI with `"gating": false`,
+so a candidate with DSR 0.59, or whose CI included 0, could reach
+`VALIDATION_SURVIVOR`.  v5 = v4 + four robustness keys and nothing else:
+
+| key | value | meaning |
+|---|---|---|
+| `dsr_gating`, `min_dsr`, `dsr_min_days` | true, 0.95, 30 | DEV deflated Sharpe vs the trial set must be ≥ 0.95 |
+| `dsr_trial_set` | `search_pool` | DSR and PBO trials = latest DEV series of every strategy in the search pool (robustness neighbours excluded), so the result does not depend on evaluation order |
+| `ci_gating`, `ci_lower_bound_min_bp`, `ci_bootstrap_B`, `ci_min_days` | true, 0.0, 2000, 30 | the lower bound of the 95 % stationary-bootstrap CI of the validation daily mean must be > 0 |
+
+A check that **fails** makes the candidate `REJECTED`.  A check that **cannot
+be computed** (too few days, fewer than two trials, no variance) never passes:
+if every failed check is uncomputable the status is `BLOCKED_STATISTICS` with
+reasons `INSUFFICIENT_DATA: …` (`resume_to` `VALIDATION_SURVIVOR`).  It resumes
+only when DSR/PBO become computable from more DEV trials; a CI-days shortfall
+never resumes, because the validation window is not extended.  The robustness
+record stores `not_computable` and `config_version`; the config hash is part of
+the context id.  v3 and v4 stay loadable (`--promotion-config`) for the record.
+
+Power of these gates (`power_analysis.py`, `config/power_analysis_v1.json`,
+synthetic only, fixed seed; result in
+`run/audit/evidence_power_20261110/power_v1.json`) is summarised in ADR 0064.
+

@@ -24,9 +24,10 @@ from test_pipeline import EDGE, NOISE, PipelineCase, SyntheticProvider  # noqa: 
 
 
 class TestSearchWideFamily(unittest.TestCase):
-    def test_default_config_is_v3_and_only_tightens_v2(self):
-        v3, _ = load_promotion_config()
-        self.assertEqual(DEFAULT_PROMOTION_CONFIG.name, "promotion_v3.json")
+    def test_v3_only_tightens_v2(self):
+        # the default is promotion_v5.json since ADR 0064 (tested there); v3 keeps its meaning
+        v3, _ = load_promotion_config(DISC / "config" / "promotion_v3.json")
+        self.assertEqual(DEFAULT_PROMOTION_CONFIG.name, "promotion_v5.json")
         v2 = json.loads((DISC / "config" / "promotion_v2.json").read_text())
         for sec in ("validation", "locked"):
             self.assertLessEqual(window_alpha_total(v3[sec]), window_alpha_total(v2[sec]))

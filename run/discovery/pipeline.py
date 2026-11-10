@@ -82,7 +82,8 @@ def load_selection_config(path: Path = DEFAULT_SELECTION_CONFIG) -> dict:
     if keys is None or not all(isinstance(cfg.get(k), bool) for k in keys):
         raise ValueError(f"{path}: not a candidate_selection_v1/v2 config")
     return {"one_per_near_entry_signal": False, **cfg}
-DEFAULT_PROMOTION_CONFIG = Path(__file__).resolve().parent / "config" / "promotion_v3.json"
+#: one default policy (ADR 0064): promo-v5 = v4 + DSR and bootstrap-CI gates
+DEFAULT_PROMOTION_CONFIG = Path(__file__).resolve().parent / "config" / "promotion_v5.json"
 #: append-only record of validation batches run on the real validation windows
 #: in state directories that no longer exist (ADR 0013).  Alpha spending is per
 #: window, not per state directory: a fresh directory must not restart at k = 1.
@@ -656,13 +657,17 @@ class EvolutionPipeline:
         if metrics["dev_cost_share"] > sc["max_cost_share"]:
             fails.append("dev_cost_share_too_high")
         metrics["screen_pass"] = not fails
+        # series first: an interrupted run must never leave an OK record without
+        # its series (resume skips the record, and the strategy would silently
+        # drop out of the DSR/PBO trial set).  A series without a record is
+        # re-evaluated on resume; readers take the latest row.
+        append_jsonl(self.series_path, {"strategy_id": sid, "context_id": ctx,
+                                        "series": {s: [d0, [round(v, 6) for v in vals]]
+                                                   for s, (d0, vals) in day_series.items()}})
         rec = self._append_eval({**base, "status": "OK", "metrics": metrics, "per_symbol": per,
                                  "screen": {"pass": not fails, "failures": fails,
                                             "config_hash": self.cfg_hash},
                                  "dataset": {s: data[s]["identity"] for s in data}})
-        append_jsonl(self.series_path, {"strategy_id": sid, "context_id": ctx,
-                                        "series": {s: [d0, [round(v, 6) for v in vals]]
-                                                   for s, (d0, vals) in day_series.items()}})
         if record_status:
             self._dev_status(sid, rec)
         return rec
@@ -970,10 +975,27 @@ class EvolutionPipeline:
                     continue
                 if (st["status"] == "RESEARCH_ONLY" and self.evaluation("robustness", m) is None) or (
                         st["status"] == "BLOCKED_STATISTICS" and st["stage"] == "robustness"
-                        and self._pbo()["computable"]):
+                        and self._blocked_now_computable(m)):
                     self.robustness(m)
                     out.append(m)
         return out
+
+    def _blocked_now_computable(self, sid: str) -> bool:
+        """A robustness record blocked only by not-computable checks may be redone
+        once those checks can be computed (more strategies in the trial set).  The
+        validation-day CI cannot change (fixed window), so it never resumes."""
+        rec = self.evaluation("robustness", sid) or {}
+        nc = rec.get("not_computable")
+        if nc is None:                         # records before ADR 0064: PBO only
+            nc = ["pbo"]
+        if not nc or "bootstrap_ci" in nc:
+            return False
+        ok = True
+        if "pbo" in nc:
+            ok &= bool(self._pbo()["computable"])
+        if "dsr" in nc:
+            ok &= bool(self._dsr(sid)["computable"])
+        return ok
 
     def variation_report(self) -> list[dict]:
         """Parent -> child DEV comparisons (Diebold-Mariano on the daily
@@ -1031,10 +1053,24 @@ class EvolutionPipeline:
         return out
 
     # -- stage 3: robustness (filters only) ---------------------------------------------
-    def _pbo(self) -> dict:
+    def _trial_series(self) -> dict:
+        """{strategy id: latest DEV series row} of the trial set used by PBO and DSR.
+
+        promo-v5 (``dsr_trial_set = "search_pool"``, ADR 0064): the strategies the
+        search could select from (seeds and search children).  Robustness
+        neighbours are DEV-evaluated only after their centre passed validation;
+        counting them made the trial set — and so PBO and DSR — depend on which
+        validation survivor was checked first.  Older configs keep their recorded
+        meaning (every DEV series of the context)."""
         ctx = self.context_id()
-        rows = [r for r in iter_jsonl(self.series_path) if r["context_id"] == ctx]
-        latest = {r["strategy_id"]: r for r in rows}
+        latest = {r["strategy_id"]: r for r in iter_jsonl(self.series_path) if r["context_id"] == ctx}
+        if self.cfg["robustness"].get("dsr_trial_set") == "search_pool":
+            pool = self.search_pool()
+            latest = {k: v for k, v in latest.items() if k in pool}
+        return latest
+
+    def _pbo(self) -> dict:
+        latest = self._trial_series()
         if len(latest) < self.cfg["robustness"]["pbo_min_trials"]:
             return {"computable": False, "trials": len(latest)}
         pooled: dict[str, dict[int, float]] = {}
@@ -1058,8 +1094,8 @@ class EvolutionPipeline:
         number of effectively independent trials is unknowable here and the
         daily series of one search are strongly dependent."""
         from engine_lib import deflated_sharpe
-        ctx = self.context_id()
-        latest = {r["strategy_id"]: r for r in iter_jsonl(self.series_path) if r["context_id"] == ctx}
+        latest = self._trial_series()
+        min_days = int(self.cfg["robustness"].get("dsr_min_days", 30))
 
         def pooled(r):
             acc: dict[int, float] = {}
@@ -1071,7 +1107,7 @@ class EvolutionPipeline:
         srs = {}
         for s_, r in latest.items():
             x = pooled(r)
-            if len(x) < 30:
+            if len(x) < min_days:
                 continue
             mu = sum(x) / len(x)
             sd = (sum((v - mu) ** 2 for v in x) / (len(x) - 1)) ** 0.5
@@ -1172,14 +1208,23 @@ class EvolutionPipeline:
         days = sorted(by_day)
         ser = [by_day.get(d, 0.0) for d in range(days[0], days[-1] + 1)] if days else []
         ci = None
-        if len(ser) >= 10:
+        nb_ci = int(rc.get("ci_bootstrap_B", 500))
+        if len(ser) >= int(rc.get("ci_min_days", 10)):
             rng = random.Random(self.cfg["validation"]["bootstrap_seed"])
             q = default_q(len(ser))
             ms = sorted(sum(ser[i] for i in stationary_bootstrap_indices(len(ser), q, rng)) / len(ser)
-                        for _ in range(500))
+                        for _ in range(nb_ci))
             a = (1 - rc["ci_level"]) / 2
-            ci = [ms[int(a * 500)], ms[int((1 - a) * 500) - 1]]
-        checks["bootstrap_ci"] = {"pass": True, "ci_mean_daily_bp": ci, "gating": False}
+            ci = [ms[int(a * nb_ci)], ms[int((1 - a) * nb_ci) - 1]]
+        if rc.get("ci_gating"):
+            # promo-v5 (ADR 0064): the CI must exclude ci_lower_bound_min_bp from below;
+            # too few validation days is INSUFFICIENT_DATA, never a pass
+            checks["bootstrap_ci"] = {"pass": ci is not None and ci[0] > rc["ci_lower_bound_min_bp"],
+                                      "computable": ci is not None, "ci_mean_daily_bp": ci,
+                                      "n_days": len(ser), "B": nb_ci, "gating": True,
+                                      "lower_bound_min_bp": rc["ci_lower_bound_min_bp"]}
+        else:
+            checks["bootstrap_ci"] = {"pass": True, "ci_mean_daily_bp": ci, "gating": False}
         # parameter neighbourhood (DEV data only)
         nb = neighbours(spec)
         nb_means = []
@@ -1206,19 +1251,34 @@ class EvolutionPipeline:
         # overfitting probability of the whole search (CSCV on DEV series)
         pbo = self._pbo()
         checks["pbo"] = {"pass": bool(pbo["computable"]) and pbo["pbo"] <= rc["max_pbo"], **pbo}
-        checks["dsr"] = {"pass": True, "gating": False, **self._dsr(sid)}
+        dsr = self._dsr(sid)
+        if rc.get("dsr_gating"):
+            # promo-v5 (ADR 0064): DSR below min_dsr fails; not computable (too few DEV
+            # days or trials) is INSUFFICIENT_DATA, never a pass
+            checks["dsr"] = {**dsr, "pass": bool(dsr["computable"]) and dsr["dsr"] >= rc["min_dsr"],
+                             "gating": True, "min_dsr": rc["min_dsr"]}
+        else:
+            checks["dsr"] = {"pass": True, "gating": False, **dsr}
         failed = sorted(k for k, v in checks.items() if not v["pass"])
+        # failures that only say "cannot be computed yet" (PBO / DSR / CI) are
+        # INSUFFICIENT_DATA: blocked, resumable — never REJECTED and never a pass
+        not_computable = sorted(k for k in failed if checks[k].get("computable") is False)
         rec = self._append_eval({"stage": "robustness", "strategy_id": sid, "context_id": ctx,
                                  "status": "OK", "checks": checks, "failed": failed,
-                                 "config_hash": self.cfg_hash})
+                                 "not_computable": not_computable,
+                                 "config_hash": self.cfg_hash,
+                                 "config_version": self.cfg.get("version")})
         ev = {"dev": dev["record_id"], "validation": self.evaluation("validation", sid)["record_id"],
               "robustness": rec["record_id"]}
         if not failed:
             self.statuses.set(sid, ctx, "VALIDATION_SURVIVOR", stage="robustness", evidence=ev)
-        elif failed == ["pbo"] and not pbo["computable"]:
+        elif failed == not_computable:
+            why = {"pbo": f"PBO not computable ({pbo['trials']} trials)",
+                   "dsr": f"DSR not computable ({checks['dsr'].get('trials')} trials)",
+                   "bootstrap_ci": f"bootstrap CI not computable ({checks['bootstrap_ci'].get('n_days')} days)"}
             self.statuses.set(sid, ctx, "BLOCKED_STATISTICS", stage="robustness",
-                              reasons=[f"PBO not computable ({pbo['trials']} trials)"], evidence=ev,
-                              resume_to="VALIDATION_SURVIVOR")
+                              reasons=["INSUFFICIENT_DATA: " + why.get(k, k) for k in not_computable],
+                              evidence=ev, resume_to="VALIDATION_SURVIVOR")
         else:
             self.statuses.set(sid, ctx, "REJECTED", stage="robustness",
                               reasons=[f"robustness failed: {', '.join(failed)}"], evidence=ev)

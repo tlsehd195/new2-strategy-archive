@@ -1,0 +1,391 @@
+{
+ "config": {
+  "ar1_phi": 0.1,
+  "batch_m": 10,
+  "ci_B": 500,
+  "dev_days": 1000,
+  "dev_trials": 900,
+  "n_sims": 40,
+  "note": "ADR 0064. Synthetic power of the promo-v5 confirmatory gates at the sample sizes of the current design. validation_days 175 = VALIDATION_MONTHS 6 (180 d) minus the embargo; batch_index 8 = the next batch on the BTC/ETH validation windows (7 recorded in validation_window_history.jsonl); dev_days ~ BTC DEV span 2021-01..2023-09; dev_trials ~ R6 (894 DEV evaluations). batch_m 10 (max_batch_size is 20; 10 keeps the bootstrap-t StepM affordable and is optimistic for power). Changing a value is a new file version.",
+  "scenarios": [
+   {
+    "batch_index": 8,
+    "name": "BTC_or_ETH_validation_next_batch_k8",
+    "validation_days": 175
+   },
+   {
+    "batch_index": 1,
+    "name": "fresh_6m_window_k1",
+    "validation_days": 175
+   },
+   {
+    "batch_index": 1,
+    "name": "regime_half_of_fresh_window_k1",
+    "validation_days": 88
+   },
+   {
+    "batch_index": 1,
+    "name": "fresh_12m_window_k1",
+    "validation_days": 365
+   }
+  ],
+  "schema": "power_analysis_config_v1",
+  "seed": 20261110,
+  "sr_grid": [
+   0.0,
+   1.0,
+   2.0,
+   3.0,
+   4.0
+  ],
+  "stepm_B": 200,
+  "t_df": 4
+ },
+ "config_sha256": "411d0343e3b7534c478edf5774cd2cd1525b1693d54ed99de06b06613f70d86e",
+ "data": "synthetic only (no market data read)",
+ "promotion_config": {
+  "hash": "619b16b9a8504100",
+  "version": "promo-v5"
+ },
+ "python": "3.13.18",
+ "runtime_seconds": 1929.9,
+ "scenarios": [
+  {
+   "alpha_window": 0.00023747152416172922,
+   "batch_index": 8,
+   "batch_m": 10,
+   "min_detectable_sr_at_80pct_all_gates": null,
+   "name": "BTC_or_ETH_validation_next_batch_k8",
+   "rows": [
+    {
+     "fdr_validation": 0.0,
+     "fwer_validation": 0.0,
+     "n_sims": 40,
+     "pass_ci": 0.0,
+     "pass_dsr": 0.0,
+     "pass_dsr_best_of_null": 0.0,
+     "power_all": 0.0,
+     "power_validation_stepm": 0.0,
+     "seed": 4286940635,
+     "sr_annual": 0.0,
+     "type2_all": 1.0
+    },
+    {
+     "fdr_validation": 0.0,
+     "fwer_validation": 0.0,
+     "n_sims": 40,
+     "pass_ci": 0.2,
+     "pass_dsr": 0.0,
+     "power_all": 0.0,
+     "power_validation_stepm": 0.0,
+     "seed": 2073717995,
+     "sr_annual": 1.0,
+     "type2_all": 1.0
+    },
+    {
+     "fdr_validation": 0.0,
+     "fwer_validation": 0.0,
+     "n_sims": 40,
+     "pass_ci": 0.225,
+     "pass_dsr": 0.2,
+     "power_all": 0.005000000000000001,
+     "power_validation_stepm": 0.025,
+     "seed": 2735215388,
+     "sr_annual": 2.0,
+     "type2_all": 0.995
+    },
+    {
+     "fdr_validation": 0.5,
+     "fwer_validation": 0.025,
+     "n_sims": 40,
+     "pass_ci": 0.525,
+     "pass_dsr": 0.6,
+     "power_all": 0.015,
+     "power_validation_stepm": 0.025,
+     "seed": 1441227165,
+     "sr_annual": 3.0,
+     "type2_all": 0.985
+    },
+    {
+     "fdr_validation": 0.0,
+     "fwer_validation": 0.0,
+     "n_sims": 40,
+     "pass_ci": 0.75,
+     "pass_dsr": 0.9,
+     "power_all": 0.18000000000000002,
+     "power_validation_stepm": 0.2,
+     "seed": 3075854259,
+     "sr_annual": 4.0,
+     "type2_all": 0.82
+    }
+   ],
+   "status": "UNDETERMINED_POWER",
+   "type1": {
+    "fwer_validation": 0.0,
+    "pass_ci_null": 0.0,
+    "pass_dsr_best_of_null": 0.0,
+    "pass_dsr_single_null": 0.0
+   },
+   "validation_days": 175,
+   "validation_days_for_80pct_stepm_power_normal_approx": {
+    "1.0": 10752,
+    "2.0": 2688,
+    "3.0": 1195,
+    "4.0": 672
+   }
+  },
+  {
+   "alpha_window": 0.01519817754635067,
+   "batch_index": 1,
+   "batch_m": 10,
+   "min_detectable_sr_at_80pct_all_gates": null,
+   "name": "fresh_6m_window_k1",
+   "rows": [
+    {
+     "fdr_validation": 0.0,
+     "fwer_validation": 0.0,
+     "n_sims": 40,
+     "pass_ci": 0.05,
+     "pass_dsr": 0.0,
+     "pass_dsr_best_of_null": 0.0,
+     "power_all": 0.0,
+     "power_validation_stepm": 0.0,
+     "seed": 2289272096,
+     "sr_annual": 0.0,
+     "type2_all": 1.0
+    },
+    {
+     "fdr_validation": 0.5,
+     "fwer_validation": 0.025,
+     "n_sims": 40,
+     "pass_ci": 0.175,
+     "pass_dsr": 0.0,
+     "power_all": 0.0,
+     "power_validation_stepm": 0.025,
+     "seed": 973611366,
+     "sr_annual": 1.0,
+     "type2_all": 1.0
+    },
+    {
+     "fdr_validation": 0.0,
+     "fwer_validation": 0.0,
+     "n_sims": 40,
+     "pass_ci": 0.325,
+     "pass_dsr": 0.1,
+     "power_all": 0.010000000000000002,
+     "power_validation_stepm": 0.1,
+     "seed": 1745015227,
+     "sr_annual": 2.0,
+     "type2_all": 0.99
+    },
+    {
+     "fdr_validation": 0.125,
+     "fwer_validation": 0.025,
+     "n_sims": 40,
+     "pass_ci": 0.65,
+     "pass_dsr": 0.65,
+     "power_all": 0.11374999999999999,
+     "power_validation_stepm": 0.175,
+     "seed": 2477597640,
+     "sr_annual": 3.0,
+     "type2_all": 0.88625
+    },
+    {
+     "fdr_validation": 0.0,
+     "fwer_validation": 0.0,
+     "n_sims": 40,
+     "pass_ci": 0.625,
+     "pass_dsr": 0.95,
+     "power_all": 0.285,
+     "power_validation_stepm": 0.3,
+     "seed": 3499843390,
+     "sr_annual": 4.0,
+     "type2_all": 0.7150000000000001
+    }
+   ],
+   "status": "UNDETERMINED_POWER",
+   "type1": {
+    "fwer_validation": 0.0,
+    "pass_ci_null": 0.05,
+    "pass_dsr_best_of_null": 0.0,
+    "pass_dsr_single_null": 0.0
+   },
+   "validation_days": 175,
+   "validation_days_for_80pct_stepm_power_normal_approx": {
+    "1.0": 6460,
+    "2.0": 1615,
+    "3.0": 718,
+    "4.0": 404
+   }
+  },
+  {
+   "alpha_window": 0.01519817754635067,
+   "batch_index": 1,
+   "batch_m": 10,
+   "min_detectable_sr_at_80pct_all_gates": null,
+   "name": "regime_half_of_fresh_window_k1",
+   "rows": [
+    {
+     "fdr_validation": 1.0,
+     "fwer_validation": 0.025,
+     "n_sims": 40,
+     "pass_ci": 0.05,
+     "pass_dsr": 0.0,
+     "pass_dsr_best_of_null": 0.0,
+     "power_all": 0.0,
+     "power_validation_stepm": 0.0,
+     "seed": 1125864747,
+     "sr_annual": 0.0,
+     "type2_all": 1.0
+    },
+    {
+     "fdr_validation": 0.0,
+     "fwer_validation": 0.0,
+     "n_sims": 40,
+     "pass_ci": 0.1,
+     "pass_dsr": 0.0,
+     "power_all": 0.0,
+     "power_validation_stepm": 0.0,
+     "seed": 3801108746,
+     "sr_annual": 1.0,
+     "type2_all": 1.0
+    },
+    {
+     "fdr_validation": 0.0,
+     "fwer_validation": 0.0,
+     "n_sims": 40,
+     "pass_ci": 0.2,
+     "pass_dsr": 0.025,
+     "power_all": 0.0,
+     "power_validation_stepm": 0.0,
+     "seed": 3592805417,
+     "sr_annual": 2.0,
+     "type2_all": 1.0
+    },
+    {
+     "fdr_validation": 0.2,
+     "fwer_validation": 0.025,
+     "n_sims": 40,
+     "pass_ci": 0.5,
+     "pass_dsr": 0.5,
+     "power_all": 0.05,
+     "power_validation_stepm": 0.1,
+     "seed": 4014475010,
+     "sr_annual": 3.0,
+     "type2_all": 0.95
+    },
+    {
+     "fdr_validation": 0.0,
+     "fwer_validation": 0.0,
+     "n_sims": 40,
+     "pass_ci": 0.475,
+     "pass_dsr": 0.925,
+     "power_all": 0.09250000000000001,
+     "power_validation_stepm": 0.1,
+     "seed": 2024114800,
+     "sr_annual": 4.0,
+     "type2_all": 0.9075
+    }
+   ],
+   "status": "UNDETERMINED_POWER",
+   "type1": {
+    "fwer_validation": 0.025,
+    "pass_ci_null": 0.05,
+    "pass_dsr_best_of_null": 0.0,
+    "pass_dsr_single_null": 0.0
+   },
+   "validation_days": 88,
+   "validation_days_for_80pct_stepm_power_normal_approx": {
+    "1.0": 6460,
+    "2.0": 1615,
+    "3.0": 718,
+    "4.0": 404
+   }
+  },
+  {
+   "alpha_window": 0.01519817754635067,
+   "batch_index": 1,
+   "batch_m": 10,
+   "min_detectable_sr_at_80pct_all_gates": null,
+   "name": "fresh_12m_window_k1",
+   "rows": [
+    {
+     "fdr_validation": 0.0,
+     "fwer_validation": 0.0,
+     "n_sims": 40,
+     "pass_ci": 0.05,
+     "pass_dsr": 0.0,
+     "pass_dsr_best_of_null": 0.0,
+     "power_all": 0.0,
+     "power_validation_stepm": 0.0,
+     "seed": 1511740955,
+     "sr_annual": 0.0,
+     "type2_all": 1.0
+    },
+    {
+     "fdr_validation": 0.0,
+     "fwer_validation": 0.0,
+     "n_sims": 40,
+     "pass_ci": 0.2,
+     "pass_dsr": 0.025,
+     "power_all": 0.0006250000000000001,
+     "power_validation_stepm": 0.025,
+     "seed": 3531939342,
+     "sr_annual": 1.0,
+     "type2_all": 0.999375
+    },
+    {
+     "fdr_validation": 0.0,
+     "fwer_validation": 0.0,
+     "n_sims": 40,
+     "pass_ci": 0.425,
+     "pass_dsr": 0.1,
+     "power_all": 0.010000000000000002,
+     "power_validation_stepm": 0.1,
+     "seed": 3872700054,
+     "sr_annual": 2.0,
+     "type2_all": 0.99
+    },
+    {
+     "fdr_validation": 0.05,
+     "fwer_validation": 0.025,
+     "n_sims": 40,
+     "pass_ci": 0.775,
+     "pass_dsr": 0.65,
+     "power_all": 0.30874999999999997,
+     "power_validation_stepm": 0.475,
+     "seed": 439491033,
+     "sr_annual": 3.0,
+     "type2_all": 0.69125
+    },
+    {
+     "fdr_validation": 0.03571428571428571,
+     "fwer_validation": 0.025,
+     "n_sims": 40,
+     "pass_ci": 0.975,
+     "pass_dsr": 0.95,
+     "power_all": 0.64125,
+     "power_validation_stepm": 0.675,
+     "seed": 2374111029,
+     "sr_annual": 4.0,
+     "type2_all": 0.35875
+    }
+   ],
+   "status": "UNDETERMINED_POWER",
+   "type1": {
+    "fwer_validation": 0.0,
+    "pass_ci_null": 0.05,
+    "pass_dsr_best_of_null": 0.0,
+    "pass_dsr_single_null": 0.0
+   },
+   "validation_days": 365,
+   "validation_days_for_80pct_stepm_power_normal_approx": {
+    "1.0": 6460,
+    "2.0": 1615,
+    "3.0": 718,
+    "4.0": 404
+   }
+  }
+ ],
+ "version": "power-analysis-v1"
+}

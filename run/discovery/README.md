@@ -103,9 +103,10 @@ window) → robustness filters → one locked-window campaign → promotion revi
 → isolated paper replay.  State lives in `state/evolution/` (specs, lineage,
 evaluations, statuses, batches, rounds, search state, reviews, paper runs) and
 `state/locked_window_campaigns.jsonl` (shared with the legacy path).  Gates
-are in `config/promotion_v3.json` (its hash is part of the context; v1 and v2 are
-kept for the record — v3 makes the whole search one FWER family per window, see
-`STATISTICS_AND_STATES.md` §10).
+are in `config/promotion_v5.json` (the single default; its version and hash are
+part of the context and of every robustness record; v1–v4 are kept for the
+record — v3 makes the whole search one FWER family per window, v4 tightens PBO,
+v5 makes DSR and the bootstrap CI gating, see `STATISTICS_AND_STATES.md` §10).
 `PAPER_TEST_READY` means "eligible for an isolated paper replay" — never
 "profitable", never live trading (no order code exists).
 
