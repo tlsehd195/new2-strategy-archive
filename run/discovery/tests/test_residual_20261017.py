@@ -25,6 +25,10 @@ for p in (str(DISC), str(HERE)):
         sys.path.insert(0, p)
 
 import cost_calibration as cc  # noqa: E402
+import functools  # noqa: E402
+#: these synthetic processes stand for a REAL account's fills (ADR 0063 makes the
+#: account kind explicit; demo / undeclared accounts are tested separately)
+_cav = functools.partial(cc.calibrate_and_verify, account_kind="real")
 import public_cost_estimate as pce  # noqa: E402
 import public_market_collect as pmc  # noqa: E402
 from costs_bridge import CostConfigError, CostContext, FUTURES_COST_DEFAULTS  # noqa: E402
@@ -228,7 +232,7 @@ class TestCalibrationEvidence(unittest.TestCase):
         quotes = [cc.Observation(ts_ms=1_600_000_000_000 + i, symbol="SOLUSDT", side=1, order_type="maker",
                                  notional=1.0, ref_price=100.0, status="EXPIRED",
                                  source_kind="quote_snapshots", bid=99.99, ask=100.01) for i in range(2000)]
-        rec = cc.calibrate_and_verify(fills + [stray] + quotes, CostContext.futures_default(),
+        rec = _cav(fills + [stray] + quotes, CostContext.futures_default(),
                                       required_symbols=["BTCUSDT"], order_value=10_000.0)
         self.assertEqual(rec["status"], "VERIFIED", rec["reasons"])
         self.assertEqual(rec["scope"]["symbols"], ["BTCUSDT"])
@@ -241,7 +245,7 @@ class TestCalibrationEvidence(unittest.TestCase):
         self.assertFalse(ctx.verified_for(["BTCUSDT"], 1.0)[0])
 
     def test_rehashed_record_with_reasons_is_not_verified(self):
-        rec = cc.calibrate_and_verify(synth_fills(), CostContext.futures_default(),
+        rec = _cav(synth_fills(), CostContext.futures_default(),
                                       required_symbols=["BTCUSDT"], order_value=10_000.0)
         forged = cc.seal({**rec, "reasons": ["p90 underestimate"]})
         with self.assertRaises(cc.CalibrationError):

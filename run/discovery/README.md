@@ -143,14 +143,15 @@ Environment (all optional, fail-closed when wrong):
   parents are drawn uniformly over the occupied cells.  The default `pareto_niche`
   is unchanged and keeps its search-config hash.  `run/compare_selection_dev.py`
   compares two such runs (same seed and budget) from their ledgers.
-- `fills_import.py --fills <export.csv|json> --klines <dir> [--fee-prices f.json]
+- `fills_import.py --fills <export.csv|json> --account-kind real|demo|paper|unknown --klines <dir> [--fee-prices f.json]
   [--verify --decisions d.jsonl --quotes q.jsonl]` imports a Binance trade-history
   export into `private_fills/` (git-ignored; only counts and hashes are printed),
   checks columns, types, duplicates, time order, time zone, missing fees (never
   read as 0), fee-asset conversion (method and price time recorded per fill) and
   per-symbol counts, and can run `cost_calibration` on the result.  Policy:
   `config/fills_import_v1.json`.  `--data-origin synthetic_test` data can never be
-  VERIFIED.
+  VERIFIED, and neither can fills of a demo / paper / undeclared account
+  (`--account-kind` is required; only `real` counts, ADR 0063).
 - `ledger_check.py <state_dir>` is a read-only consistency check of the source
   ledgers and derived summaries (exit 0 consistent, 2 findings, 1 unreadable); the
   file roles are listed in its docstring.

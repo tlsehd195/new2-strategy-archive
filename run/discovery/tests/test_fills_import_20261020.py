@@ -25,6 +25,10 @@ for p in (str(DISC), str(HERE)):
         sys.path.insert(0, p)
 
 import cost_calibration as cc  # noqa: E402
+import functools  # noqa: E402
+#: these synthetic processes stand for a REAL account's fills (ADR 0063 makes the
+#: account kind explicit; demo / undeclared accounts are tested separately)
+_cav = functools.partial(cc.calibrate_and_verify, account_kind="real")
 import fills_import as fi  # noqa: E402
 from data_quality import Bar  # noqa: E402
 
@@ -100,6 +104,7 @@ class ImportCase(unittest.TestCase):
         p = self.d / "trades.csv"
         write_csv(p, rows, header)
         kw.setdefault("data_origin", "synthetic_test")
+        kw.setdefault("account_kind", "real")
         return fi.import_fills(p, now_ms=NOW, **kw)
 
 
@@ -156,7 +161,7 @@ class TestColumnsTypesAndMissing(ImportCase):
                 "maker": False, "buyer": r["Side"] == "BUY", "realizedPnl": "0"} for r in rows]
         p = self.d / "trades.json"
         p.write_text(json.dumps(api))
-        res = fi.import_fills(p, now_ms=NOW, data_origin="synthetic_test")
+        res = fi.import_fills(p, now_ms=NOW, data_origin="synthetic_test", account_kind="real")
         self.assertEqual(res["report"]["source_format"], "binance_api_json")
         self.assertEqual((res["status"], len(res["fills"])), ("IMPORTED", len(rows)))
         self.assertTrue(all(f["liquidity"] == "TAKER" for f in res["fills"]))
@@ -221,7 +226,7 @@ class TestDuplicatesAndAbnormal(ImportCase):
         p = self.d / "t.csv"
         write_csv(p, rows)
         pol, _ = fi.load_import_policy()
-        res = fi.import_fills(p, now_ms=NOW, data_origin="synthetic_test")
+        res = fi.import_fills(p, now_ms=NOW, data_origin="synthetic_test", account_kind="real")
         good, bad, _ = fi.check_fills(
             fi.normalise_rows(fi._read_rows(p.read_bytes(), "binance_csv")[0], HEADER, policy=pol)[0],
             policy=pol, klines=kl, now_ms=NOW)
@@ -362,7 +367,7 @@ class TestEvidenceStatusVocabulary(unittest.TestCase):
     def test_verified_record_of_another_cost_source_requires_reverification(self):
         from test_completion import synth_fills
         from costs_bridge import CostContext
-        rec = cc.seal(cc.calibrate_and_verify(synth_fills(n=900, symbols=("BTCUSDT", "ETHUSDT")),
+        rec = cc.seal(_cav(synth_fills(n=900, symbols=("BTCUSDT", "ETHUSDT")),
                                               CostContext.futures_default(),
                                               required_symbols=["BTCUSDT"], order_value=10_000.0))
         self.assertEqual(rec["status"], "VERIFIED")
@@ -381,7 +386,7 @@ class TestPrivacy(ImportCase):
         out = self.d / "private"
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
-            rc = fi.main(["--fills", str(p), "--out-dir", str(out), "--data-origin", "synthetic_test"])
+            rc = fi.main(["--fills", str(p), "--out-dir", str(out), "--data-origin", "synthetic_test", "--account-kind", "real"])
         text = buf.getvalue()
         self.assertEqual(rc, 0)
         for r in rows[:5]:

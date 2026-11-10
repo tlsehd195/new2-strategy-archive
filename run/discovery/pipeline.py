@@ -555,8 +555,11 @@ class EvolutionPipeline:
         return data, fng, missing
 
     def _cost_block(self) -> dict:
+        from costs_bridge import cost_component_evidence
         b = {"version": self.cost.version, "status": self.cost.status,
-             "test_only": self.cost.test_only, "scope": COST_MODEL_SCOPE}
+             "test_only": self.cost.test_only, "scope": COST_MODEL_SCOPE,
+             # per-component treatment and evidence level (ADR 0063, reporting only)
+             "components": cost_component_evidence(self.cost)}
         if self.cost.assumption is not None:
             b["assumption"] = {k: self.cost.assumption[k] for k in ("profile_id", "sha256")}
             b["claim"] = f"비용 미검증({self.cost.status}): research only, never promotable"

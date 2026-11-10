@@ -35,6 +35,10 @@ from test_pipeline import (EDGE, NOISE, MS15, PipelineCase, SyntheticProvider, h
 from test_residual_fixes import fee_cost  # noqa: E402
 
 import cost_calibration as cc  # noqa: E402
+import functools  # noqa: E402
+#: these synthetic processes stand for a REAL account's fills (ADR 0063 makes the
+#: account kind explicit; demo / undeclared accounts are tested separately)
+_cav = functools.partial(cc.calibrate_and_verify, account_kind="real")
 
 
 # ---------------------------------------------------------------------------
@@ -71,7 +75,7 @@ class TestCostVerificationGate(unittest.TestCase):
         self.assertTrue(verified_fee_cost().verified and verified_fee_cost().test_only)
 
     def test_known_process_is_verified_out_of_sample_and_sealed(self):
-        rec = cc.calibrate_and_verify(synth_fills(), CostContext.futures_default(),
+        rec = _cav(synth_fills(), CostContext.futures_default(),
                                       required_symbols=["BTCUSDT"], order_value=10_000.0)
         self.assertEqual(rec["status"], "VERIFIED", rec["reasons"])
         self.assertAlmostEqual(rec["params"]["fee_rate"], 0.0004, places=6)
@@ -87,7 +91,7 @@ class TestCostVerificationGate(unittest.TestCase):
         self.assertEqual(len(why), 2)                     # symbol + notional outside scope
 
     def test_tampered_or_mismatched_record_is_refused(self):
-        sealed = cc.seal(cc.calibrate_and_verify(synth_fills(), CostContext.futures_default(),
+        sealed = cc.seal(_cav(synth_fills(), CostContext.futures_default(),
                                                  required_symbols=["BTCUSDT"], order_value=10_000.0))
         bad = dict(sealed, params={**sealed["params"], "fee_rate": 0.0})
         with self.assertRaises(CostConfigError):
@@ -107,25 +111,25 @@ class TestCostVerificationGate(unittest.TestCase):
         # from the first half underestimates out of sample
         obs = obs[:300] + [cc.Observation(**{**o.__dict__, "fill_price": o.fill_price * (1 + o.side * 0.0005)})
                            for o in obs[300:]]
-        rec = cc.calibrate_and_verify(obs, CostContext.futures_default(), required_symbols=["BTCUSDT"],
+        rec = _cav(obs, CostContext.futures_default(), required_symbols=["BTCUSDT"],
                                       order_value=10_000.0)
         self.assertEqual(rec["status"], "NOT_VERIFIED")
         self.assertTrue(any("underestimate" in r for r in rec["reasons"]))
 
     def test_insufficient_or_quote_only_data_blocks(self):
-        rec = cc.calibrate_and_verify(synth_fills(n=100), CostContext.futures_default(),
+        rec = _cav(synth_fills(n=100), CostContext.futures_default(),
                                       required_symbols=["BTCUSDT", "ETHUSDT"], order_value=10_000.0)
         # too few fills is a sample shortfall, not a failed model (ADR 0013)
         self.assertEqual(rec["status"], "INSUFFICIENT_DATA")
         self.assertTrue(any("ETHUSDT" in r for r in rec["reasons"]))
-        empty = cc.calibrate_and_verify([], CostContext.futures_default(), required_symbols=["BTCUSDT"],
+        empty = _cav([], CostContext.futures_default(), required_symbols=["BTCUSDT"],
                                         order_value=1.0)
         self.assertEqual(empty["status"], "BLOCKED_EXTERNAL_EVIDENCE")
         # the repository's own maker-fill monitor ledger: quotes only, virtual fills
         ledger = DISC.parent.parent / "data" / "fill_ledger.jsonl"
         obs = cc.observations_from_fill_monitor(ledger)
         self.assertTrue(obs)
-        rec = cc.calibrate_and_verify(obs, CostContext.futures_default(),
+        rec = _cav(obs, CostContext.futures_default(),
                                       required_symbols=["BTCUSDT", "ETHUSDT"], order_value=10_000.0)
         self.assertEqual(rec["status"], "BLOCKED_EXTERNAL_EVIDENCE")
         self.assertTrue(any("not verifiable" in r for r in rec["reasons"]))

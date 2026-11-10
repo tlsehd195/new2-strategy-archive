@@ -76,6 +76,7 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Iterable, Mapping, Optional, Sequence
 
+from cost_calibration import ACCOUNT_KINDS
 from engine_lib import append_jsonl, atomic_write_json, canonical_json, iso_now, iter_jsonl
 
 FILLS_SCHEMA = "account_fill_v1"
@@ -83,6 +84,8 @@ IMPORT_VERSION = "fills-import-v1"
 DEFAULT_POLICY = Path(__file__).resolve().parent / "config" / "fills_import_v1.json"
 DEFAULT_OUT = Path(__file__).resolve().parent / "private_fills"
 DATA_ORIGINS = ("user_export", "synthetic_test")
+#: owner of the exported account (ADR 0063): only "real" fills can verify costs.
+#: The CLI requires it; the library default "unknown" never verifies.
 
 #: export column name (lower-cased, spaces/underscores removed) -> field
 COLUMN_ALIASES = {
@@ -659,18 +662,21 @@ def summarise(fills: Sequence[dict]) -> dict:
 def import_fills(path: Path, *, fmt: Optional[str] = None, policy_path: Optional[Path] = None,
                  column_map: Optional[Mapping] = None, timezone: Optional[str] = None,
                  klines_dir: Optional[Path] = None, fee_prices: Optional[Path] = None,
-                 data_origin: str = "user_export", now_ms: Optional[int] = None) -> dict:
+                 data_origin: str = "user_export", now_ms: Optional[int] = None,
+                 account_kind: str = "unknown") -> dict:
     """Steps 1-6.  Returns {status, fills, quarantined, report} — the caller
     decides where (private) rows go; the report holds no row content."""
     if data_origin not in DATA_ORIGINS:
         raise FillImportError(f"data_origin must be one of {DATA_ORIGINS}")
+    if account_kind not in ACCOUNT_KINDS:
+        raise FillImportError(f"account_kind must be one of {ACCOUNT_KINDS}")
     policy, phash = load_import_policy(policy_path)
     raw = Path(path).read_bytes()
     sha = hashlib.sha256(raw).hexdigest()
     fmt = fmt or detect_format(path)
     report = {"import_version": IMPORT_VERSION, "policy_hash": phash, "source_sha256": sha,
               "source_format": fmt, "source_bytes": len(raw), "data_origin": data_origin,
-              "imported_at": iso_now()}
+              "account_kind": account_kind, "imported_at": iso_now()}
     try:
         rows, header = _read_rows(raw, fmt)
         fills, bad = normalise_rows(rows, header, policy=policy, column_map=column_map,
@@ -723,10 +729,11 @@ def verify_from_import(res: Mapping, *, symbols: Sequence[str], order_value: flo
         criteria_path=criteria_path, source_ref=f"fills_import:{rep['source_sha256'][:16]}",
         quarantined=rep.get("quarantined", 0), order_outcomes_observable=dec is not None,
         data_origin=rep["data_origin"],
-        import_integrity_failed=res["status"] == "DATA_INVALID")
+        import_integrity_failed=res["status"] == "DATA_INVALID",
+        account_kind=rep.get("account_kind", "unknown"))
     rec["import"] = {k: rep.get(k) for k in ("import_version", "policy_hash", "source_sha256",
                                               "source_format", "rows", "valid_fills", "quarantined",
-                                              "status", "data_origin", "fee_assets")}
+                                              "status", "data_origin", "account_kind", "fee_assets")}
     rec["orders_not_used"] = dropped
     rec["reference_source"] = ("decision log" if dec else "quote file" if quotes
                                else "public order-book snapshots" if public_snapshots else "none")
@@ -752,12 +759,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:  # pragma: no cover - CLI
     ap.add_argument("--ledger", help="append the sealed verification record here")
     ap.add_argument("--data-origin", choices=DATA_ORIGINS, default="user_export",
                     help="synthetic_test for generated files (never verification evidence)")
+    ap.add_argument("--account-kind", required=True, choices=ACCOUNT_KINDS,
+                    help="real = your real-money account; demo / paper fills are never cost evidence (ADR 0063)")
     a = ap.parse_args(list(argv) if argv is not None else None)
     res = import_fills(Path(a.fills), fmt=a.format,
                        column_map=json.loads(a.column_map) if a.column_map else None,
                        timezone=a.timezone, klines_dir=Path(a.klines) if a.klines else None,
                        fee_prices=Path(a.fee_prices) if a.fee_prices else None,
-                       data_origin=a.data_origin)
+                       data_origin=a.data_origin, account_kind=a.account_kind)
     out = Path(a.out_dir)
     out.mkdir(parents=True, exist_ok=True)
     sha = res["report"]["source_sha256"][:16]
