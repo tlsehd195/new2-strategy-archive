@@ -146,11 +146,12 @@ def funding_cost_detail(df_klines, df_funding, entry_ms, exit_ms,
     gaps = []
     complete = True
     if n == 0:
-        # 데이터 시작 전 구간이거나 실결측 — 폴백 간격 1.5배 초과 시 결측 의심
-        if (exit_ms - entry_ms) > GAP_TOL * fb_iv + JITTER_MS:
+        # 데이터 시작 전 구간이거나 실결측. 보유가 정산 간격 1배를 넘으면 정산이
+        # 최소 한 번은 있어야 한다(ADR 0070: 이전 1.5배 기준은 8~12h 보유의 누락 정산을 놓침).
+        if (exit_ms - entry_ms) > fb_iv + JITTER_MS:
             complete = False
             gaps.append({"after_ts": int(entry_ms), "gap_ms": int(exit_ms - entry_ms),
-                         "allowed_ms": int(GAP_TOL * fb_iv + JITTER_MS),
+                         "allowed_ms": int(fb_iv + JITTER_MS),
                          "where": "no_events_in_window"})
     else:
         # 진입 경계: 윈도우 직전 마지막 이벤트(prev)와 첫 이벤트 간 간격

@@ -93,11 +93,22 @@ def _file(out: Path, kind: str, symbol: str, t_ms: int) -> Path:
     return out / symbol / f"listing_{kind}_{symbol}_{_day(t_ms)}.jsonl"
 
 
+class StateCorrupt(RuntimeError):
+    """state.json exists but cannot be read (ADR 0070): never re-baseline silently."""
+
+
 def load_state(out: Path) -> dict:
-    try:
-        return json.loads((out / "state.json").read_text(encoding="utf-8"))
-    except (OSError, ValueError):
+    p = out / "state.json"
+    if not p.exists():
         return {}
+    try:
+        st = json.loads(p.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        # re-baselining would forget every listing tracked so far without a trace
+        raise StateCorrupt(f"{p} unreadable ({e}); fix or move it aside explicitly") from e
+    if not isinstance(st, dict):
+        raise StateCorrupt(f"{p} is not a JSON object")
+    return st
 
 
 def save_state(out: Path, state: dict) -> None:
@@ -312,7 +323,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:  # pragma: no cover - CLI
     try:
         r = collect(Path(a.out), hours=a.hours, discover_sec=a.discover_sec, allow_network=a.allow_network,
                     track_recent_days=a.track_recent_days)
-    except (CollectRefused, ValueError) as e:
+    except (CollectRefused, StateCorrupt, ValueError) as e:
         print(f"REFUSED: {e}", file=sys.stderr)
         return 1
     print(json.dumps(r, indent=1))

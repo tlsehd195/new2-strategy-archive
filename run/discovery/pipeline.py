@@ -1141,7 +1141,7 @@ class EvolutionPipeline:
             if sd > 0:
                 srs[s_] = (mu / sd, x)
         if sid not in srs or len(srs) < 2:
-            return {"computable": False, "trials": len(srs)}
+            return {"computable": False, "trials": len(srs), "trials_searched": len(latest)}
         sr, x = srs[sid]
         n = len(x)
         mu = sum(x) / n
@@ -1152,6 +1152,13 @@ class EvolutionPipeline:
         m_ = sum(all_sr) / len(all_sr)
         var_sr = sum((v - m_) ** 2 for v in all_sr) / (len(all_sr) - 1)
         d = deflated_sharpe(sr, n, skew, kurt, len(srs), var_sr)
+        # ADR 0069 (diagnostic, not a gate): every search-pool strategy with a DEV
+        # series was a trial, also those whose SR is not computable (too few days,
+        # no variation).  ``trials`` counts only computable ones, which can only
+        # lower the expected-maximum benchmark; the DSR at the full count is kept
+        # next to it so the difference is visible.
+        n_searched = len(latest)
+        d_all = deflated_sharpe(sr, n, skew, kurt, max(n_searched, len(srs)), var_sr)
         # MinBTL (Bailey et al. 2014): raw trial count, 365 d/yr (24/7 market).
         from engine_lib import expected_max_sr, min_backtest_years
         sr_ann = sr * math.sqrt(365.0)
@@ -1161,6 +1168,8 @@ class EvolutionPipeline:
                 "exceeds_sr_floor": sr_ann > floor_ann,
                 "computable": math.isfinite(d), "dsr": d if math.isfinite(d) else None,
                 "sr_daily": sr, "n_days": n, "trials": len(srs), "var_sr": var_sr,
+                "trials_searched": n_searched,
+                "dsr_at_trials_searched": d_all if math.isfinite(d_all) else None,
                 "skew": skew, "kurtosis": kurt}
 
     def robustness(self, sid: str) -> dict:
