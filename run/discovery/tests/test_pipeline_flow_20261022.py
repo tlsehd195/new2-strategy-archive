@@ -600,6 +600,7 @@ class TestReportConsistency(PipelineCase):
 #: silent edit (e.g. a lowered alpha or a cheaper cost) fail CI.
 PINNED = {
     "config/promotion_v3.json": "01fbef5c4946",
+    "config/promotion_v5.json": "619b16b9a850",
     "config/independent_window_v1.json": "49721cc7daad",
     "config/cost_assumed_public_v1.json": "b6478c34e5f1",
     "config/cost_verification_v1.json": "d0bdb7586c4a",

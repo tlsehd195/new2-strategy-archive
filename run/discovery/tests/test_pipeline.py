@@ -163,11 +163,13 @@ class PipelineCase(unittest.TestCase):
         self.td = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.td, True)
 
-    def pipe(self, provider, *, cfg_patch=None, state=None, cost=None):
+    def pipe(self, provider, *, cfg_patch=None, state=None, cost=None, promo=None):
+        """``promo``: a config file name under config/ instead of the default."""
         from pipeline import DEFAULT_PROMOTION_CONFIG, EvolutionPipeline
-        cfgp = None
+        base = DEFAULT_PROMOTION_CONFIG if promo is None else DEFAULT_PROMOTION_CONFIG.parent / promo
+        cfgp = None if promo is None else base
         if cfg_patch:
-            cfg = json.loads(DEFAULT_PROMOTION_CONFIG.read_text())
+            cfg = json.loads(base.read_text())
             for sec, kv in cfg_patch.items():
                 cfg[sec].update(kv)
             cfgp = self.td / "promo.json"
@@ -266,7 +268,10 @@ class TestStagedPipeline(PipelineCase):
 
 class TestLockedCampaigns(PipelineCase):
     def test_window_retires_after_campaign_budget(self):
-        p = self.pipe(SyntheticProvider(), cfg_patch={"locked": {"max_campaigns_per_window": 1}})
+        # campaign mechanics need two survivors: under promo-v5 EDGE2 fails the DSR gate
+        # (DSR 0.59 < 0.95, ADR 0064), so this test pins the v3 robustness rules
+        p = self.pipe(SyntheticProvider(), cfg_patch={"locked": {"max_campaigns_per_window": 1}},
+                      promo="promotion_v3.json")
         ctx = p.context_id()
         e1, e2, *_ = self.register_all(p, [EDGE, EDGE2] + NOISE[:7])
         p.run_validation(max_batch=1)
@@ -285,7 +290,7 @@ class TestLockedCampaigns(PipelineCase):
     def test_bonferroni_inside_campaign(self):
         from campaigns import member_alpha
         from stats_mc import spending_alpha
-        p = self.pipe(SyntheticProvider())
+        p = self.pipe(SyntheticProvider(), promo="promotion_v3.json")   # two survivors (see above)
         e1, e2, *_ = self.register_all(p, [EDGE, EDGE2] + NOISE[:7])
         p.run_validation()
         camp = p.run_locked_campaign()

@@ -1,0 +1,20 @@
+{
+ "schema": "power_analysis_config_v1",
+ "note": "ADR 0064. Synthetic power of the promo-v5 confirmatory gates at the sample sizes of the current design. validation_days 175 = VALIDATION_MONTHS 6 (180 d) minus the embargo; batch_index 8 = the next batch on the BTC/ETH validation windows (7 recorded in validation_window_history.jsonl); dev_days ~ BTC DEV span 2021-01..2023-09; dev_trials ~ R6 (894 DEV evaluations). batch_m 10 (max_batch_size is 20; 10 keeps the bootstrap-t StepM affordable and is optimistic for power). Changing a value is a new file version.",
+ "seed": 20261110,
+ "n_sims": 40,
+ "sr_grid": [0.0, 1.0, 2.0, 3.0, 4.0],
+ "ar1_phi": 0.1,
+ "t_df": 4,
+ "batch_m": 10,
+ "stepm_B": 200,
+ "ci_B": 500,
+ "dev_days": 1000,
+ "dev_trials": 900,
+ "scenarios": [
+  {"name": "BTC_or_ETH_validation_next_batch_k8", "validation_days": 175, "batch_index": 8},
+  {"name": "fresh_6m_window_k1", "validation_days": 175, "batch_index": 1},
+  {"name": "regime_half_of_fresh_window_k1", "validation_days": 88, "batch_index": 1},
+  {"name": "fresh_12m_window_k1", "validation_days": 365, "batch_index": 1}
+ ]
+}
