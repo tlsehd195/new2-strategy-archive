@@ -45,8 +45,11 @@ If the log directory cannot be created the runner is not started (exit 1).
 `NEW2_DISC_TEE` replaces the log writer command (used by the tests).
 
 `runner.py` can be called directly: `python3 run/discovery/runner.py --batch N
-[--mode legacy|evolve|full] [--rounds R] [--evals E]` (`--help` lists them).
-`run_cycle.sh` passes `NEW2_DISC_MODE` as `--mode`.
+[--mode legacy|evolve|full|audit|power] [--rounds R] [--evals E]` (`--help` lists them).
+`run_cycle.sh` passes `NEW2_DISC_MODE` as `--mode`.  `--mode audit` (ledger /
+state consistency of `NEW2_STATE_DIR`) and `--mode power` (synthetic power of the
+promotion gates, `results/power_analysis.json`) are read-only: no lock, no market
+data, nothing written to the state directory (ADR 0065).
 
 **The default mode is `legacy`** (the fixed 779-candidate engine with
 generation BH-FDR), not the evolution engine.  With `NEW2_DISC_MODE` unset,
@@ -54,7 +57,9 @@ generation BH-FDR), not the evolution engine.  With `NEW2_DISC_MODE` unset,
 every result line names the mode (`CYCLE_OK batch=10 mode=legacy`); the
 runner prints `RUN_MODE <mode> state_dir=…`.  The latest real-data runs used
 `--mode evolve`.  A `CYCLE_OK` means the cycle ran, never that a strategy
-passed.  The two engines' procedures differ: `STATISTICS_AND_STATES.md` §9.
+passed: the evolution summary says so in `status_meaning`, and
+`strategies_passed` lists the VALIDATION_SURVIVOR / PAPER_TEST_READY counts (empty
+= none).  The two engines' procedures differ: `STATISTICS_AND_STATES.md` §9.
 
 ### State files: current vs historical (ADR 0010)
 
@@ -153,9 +158,13 @@ Environment (all optional, fail-closed when wrong):
   `config/fills_import_v1.json`.  `--data-origin synthetic_test` data can never be
   VERIFIED, and neither can fills of a demo / paper / undeclared account
   (`--account-kind` is required; only `real` counts, ADR 0063).
-- `ledger_check.py <state_dir>` is a read-only consistency check of the source
-  ledgers and derived summaries (exit 0 consistent, 2 findings, 1 unreadable); the
-  file roles are listed in its docstring.
+- `--search-config FILE` (`--mode evolve`) reads `search.SearchConfig` fields from a
+  JSON object; unknown keys are a usage error and the parent selection stays on
+  `--selection` (ADR 0065).
+- `ledger_check.py <state_dir>` (or `runner.py --mode audit`) is a read-only
+  consistency check of the source ledgers and derived summaries (exit 0 consistent,
+  2 findings, 1 unreadable); the file roles are listed in its docstring.  It also
+  flags an OK DEV record without its DEV series (`MISSING_DEV_SERIES`).
 
 Recovery after a crash, `kill` or reboot:
 

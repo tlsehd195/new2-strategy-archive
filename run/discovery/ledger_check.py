@@ -27,7 +27,8 @@ Evolution engine checks: every status transition is allowed by
 records match their hash; no (stage, strategy, context) is evaluated twice;
 no strategy is preregistered in two validation batches of one context; every
 batch has at most one result and every result a preregistration; every
-evidence id a status cites exists; at most one PAPER_TEST_READY review per
+evidence id a status cites exists; every OK DEV record has its DEV daily
+series (``MISSING_DEV_SERIES``); at most one PAPER_TEST_READY review per
 (strategy, context); the summary's status counts match the status ledger.
 
 Frozen v1 history (``state.json`` with ``engine == "NEW2-discovery-v1"``, the
@@ -106,6 +107,16 @@ def check_evolution(state_dir: Path) -> list[dict]:
                         "detail": f"record {r.get('record_id')} does not match its content"})
         seen[(r["stage"], r["strategy_id"], r["context_id"])] += 1
         ids.add(r.get("record_id"))
+    # an OK DEV record must have its daily series (DSR / PBO trial set, ADR 0065);
+    # before ADR 0064 the record was written first, so a kill between the two
+    # writes left the record without its series
+    have_series = {(r.get("strategy_id"), r.get("context_id")) for r in iter_jsonl(evo / "dev_series.jsonl")}
+    for i, r in enumerate(iter_jsonl(evo / "evaluations.jsonl"), 1):
+        if r.get("stage") == "dev" and r.get("status") == "OK" \
+                and (r["strategy_id"], r["context_id"]) not in have_series:
+            out.append({"kind": "MISSING_DEV_SERIES", "line": i, "strategy_id": r["strategy_id"],
+                        "detail": f"OK DEV record under {r['context_id']} has no dev_series row — "
+                                  "the strategy is missing from the DSR/PBO trial set"})
     for (stage, sid, ctx), n in sorted(seen.items()):
         if n > 1 and stage != "robustness":
             out.append({"kind": "DUPLICATE_EVALUATION", "strategy_id": sid,
