@@ -105,7 +105,9 @@ def registry_identity() -> dict:
             "features": {n: {"params": {p: [v.kind.__name__, v.lo, v.hi] for p, v in f.params.items()},
                              "range": list(f.value_range), "signed": f.signed, "data": list(f.data),
                              "ops": list(f.ops)}
-                         for n, f in sorted(FEATURES.items())}}
+                         for n, f in sorted(FEATURES.items())},
+            # only when an opt-in set is enabled: default identities are unchanged
+            **({"feature_sets": sorted(_ENABLED_SETS)} if _ENABLED_SETS else {})}
 
 
 # --- causal helpers -----------------------------------------------------------
@@ -258,6 +260,104 @@ register_feature(Feature("rsi", {"period": Param(int, 2, 256, 14)},
                          (0.0, 100.0), False, ("klines",), "oscillator", _f_rsi))
 register_feature(Feature("volume_z", {"window": Param(int, 16, 2048, 96)},
                          (-8.0, 8.0), True, ("klines",), "flow", _f_volume_z))
+
+# --- opt-in feature set v2 (ADR 0066) -------------------------------------------
+# Built only from the klines already used (OHLC + quote volume), causal (value i
+# uses bars <= i), never registered by default: enabling a set changes
+# ``registry_identity()`` and therefore the experiment context, so runs made
+# without it keep their context ids and DEV results.
+
+def _f_range_z(ctx: dict, p: Mapping) -> list:
+    """z of the bar range (high - low) / close against the prior window."""
+    rng = [((b.high - b.low) / b.close) if b.close > 0 else None for b in ctx["bars"]]
+    return [_rolling_z(rng, i, p["window"]) for i in range(len(rng))]
+
+
+def _f_illiq_z(ctx: dict, p: Mapping) -> list:
+    """z of the Amihud ratio |r_1| / quote volume (bp per million quote) against the prior window."""
+    closes, bars = ctx["closes"], ctx["bars"]
+    am: list = [None] * len(bars)
+    for i in range(1, len(bars)):
+        if closes[i - 1] > 0 and bars[i].quote_volume > 0:
+            am[i] = abs(closes[i] / closes[i - 1] - 1.0) * 1e4 / (bars[i].quote_volume / 1e6)
+    return [_rolling_z(am, i, p["window"]) for i in range(len(am))]
+
+
+def _f_ma_dist_z(ctx: dict, p: Mapping) -> list:
+    """(close - SMA of the prior window) / sd of the prior window."""
+    closes, w = ctx["closes"], p["window"]
+    out: list = [None] * len(closes)
+    for i in range(w, len(closes)):
+        xs = closes[i - w:i]
+        mu = sum(xs) / w
+        sd = (sum((x - mu) ** 2 for x in xs) / max(1, w - 1)) ** 0.5
+        if sd > 0:
+            out[i] = max(-8.0, min(8.0, (closes[i] - mu) / sd))
+    return out
+
+
+def _f_skew_z(ctx: dict, p: Mapping) -> list:
+    """z of the rolling skewness of the last ``length`` 15m log returns (bars <= i)
+    against its prior ``window`` values (legacy X12 rule, PREREG_x12_skewness)."""
+    closes, L = ctx["closes"], p["length"]
+    lr = [None] + [math.log(closes[i] / closes[i - 1]) if closes[i - 1] > 0 and closes[i] > 0 else None
+                   for i in range(1, len(closes))]
+    sk: list = [None] * len(closes)
+    for i in range(L, len(closes)):
+        xs = [x for x in lr[i - L + 1:i + 1] if x is not None]
+        if len(xs) < max(3, int(L * 0.9)):
+            continue
+        n = len(xs)
+        mu = sum(xs) / n
+        m2 = sum((x - mu) ** 2 for x in xs) / n
+        if m2 <= 0:
+            continue
+        sk[i] = (sum((x - mu) ** 3 for x in xs) / n) / m2 ** 1.5
+    return [_rolling_z(sk, i, p["window"]) for i in range(len(sk))]
+
+
+def _f_dow_utc(ctx: dict, p: Mapping) -> list:
+    """UTC day of week of the bar open, Monday = 0 (1970-01-01 was a Thursday)."""
+    return [float((b.ts // 86_400_000 + 3) % 7) for b in ctx["bars"]]
+
+
+FEATURE_SETS: dict[str, tuple] = {
+    "v1": (),
+    "v2": (
+        Feature("range_z", {"window": Param(int, 16, 2048, 96)}, (-8.0, 8.0), False, ("klines",),
+                "volatility", _f_range_z),
+        Feature("illiq_z", {"window": Param(int, 16, 2048, 96)}, (-8.0, 8.0), False, ("klines",),
+                "liquidity", _f_illiq_z),
+        Feature("ma_dist_z", {"window": Param(int, 8, 2048, 96)}, (-8.0, 8.0), True, ("klines",),
+                "mean_reversion", _f_ma_dist_z),
+        Feature("skew_z", {"length": Param(int, 16, 1024, 96), "window": Param(int, 64, 2048, 960)},
+                (-8.0, 8.0), True, ("klines",), "distribution", _f_skew_z),
+        Feature("dow_utc", {}, (0.0, 7.0), False, ("klines",), "calendar", _f_dow_utc,
+                ops=("between",)),
+    ),
+}
+_ENABLED_SETS: list = []
+
+
+def enable_feature_set(name: str) -> list:
+    """Register the features of an opt-in set (idempotent); returns their names."""
+    if name not in FEATURE_SETS:
+        raise SpecError(f"unknown feature set {name!r} (have {sorted(FEATURE_SETS)})")
+    for f in FEATURE_SETS[name]:
+        if f.name not in FEATURES:
+            register_feature(f)
+    if FEATURE_SETS[name] and name not in _ENABLED_SETS:
+        _ENABLED_SETS.append(name)
+    return [f.name for f in FEATURE_SETS[name]]
+
+
+def disable_feature_set(name: str) -> None:
+    """Remove an opt-in set again (tests; one process = one registry)."""
+    for f in FEATURE_SETS.get(name, ()):
+        FEATURES.pop(f.name, None)
+    if name in _ENABLED_SETS:
+        _ENABLED_SETS.remove(name)
+
 
 RISK_DEFAULTS = {"sizing": "vol_inverse", "risk_per_trade": 0.01, "max_leverage": 1.0,
                  "max_concurrent": 2}

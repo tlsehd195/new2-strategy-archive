@@ -97,6 +97,11 @@ def load_daily(data: Path, seg: str) -> dict:
 
 
 def load_funding(data: Path, syms: list, t0: int, t1: int) -> pd.DataFrame:
+    """Funding settlements in [t0, t1 + 1 day].  The requested range must not
+    touch a never-read range (ADR 0066).  The one settlement at 00:00 after t1
+    is the payment for holding on the last DEV day; its rate is fixed from the
+    premium of the 8 h before it (DEV time)."""
+    assert_allowed(t0, t1)
     recs = []
     for s in syms:
         for p in sorted((data / "funding").glob(f"{s}-fundingRate-*.csv")):
@@ -108,6 +113,7 @@ def load_funding(data: Path, syms: list, t0: int, t1: int) -> pd.DataFrame:
 
 
 def load_bar2345(data: Path, syms: list, t0: int, t1: int) -> dict:
+    assert_allowed(t0, t1)
     out = {}
     for s in syms:
         for p in sorted((data / "bar2345").glob(f"{s}-2345-*.csv")):
