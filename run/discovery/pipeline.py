@@ -68,7 +68,9 @@ EVO_CODE_FILES = tuple(sorted(set(CODE_FILES) | {"public_cost_estimate.py", "por
                                                  "config/paper_forward_v1.json",
                                                  "config/exit_fill_v1.json",
                                                  "config/candidate_selection_v1.json",
-                                                 "config/candidate_selection_v2.json"}))
+                                                 "config/candidate_selection_v2.json",
+                                                 "portfolio_multi.py",
+                                                 "config/portfolio_validation_v1.json"}))
 #: which DEV screen-pass candidates go into a validation batch (ADR 0031, v2: ADR 0033)
 DEFAULT_SELECTION_CONFIG = Path(__file__).resolve().parent / "config" / "candidate_selection_v2.json"
 
@@ -84,6 +86,8 @@ def load_selection_config(path: Path = DEFAULT_SELECTION_CONFIG) -> dict:
     return {"one_per_near_entry_signal": False, **cfg}
 #: one default policy (ADR 0064): promo-v5 = v4 + DSR and bootstrap-CI gates
 DEFAULT_PROMOTION_CONFIG = Path(__file__).resolve().parent / "config" / "promotion_v5.json"
+#: portfolio validation layer (ADR 0068): separate criteria, promo-v5 unchanged
+DEFAULT_PORTFOLIO_CONFIG = Path(__file__).resolve().parent / "config" / "portfolio_validation_v1.json"
 #: append-only record of validation batches run on the real validation windows
 #: in state directories that no longer exist (ADR 0013).  Alpha spending is per
 #: window, not per state directory: a fresh directory must not restart at k = 1.
@@ -153,6 +157,26 @@ def load_promotion_config(path: Optional[Path] = None) -> tuple[dict, str]:
     cfg = json.loads(raw)
     if cfg.get("schema") != "promotion_config_v1":
         raise ValueError(f"{p}: not a promotion_config_v1 file")
+    return cfg, hashlib.sha256(raw).hexdigest()[:16]
+
+
+def load_portfolio_config(path: Optional[Path] = None) -> tuple[dict, str]:
+    p = Path(path or DEFAULT_PORTFOLIO_CONFIG)
+    raw = p.read_bytes()
+    cfg = json.loads(raw)
+    if cfg.get("schema") != "portfolio_validation_v1":
+        raise ValueError(f"{p}: not a portfolio_validation_v1 file")
+    from portfolio_multi import MultiConfig
+    known = {"final_equity_gt_initial", "max_drawdown_lt", "liquidation_events_eq", "no_bankruptcy",
+             "min_trades", "min_days", "max_margin_skip_share"}
+    for name, sc in cfg["scenarios"].items():
+        MultiConfig(**sc["config"]).validate()
+        bad = set(sc.get("checks") or {}) - known
+        if bad:
+            # a typo must not silently drop a criterion
+            raise ValueError(f"{p}: scenario {name} has unknown checks {sorted(bad)}")
+        if not isinstance(sc.get("gating"), bool) or not isinstance(sc.get("checks"), dict):
+            raise ValueError(f"{p}: scenario {name} needs bool gating and checks")
     return cfg, hashlib.sha256(raw).hexdigest()[:16]
 
 
@@ -412,7 +436,8 @@ class EvolutionPipeline:
     def __init__(self, state_dir: Path, provider, cost, *, symbols: Sequence[str] = ("BTCUSDT", "ETHUSDT"),
                  search_cfg: Optional[SearchConfig] = None,
                  promotion_config: Optional[Path] = None, order_value: float = 10_000.0,
-                 validation_history: Optional[Path] = None):
+                 validation_history: Optional[Path] = None,
+                 portfolio_config: Optional[Path] = None):
         self.state_dir = Path(state_dir)
         self.dir = self.state_dir / "evolution"
         self.dir.mkdir(parents=True, exist_ok=True)
@@ -421,6 +446,7 @@ class EvolutionPipeline:
         self.symbols = list(symbols)
         self.search_cfg = search_cfg or SearchConfig()
         self.cfg, self.cfg_hash = load_promotion_config(promotion_config)
+        self.pf_cfg, self.pf_hash = load_portfolio_config(portfolio_config)
         self.order_value = order_value
         self.specs = SpecStore(self.dir / "specs.jsonl")
         self.lineage = LineageStore(self.dir / "lineage.jsonl")
@@ -446,6 +472,7 @@ class EvolutionPipeline:
                 "cost": self.cost.identity(),
                 "code": {"code_hash": code_identity(files=EVO_CODE_FILES)["code_hash"]},
                 "validation": {"pipeline": PIPELINE_VERSION, "promotion_config": self.cfg_hash,
+                               "portfolio_config": self.pf_hash,
                                "search_config": self.search_cfg.config_hash(),
                                "mc_method": MC_METHOD_VERSION, "spec_registry": registry_identity(),
                                "order_value": self.order_value, "symbols": sorted(self.symbols)},
@@ -1272,6 +1299,8 @@ class EvolutionPipeline:
               "robustness": rec["record_id"]}
         if not failed:
             self.statuses.set(sid, ctx, "VALIDATION_SURVIVOR", stage="robustness", evidence=ev)
+            # PASS_INDIVIDUAL: the separate portfolio layer runs next (ADR 0068)
+            self.portfolio_validation(sid)
         elif failed == not_computable:
             why = {"pbo": f"PBO not computable ({pbo['trials']} trials)",
                    "dsr": f"DSR not computable ({checks['dsr'].get('trials')} trials)",
@@ -1283,6 +1312,174 @@ class EvolutionPipeline:
             self.statuses.set(sid, ctx, "REJECTED", stage="robustness",
                               reasons=[f"robustness failed: {', '.join(failed)}"], evidence=ev)
         return rec
+
+    # -- stage 3b: portfolio validation (ADR 0068) -------------------------------------------
+    #: statuses that take a strategy out of the book
+    _OUT_OF_BOOK = ("REJECTED", "INCONCLUSIVE", "PAPER_FAILED")
+
+    def portfolio_status(self, sid: str) -> Optional[str]:
+        """PASS_PORTFOLIO / FAIL_PORTFOLIO / INSUFFICIENT_PORTFOLIO_DATA /
+        UNDETERMINED_PORTFOLIO / PORTFOLIO_SIMULATION_ERROR of the latest
+        portfolio record in this context, None when there is none.  Kept apart
+        from the individual status (statuses.jsonl): an individual
+        VALIDATION_SURVIVOR is PASS_INDIVIDUAL whatever this says."""
+        r = self.evaluation("portfolio", sid)
+        return None if r is None else r["portfolio_status"]
+
+    def portfolio_book(self, exclude: str) -> list[str]:
+        ctx = self.context_id()
+        out = []
+        for (st, s, c), r in sorted(self._index().items()):
+            if st != "portfolio" or c != ctx or s == exclude or r.get("portfolio_status") != "PASS_PORTFOLIO":
+                continue
+            if self.statuses.status(s, ctx) in self._OUT_OF_BOOK:
+                continue
+            out.append(s)
+        return sorted(out)[: int(self.pf_cfg["composition"]["max_book_members"])]
+
+    def _portfolio_inputs(self, members: Sequence[str]):
+        """Validation-window bars, funding and trades of every member; the
+        list of data issues (never filled in)."""
+        from portfolio_multi import trades_from_events
+        bars_by, fund_by, trades, issues, as_of = {}, {}, [], [], None
+        for m in members:
+            spec = canonicalize_spec(self.specs.get(m))
+            for sym in spec["symbols"]:
+                e = self.provider.symbol(sym)
+                if e["missing"] or not e["bars"]:
+                    issues.append(f"{m}/{sym}: data missing ({'; '.join(e['missing']) or 'no bars'})")
+                    continue
+                ev, v0, v1 = self._validation_events(m, sym)
+                if not v1 > v0:
+                    issues.append(f"{m}/{sym}: no validation window")
+                    continue
+                bars = e["bars"]
+                if sym not in bars_by:
+                    bars_by[sym] = (v0, v1)
+                else:
+                    a, b = bars_by[sym]
+                    bars_by[sym] = (min(a, v0), max(b, v1))
+                fund_by[sym] = e["funding"]
+                if e["funding"] is None:
+                    issues.append(f"{sym}: funding series missing")
+                trades += trades_from_events(m, ev, bars)
+        sliced = {}
+        for sym, (v0, v1) in bars_by.items():
+            bars = self.provider.symbol(sym)["bars"]
+            sliced[sym] = list(bars[v0:v1 + 1])
+            as_of = bars[v1].ts if as_of is None else max(as_of, bars[v1].ts)
+        return sliced, fund_by, trades, issues, as_of
+
+    def _portfolio_run(self, members: Sequence[str]) -> dict:
+        from portfolio_multi import (MultiConfig, PortfolioInputError, combine, judge,
+                                     simulate_multi)
+        out: dict = {"members": list(members), "scenarios": {}}
+        try:
+            bars_by, fund_by, trades, issues, as_of = self._portfolio_inputs(members)
+        except (CostComputationError, CostConfigError) as err:
+            out.update(status="UNDETERMINED_PORTFOLIO", reasons=[f"cost: {err}"])
+            return out
+        except Exception as err:  # noqa: BLE001 — a member that fails is never dropped silently
+            out.update(status="PORTFOLIO_SIMULATION_ERROR", reasons=[f"inputs: {type(err).__name__}: {err}"])
+            return out
+        gating = []
+        for name, sc in sorted(self.pf_cfg["scenarios"].items()):
+            if not bars_by:
+                st, why, res = "INSUFFICIENT_PORTFOLIO_DATA", issues or ["no data"], None
+            else:
+                try:
+                    specs = {m: canonicalize_spec(self.specs.get(m)) for m in members}
+                    rules = {}
+                    for m, sp in specs.items():
+                        r_ = stop_exit_rule(sp)
+                        h_ = sp["exit"]["horizon"]
+                        rules[m] = (r_ or (lambda bars, i, side, h: (i + h, bars[i + h].open, "time")
+                                           if i + h < len(bars) else None), h_)
+                    res = simulate_multi(bars_by, trades, fund_by, self.cost, MultiConfig(**sc["config"]),
+                                         members=list(members), as_of_ts=as_of,
+                                         member_symbols={m: sp["symbols"] for m, sp in specs.items()},
+                                         exit_rules=rules)
+                    st, why = judge(res, sc["checks"], data_issues=issues)
+                except PortfolioInputError as err:
+                    st, why, res = "PORTFOLIO_SIMULATION_ERROR", [f"input: {err}"], None
+                except Exception as err:  # noqa: BLE001 — recorded, never a pass
+                    st, why, res = "PORTFOLIO_SIMULATION_ERROR", [f"{type(err).__name__}: {err}"], None
+            if res is not None:
+                res = {k: v for k, v in res.items() if k != "equity_daily"} | {
+                    "equity_daily_n": len(res.get("equity_daily") or []),
+                    "equity_daily_tail": (res.get("equity_daily") or [])[-5:]}
+            out["scenarios"][name] = {"status": st, "reasons": why, "gating": sc["gating"], "result": res}
+            if sc["gating"]:
+                gating.append(st)
+        out["status"] = combine(gating)
+        out["reasons"] = [f"{n}: {r}" for n, v in sorted(out["scenarios"].items()) if v["gating"]
+                          for r in v["reasons"]]
+        return out
+
+    def portfolio_validation(self, sid: str) -> dict:
+        """Standalone and joint (candidate + book) account simulation on the
+        validation window.  Append-only record (stage ``portfolio``); an
+        existing record of this context is returned as it is (resume)."""
+        from portfolio_multi import PORTFOLIO_MULTI_VERSION, combine
+        have = self.evaluation("portfolio", sid)
+        if have is not None:
+            return have
+        ctx = self.context_id()
+        book = self.portfolio_book(exclude=sid)
+        comps = {"standalone": self._portfolio_run([sid])}
+        if book:
+            comps["joint"] = self._portfolio_run(sorted([sid] + book))
+        status = combine([c["status"] for c in comps.values()])
+        n_prior = sum(1 for (st, _s, c) in self._index() if st == "portfolio" and c == ctx)
+        rec = self._append_eval({
+            "stage": "portfolio", "strategy_id": sid, "context_id": ctx, "status": "OK",
+            "portfolio_status": status, "individual_status": "PASS_INDIVIDUAL",
+            "compositions": comps, "book": book,
+            "selection_record": {"portfolio_checks_before_in_context": n_prior,
+                                 "book_size": len(book),
+                                 "note": "veto-only check on the already-used validation window; "
+                                         "a pass is not evidence of an edge"},
+            "data_window": "validation", "model_version": PORTFOLIO_MULTI_VERSION,
+            "portfolio_config_hash": self.pf_hash, "portfolio_config_version": self.pf_cfg["version"],
+            "cost_model": self._cost_block()})
+        return rec
+
+    def resume_pending_portfolio(self) -> list[str]:
+        """Individual survivors without a portfolio record (interrupted run)."""
+        ctx = self.context_id()
+        out = []
+        for s, st in sorted(self.statuses.all(ctx).items()):
+            r = self.statuses.get(s, ctx)
+            survivor = st == "VALIDATION_SURVIVOR" or (st in _BLOCKED and r.get("resume_to") == "VALIDATION_SURVIVOR"
+                                                       and r.get("stage") in ("locked", "promotion"))
+            if survivor and self.evaluation("robustness", s) is not None and self.evaluation("portfolio", s) is None:
+                self.portfolio_validation(s)
+                out.append(s)
+        return out
+
+    def portfolio_report(self) -> list[dict]:
+        """Individual and portfolio result side by side, never merged."""
+        ctx = self.context_id()
+        rows = []
+        for s, st in sorted(self.statuses.all(ctx).items()):
+            pr = self.evaluation("portfolio", s)
+            if pr is None and st != "VALIDATION_SURVIVOR":
+                continue
+            rows.append({"strategy_id": s, "individual_status": st,
+                         "individual": "PASS_INDIVIDUAL" if self.evaluation("robustness", s) and not
+                         (self.evaluation("robustness", s) or {}).get("failed") else "NOT_PASSED",
+                         "portfolio_status": None if pr is None else pr["portfolio_status"],
+                         "portfolio_record": None if pr is None else pr["record_id"]})
+        return rows
+
+    def _portfolio_gate(self, sid: str) -> Optional[str]:
+        """None when the portfolio layer lets the strategy proceed, else why not."""
+        if not self.pf_cfg.get("gating"):
+            return None
+        st = self.portfolio_status(sid)
+        if st is None:
+            st = self.portfolio_validation(sid)["portfolio_status"]
+        return None if st == "PASS_PORTFOLIO" else f"portfolio validation {st}"
 
     # -- stage 4: locked TEST campaigns ------------------------------------------------------
     def run_locked_campaign(self) -> Optional[dict]:
@@ -1302,6 +1499,10 @@ class EvolutionPipeline:
                 waiting = (st in ("BLOCKED_DATA", "BLOCKED_COST") and rec.get("stage") == "locked"
                            and rec.get("resume_to") == "VALIDATION_SURVIVOR")
                 if (st == "VALIDATION_SURVIVOR" or waiting) and s not in in_camp:
+                    # ADR 0068: only PASS_PORTFOLIO enters a campaign; the locked
+                    # window is not touched for an account that cannot carry it
+                    if self._portfolio_gate(s) is not None:
+                        continue
                     survivors.append((s, st))
             members: dict[str, list[str]] = {}
             for sid, st in survivors:
@@ -1501,6 +1702,11 @@ class EvolutionPipeline:
         if not lock or not all(v.get("pass") for v in (lock.get("per_symbol") or {}).values()) \
                 or not lock.get("per_symbol"):
             failures.append("locked campaign not passed")
+        pf_why = self._portfolio_gate(sid)
+        if pf_why is not None:
+            failures.append(pf_why)
+        if self.pf_cfg.get("gating") and self.evaluation("portfolio", sid) is not None:
+            evidence["portfolio"] = self.evaluation("portfolio", sid)["record_id"]
         for s in canonicalize_spec(self.specs.get(sid))["symbols"]:
             if self.lock_registry.uses(sid, s) != 1:
                 failures.append(f"{s}: locked window not used exactly once")

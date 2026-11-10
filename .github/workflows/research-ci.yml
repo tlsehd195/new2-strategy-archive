@@ -47,7 +47,8 @@ jobs:
           python - <<'EOF'
           import json, sys
           sys.path.insert(0, ".")
-          from pipeline import load_promotion_config
+          from pipeline import load_portfolio_config, load_promotion_config
+          load_portfolio_config()
           from cost_calibration import load_criteria as cost_criteria
           from paper_forward import load_criteria as paper_criteria
           from costs_bridge import ASSUMED_PROFILES, load_assumed_profile

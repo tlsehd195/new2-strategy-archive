@@ -1,0 +1,41 @@
+{
+  "schema": "portfolio_validation_v1",
+  "version": "portfolio-validation-v1",
+  "status": "DEFAULT (pipeline.DEFAULT_PORTFOLIO_CONFIG, ADR 0068). Fixed before any evolve strategy has reached the portfolio stage (0 VALIDATION_SURVIVOR in every recorded context). A change needs a new versioned file and an ADR.",
+  "note": "Separate from promotion_v5.json: promo-v5 (the individual-strategy criteria) is unchanged. This is an ADDITIONAL veto layer: a VALIDATION_SURVIVOR (= PASS_INDIVIDUAL) enters a locked campaign and promotion only with portfolio_status PASS_PORTFOLIO. Passing it is a necessary condition about account risk, never evidence of an edge (the members were selected on the same validation window).",
+  "gating": true,
+  "data": "validation window of each member symbol (already read by the StepM batch and robustness of these members). Never the locked TEST window, IW0/IW1 or any sealed data.",
+  "composition": {
+    "rule": "standalone (the candidate alone) AND joint (the candidate + the book). Book = strategies of the same experiment context whose latest portfolio record is PASS_PORTFOLIO and whose current status is not REJECTED, INCONCLUSIVE or PAPER_FAILED. Members sorted by strategy id; equal weights; no weight is fitted to data.",
+    "weights": "equal",
+    "max_book_members": 20
+  },
+  "scenarios": {
+    "base": {
+      "config": {"initial_capital": 10000.0, "leverage": 1.0, "margin_mode": "isolated", "mmr": 0.005,
+                 "max_concurrent": 4, "max_gross_exposure": 1.0, "position_fraction": 1.0,
+                 "same_symbol_policy": "hedge", "fill_ratio": 1.0, "latency_bars": 0},
+      "gating": true,
+      "checks": {"final_equity_gt_initial": true, "max_drawdown_lt": 0.5, "liquidation_events_eq": 0,
+                 "no_bankruptcy": true, "min_trades": 30, "min_days": 30}
+    },
+    "stress_cross_3x": {
+      "config": {"initial_capital": 10000.0, "leverage": 3.0, "margin_mode": "cross", "mmr": 0.005,
+                 "max_concurrent": 4, "max_gross_exposure": 3.0, "position_fraction": 1.0,
+                 "same_symbol_policy": "hedge", "fill_ratio": 1.0, "latency_bars": 0},
+      "gating": true,
+      "checks": {"liquidation_events_eq": 0, "no_bankruptcy": true, "min_trades": 30, "min_days": 30}
+    },
+    "stress_partial_latency": {
+      "config": {"initial_capital": 10000.0, "leverage": 1.0, "margin_mode": "isolated", "mmr": 0.005,
+                 "max_concurrent": 4, "max_gross_exposure": 1.0, "position_fraction": 1.0,
+                 "same_symbol_policy": "hedge", "fill_ratio": 0.5, "latency_bars": 1},
+      "gating": false,
+      "checks": {"final_equity_gt_initial": true, "max_drawdown_lt": 0.5, "liquidation_events_eq": 0,
+                 "no_bankruptcy": true, "min_trades": 30, "min_days": 30},
+      "note": "diagnostic only: fill_ratio = share filled at the decision's entry open, the remainder fills at the next open with its own price and cost (cancelled if that is at/after the exit); latency = entry 1 bar later with the exit re-derived from the strategy's own exit rule. Uncalibrated (no real fills exist)."
+    }
+  },
+  "max_gross_exposure": "sum of entry notionals / equity at the entry open (not multiplied by leverage): 1.0 at 1x, 3.0 for the 3x stress",
+  "thresholds_source": "base checks reuse portfolio.PORTFOLIO_PASS_CRITERIA (final equity > initial, MDD < 0.5, 0 liquidations, not bankrupt) and the validation sample minima of promo-v5 (30 events, 30 days); the cross 3x stress adds no new numeric threshold, only 0 liquidations / no bankruptcy."
+}

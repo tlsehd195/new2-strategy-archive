@@ -50,6 +50,8 @@ class EvolutionCycleSummary:
     search_status: str = ""
     validation_batch: Optional[dict] = None
     robustness_resumed: list = field(default_factory=list)
+    portfolio_resumed: list = field(default_factory=list)
+    portfolio_report: list = field(default_factory=list)
     campaign: Optional[dict] = None
     paper: list = field(default_factory=list)
     forward: list = field(default_factory=list)
@@ -67,6 +69,11 @@ class EvolutionCycleSummary:
         d = asdict(self)
         d["strategies_passed"] = {k: v for k, v in (self.status_counts or {}).items()
                                   if k in ("VALIDATION_SURVIVOR", "PAPER_TEST_READY")}
+        # the individual pass above is PASS_INDIVIDUAL; the portfolio layer is counted apart
+        d["portfolio_status_counts"] = {}
+        for r in self.portfolio_report or []:
+            k = r.get("portfolio_status") or "PORTFOLIO_PENDING"
+            d["portfolio_status_counts"][k] = d["portfolio_status_counts"].get(k, 0) + 1
         return d
 
 
@@ -248,11 +255,14 @@ def _run_evolution_cycle(state_dir: Path, provider, cost, *, symbols: Sequence[s
         return _finish(s, t0, results_dir or (Path(state_dir) / "evolution"))
     # 5) confirmatory stages
     s.robustness_resumed = pipe.resume_pending_robustness()
+    s.portfolio_resumed = pipe.resume_pending_portfolio()
     vb = pipe.run_validation()
     if vb is not None:
         s.validation_batch = {"batch_id": vb.get("batch_id"), "outcome": vb.get("outcome"),
                               "blocked": vb.get("blocked")}
     s.campaign = pipe.run_locked_campaign()
+    # individual and portfolio results side by side (ADR 0068), never merged
+    s.portfolio_report = pipe.portfolio_report()
     # 6) isolated paper replay of newly ready strategies
     for sid, stt in sorted(pipe.statuses.all(ctx).items()):
         if stt in ("PAPER_TEST_READY", "PAPER_TESTING"):
