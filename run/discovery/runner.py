@@ -7,6 +7,7 @@ never quietly reads old data from another location.
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import math
@@ -1669,7 +1670,9 @@ class UsageError(ValueError):
     pass
 
 
-MODES = ("legacy", "evolve", "full")
+MODES = ("legacy", "evolve", "full", "audit", "power")
+#: modes that read no market data and change no state (ADR 0065)
+READ_ONLY_MODES = ("audit", "power")
 
 
 def parse_options(argv: Sequence[str]) -> dict:
@@ -1677,7 +1680,8 @@ def parse_options(argv: Sequence[str]) -> dict:
     legacy), ``--rounds N`` and ``--evals N`` (evolution budgets per cycle).
     Anything else is a usage error — never silently ignored."""
     args = list(argv)
-    opts = {"batch": 10, "mode": "legacy", "rounds": 2, "evals": 60, "selection": "pareto_niche"}
+    opts = {"batch": 10, "mode": "legacy", "rounds": 2, "evals": 60, "selection": "pareto_niche",
+            "search-config": None}
     i = 0
     while i < len(args):
         a = args[i]
@@ -1704,6 +1708,9 @@ def parse_options(argv: Sequence[str]) -> dict:
                 raise UsageError(f"--selection must be one of {SELECTIONS}, got {val!r}")
             opts["selection"] = val
             continue
+        if key == "search-config":
+            opts["search-config"] = val
+            continue
         if key == "mode":
             if val not in MODES:
                 raise UsageError(f"--mode must be one of {MODES}, got {val!r}")
@@ -1714,10 +1721,58 @@ def parse_options(argv: Sequence[str]) -> dict:
         opts[key] = int(val)
     if opts.get("dev_only") and opts["mode"] != "evolve":
         raise UsageError("--dev-only needs --mode evolve")
+    if opts["search-config"] is not None and opts["mode"] != "evolve":
+        raise UsageError("--search-config needs --mode evolve")
     if opts["selection"] != "pareto_niche" and not opts.get("dev_only"):
         # a new parent selection is a DEV experiment until compared (ADR 0019)
         raise UsageError("--selection map_elites needs --mode evolve --dev-only")
     return opts
+
+
+def load_search_config(path: str, selection: str):
+    """``--search-config FILE``: a JSON object of :class:`search.SearchConfig`
+    fields.  Unknown keys are an error (``SearchConfig.from_json`` would drop
+    them silently); ``--selection`` still applies its own DEV-only rule.  The
+    config hash is part of the search state, so a new file is a new search."""
+    from search import SearchConfig
+    try:
+        d = json.loads(Path(path).read_text())
+    except (OSError, ValueError) as e:
+        raise UsageError(f"--search-config {path}: {e}") from e
+    if not isinstance(d, dict):
+        raise UsageError(f"--search-config {path}: not a JSON object")
+    unknown = sorted(set(d) - set(SearchConfig.__dataclass_fields__))
+    if unknown:
+        raise UsageError(f"--search-config {path}: unknown keys {unknown}")
+    if "selection" in d:
+        raise UsageError("--search-config: set the parent selection with --selection (DEV-only rule)")
+    try:
+        return SearchConfig.from_json({**d, "selection": selection})
+    except TypeError as e:
+        raise UsageError(f"--search-config {path}: {e}") from e
+
+
+def run_read_only_mode(mode: str, paths) -> int:
+    """``--mode audit``: ledger / state consistency (``ledger_check``) of the
+    state directory — read-only, exit 0 consistent, 2 inconsistent, 1
+    unreadable.  ``--mode power``: the synthetic power analysis of the current
+    promotion gates (``power_analysis``, ADR 0064), written to
+    ``results/power_analysis.json``; no market data is read."""
+    if mode == "audit":
+        import ledger_check
+        rep = ledger_check.check(paths.state_dir)
+        print(json.dumps({"mode": "audit", **{k: rep.get(k) for k in ("state_dir", "status", "counts", "error")},
+                          "findings": rep.get("findings", [])[:50]}, default=str))
+        return {"CONSISTENT": 0, "INCONSISTENT": 2}.get(rep["status"], 1)
+    import power_analysis
+    rep = power_analysis.run()
+    out = Path(paths.results_dir) / "power_analysis.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(rep, indent=1, sort_keys=True) + "\n")
+    print(json.dumps({"mode": "power", "out": str(out), "version": rep["version"],
+                      "promotion_config": rep["promotion_config"],
+                      "status": {sc["name"]: sc["status"] for sc in rep["scenarios"]}}))
+    return 0
 
 
 def parse_args(argv: Sequence[str]) -> int:
@@ -1752,13 +1807,16 @@ def cost_from_env() -> CostContext:
                           + " | ".join(ASSUMED_PROFILES) + " | public_estimate:<record.json>)")
 
 
-USAGE = """usage: runner.py [--batch N] [--mode legacy|evolve|full] [--rounds R] [--evals E] [--dev-only]
-                 [--selection pareto_niche|map_elites]
+USAGE = """usage: runner.py [--batch N] [--mode legacy|evolve|full|audit|power] [--rounds R] [--evals E]
+                 [--dev-only] [--selection pareto_niche|map_elites] [--search-config FILE]
   --mode legacy  (default) v2 candidate engine: generation BH-FDR, state/state.json,
                  state/discovery_ledger.jsonl, results/cycle_summary.json
   --mode evolve  evolution engine: StepM validation batches + locked campaigns,
                  state/evolution/*, results/evolution_cycle_summary.json
   --mode full    legacy then evolve in one cycle
+  --mode audit   read-only ledger / state consistency check of the state directory
+  --mode power   synthetic power analysis of the promotion gates -> results/power_analysis.json
+  --search-config FILE  (evolve) JSON of search.SearchConfig fields (unknown keys are an error)
   --dev-only     (evolve) DEV evaluation and search only: no validation window is looked at
   --selection    (evolve --dev-only) parent selection: pareto_niche (default) or map_elites
                  (one champion per direction x holding band x signal group cell, ADR 0019)
@@ -1775,11 +1833,29 @@ def main(argv: Sequence[str]) -> int:
     except UsageError as e:
         print(f"USAGE_ERROR: {e}", file=sys.stderr)
         return 1
+    if opts["mode"] in READ_ONLY_MODES:
+        # no lock, no market data, no cost profile, nothing created in the state
+        # directory (PathConfig.from_env would require NEW2_DATA_DIR and mkdir)
+        root = Path(os.environ.get("NEW2_DISCOVERY_ROOT", str(Path(__file__).resolve().parent)))
+        ro = argparse.Namespace(state_dir=Path(os.environ.get("NEW2_STATE_DIR", root / "state")),
+                                results_dir=Path(os.environ.get("NEW2_RESULTS_DIR", root / "results")))
+        try:
+            return run_read_only_mode(opts["mode"], ro)
+        except Exception as e:  # noqa: BLE001 — a crash is FAILED, never success
+            print(json.dumps({"status": "FAILED", "fatal": f"{type(e).__name__}: {e}"}))
+            return 1
     try:
         paths = PathConfig.from_env()
     except PathConfigError as e:
         print(f"CONFIG_ERROR: {e}", file=sys.stderr)
         return 1
+    search_cfg = None
+    if opts["search-config"] is not None:
+        try:
+            search_cfg = load_search_config(opts["search-config"], opts["selection"])
+        except UsageError as e:
+            print(f"USAGE_ERROR: {e}", file=sys.stderr)
+            return 1
     if os.environ.get("REFRESH") == "1":
         # §9-1 (R-4): the flag is explicitly NOT supported — say so, loudly,
         # instead of silently pretending data was refreshed.
@@ -1824,7 +1900,7 @@ def main(argv: Sequence[str]) -> int:
                 from search import SearchConfig
                 es = run_evolution_cycle(paths.state_dir, RunnerDataProvider(paths.data_dir),
                                          cost, rounds=opts["rounds"],
-                                         search_cfg=SearchConfig(selection=opts["selection"]),
+                                         search_cfg=search_cfg or SearchConfig(selection=opts["selection"]),
                                          max_dev_evals=opts["evals"], results_dir=paths.results_dir,
                                          forward_feed=FileFeed(paths.data_dir), validation_history=vh,
                                          confirmatory=not opts.get("dev_only"))

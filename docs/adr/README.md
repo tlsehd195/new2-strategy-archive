@@ -68,3 +68,4 @@
 | [0062](0062-iw0-sealed-confirmation-window-rules.md) | IW0 지정: 현물 2017-08~2019-12를 봉인 확인 전용 구간으로 지정(규칙만, 개봉 없음): 1회·사전등록 먼저·동동 최종 확인·롱/현금만·가정 비용(승격 근거 아님)·DEV 사용 금지 | Accepted (규칙 기록만) |
 | [0063](0063-cost-evidence-real-account-only-and-component-table.md) | 비용 증거: 실계좌 체결만 VERIFIED(계좌 종류 필수, 모의·미기재는 BLOCKED_EXTERNAL_EVIDENCE), 증거 등급 표, 비용 구성요소별 처리·증거 표 | Accepted |
 | [0064](0064-promo-v5-dsr-ci-gating-and-power-analysis.md) | 통계 게이트: promo-v5를 단일 기본값으로(DSR ≥ 0.95·부트스트랩 CI 하한 > 0이 판정 게이트, 계산 불가는 BLOCKED_STATISTICS/INSUFFICIENT_DATA, 시행 집합 = 탐색 풀), DEV 시계열 먼저 기록; 재현 가능한 검정력 분석: 1종 오류 ≤ 0.025 유지, 그러나 SR 4까지 80% 검정력 없음(BTC/ETH k=8 창 SR 4에서 18%), 기준 완화가 아니라 증거량 확대가 필요 | Accepted |
+| [0065](0065-run-modes-audit-power-and-state-integrity.md) | 실행 모드·상태 무결성: `--mode audit`(읽기 전용 원장 점검)·`--mode power`(합성 검정력), 엄격한 `--search-config`(모르는 키는 오류), `ledger_check`의 MISSING_DEV_SERIES, 사이클 요약에 `status_meaning`·`strategies_passed`(CYCLE_OK는 전략 판정 아님) | Accepted |

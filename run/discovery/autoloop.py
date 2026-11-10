@@ -57,9 +57,17 @@ class EvolutionCycleSummary:
     reverify_pending: list = field(default_factory=list)
     notes: list = field(default_factory=list)
     runtime_seconds: float = 0.0
+    #: ``status`` is the health of the cycle (it ran, it was blocked, it failed);
+    #: it never says that a strategy passed — strategy outcomes are ``status_counts``
+    #: and ``strategies_passed``
+    status_meaning: str = "cycle health only, not a strategy verdict"
+    strategies_passed: dict = field(default_factory=dict)
 
     def to_json(self) -> dict:
-        return asdict(self)
+        d = asdict(self)
+        d["strategies_passed"] = {k: v for k, v in (self.status_counts or {}).items()
+                                  if k in ("VALIDATION_SURVIVOR", "PAPER_TEST_READY")}
+        return d
 
 
 def run_evolution_cycle(state_dir: Path, provider, cost, *, results_dir: Optional[Path] = None,
