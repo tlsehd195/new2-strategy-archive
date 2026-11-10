@@ -153,9 +153,13 @@ def run(a) -> int:
     funding_cache = {}
 
     def fund_sum(sym, t0, t1):
-        if sym not in funding_cache:
-            funding_cache[sym] = bu.load_funding(data, [sym], bu.ms("2021-01-01"), bu.ms("2025-10-20"))
-        f = funding_cache[sym]
+        # per DEV segment: one load over 2021-01..2025-10 read the never-read
+        # 2023-09-19..2024-06-18 gap too (unused, but loaded; ADR 0066)
+        seg = seg_of(t0)
+        if (sym, seg) not in funding_cache:
+            lo, hi, _ = SEGS[seg]
+            funding_cache[(sym, seg)] = bu.load_funding(data, [sym], bu.ms(lo), bu.ms(hi))
+        f = funding_cache[(sym, seg)]
         m = (f["t"] > t0) & (f["t"] <= t1)
         return float(f.loc[m, "rate"].sum())
 

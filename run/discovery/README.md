@@ -161,6 +161,15 @@ Environment (all optional, fail-closed when wrong):
 - `--search-config FILE` (`--mode evolve`) reads `search.SearchConfig` fields from a
   JSON object; unknown keys are a usage error and the parent selection stays on
   `--selection` (ADR 0065).
+- `--feature-set v2` (`--mode evolve`) registers the opt-in klines features
+  `range_z`, `illiq_z`, `ma_dist_z`, `skew_z`, `dow_utc` (causal, prefix-invariance
+  tested).  It changes `registry_identity()` and so starts a new experiment
+  context; without it nothing changes.  `feature_data_registry.py <data_dir>` lists
+  which feature families have their data and which are `DATA_MISSING` (open
+  interest, premium index, liquidations, order-book history, DVOL) or
+  `NOT_DERIVABLE` (trade count).  `strategy_record.py` is the one record format for
+  engine and independent strategies (with the dedup rule); the classification of
+  every `run/*.py` is `run/audit/RESEARCH_SCRIPTS_20261110.md` (ADR 0066).
 - `ledger_check.py <state_dir>` (or `runner.py --mode audit`) is a read-only
   consistency check of the source ledgers and derived summaries (exit 0 consistent,
   2 findings, 1 unreadable); the file roles are listed in its docstring.  It also

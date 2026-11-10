@@ -79,6 +79,9 @@ def _threshold_for(rng: random.Random, name: str, op: str):
     if name == "hour_utc":
         h0 = rng.randrange(0, 23)
         return [float(h0), float(min(24, h0 + rng.choice([1, 2, 3, 4, 6])))]
+    if name == "dow_utc":                     # opt-in set v2 (ADR 0066)
+        d0 = rng.randrange(0, 7)
+        return [float(d0), float(min(7, d0 + rng.choice([1, 2, 3])))]
     if name in ("rsi", "fng_max", "fng_min"):
         return float(rng.choice([10, 15, 20, 25, 30]) if op in ("lt", "le")
                      else rng.choice([70, 75, 80, 85, 90]))
@@ -113,7 +116,7 @@ def random_condition(rng: random.Random, available_data: Sequence[str],
     if name == "vol_ratio" and params["short"] >= params["long"]:
         params["short"], params["long"] = 16, 192
     op = rng.choice([o for o in f.ops])
-    if name != "hour_utc" and op == "between":
+    if name not in INTEGER_FEATURES and op == "between":
         op = "gt"
     return {"feature": name, "params": params, "op": op, "value": _threshold_for(rng, name, op)}
 
@@ -192,7 +195,7 @@ def op_tweak_threshold(s, rng, ctx):
     w = rng.choice(_all_conds(s))
     c = _get(s, w)
     lo, hi = FEATURES[c["feature"]].value_range
-    step = 1.0 if c["feature"] == "hour_utc" else (5.0 if hi >= 100 else 0.25)
+    step = 1.0 if c["feature"] in INTEGER_FEATURES else (5.0 if hi >= 100 else 0.25)
     d = rng.choice([-step, step])
     old = copy.deepcopy(c["value"])
     if c["op"] == "between":
@@ -342,7 +345,7 @@ OPS = {
 FINGERPRINT_VERSION = "fp-v2"
 #: features whose value is an integer by construction (UTC hour of the bar), so
 #: thresholds between two integers select the same bars
-INTEGER_FEATURES = frozenset({"hour_utc"})
+INTEGER_FEATURES = frozenset({"hour_utc", "dow_utc"})
 _INF = float("inf")
 
 

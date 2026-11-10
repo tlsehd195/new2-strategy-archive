@@ -1681,7 +1681,7 @@ def parse_options(argv: Sequence[str]) -> dict:
     Anything else is a usage error — never silently ignored."""
     args = list(argv)
     opts = {"batch": 10, "mode": "legacy", "rounds": 2, "evals": 60, "selection": "pareto_niche",
-            "search-config": None}
+            "search-config": None, "feature-set": "v1"}
     i = 0
     while i < len(args):
         a = args[i]
@@ -1711,6 +1711,12 @@ def parse_options(argv: Sequence[str]) -> dict:
         if key == "search-config":
             opts["search-config"] = val
             continue
+        if key == "feature-set":
+            from strategy_spec import FEATURE_SETS
+            if val not in FEATURE_SETS:
+                raise UsageError(f"--feature-set must be one of {sorted(FEATURE_SETS)}, got {val!r}")
+            opts["feature-set"] = val
+            continue
         if key == "mode":
             if val not in MODES:
                 raise UsageError(f"--mode must be one of {MODES}, got {val!r}")
@@ -1721,6 +1727,9 @@ def parse_options(argv: Sequence[str]) -> dict:
         opts[key] = int(val)
     if opts.get("dev_only") and opts["mode"] != "evolve":
         raise UsageError("--dev-only needs --mode evolve")
+    if opts["feature-set"] != "v1" and opts["mode"] != "evolve":
+        # a feature set is a new experiment context of the evolution engine (ADR 0066)
+        raise UsageError("--feature-set needs --mode evolve")
     if opts["search-config"] is not None and opts["mode"] != "evolve":
         raise UsageError("--search-config needs --mode evolve")
     if opts["selection"] != "pareto_niche" and not opts.get("dev_only"):
@@ -1809,6 +1818,7 @@ def cost_from_env() -> CostContext:
 
 USAGE = """usage: runner.py [--batch N] [--mode legacy|evolve|full|audit|power] [--rounds R] [--evals E]
                  [--dev-only] [--selection pareto_niche|map_elites] [--search-config FILE]
+                 [--feature-set v1|v2]
   --mode legacy  (default) v2 candidate engine: generation BH-FDR, state/state.json,
                  state/discovery_ledger.jsonl, results/cycle_summary.json
   --mode evolve  evolution engine: StepM validation batches + locked campaigns,
@@ -1817,6 +1827,8 @@ USAGE = """usage: runner.py [--batch N] [--mode legacy|evolve|full|audit|power] 
   --mode audit   read-only ledger / state consistency check of the state directory
   --mode power   synthetic power analysis of the promotion gates -> results/power_analysis.json
   --search-config FILE  (evolve) JSON of search.SearchConfig fields (unknown keys are an error)
+  --feature-set v1|v2   (evolve) v2 adds the opt-in klines features range_z, illiq_z, ma_dist_z,
+                 skew_z, dow_utc (new experiment context; ADR 0066)
   --dev-only     (evolve) DEV evaluation and search only: no validation window is looked at
   --selection    (evolve --dev-only) parent selection: pareto_niche (default) or map_elites
                  (one champion per direction x holding band x signal group cell, ADR 0019)
@@ -1895,6 +1907,12 @@ def main(argv: Sequence[str]) -> int:
             # SIGTERM / SIGINT stop the evolution cycle where it is: the cycle wrapper
             # records CYCLE_FAILED (never a lingering CYCLE_RUNNING), the lock is
             # released below and the next run resumes from the ledgers (§7)
+            if opts["feature-set"] != "v1":
+                # registers the opt-in features: registry_identity() and with it the
+                # experiment context change, so v1 contexts are never mixed with v2
+                from strategy_spec import enable_feature_set
+                enable_feature_set(opts["feature-set"])
+                print(f"FEATURE_SET {opts['feature-set']}", file=sys.stderr)
             old = _install_interrupt_handlers()
             try:
                 from search import SearchConfig

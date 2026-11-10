@@ -1,0 +1,2025 @@
+[
+ {
+  "file": "a1_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 185,
+  "doc": "A1 교차검증 — 기존 정액 비용(12/16/20bp) 대신 저장소 엔진 CandleCostModel",
+  "adr": [],
+  "flags": {
+   "future_index": 1,
+   "v1_path": 2,
+   "cointrader": 1
+  }
+ },
+ {
+  "file": "a1_family_precheck.py",
+  "class": "INTEGRATED_CORE",
+  "reason": "A1 Amihud illiquidity z (prior-960 window) = feature illiq_z of opt-in set v2 (ADR 0066); script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 129,
+  "doc": "Task 31 — A1(Amihud 비유동성) 패밀리 사전검증.",
+  "adr": [],
+  "flags": {
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "a1_illiq_diag.py",
+  "class": "INTEGRATED_CORE",
+  "reason": "A1 Amihud illiquidity z (prior-960 window) = feature illiq_z of opt-in set v2 (ADR 0066); script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "LOGIC_TRACED",
+  "traced": "header rule (z vs prior 960, shift 1) — used for illiq_z",
+  "legacy": true,
+  "lines": 263,
+  "doc": "A1 Amihud 비유동성 방향 신호 진단 — PREREG_a1_illiq_2026-10-13.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "future_index": 5,
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "alpha101_dev.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "weekly cross-section of 101 Alphas (ADR 0054): multi-asset panel, engine is per-symbol; NOT_PROMISING",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 164,
+  "doc": "Eight WorldQuant '101 Formulaic Alphas' as a weekly cross-section, DEV only (ADR 0054).",
+  "adr": [
+   "035",
+   "040",
+   "054"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "alt_download.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "alt funding extremes, v1 rounds; funding signal = funding_z in the engine (BTC/ETH), alt cross-sections re-done by broad/wide_universe_dev; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 62,
+  "doc": "Task 33 ALT-P1 데이터 다운로드 — data.binance.vision 월별 zip (KP 선례 우회 경로)",
+  "adr": [],
+  "flags": {
+   "network": 3,
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "alt_download_r2.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "alt funding extremes, v1 rounds; funding signal = funding_z in the engine (BTC/ETH), alt cross-sections re-done by broad/wide_universe_dev; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 61,
+  "doc": "Task 34 ALT-P1-R2 데이터 다운로드 — data.binance.vision 월별 zip (Task 33 선례 재용)",
+  "adr": [],
+  "flags": {
+   "network": 3,
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "alt_funding_diag.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "alt funding extremes, v1 rounds; funding signal = funding_z in the engine (BTC/ETH), alt cross-sections re-done by broad/wide_universe_dev; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 271,
+  "doc": "Task 33 ALT-P1 진단 — PREREG_alt_funding_extreme_2026-10-14.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "alt_funding_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 185,
+  "doc": "Task 33 ALT-P1 엔진 교차검증 — 저장소 CandleCostModel(costs.py:104-117) 기본 파라미터 적용.",
+  "adr": [],
+  "flags": {
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "alt_funding_r2_diag.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "alt funding extremes, v1 rounds; funding signal = funding_z in the engine (BTC/ETH), alt cross-sections re-done by broad/wide_universe_dev; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 295,
+  "doc": "Task 34 ALT-P1-R2 진단 — PREREG_alt_funding_extreme_r2_2026-10-14.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "alt_funding_r2_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 173,
+  "doc": "Task 34 ALT-P1-R2 엔진 교차검증 — 저장소 CandleCostModel(costs.py:104-117) 기본 파라미터 적용.",
+  "adr": [],
+  "flags": {
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "alt_funding_r2_precheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "alt funding extremes, v1 rounds; funding signal = funding_z in the engine (BTC/ETH), alt cross-sections re-done by broad/wide_universe_dev; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 78,
+  "doc": "Task 34 ALT-P1-R2 §5 사전검증 — 방향 정보 없는 분포·트리거 수 기록 (전략 수익 열람 전 실행).",
+  "adr": [],
+  "flags": {
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "basis_harvest_dev.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "spot-index long / perp short (ADR 0060): two-leg carry; NOT_PROMISING",
+  "read_status": "LOGIC_TRACED",
+  "traced": "shift(-1): open-to-next-open realised return of a position opened at the signal open",
+  "legacy": false,
+  "lines": 209,
+  "doc": "Spot-index long / perp short basis harvest, DEV only (ADR 0060).",
+  "adr": [
+   "060"
+  ],
+  "flags": {
+   "neg_shift": 3
+  }
+ },
+ {
+  "file": "broad_universe_dev.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "broad-universe cross-section (ADR 0035); also the shared DEV-window guard / loaders of the panel tools",
+  "read_status": "TESTED",
+  "traced": "SEGMENTS / NEVER / assert_allowed and the four loaders (load_funding, load_bar2345 had no guard)",
+  "legacy": false,
+  "lines": 416,
+  "doc": "Broad-universe cross-sectional DEV check (ADR 0035).",
+  "adr": [
+   "012",
+   "035",
+   "038",
+   "039",
+   "066"
+  ],
+  "flags": {
+   "neg_shift": 1
+  }
+ },
+ {
+  "file": "broad_universe_fetch.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "public download for the panel tools (ADR 0035)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 204,
+  "doc": "Download the public data for the broad-universe DEV check (ADR 0035).",
+  "adr": [
+   "035",
+   "046"
+  ],
+  "flags": {
+   "network": 2
+  }
+ },
+ {
+  "file": "bundle_regime_dev.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "bundle by regime vs buy-and-hold (ADR 0026); NOT stable",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 211,
+  "doc": "Top-5 bundle by market regime and against buy-and-hold, DEV only (ADR 0026).",
+  "adr": [
+   "024",
+   "026"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "c1_basis_momentum_diag.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "basis momentum: premium-index / basis history not in the repository; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 310,
+  "doc": "C1 베이시스 모멘텀 진단 — PREREG_c1_basis_momentum_2026-10-12.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "future_index": 2,
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "c1_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 189,
+  "doc": "C1 교차검증 — 기존 정액 비용(12/16/20bp) 대신 저장소 엔진 CandleCostModel",
+  "adr": [],
+  "flags": {
+   "future_index": 1,
+   "v1_path": 2,
+   "cointrader": 1
+  }
+ },
+ {
+  "file": "c3_coinbase_premium_diag.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "Coinbase premium: Coinbase klines not in the repository; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 366,
+  "doc": "C3 코인베이스 프리미엄 진단 — PREREG_c3_coinbase_premium_2026-10-13.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "future_index": 2,
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "c3_download_binance.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 104,
+  "doc": "C3 데이터 수집 2 — Binance spot 15m 전체(2021-04~2026-10) + perp 15m 백필(잠금 제외 월)",
+  "adr": [],
+  "flags": {
+   "network": 10,
+   "v1_path": 3
+  }
+ },
+ {
+  "file": "c3_download_coinbase.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 79,
+  "doc": "C3 데이터 수집 1 — Coinbase Exchange candles 15m (BTC-USD, ETH-USD)",
+  "adr": [],
+  "flags": {
+   "network": 10,
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "c3_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 199,
+  "doc": "C3 교차검증 — 기존 정액 비용(12/16/20bp) 대신 저장소 엔진 CandleCostModel",
+  "adr": [],
+  "flags": {
+   "future_index": 1,
+   "v1_path": 2,
+   "cointrader": 1
+  }
+ },
+ {
+  "file": "c4_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 185,
+  "doc": "C4 교차검증 — 기존 정액 비용(12/16/20bp) 대신 저장소 엔진 CandleCostModel",
+  "adr": [],
+  "flags": {
+   "future_index": 1,
+   "v1_path": 2,
+   "cointrader": 1
+  }
+ },
+ {
+  "file": "c4_premium_spike_diag.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "premium spike: premium-index history not in the repository; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 314,
+  "doc": "C4 프리미엄 인덱스 인트라-인터벌 스파이크 회귀 진단 — PREREG_c4_premium_spike_2026-10-12.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "future_index": 2,
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "c5_download_archive.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 81,
+  "doc": "C5 납품계약 데이터 — data.binance.vision 월간 아카이브 방식 (fapi 418 회피).",
+  "adr": [],
+  "flags": {
+   "network": 2,
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "c5_download_data.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 134,
+  "doc": "C5 데이터 수집 v2 — 418/429 재시도 강화 + 느린 페이싱 + 재개 가능. HTTP 실측 기록 필수.",
+  "adr": [],
+  "flags": {
+   "network": 8,
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "c5_download_spot_parallel.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 56,
+  "doc": "스팟 1h 병렬 다운로드 — api.binance.com은 fapi와 레이트리밋 분리. 재시도 강화.",
+  "adr": [],
+  "flags": {
+   "network": 4,
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "c5_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 247,
+  "doc": "C5 교차검증 — 기존 정액 비용(12/16/20bp) 대신 저장소 엔진 CandleCostModel",
+  "adr": [],
+  "flags": {
+   "v1_path": 2,
+   "cointrader": 1
+  }
+ },
+ {
+  "file": "c5_quarterly_curve_diag.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "quarterly futures curve: dated-futures klines not in the repository; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 398,
+  "doc": "C5 분기선물 커브 슬로프 진단 — PREREG_c5_quarterly_curve_2026-10-12.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "c7_cross_venue_spread_diag.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "cross-venue spread: other-venue klines not in the repository; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 388,
+  "doc": "C7 교차거래소 퍼페-퍼페 스프레드 정상화 진단 — PREREG_c7_cross_venue_spread_2026-10-13.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "future_index": 2,
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "c7_download_venues.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 152,
+  "doc": "C7 데이터 다운로드 — PREREG_c7_cross_venue_spread_2026-10-13.md §2 규격.",
+  "adr": [],
+  "flags": {
+   "network": 3,
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "c7_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 200,
+  "doc": "C7 교차검증 — 기존 정액 비용(12/16/20bp) 대신 저장소 엔진 CandleCostModel",
+  "adr": [],
+  "flags": {
+   "future_index": 1,
+   "v1_path": 2,
+   "cointrader": 1
+  }
+ },
+ {
+  "file": "c7_probe_data.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "cross-venue spread: other-venue klines not in the repository; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 127,
+  "doc": "C7 교차거래소 퍼페-퍼페 스프레드 — 데이터 가용성 재실측 (PREREG 작성 전 필수 단계)",
+  "adr": [],
+  "flags": {
+   "network": 4,
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "c9_download_dvol.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 91,
+  "doc": "C9 Deribit DVOL 일간 시리즈 다운로드 — PREREG_c9_dvol_2026-10-13.md §2 규격.",
+  "adr": [],
+  "flags": {
+   "network": 15,
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "c9_dvol_diag.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "DVOL implied volatility: not in the repository; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 365,
+  "doc": "C9 Deribit DVOL 변동성 지수 극단 역발상 진단 — PREREG_c9_dvol_2026-10-13.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "future_index": 2,
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "c9_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 203,
+  "doc": "C9 엔진 교차검증 — 정액 비용(12/16/20bp) 대신 저장소 엔진 CandleCostModel",
+  "adr": [],
+  "flags": {
+   "future_index": 1,
+   "v1_path": 1,
+   "cointrader": 1
+  }
+ },
+ {
+  "file": "c9_inspect.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "DVOL implied volatility: not in the repository; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 37,
+  "doc": "C9 결과 상세 검토 — 구성 일관성 및 탐색 관측 등록 자격(X1-R 엄격 기준: 유효n>=22 + 엔진 net>0 + 구성 일관)",
+  "adr": [],
+  "flags": {
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "candidate_regime_dev.py",
+  "class": "STANDARD_INTERFACE",
+  "reason": "per-regime scorecard via canonicalize_spec + CostContext (ADR 0044)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 236,
+  "doc": "Per-regime scorecard of the R9 candidates and five bundles, DEV only (ADR 0044).",
+  "adr": [
+   "044"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "compare_selection_dev.py",
+  "class": "STANDARD_INTERFACE",
+  "reason": "compares two evolve ledgers (ADR 0019)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 107,
+  "doc": "Compare DEV-only evolve runs that differ only in parent selection (ADR 0019).",
+  "adr": [
+   "019"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "cross_section_v2_dev.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "five cross-sectional hypotheses (ADR 0040); NOT_PROMISING",
+  "read_status": "TESTED",
+  "traced": "shift(-1) realised return, as above",
+  "legacy": false,
+  "lines": 255,
+  "doc": "Five new cross-sectional hypotheses, DEV only, measured alt cost (ADR 0040).",
+  "adr": [
+   "035",
+   "040"
+  ],
+  "flags": {
+   "neg_shift": 1
+  }
+ },
+ {
+  "file": "download_missing_data.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 data pipeline; replaced by run/discovery/data_fetch.py; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 486,
+  "doc": "Task 56-b — NEW2 Phase 5 데이터 파이프라인 복원 (재실행 가능)",
+  "adr": [],
+  "flags": {
+   "network": 8,
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "evalue_v3_block.py",
+  "class": "STANDARD_INTERFACE",
+  "reason": "e-value v3 block tool on the EvolutionPipeline / evaluator (ADR 0042)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 233,
+  "doc": "Walk-forward e-value v3 block tool: freeze, DEV vol scale, block P&L, booking (ADR 0042).",
+  "adr": [
+   "042"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "evalue_walkforward_sim.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "synthetic error-rate simulation (ADR 0025)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 811,
+  "doc": "Walk-forward e-value accumulation: does it keep its error rate?  (synthetic only)",
+  "adr": [
+   "025",
+   "027",
+   "032"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "f1_cme_gap_diag.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "CME weekend gap: CME futures prices not in the repository; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 264,
+  "doc": "F1 CME 주말 갭 진단 — PREREG_f1_cme_gap_2026-10-12.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "f1_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 182,
+  "doc": "F1 교차검증 — 엔진 CandleCostModel (costs.py:104-117) 적용 재계산.",
+  "adr": [],
+  "flags": {
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "f2x6_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 176,
+  "doc": "F2/X6 교차검증 — 기존 정액 비용(12/16/20bp) 대신 저장소 엔진 CandleCostModel",
+  "adr": [],
+  "flags": {
+   "future_index": 1,
+   "v1_path": 3,
+   "cointrader": 1
+  }
+ },
+ {
+  "file": "f2x6_fng_diag.py",
+  "class": "INTEGRATED_CORE",
+  "reason": "Fear & Greed extremes = legacy family fng and features fng_max / fng_min; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 270,
+  "doc": "F2/X6 공포탐욕 극단 역발 진단 — PREREG_f2x6_fng_2026-10-12.md 규격 구현.",
+  "adr": [],
+  "flags": {
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "f2x6_fng_extreme_diag.py",
+  "class": "INTEGRATED_CORE",
+  "reason": "Fear & Greed extremes = legacy family fng and features fng_max / fng_min; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 322,
+  "doc": "F2/X6 공포·탐욕 극단 역발상 진단 — PREREG_f2x6_fng_extreme_2026-10-12.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "future_index": 2,
+   "v1_path": 3
+  }
+ },
+ {
+  "file": "fast_short_dev.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "fast short-horizon panel strategies (ADR 0045); NOT_PROMISING",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 404,
+  "doc": "Fast short-horizon strategies vs the cost wall, DEV only, measured alt cost (ADR 0045).",
+  "adr": [
+   "045"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "fng_refresh_check.py",
+  "class": "INTEGRATED_CORE",
+  "reason": "F&G refresh check; F&G is a dataset of the engine (fng); script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 36,
+  "doc": "Task 31 — F2/X6-R 조기 점검: F&G 재다운로드 후 잠금 외 신규 구간 극단공포 이벤트 확인.",
+  "adr": [],
+  "flags": {
+   "network": 2,
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "forward_v2_entry_bar_dev.py",
+  "class": "STANDARD_INTERFACE",
+  "reason": "prereg v2 entry bar via canonicalize_spec + CostContext (ADR 0036)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 86,
+  "doc": "Prereg v2 entry bar on DEV time: basket-average annual SR of candidates (ADR 0036).",
+  "adr": [
+   "019",
+   "023",
+   "036"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "fr_crosscheck_engine_cost.py",
+  "class": "INTEGRATED_CORE",
+  "reason": "funding extremes = legacy family fund_z and feature funding_z; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 198,
+  "doc": "P1 교차검증 — 기존 정액 비용(12/16/20bp 왕복) 대신 저장소 엔진의 CandleCostModel",
+  "adr": [],
+  "flags": {
+   "v1_path": 2,
+   "cointrader": 1
+  }
+ },
+ {
+  "file": "fr_extreme_diag.py",
+  "class": "INTEGRATED_CORE",
+  "reason": "funding extremes = legacy family fund_z and feature funding_z; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 213,
+  "doc": "P1 fr_extreme 진단 — 사전등록(PREREG_local_2026-10-12.md) 규격 그대로 구현.",
+  "adr": [
+   "088"
+  ],
+  "flags": {
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "fr_supplementary.py",
+  "class": "INTEGRATED_CORE",
+  "reason": "funding extremes = legacy family fund_z and feature funding_z; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 47,
+  "doc": "보조 통계(서술용, 판정 규칙 없음): 펀딩 z와 선행수익의 선형 상관 + 정산 시점 자체 드리프트",
+  "adr": [],
+  "flags": {
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "hilo_intraday_dev.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "high/low line + volume spike, 15m/1h panel (ADR 0046); variant of hilo_volume_dev",
+  "read_status": "TESTED",
+  "traced": "swing_lines: future-looking pivot test shifted by k (known at j+k) — causal",
+  "legacy": false,
+  "lines": 343,
+  "doc": "High/low line + volume-spike strategy on 15m/1h bars, DEV only (ADR 0044).",
+  "adr": [
+   "035",
+   "044"
+  ],
+  "flags": {
+   "neg_shift": 3
+  }
+ },
+ {
+  "file": "hilo_volume_dev.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "high/low line + volume spike, daily panel (ADR 0043); NOT_PROMISING",
+  "read_status": "TESTED",
+  "traced": "shift(-1) realised return, as above",
+  "legacy": false,
+  "lines": 288,
+  "doc": "High/low line + volume-spike strategy, DEV only, measured alt cost (ADR 0043).",
+  "adr": [
+   "035",
+   "043"
+  ],
+  "flags": {
+   "neg_shift": 1
+  }
+ },
+ {
+  "file": "iw1_statistic_dev.py",
+  "class": "STANDARD_INTERFACE",
+  "reason": "IW1 statistic re-score via evaluator.run_event_study (ADR 0019/0036)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 78,
+  "doc": "Re-score given spec candidates with the IW1 statistic on DEV time (ADR 0019).",
+  "adr": [
+   "019"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "kp_diag.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "kimchi premium: KRW exchange prices / FX not in the repository; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 218,
+  "doc": "KP 김치 프리미엄 정상화 진단 — PREREG_kp_kimchi_2026-10-13.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "future_index": 1,
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "kp_download.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 98,
+  "doc": "Task 29 - KP(김치 프리미엄) 데이터 다운로드 v2",
+  "adr": [],
+  "flags": {
+   "network": 5,
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "kp_download_binance.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 57,
+  "doc": "Task 29 - Binance spot 1d via data.binance.vision (zipfile 명시 해제 + 마이크로초 보정)",
+  "adr": [],
+  "flags": {
+   "network": 3,
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "kp_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 176,
+  "doc": "KP 엔진 교차검증 — 정액 비용(12/16/20bp) 대신 저장소 엔진 CandleCostModel 공식 적용.",
+  "adr": [],
+  "flags": {
+   "future_index": 1,
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "l1_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 139,
+  "doc": "L1 교차검증 — 저장소 엔진 CandleCostModel (costs.py:104-117) 적용.",
+  "adr": [],
+  "flags": {
+   "v1_path": 3
+  }
+ },
+ {
+  "file": "l1_expiry_diag.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "futures expiry: ~20 events (structurally underpowered) and dated futures data; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 312,
+  "doc": "L1 선물 만기(납품) 효과 진단 — PREREG_l1_expiry_2026-10-12.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "l3_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 185,
+  "doc": "L3 교차검증 — 기존 정액 비용(12/16/20bp) 대신 저장소 엔진 CandleCostModel",
+  "adr": [],
+  "flags": {
+   "future_index": 1,
+   "v1_path": 2,
+   "cointrader": 1
+  }
+ },
+ {
+  "file": "l3_rv_tail_diag.py",
+  "class": "INTEGRATED_CORE",
+  "reason": "realised-vol tail z ~ vol_ratio (engine) and range_z (v2); the exact RV-z rule is not a registered feature (partial); script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "LOGIC_TRACED",
+  "traced": "header rule only",
+  "legacy": true,
+  "lines": 335,
+  "doc": "L3 실현변동(RV) 꼬리 방향 신호 진단 — PREREG_l3_rv_tail_2026-10-12.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "future_index": 2,
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "liquid_search_dev.py",
+  "class": "STANDARD_INTERFACE",
+  "reason": "DEV search on a liquid universe via evaluator + CostContext, forbidden-read guard (ADR 0024)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 927,
+  "doc": "DEV-only search on a LIQUID universe (ADR 0024); derived from run/strong_search_dev.py (ADR 0019, commit 88caa15).",
+  "adr": [
+   "010",
+   "016",
+   "019",
+   "024"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "lowliq_cost_calibration.py",
+  "class": "STANDARD_INTERFACE",
+  "reason": "volume-scaled alt cost calibration (ADR 0041), feeds CostContext",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 113,
+  "doc": "Volume-scaled alt cost calibration from the measured public order books (ADR 0039).",
+  "adr": [
+   "038",
+   "039"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "maker_entry_estimate.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "maker-entry cost estimate from public books (ADR 0049)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 377,
+  "doc": "Limit-order (maker) entry cost estimate from public books + public aggTrades (ADR 0049).",
+  "adr": [
+   "049"
+  ],
+  "flags": {
+   "future_index": 2
+  }
+ },
+ {
+  "file": "maker_entry_reeval.py",
+  "class": "STANDARD_INTERFACE",
+  "reason": "re-evaluates engine DEV candidates with maker cost (ADR 0049)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 194,
+  "doc": "Re-evaluate the DEV candidates with limit-order (maker) entry costs, DEV only (ADR 0049).",
+  "adr": [
+   "038",
+   "045",
+   "049"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "maker_rescore_dev.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "maker re-pricing of published panel candidates (ADR 0056)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 129,
+  "doc": "Limit-order (maker) cost re-pricing of published DEV cross-sectional candidates (ADR 0056).",
+  "adr": [
+   "056"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "n2_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 240,
+  "doc": "N2 교차검증 — 체결 시뮬레이션의 독립 재구현(벡터화) + 엔진 비용 구성표($10k/$100k) + taker-taker 대조군.",
+  "adr": [],
+  "flags": {
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "n2_maker_exec_diag.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "maker execution layer needs queue / order-book history; maker cost estimated by maker_entry_estimate.py; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 389,
+  "doc": "N2 지정가(maker) 진입 실행계층 진단 — PREREG_n2_maker_exec_2026-10-13.md 규격 구현.",
+  "adr": [],
+  "flags": {
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "newlisting_short_dev.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "new-listing short event study (ADR 0060); funding read per DEV segment since ADR 0066",
+  "read_status": "LOGIC_TRACED",
+  "traced": "load_symbol (segment filter), fund_sum (read 2021-01..2025-10 incl. the never-read gap)",
+  "legacy": false,
+  "lines": 288,
+  "doc": "New-listing short event study, DEV only (ADR 0060).",
+  "adr": [
+   "060",
+   "066"
+  ],
+  "flags": {
+   "neg_shift": 1
+  }
+ },
+ {
+  "file": "null_power_report.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "summary of null_power_sim runs (ADR 0048)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 106,
+  "doc": "Summarise runs.jsonl of null_power_sim.py by the metrics fixed in the prereg (ADR 0048).",
+  "adr": [
+   "019",
+   "048"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "null_power_sim.py",
+  "class": "STANDARD_INTERFACE",
+  "reason": "null / planted-edge runs of the DEV pipeline (ADR 0048)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 397,
+  "doc": "Null (no-edge) and planted-edge runs of the DEV search pipeline (ADR 0048).",
+  "adr": [
+   "048"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "okx_real_cost.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "round-trip cost back-calculation from a fills CSV (ADR 0058); demo records are not cost evidence",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 55,
+  "doc": "체결 기록 CSV에서 왕복 비용을 역산한다. 기본은 실계좌 기록(research/okx_real/real_fills.csv).",
+  "adr": [
+   "058"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "okx_tendency_dev.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "OKX paper-record tendencies as DEV rules (ADR 0052); NOT_PROMISING",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 318,
+  "doc": "OKX paper-record tendencies as preregistered DEV rules (ADR 0052).",
+  "adr": [
+   "045",
+   "052"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "p3_probe2.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "liquidation data source probe; liquidation history not in the repository",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 58,
+  "doc": "Task 29 - P3 probe 2차: BitMEX 파라미터 변형 + OKX begin/end 지원 여부",
+  "adr": [],
+  "flags": {
+   "network": 13
+  }
+ },
+ {
+  "file": "p3_probe_liquidation.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "liquidation data source probe; liquidation history not in the repository",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 78,
+  "doc": "Task 29 - P3 청산 데이터 소스 재실측 probe",
+  "adr": [],
+  "flags": {
+   "network": 14
+  }
+ },
+ {
+  "file": "pdf_check_sim.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "synthetic checks of two papers (ADR 0032)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 242,
+  "doc": "Synthetic error-rate checks for the two papers read from PDF on 2026-10-22",
+  "adr": [
+   "027",
+   "028"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "power_audit_ledger.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "reads one DEV state directory: what the gates removed (ADR 0022)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 193,
+  "doc": "Read one DEV-only state directory and ask: what did the cost gate and the",
+  "adr": [],
+  "flags": {}
+ },
+ {
+  "file": "power_audit_synthetic.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "synthetic miss rate of the gates (ADR 0022); superseded for promo-v5 by discovery/power_analysis.py (ADR 0064)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 339,
+  "doc": "How many REAL edges would the archive's gates miss?  (synthetic, diagnostic only)",
+  "adr": [
+   "009",
+   "016"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "residual_signals_dev.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "market-factor residual panel signals (ADR 0051); NOT_PROMISING",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 159,
+  "doc": "Market-factor-residual cross-sectional DEV check (ADR 0051).",
+  "adr": [
+   "047",
+   "049",
+   "051"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "stepm_block_sim.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "StepM FWER vs bootstrap block length (ADR 0027)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 270,
+  "doc": "StepM family-wise error rate vs the stationary-bootstrap block length",
+  "adr": [
+   "027",
+   "030"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "strong_search_dev.py",
+  "class": "STANDARD_INTERFACE",
+  "reason": "strong-candidate DEV search via evaluator + CostContext, forbidden-read guard (ADR 0019)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 919,
+  "doc": "DEV-only search for markedly stronger candidates (ADR 0019).",
+  "adr": [
+   "010",
+   "016",
+   "019"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "structural_search_dev.py",
+  "class": "STANDARD_INTERFACE",
+  "reason": "market-structure DEV search with engine DSR (ADR 0020)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 518,
+  "doc": "DEV-only search for market-structure return sources (ADR 0020).",
+  "adr": [
+   "019",
+   "020"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_alpha101.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 115,
+  "doc": "Tests for the 101 Formulaic Alphas DEV check (ADR 0054). Needs numpy and pandas.",
+  "adr": [
+   "054"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_broad_universe.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 79,
+  "doc": "Tests for the broad-universe DEV check (ADR 0035). Needs numpy and pandas.",
+  "adr": [
+   "035"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_bundle_regime.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 43,
+  "doc": "Sanity checks for run/bundle_regime_dev.py (synthetic arrays only, no data files).",
+  "adr": [],
+  "flags": {}
+ },
+ {
+  "file": "test_candidate_regime.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 48,
+  "doc": "Tests for the candidate regime scorecard helpers (ADR 0044).",
+  "adr": [
+   "044"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_cross_section_v2.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 111,
+  "doc": "Tests for the cross-section v2 DEV check (ADR 0040). Needs numpy and pandas.",
+  "adr": [
+   "040"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_dev_window_guard.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 50,
+  "doc": "DEV-window guard of the shared loaders (ADR 0066): funding and 2345-bar",
+  "adr": [
+   "066"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_evalue_v3.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 30,
+  "doc": "evalue_v3.e_path (stdlib, ADR 0042) equals the simulated bet rule",
+  "adr": [
+   "025",
+   "042"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_evalue_walkforward.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 115,
+  "doc": "Sanity checks for run/evalue_walkforward_sim.py (synthetic numbers only).",
+  "adr": [],
+  "flags": {}
+ },
+ {
+  "file": "test_fast_short.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 132,
+  "doc": "Tests for the fast short-horizon DEV check (ADR 0045). Needs numpy and pandas.",
+  "adr": [
+   "045"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_forward_v2_entry_bar.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 36,
+  "doc": "Prereg v2 entry-bar tool (ADR 0036): S2 never reads BTC, every read is an",
+  "adr": [
+   "036"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_hilo_intraday.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 129,
+  "doc": "Tests for the intraday high/low line + volume-spike DEV check (ADR 0046). Needs numpy and pandas.",
+  "adr": [
+   "046"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_hilo_volume.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 108,
+  "doc": "Tests for the high/low line + volume-spike DEV check (ADR 0043). Needs numpy and pandas.",
+  "adr": [
+   "043"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_independent_check.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 61,
+  "doc": "Synthetic tests for the independent re-check engine (ADR 0057). No market data.",
+  "adr": [
+   "057"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_independent_samples.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 33,
+  "doc": "Synthetic tests for the independent-sample accounting tool (ADR 0059). No market data.",
+  "adr": [
+   "055",
+   "059"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_maker_entry.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 96,
+  "doc": "Tests for the limit-order entry cost estimate (ADR 0049). Needs numpy.",
+  "adr": [
+   "049"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_maker_rescore.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 43,
+  "doc": "Tests for the limit-order cost re-pricing (ADR 0056). Standard library only.",
+  "adr": [
+   "056"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_null_power.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 91,
+  "doc": "Tests for the null/planted-edge simulator (ADR 0045). Needs numpy and pandas.",
+  "adr": [
+   "045"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_okx_tendency.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 141,
+  "doc": "Tests for the OKX-tendency DEV rules (ADR 0052). Needs numpy and pandas.",
+  "adr": [
+   "052"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_pdf_check.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 127,
+  "doc": "Numpy parts of the PDF check (ADR 0032): the vectorised Goetze-Kuensch draws of",
+  "adr": [
+   "032"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_power_audit.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 47,
+  "doc": "Sanity checks for run/power_audit_synthetic.py (synthetic numbers only).",
+  "adr": [],
+  "flags": {}
+ },
+ {
+  "file": "test_residual_signals.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 96,
+  "doc": "Tests for the market-factor-residual DEV check (ADR 0051). Needs numpy and pandas.",
+  "adr": [
+   "051"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_stepm_block_sim.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 37,
+  "doc": "Sanity checks for run/stepm_block_sim.py (synthetic numbers only).",
+  "adr": [],
+  "flags": {}
+ },
+ {
+  "file": "test_structural_search.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 83,
+  "doc": "Structural DEV-only search (ADR 0020): forbidden windows, no look-ahead in",
+  "adr": [
+   "020"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_unsup_regime.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 55,
+  "doc": "Tests for the unsupervised regime classifier helpers (ADR 0050).",
+  "adr": [
+   "050"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_wide_universe.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 152,
+  "doc": "Tests for the wide-universe DEV check (ADR 0044). Needs numpy and pandas.",
+  "adr": [
+   "044"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "unsup_regime_dev.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "k-means regime classifier on DEV S1 (ADR 0050); NOT_USEFUL",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 199,
+  "doc": "Unsupervised (k-means) regime classifier trained on DEV S1 only, applied frozen to S2 (ADR 0050).",
+  "adr": [
+   "044",
+   "050"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "wide_universe_dev.py",
+  "class": "KEPT_INDEPENDENT",
+  "reason": "wide-universe panel with effective independent names (ADR 0047); variant of broad_universe_dev",
+  "read_status": "TESTED",
+  "traced": "shift(-1) realised return, as above",
+  "legacy": false,
+  "lines": 383,
+  "doc": "Wide-universe cross-sectional DEV check with effective independent names (ADR 0044).",
+  "adr": [
+   "041",
+   "044"
+  ],
+  "flags": {
+   "neg_shift": 1
+  }
+ },
+ {
+  "file": "x10_calendar_diag.py",
+  "class": "INTEGRATED_CORE",
+  "reason": "calendar = legacy family tod and features hour_utc / dow_utc (v2); script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 283,
+  "doc": "X10 캘린더 계절성 진단 — PREREG_x10_calendar_seasonality_2026-10-13.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "x10_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 162,
+  "doc": "X10 교차검증 — 기존 정액 비용(12/16/20bp) 대신 저장소 엔진 CandleCostModel",
+  "adr": [],
+  "flags": {
+   "v1_path": 2,
+   "cointrader": 1
+  }
+ },
+ {
+  "file": "x12_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 179,
+  "doc": "X12 교차검증 — 기존 정액 비용(12/16/20bp) 대신 저장소 엔진 CandleCostModel",
+  "adr": [],
+  "flags": {
+   "future_index": 1,
+   "v1_path": 2,
+   "cointrader": 1
+  }
+ },
+ {
+  "file": "x12_family_precheck.py",
+  "class": "INTEGRATED_CORE",
+  "reason": "rolling skewness z (X12 rule) = feature skew_z of opt-in set v2 (ADR 0066); script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 124,
+  "doc": "Task 32 — X12(왜도/MAX 효과) 패밀리 사전검증.",
+  "adr": [],
+  "flags": {
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "x12_skew_diag.py",
+  "class": "INTEGRATED_CORE",
+  "reason": "rolling skewness z (X12 rule) = feature skew_z of opt-in set v2 (ADR 0066); script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "LOGIC_TRACED",
+  "traced": "header rule (rolling skew z, shift 1) — used for skew_z",
+  "legacy": true,
+  "lines": 264,
+  "doc": "X12 롤링 왜도(MAX/로터리 prior) 방향 신호 진단 — PREREG_x12_skewness_2026-10-13.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "future_index": 5,
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "x1_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 191,
+  "doc": "X1 교차검증 — 엔진 CandleCostModel 적용. 신호/거래 생성은 x1_external_momentum_diag.py와 동일 로직.",
+  "adr": [],
+  "flags": {
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "x1_external_momentum_diag.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "ES/NQ external momentum: CME index futures 1h not in the repository; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 294,
+  "doc": "X1 외부자산(ES/NQ) 1h 모멘텀 동조 진단 — PREREG_x1_external_momentum_2026-10-12.md 규격 구현.",
+  "adr": [],
+  "flags": {
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "x1r_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 210,
+  "doc": "X1-R 재검증 교차검증 — 엔진 CandleCostModel 적용. 신호/거래 생성은 x1r_reverify_diag.py와 동일 로직(역방향 h48).",
+  "adr": [],
+  "flags": {
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "x1r_reverify_diag.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "X1 re-verification: same external data; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 382,
+  "doc": "X1-R 재검증 진단 — PREREG_x1r_reverify_2026-10-13.md 규격 구현.",
+  "adr": [],
+  "flags": {
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "x2_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 89,
+  "doc": "X2 교차검증 — 저장소 엔진 CandleCostModel (costs.py:104-117) 적용.",
+  "adr": [],
+  "flags": {
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "x2_macro_events_diag.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "macro event calendar not in the repository; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 281,
+  "doc": "X2 매크로 이벤트(FOMC/CPI) 사후반응 추종 진단 — PREREG_x2_macro_events_2026-10-12.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "v1_path": 3
+  }
+ },
+ {
+  "file": "x2_prep_events.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "macro event calendar not in the repository; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 73,
+  "doc": "X2 이벤트 데이터 준비 — FOMC 성명서 날짜 + CPI 발표 날짜를 UTC 타임스탬프로 확정.",
+  "adr": [],
+  "flags": {
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "x3_basis_collapse_diag.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "basis collapse: basis history not in the repository; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 303,
+  "doc": "X3 베이시스 마진 붕괴 진단 — PREREG_x3_basis_collapse_2026-10-12.md 규격 그대로 구현.",
+  "adr": [
+   "088"
+  ],
+  "flags": {
+   "future_index": 2,
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "x3_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 184,
+  "doc": "X3 교차검증 — 기존 정액 비용(12/16/20bp) 대신 저장소 엔진 CandleCostModel",
+  "adr": [],
+  "flags": {
+   "future_index": 1,
+   "v1_path": 2,
+   "cointrader": 1
+  }
+ },
+ {
+  "file": "x4f3_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 72,
+  "doc": "X4/F3 교차검증 — 저장소 엔진 CandleCostModel (costs.py:104-117) 적용.",
+  "adr": [],
+  "flags": {
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "x4f3_pair_spread_diag.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "BTC-ETH pair spread: klines exist, but the engine has no two-leg strategy type (unresolved F-item); script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 344,
+  "doc": "X4/F3 BTC-ETH 스프레드(로그비율) 평균회귀 1레그 진단 — PREREG_x4f3_pair_spread_2026-10-12.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "future_index": 2,
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "x5_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 159,
+  "doc": "X5 교차검증 — 엔진 CandleCostModel 적용. 신호/거래 생성은 x5_stable_supply_diag.py와 동일 로직.",
+  "adr": [],
+  "flags": {
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "x5_stable_supply_diag.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "stablecoin supply history not in the repository; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 307,
+  "doc": "X5 스테이블코인 공급 모멘텀 진단 — PREREG_x5_stable_supply_2026-10-12.md 규격 구현.",
+  "adr": [],
+  "flags": {
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "x7_download_announcements.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 91,
+  "doc": "X7 데이터 수집 — Binance 공지 카탈로그 48 \"New Cryptocurrency Listing\" 전체 페이징.",
+  "adr": [],
+  "flags": {
+   "network": 2,
+   "v1_path": 1
+  }
+ },
+ {
+  "file": "x7_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 113,
+  "doc": "X7 교차검증 — 저장소 엔진 CandleCostModel (costs.py:104-117) 적용.",
+  "adr": [],
+  "flags": {
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "x7_listing_events_diag.py",
+  "class": "DUPLICATE_RESEARCH",
+  "reason": "listing events: superseded by newlisting_short_dev.py (ADR 0060, DEV-window guarded); script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 310,
+  "doc": "X7 상장 예고 공지 이벤트 진단 — PREREG_x7_listing_events_2026-10-12.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "v1_path": 3
+  }
+ },
+ {
+  "file": "x8_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 178,
+  "doc": "X8 교차검증 — 기존 정액 비용(12/16/20bp) 대신 저장소 엔진 CandleCostModel",
+  "adr": [],
+  "flags": {
+   "future_index": 1,
+   "v1_path": 2,
+   "cointrader": 1
+  }
+ },
+ {
+  "file": "x8_taker_flow_diag.py",
+  "class": "INTEGRATED_CORE",
+  "reason": "taker flow = legacy family flow_z and feature taker_share_z; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 307,
+  "doc": "X8 테이커 플로우 불균형(집계 프록시) 진단 — PREREG_x8_taker_flow_2026-10-13.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "future_index": 3,
+   "v1_path": 2
+  }
+ },
+ {
+  "file": "x9_engine_crosscheck.py",
+  "class": "RETIRED_OR_ON_HOLD",
+  "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 178,
+  "doc": "X9 교차검증 — 기존 정액 비용(12/16/20bp) 대신 저장소 엔진 CandleCostModel",
+  "adr": [],
+  "flags": {
+   "future_index": 1,
+   "v1_path": 2,
+   "cointrader": 1
+  }
+ },
+ {
+  "file": "x9_ticket_size_diag.py",
+  "class": "NEEDS_MORE_DATA",
+  "reason": "ticket size needs the trade count per bar, which data_quality.Bar does not keep (NOT_DERIVABLE); script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": true,
+  "lines": 316,
+  "doc": "X9 평균 거래 티켓 크기(qv/n) 극단 진단 — PREREG_x8_taker_flow_2026-10-13.md 규격 그대로 구현.",
+  "adr": [],
+  "flags": {
+   "future_index": 3,
+   "v1_path": 2
+  }
+ }
+]

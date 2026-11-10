@@ -50,7 +50,7 @@ from engine_lib import (
     pbo_cscv, runtime_identity, t_sf,
 )
 from evaluator import cell_stats, run_event_study
-from evolution import EVOLUTION_GENERATOR_VERSION, LineageStore, SpecStore
+from evolution import EVOLUTION_GENERATOR_VERSION, INTEGER_FEATURES, LineageStore, SpecStore
 from search import SearchConfig, dev_feedback
 from stats_mc import (
     MC_METHOD_VERSION, by_fdr, daily_series, default_q, dm_test, mcs, reality_check, spa_test, step_spa,
@@ -388,7 +388,7 @@ def neighbours(spec: Mapping, limit: int = 12) -> list[dict]:
                     cc["params"][pn] = int(round(nv)) if ps.kind is int else round(nv, 4)
                     _try(d)
             lo, hi = FEATURES[c["feature"]].value_range
-            step = 1.0 if c["feature"] == "hour_utc" else (5.0 if hi >= 100 else 0.25)
+            step = 1.0 if c["feature"] in INTEGER_FEATURES else (5.0 if hi >= 100 else 0.25)
             for dlt in (-step, step):
                 d = json.loads(json.dumps(base))
                 cc = (d["entry"]["conditions"] if where == "entry" else d["filters"])[i]
