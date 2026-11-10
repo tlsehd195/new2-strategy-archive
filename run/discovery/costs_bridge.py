@@ -369,3 +369,48 @@ def scenario_model(name: str) -> CostContext:
     params.update(SENSITIVITY_SCENARIOS[name])
     return CostContext.from_params(params, version=SCENARIO_VERSIONS[name],
                                    verified=False)
+
+
+#: cost components of the directive 2026-11-10 §8-1 and what the candle model
+#: does with each (ADR 0063).  "MODELLED" = a number is charged; "NOT_MODELLED"
+#: = no number is charged and the result says so; the evidence level is the
+#: cost context's status unless a component has its own source.
+COST_COMPONENTS = ("maker_fee", "taker_fee", "bid_ask_spread", "slippage", "market_impact",
+                   "partial_fill", "fill_latency", "funding", "long_short_asymmetry",
+                   "size_dependence", "volatility_dependence", "venue_symbol_dependence")
+
+
+def cost_component_evidence(ctx: "CostContext") -> dict:
+    """{component: {treatment, value, evidence}} for one cost context.
+
+    Every trade is priced as a TAKER order at ``fee_rate`` (maker entries are a
+    separate DEV estimate, ADR 0049); spread is a constant ``half_spread`` per
+    side; impact is ``impact_coefficient * sqrt(participation)`` on the last
+    closed bar's traded value (so cost grows with order size, not with
+    volatility); funding is charged from the recorded public settlement history
+    (a measurement, not an estimate); partial fills and latency are not
+    modelled.  Only a VERIFIED context turns the modelled rows into verified
+    ones — and only for its verified scope."""
+    ev = ctx.status
+    p = ctx.params
+    row = lambda t, v, e: {"treatment": t, "value": v, "evidence": e}  # noqa: E731
+    return {
+        "maker_fee": row("NOT_MODELLED (every fill priced as taker)", None, "NOT_APPLICABLE"),
+        "taker_fee": row("MODELLED fee_rate per side", p["fee_rate"], ev),
+        "bid_ask_spread": row("MODELLED constant half_spread per side", p["half_spread"], ev),
+        "slippage": row("MODELLED inside half_spread/impact; stop fills at the bar extreme "
+                        "(config/exit_fill_v1.json)", None, ev),
+        "market_impact": row("MODELLED impact_coefficient*sqrt(order/bar_traded_value), "
+                             "refused above max_participation",
+                             {"impact_coefficient": p["impact_coefficient"],
+                              "max_participation": p["max_participation"]}, ev),
+        "partial_fill": row("NOT_MODELLED (orders fill completely or are refused)", None, "NOT_MODELLED"),
+        "fill_latency": row("NOT_MODELLED (fill at the next bar open)", None, "NOT_MODELLED"),
+        "funding": row("MEASURED from the public settlement history of the held window; "
+                       "an uncovered window drops the trade", None, "PUBLIC_HISTORY"),
+        "long_short_asymmetry": row("only through funding sign; fees/spread symmetric", None, ev),
+        "size_dependence": row("through sqrt participation", None, ev),
+        "volatility_dependence": row("NOT_MODELLED", None, "NOT_MODELLED"),
+        "venue_symbol_dependence": row("one parameter set for every symbol (public estimate "
+                                       "records may carry per-symbol values)", None, ev),
+    }

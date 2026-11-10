@@ -26,6 +26,10 @@ for p in (str(DISC), str(HERE)):
         sys.path.insert(0, p)
 
 import cost_calibration as cc  # noqa: E402
+import functools  # noqa: E402
+#: these synthetic processes stand for a REAL account's fills (ADR 0063 makes the
+#: account kind explicit; demo / undeclared accounts are tested separately)
+_cav = functools.partial(cc.calibrate_and_verify, account_kind="real")
 from costs_bridge import CostContext  # noqa: E402
 from engine_lib import iter_jsonl  # noqa: E402
 from strategy_spec import SPEC_SCHEMA  # noqa: E402
@@ -197,7 +201,7 @@ class TestCalibrationAudit(unittest.TestCase):
         self.addCleanup(shutil.rmtree, self.td, True)
 
     def calib(self, obs, symbols=("BTCUSDT", "ETHUSDT"), **kw):
-        return cc.calibrate_and_verify(obs, CostContext.futures_default(), required_symbols=list(symbols),
+        return _cav(obs, CostContext.futures_default(), required_symbols=list(symbols),
                                        order_value=10_000.0, **kw)
 
     def test_unit_errors_are_refused(self):

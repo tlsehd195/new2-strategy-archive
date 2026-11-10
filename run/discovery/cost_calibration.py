@@ -92,6 +92,35 @@ EVIDENCE_STATUSES = ("VERIFIED_FROM_ACTUAL_FILLS", "ESTIMATED_FROM_PUBLIC_QUOTES
                      "DATA_INVALID", "NOT_CALIBRATED", "REVERIFY_REQUIRED", "NOT_VERIFIED")
 
 
+#: who owned the account an execution report comes from (ADR 0063).  Only a
+#: REAL account's fills are execution evidence: a DEMO / paper-trading account
+#: fills against a simulated matching engine with promotional or simulated fees
+#: (the OKX demo record of ADR 0058 was nearly counted as real), and an
+#: undeclared account is treated as not real.  Never inferred from the file.
+ACCOUNT_KINDS = ("real", "demo", "paper", "unknown")
+
+#: evidence tiers (directive 2026-11-10 §8-2): what each kind of data may be
+#: used for.  A lower tier is never promoted to a higher one.
+EVIDENCE_TIERS = {
+    "REAL_ACCOUNT_FILLS": "verified execution cost (fee, spread, impact, fill/reject rates)",
+    "PUBLIC_BOOK_SNAPSHOTS": "observed spread / depth only (no execution)",
+    "PAPER_FILLS": "simulated execution assumptions only (no real order)",
+    "OHLCV": "price/volume based estimate only",
+    "DEMO_ACCOUNT_RECORDS": "reference material of the demo environment only (never cost evidence)",
+}
+
+
+def evidence_tier(source_kind: str, account_kind: Optional[str] = None) -> str:
+    """Tier of one observation source; ``exchange_fills`` is REAL_ACCOUNT_FILLS
+    only with ``account_kind == "real"`` (an undeclared account is not)."""
+    if source_kind == "exchange_fills":
+        if account_kind == "real":
+            return "REAL_ACCOUNT_FILLS"
+        return "DEMO_ACCOUNT_RECORDS" if account_kind in ("demo", "paper") else "UNDECLARED_ACCOUNT"
+    return {"quote_snapshots": "PUBLIC_BOOK_SNAPSHOTS", "paper_fill_monitor": "PAPER_FILLS",
+            "ohlcv_only": "OHLCV"}.get(source_kind, "UNKNOWN")
+
+
 class CalibrationError(ValueError):
     pass
 
@@ -370,7 +399,8 @@ def calibrate_and_verify(obs: Sequence[Observation], base_ctx, *, required_symbo
                          order_value: float, criteria_path: Optional[Path] = None,
                          source_ref: str = "", quarantined: int = 0,
                          order_outcomes_observable: bool = True, data_origin: Optional[str] = None,
-                         import_integrity_failed: bool = False) -> dict:
+                         import_integrity_failed: bool = False,
+                         account_kind: Optional[str] = None) -> dict:
     """Fit on the first ``calibration_fraction`` (by time), verify the fitted
     context on the rest.  Returns an UNSEALED decision record (see :func:`seal`).
 
@@ -378,7 +408,11 @@ def calibrate_and_verify(obs: Sequence[Observation], base_ctx, *, required_symbo
     (a trade export), so the reject rate cannot be measured — the criterion is
     then unmet (INSUFFICIENT_DATA), never "0 rejects".  ``data_origin`` is
     recorded; ``"synthetic_test"`` can never be VERIFIED.  Quarantined rows,
-    duplicates or ``import_integrity_failed`` make the record DATA_INVALID."""
+    duplicates or ``import_integrity_failed`` make the record DATA_INVALID.
+
+    ``account_kind`` (ADR 0063) must be ``"real"`` for account execution
+    reports to count: a demo / paper / undeclared account leaves the record
+    BLOCKED_EXTERNAL_EVIDENCE (the model is not judged on non-real fills)."""
     from costs_bridge import COST_MODEL_SOURCE_SHA256, CostContext, CostError, REQUIRED_COST_PARAMS
     crit, crit_hash = load_criteria(criteria_path)
     for o in obs:
@@ -393,7 +427,11 @@ def calibrate_and_verify(obs: Sequence[Observation], base_ctx, *, required_symbo
                  "cost_source_sha256": COST_MODEL_SOURCE_SHA256,
                  "code_hash": code_identity(files=("cost_calibration.py", "costs_bridge.py"))["code_hash"],
                  "base_params": dict(base_ctx.params), "n_quarantined": int(quarantined),
-                 "data_origin": data_origin, "order_outcomes_observable": bool(order_outcomes_observable)}
+                 "data_origin": data_origin, "order_outcomes_observable": bool(order_outcomes_observable),
+                 "account_kind": account_kind if account_kind in ACCOUNT_KINDS else "unknown",
+                 "evidence_tiers": sorted({evidence_tier(k, account_kind) for k in kinds})}
+    if account_kind is not None and account_kind not in ACCOUNT_KINDS:
+        raise CalibrationError(f"account_kind must be one of {ACCOUNT_KINDS}, got {account_kind!r}")
     if obs:
         rec["collection_period"] = {"first_ts_ms": obs[0].ts_ms, "last_ts_ms": obs[-1].ts_ms,
                                     "days": (obs[-1].ts_ms - obs[0].ts_ms) / 86_400_000}
@@ -518,10 +556,16 @@ def calibrate_and_verify(obs: Sequence[Observation], base_ctx, *, required_symbo
                              f"{len(crit['volatility_edges']) + 1} volatility buckets and "
                              f"{len(rec['by_participation'])} of {len(crit['participation_edges']) + 1} "
                              "participation buckets; other regimes are not verified"]
+    not_real = "exchange_fills" in kinds and account_kind != "real"
+    if not_real:
+        reasons.append(f"account kind {account_kind or 'undeclared'!s}: fills are not real-account "
+                       "execution evidence (ADR 0063) — demo / paper / undeclared accounts never verify")
     if missing:
         status = "BLOCKED_EXTERNAL_EVIDENCE"
     elif integrity:
         status = "DATA_INVALID"
+    elif not_real:
+        status = "BLOCKED_EXTERNAL_EVIDENCE"
     elif reasons:
         status = "NOT_VERIFIED"
     elif shortfall:
@@ -573,6 +617,10 @@ def check_record(rec: Mapping) -> None:
         raise CalibrationError("only account execution reports can verify the cost model")
     if rec.get("data_origin") == "synthetic_test":
         raise CalibrationError("synthetic test data can never verify the cost model")
+    if rec.get("account_kind") != "real":
+        # records sealed before ADR 0063 never declared the account: not evidence
+        raise CalibrationError(f"account kind {rec.get('account_kind')!r} is not a real account "
+                               "(demo / paper / undeclared fills never verify the cost model)")
 
 
 def evidence_status(rec: Optional[Mapping], *, cost_status: Optional[str] = None) -> str:
@@ -592,7 +640,7 @@ def evidence_status(rec: Optional[Mapping], *, cost_status: Optional[str] = None
                 msg = str(e)
                 if "altered" in msg:
                     return "DATA_INVALID"
-                if "synthetic" in msg:
+                if "synthetic" in msg or "account kind" in msg:
                     return "NOT_CALIBRATED"
                 return "REVERIFY_REQUIRED"          # e.g. made against another cost-model source
             if rec.get("criteria_hash") != load_criteria()[1]:
