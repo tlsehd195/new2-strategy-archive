@@ -207,7 +207,8 @@ class TestStagedPipeline(PipelineCase):
         self.assertEqual(p.statuses.status(edge, ctx), "PAPER_TEST_READY")
         self.assertEqual(p.lock_registry.uses(edge, "BTCUSDT"), 1)
         review = list(iter_jsonl(p.review_path))[-1]
-        self.assertEqual(set(review["evidence"]), {"dev", "validation", "robustness", "locked"})
+        # ADR 0068: the portfolio record is linked evidence too
+        self.assertEqual(set(review["evidence"]), {"dev", "validation", "robustness", "locked", "portfolio"})
         self.assertIn("TEST_ONLY_COST", review["labels"])
         self.assertNotIn("UNVERIFIED_COST_MODEL", review["labels"])
         # every evidence id points at a stored evaluation record
