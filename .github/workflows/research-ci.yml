@@ -7,9 +7,9 @@ name: research-ci
 # token or path is needed — the cost model lives in run/discovery/cost_model.py).
 on:
   push:
-    paths: ["run/**", ".github/workflows/research-ci.yml", "data/fill_ledger.jsonl"]
+    paths: ["run/**", "src/**", ".github/workflows/research-ci.yml", "data/fill_ledger.jsonl"]
   pull_request:
-    paths: ["run/**", ".github/workflows/research-ci.yml", "data/fill_ledger.jsonl"]
+    paths: ["run/**", "src/**", ".github/workflows/research-ci.yml", "data/fill_ledger.jsonl"]
   workflow_dispatch:
 permissions:
   contents: read
@@ -94,5 +94,22 @@ jobs:
           python -m pip install --quiet "numpy==2.2.6" "pandas==2.2.3"
           python -m unittest -v $(ls test_*.py | sed 's/\.py$//') 2>&1 | tail -n 20
         shell: bash -o pipefail {0}
-      - name: Current-tool compile (run/*_dev.py and power-audit tools; legacy v1 scripts listed in run/LEGACY_SCRIPTS.md)
-        run: python -m compileall -q run/*_dev.py run/power_audit_*.py run/test_*.py
+      - name: Compile every run/ script (legacy v1 scripts included — compiled only, never run; ADR 0067)
+        run: python -m compileall -q run/*.py run/audit/*.py
+      - name: Static analysis of every run/ script (gating — syntax errors and undefined names)
+        run: ruff check --isolated --select E9,F63,F7,F82 run/*.py run/audit/*.py
+      - name: Research script inventory is current (run/audit/RESEARCH_SCRIPTS_20261110.*; ADR 0066)
+        run: |
+          python run/audit/research_inventory_20261110.py > /dev/null
+          git diff --exit-code -- run/audit/RESEARCH_SCRIPTS_20261110.json run/audit/RESEARCH_SCRIPTS_20261110.md run/audit/RESEARCH_STRATEGIES_20261110.jsonl
+      # src/*.ts are the collectors / paper monitors that run on the user's machines
+      # (never in CI): transpile-only syntax check, package manifests must parse
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.1.38"
+      - name: Transpile check (syntax, no bundling, no network)
+        run: |
+          mkdir -p "$RUNNER_TEMP/ts"
+          for f in src/*.ts; do bun build --no-bundle "$f" --outdir "$RUNNER_TEMP/ts" > /dev/null || { echo "FAIL $f"; exit 1; }; echo "ok $f"; done
+      - name: Package manifests parse
+        run: for f in src/*_package.json; do python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$f"; done
