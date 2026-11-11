@@ -83,18 +83,21 @@ are never read by the search (``search.dev_feedback`` accepts DEV only).
 
 from __future__ import annotations
 
+import fcntl
 import hashlib
 import json
 import math
+import os
 import time
 from pathlib import Path
 from typing import Callable, Mapping, Optional, Sequence
 
+from costs_bridge import CostDataMissing, CostRefused
 from data_quality import Bar, check_bars
 from engine_lib import (
     JsonlCorruption, append_jsonl, atomic_write_json, canonical_json, iso_now, iter_jsonl, nw_tstat, t_sf,
 )
-from evaluator import PrefixView, run_event_study
+from evaluator import FundingIndex, PrefixView, run_event_study
 from execution_sim import EXECUTION_SIM_VERSION, ExecutionConfig, apply_execution
 from strategy_spec import build_spec_aux, build_spec_signal, canonicalize_spec, stop_exit_rule
 
@@ -137,6 +140,21 @@ POSITION_POLICY = "paper-forward-positions-v1"
 #: in the state that is not this T is PAPER_ERROR.  A window that the clock has passed but the
 #: data does not cover is PAPER_BLOCKED_DATA (never INCONCLUSIVE on bars nobody observed).
 CUTOFF_POLICY = "paper-forward-cutoff-v1"
+#: ADR 0077: completeness of the positions and the state a final verdict is recorded with.
+#: The open positions (and the closed trades) are re-derived by an independent replay of the
+#: registered rules on the evidence on disk (warm-up file, bar log, funding log, ledger) —
+#: never from the evaluator's output — and every reported open position must match it
+#: (missing, unexpected, duplicate or differing = PAPER_ERROR); a position of the sample that
+#: the replay finds open blocks the conclusion even when the evaluator reports none.  A step
+#: holds a per-plan lock; the state it concludes with is written (compare-and-swap against
+#: the state it loaded) and re-read before the record is appended; a state changed on disk
+#: during the step refuses the conclusion and is not overwritten.
+COMPLETENESS_POLICY = "paper-forward-completeness-v1"
+#: fields of an open position compared with the independent replay
+_OPEN_KEYS = ("event_id", "symbol", "side", "entry_ts", "decision_ts", "planned_exit_ts", "status")
+#: state fields a conclusion is anchored to (equal in memory and on disk at the last gate)
+_STATE_ANCHOR_KEYS = ("status", "last_ts", "bars", "gaps", "missing_bars", "last_funding_ts", "quality_head",
+                      "funding_head", "funding_status", "events_logged", "evaluation_cutoff_ts")
 #: execution statuses of a closed-trade record and the fill fraction each one allows
 _EXEC_FILL = {"FILLED": "one", "PARTIAL": "part", "LIQUIDATED": "positive",
               "REJECTED_NO_LIQUIDITY": "zero", "REJECTED_PARTICIPATION": "zero"}
@@ -175,6 +193,10 @@ class EvidenceIntegrityError(RuntimeError):
     def __init__(self, kind: str, detail: str):
         super().__init__(f"{kind}: {detail}")
         self.kind = kind
+
+
+class StateChanged(RuntimeError):
+    """ADR 0077: state.json on disk is not the state this step loaded / wrote."""
 
 
 class ConclusionRefused(RuntimeError):
@@ -789,9 +811,68 @@ class ForwardPaper:
 
     # -- one step -----------------------------------------------------------------
     def step(self, plan_id: str) -> dict:
+        """One observation step.  ADR 0077: steps of one plan never overlap — a
+        step that finds another one running does nothing (no file is read for
+        evaluation or written, the status does not change)."""
         plan = self.plan(plan_id)
+        fd = self._try_step_lock(plan_id)
+        if fd is None:
+            return {"plan_id": plan_id, "status": "STEP_IN_PROGRESS", "verdict": "PAPER_BLOCKED_DATA",
+                    "reasons": ["STEP_IN_PROGRESS: another step of this plan holds its lock; nothing was "
+                                "observed, evaluated or written by this call"]}
         try:
-            st = self.state(plan_id)
+            return self._step_locked(plan_id, plan)
+        finally:
+            try:
+                fcntl.flock(fd, fcntl.LOCK_UN)
+            finally:
+                os.close(fd)
+
+    def _try_step_lock(self, plan_id: str) -> Optional[int]:
+        """Non-blocking exclusive lock of one plan (``step.lock`` in its directory;
+        flock: released by the kernel when the process dies, so a killed step
+        never leaves a stale lock).  No higher level holds one: ``step`` is called
+        by library users and tests only (runner.py's ``state/run.lock`` covers
+        the research cycle, which never calls it)."""
+        d = self.root / plan_id
+        d.mkdir(parents=True, exist_ok=True)
+        fd = os.open(str(d / "step.lock"), os.O_CREAT | os.O_RDWR, 0o644)
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:
+            os.close(fd)
+            return None
+        return fd
+
+    def _read_state(self, plan_id: str) -> tuple[dict, str]:
+        """The state on disk and the sha256 of its bytes."""
+        raw = self._state_path(plan_id).read_bytes()
+        return json.loads(raw), hashlib.sha256(raw).hexdigest()
+
+    def _state_sha(self, plan_id: str) -> Optional[str]:
+        try:
+            return hashlib.sha256(self._state_path(plan_id).read_bytes()).hexdigest()
+        except OSError:
+            return None
+
+    def _commit_state(self, plan_id: str, st: Mapping, base_sha: Optional[str]) -> str:
+        """Compare-and-swap save (ADR 0077): written only while the file on disk is
+        still the one this step loaded (``base_sha``); returns the sha256 of the
+        bytes now on disk.  Raises :class:`StateChanged` otherwise (the file on
+        disk is left as it is, as evidence)."""
+        now_sha = self._state_sha(plan_id)
+        if base_sha is not None and now_sha != base_sha:
+            raise StateChanged(f"state.json changed on disk during the step (sha256 {str(base_sha)[:16]} "
+                               f"when loaded, {str(now_sha)[:16]} now)")
+        self._save_state(plan_id, st)
+        got, sha = self._read_state(plan_id)
+        if canonical_json(got) != canonical_json(dict(st)):
+            raise StateChanged("state.json does not read back as written")
+        return sha
+
+    def _step_locked(self, plan_id: str, plan: Mapping) -> dict:
+        try:
+            st, base_sha = self._read_state(plan_id)
         except (OSError, ValueError) as e:
             return self._state_unusable(plan, [f"state file unreadable: {type(e).__name__}: {e}"])
         bad = self._state_problems(plan, st)
@@ -801,6 +882,12 @@ class ForwardPaper:
             return {"plan_id": plan_id, "status": "CONCLUDED", "verdict": st["verdict"]}
         d = self.root / plan_id
         now = self.clock()
+        prior = self.p.evaluation("paper_forward", plan["strategy_id"], plan["context_id"])
+        if prior is not None and prior.get("plan_id") == plan_id:
+            # ADR 0077: a step was interrupted after the evaluation record was appended and
+            # before the state said so.  Nothing new is observed: the record is completed
+            # (status, feedback, state) only if it is the one the evidence on disk gives
+            return self._resume_conclusion(plan, st, base_sha, prior, now)
         new_counts = {}
         policy = self._funding_policy(plan)
         if policy and not self._integrity(plan):
@@ -946,9 +1033,20 @@ class ForwardPaper:
                                        "rule": CUTOFF_POLICY}
         if st.get("evaluation_cutoff") is not None:
             result["evaluation_cutoff"] = st["evaluation_cutoff"]["ts"]
+        changed = None
         if verdict["final"]:
             try:
-                self._conclude(plan, verdict, result, st)
+                # ADR 0077: the state the conclusion is checked against and recorded with is
+                # this step's state, written first (compare-and-swap against the state this
+                # step loaded) and re-read by the last gate; a crash after this point
+                # resumes from it (the cutoff is kept, nothing is concluded twice)
+                snap = self._commit_state(plan_id, st, base_sha)
+                base_sha = snap
+                self._conclude(plan, verdict, result, st, snapshot_sha=snap)
+            except StateChanged as e:
+                changed = str(e)
+                verdict = {"verdict": "PAPER_BLOCKED_DATA", "final": False,
+                           "reasons": [f"CONCLUSION_REFUSED: STATE_CHANGED_DURING_STEP: {e}"]}
             except ConclusionRefused as e:
                 # ADR 0074: the last gate found a problem: nothing was recorded
                 verdict = {"verdict": "PAPER_BLOCKED_DATA", "final": False, "reasons": [f"CONCLUSION_REFUSED: {e}"]}
@@ -957,7 +1055,19 @@ class ForwardPaper:
         result["verdict"] = verdict["verdict"]
         result["reasons"] = verdict["reasons"]
         st["verdict"] = verdict["verdict"]
-        self._save_state(plan_id, st)
+        if changed is None:
+            try:
+                self._commit_state(plan_id, st, base_sha)
+            except StateChanged as e:
+                changed = str(e)
+                if st["concluded"]:      # cannot happen under the step lock; the record is verified on resume
+                    result["reasons"] = list(result["reasons"]) + [f"STATE_CHANGED_AFTER_CONCLUSION: {e}"]
+                else:
+                    result["verdict"] = "PAPER_ERROR"
+                    result["reasons"] = [f"STATE_CHANGED_DURING_STEP: {e}; the state on disk was not "
+                                         "overwritten"]
+        if changed is not None:
+            result["state_not_saved"] = changed
         append_jsonl(d / "steps.jsonl", {"at": iso_now(), "clock_ms": now,
                                          **{k: v for k, v in result.items() if k != "trades"}})
         return result
@@ -1586,7 +1696,226 @@ class ForwardPaper:
                 out.append(f"{tag}: also recorded as a closed trade (or misnamed)")
             if sym in last_exit and e0 <= last_exit[sym]:
                 out.append(f"{tag}: entered at {e0}, before the last recorded exit {last_exit[sym]}")
+        # ADR 0077: the list itself may be incomplete — compare it (and the ledger) with
+        # the positions re-derived independently from the evidence on disk
+        rec = self._reconstruct_positions(plan, st)
+        out += rec["problems"]
+        if not rec["problems"]:
+            out += self._compare_open_positions(rec["open"], opens)
         return out
+
+    # -- independent position replay (ADR 0077) ----------------------------------------
+    @staticmethod
+    def _replay_positions(sym: str, bars: Sequence[Bar], w: int, sig, horizon: int, exit_rule,
+                          ledger: Mapping[int, Mapping], refusal: Callable[[int, int, int], Optional[str]],
+                          gaps: Sequence[Sequence[int]], start_ts: int) -> dict:
+        """Walk the registered rules over ``bars`` (warm-up + observed) and say, for
+        every signal, what it became: a closed trade (it must be in ``ledger``,
+        {entry_ts: record}), refused by the rules (``refusal`` gives the reason:
+        cost / participation / funding), excluded for a data gap (accepted: it holds
+        the position, not in the ledger), overlapped, or the OPEN position (the
+        first signal after the last accepted exit whose holding period runs past
+        the bars).  Written separately from ``run_event_study`` /
+        ``_open_positions`` and fed from disk, never from the evaluator's result:
+        a position the evaluator loses is still found here.
+
+        Returns {"open": [position], "closed": [event_id], "problems": [str],
+        "counts": {...}}."""
+        n = len(bars)
+        out = {"open": [], "closed": [], "problems": [],
+               "counts": {"signals": 0, "overlapped": 0, "refused": 0, "gap_excluded": 0, "closed": 0, "open": 0}}
+        rest = dict(ledger)
+        last_exit = -1
+        if n - w >= 2:
+            for t in range(max(1, w), n - 1):
+                side = sig(PrefixView(bars, t + 1))
+                if side not in (1, -1):
+                    continue
+                out["counts"]["signals"] += 1
+                ent = t + 1
+                if ent <= last_exit:
+                    out["counts"]["overlapped"] += 1
+                    continue
+                e_ts = bars[ent].ts
+                eid = f"{sym}:{e_ts}"
+                if ent + horizon >= n:
+                    # still held at the last bar: every later signal overlaps it
+                    out["open"].append({"event_id": eid, "symbol": sym, "side": side, "entry_ts": e_ts,
+                                        "decision_ts": bars[t].ts, "planned_exit_ts": e_ts + horizon * MS15,
+                                        "status": "OPEN", "entry_index": ent})
+                    out["counts"]["open"] += 1
+                    if e_ts in rest:
+                        out["problems"].append(f"OPEN_POSITION_RECORDED_CLOSED: {eid} is open at the last "
+                                               f"observed bar {bars[-1].ts} but the ledger records it closed")
+                        rest.pop(e_ts)
+                    break
+                if exit_rule is not None:
+                    ex = exit_rule(bars, ent, side, horizon)
+                    if ex is None:              # cannot happen when the horizon fits the bars
+                        out["problems"].append(f"{eid}: exit rule undecided inside the bars")
+                        continue
+                    x_i = int(ex[0])
+                else:
+                    x_i = ent + horizon
+                why = refusal(ent, x_i, side)
+                row = rest.pop(e_ts, None)
+                if why is not None:
+                    out["counts"]["refused"] += 1
+                    if row is not None:
+                        out["problems"].append(f"LEDGER_TRADE_REFUSED_BY_RULES: {eid} is in the ledger, the "
+                                               f"registered rules refuse it ({why})")
+                    continue
+                last_exit = x_i
+                x_ts = bars[x_i].ts
+                if e_ts < start_ts or any(a < x_ts and b > e_ts - GAP_EMBARGO_BARS * MS15 for a, b in gaps):
+                    out["counts"]["gap_excluded"] += 1
+                    if row is not None:
+                        out["problems"].append(f"LEDGER_TRADE_EXCLUDED_BY_RULES: {eid} overlaps a data gap "
+                                               "(or the warm-up) but is in the ledger")
+                    continue
+                if row is None:
+                    out["problems"].append(f"CLOSED_TRADE_MISSING: {eid} (exit {x_ts}) closed under the "
+                                           "registered rules, not in the ledger")
+                    continue
+                diff = [k for k, v in (("side", side), ("exit_ts", x_ts), ("entry_index", ent),
+                                       ("exit_index", x_i)) if row.get(k) != v]
+                if diff:
+                    out["problems"].append(f"LEDGER_TRADE_MISMATCH: {eid} differs from the replay in {diff}")
+                out["closed"].append(eid)
+                out["counts"]["closed"] += 1
+        for e_ts in sorted(rest):
+            out["problems"].append(f"LEDGER_TRADE_NOT_REPLAYED: {sym}:{e_ts} is in the ledger, the registered "
+                                   "rules give no trade entered there")
+        return out
+
+    def _reconstruct_positions(self, plan: Mapping, st: Mapping) -> dict:
+        """ADR 0077: open positions and closed trades re-derived from the evidence on
+        disk: the registered spec (sha256 checked), the plan's cost model and
+        horizon / exit rule, the warm-up file (sha256 checked), the hash-chained
+        bar log and funding log, and the ledger.  Data gaps are re-derived from
+        the bar log (the state's must match).  Memoised on the sha256 of every
+        input file, so a repeated gate in one step costs one replay; any change
+        on disk is a new replay."""
+        d = self.root / plan["plan_id"]
+        problems: list[str] = []
+        try:
+            spec_raw = self.p.specs.get(plan["strategy_id"])
+            spec = canonicalize_spec(spec_raw)
+            if hashlib.sha256(canonical_json(spec).encode()).hexdigest() != plan["spec_sha256"]:
+                return {"open": [], "closed": [], "problems": ["REPLAY_REFUSED: strategy specification differs "
+                                                               "from the registered one"]}
+            key = [plan["plan_id"], plan["spec_sha256"], canonical_json(self.p.cost.identity())]
+            files = ["events.jsonl"] + [f"{k}_{s}.json{'l' if k != 'warmup' else ''}"
+                                        for s in plan["symbols"] for k in ("warmup", "bars", "funding")]
+            for name in files:
+                f = d / name
+                key.append(name + ":" + (hashlib.sha256(f.read_bytes()).hexdigest() if f.exists() else "-"))
+            key = hashlib.sha256("\n".join(key).encode()).hexdigest()
+            cache = self.__dict__.setdefault("_replay_cache", {})
+            if key not in cache:
+                cache.clear()
+                cache[key] = self._replay_from_disk(plan, spec)
+            rec = cache[key]
+        except (EvidenceIntegrityError, CausalityViolation, JsonlCorruption, OSError, ValueError, KeyError,
+                TypeError) as e:
+            return {"open": [], "closed": [], "problems": [f"REPLAY_FAILED: {type(e).__name__}: {e}"]}
+        problems += rec["problems"]
+        for sym in plan["symbols"]:
+            o = rec["observed"][sym]
+            if o["last_ts"] != st["last_ts"][sym] or o["rows"] != st["bars"][sym]:
+                problems.append(f"STATE_BAR_LOG_MISMATCH: {sym}: bar log ends at {o['last_ts']} with {o['rows']} "
+                                f"bars, the state says {st['last_ts'][sym]} / {st['bars'][sym]}")
+            if canonical_json(o["gaps"]) != canonical_json([list(g) for g in st["gaps"][sym]]):
+                problems.append(f"STATE_GAPS_MISMATCH: {sym}: gaps of the bar log differ from the state's")
+        return {"open": [dict(x) for x in rec["open"]], "closed": list(rec["closed"]), "problems": problems,
+                "counts": dict(rec["counts"])}
+
+    def _replay_from_disk(self, plan: Mapping, spec: Mapping) -> dict:
+        d = self.root / plan["plan_id"]
+        policy = self._funding_policy(plan)
+        horizon = int(spec["exit"]["horizon"])
+        exit_rule = stop_exit_rule(spec)
+        ledger_all = list(iter_jsonl(d / "events.jsonl"))
+        out = {"open": [], "closed": [], "problems": [], "observed": {}, "counts": {}}
+        for sym in plan["symbols"]:
+            wj = self._warmup(plan, sym)
+            warm = [_row_bar(r) for r in wj["rows"]]
+            obs = read_bar_log(d / f"bars_{sym}.jsonl")
+            bars = warm + [_row_bar(r) for r in obs]
+            gaps, prev = [], plan["start_ts"] - MS15
+            for r in obs:
+                if r["ts"] - prev > MS15:
+                    gaps.append([prev, r["ts"], (r["ts"] - prev) // MS15 - 1])
+                prev = r["ts"]
+            out["observed"][sym] = {"last_ts": obs[-1]["ts"] if obs else plan["start_ts"] - MS15,
+                                    "rows": len(obs), "gaps": gaps}
+            fund, ivs = self._funding_series(plan, sym)
+            funding = sorted(set(fund))
+            fng = self.p.provider.fng() if "fng" in spec["data"] else None
+            aux = build_spec_aux(bars, spec, funding if policy else (funding or None), fng)
+            sig = build_spec_signal(spec, aux)
+            fidx = (FundingIndex(funding, intervals=ivs) if policy else
+                    FundingIndex(funding) if funding else None)
+
+            def refusal(ent, x_i, side, bars=bars, fidx=fidx):
+                try:
+                    self.p.cost.round_trip_bp(plan["order_value"], bars[ent - 1].quote_volume,
+                                              bars[x_i - 1].quote_volume)
+                except CostRefused:
+                    return "participation cap"
+                except CostDataMissing:
+                    return "no traded value (cost data missing)"
+                if fidx is not None and fidx.paid_bp(bars[ent].ts, bars[x_i].ts, side) is None:
+                    return f"funding not covered ({fidx.last_status or 'FUNDING_DATA_MISSING'})"
+                return None
+            ledger = {}
+            for r in ledger_all:
+                if r.get("symbol") == sym and isinstance(r.get("entry_ts"), int):
+                    ledger.setdefault(r["entry_ts"], r)
+            rep = self._replay_positions(sym, bars, len(warm), sig, horizon, exit_rule, ledger, refusal,
+                                         [(a, b) for a, b, _ in gaps], plan["start_ts"])
+            out["open"] += rep["open"]
+            out["closed"] += rep["closed"]
+            out["problems"] += rep["problems"]
+            out["counts"][sym] = rep["counts"]
+        return out
+
+    @staticmethod
+    def _compare_open_positions(expected: Sequence[Mapping], reported: Sequence[Mapping]) -> list[str]:
+        """ADR 0077: the evaluator's open positions against the independent replay:
+        every missing, unexpected, duplicated or differing position is a problem
+        (a position entered after the cutoff included: it exists all the same)."""
+        out = []
+        exp = {x["event_id"]: x for x in expected}
+        rep: dict = {}
+        for x in reported:
+            eid = x.get("event_id") if isinstance(x, Mapping) else None
+            if eid in rep:
+                out.append(f"OPEN_POSITION_DUPLICATE: {eid!r} reported more than once")
+                continue
+            rep[eid] = x
+        for eid in sorted(set(exp) - set(rep), key=str):
+            x = exp[eid]
+            out.append(f"OPEN_POSITION_MISSING: {eid} (entry {x['entry_ts']}, decided at {x['decision_ts']}, "
+                       f"planned exit {x['planned_exit_ts']}) is open under the registered rules but not "
+                       "reported by the evaluator")
+        for eid in sorted(set(rep) - set(exp), key=str):
+            out.append(f"OPEN_POSITION_UNEXPECTED: {eid!r} reported open, the registered rules give no open "
+                       "position there")
+        for eid in sorted(set(rep) & set(exp), key=str):
+            diff = [k for k in _OPEN_KEYS if rep[eid].get(k) != exp[eid].get(k)]
+            if diff:
+                out.append(f"OPEN_POSITION_MISMATCH: {eid} differs from the replay in {diff}")
+        return out
+
+    def _pending_all(self, plan: Mapping, st: Mapping, result: Mapping, bound: int) -> list[dict]:
+        """Positions of the sample still open: the evaluator's AND the replay's
+        (ADR 0077: an empty evaluator list never hides a replayed one)."""
+        rec = self._reconstruct_positions(plan, st)
+        out = {x.get("event_id"): x for x in self._pending(result, bound)}
+        for x in self._pending({"open_positions": rec["open"]}, bound):
+            out.setdefault(x["event_id"], x)
+        return list(out.values())
 
     def _reconcile_trades(self, plan: Mapping, trades: Sequence[Mapping]) -> None:
         path = self.root / plan["plan_id"] / "events.jsonl"
@@ -1723,10 +2052,14 @@ class ForwardPaper:
             return {"verdict": "PAPER_ERROR", "final": False,
                     "reasons": [f"EVALUATION_CUTOFF_INVALID: the criteria are not final at the rule's cutoff "
                                 f"{bound} ({'; '.join(d['reasons'])})"]}
-        pending = self._pending(result, bound)
-        result["positions"] = {"policy": POSITION_POLICY, "sample_bound_ts": bound,
-                               "closed_in_sample": m["n_trades"], "pending": pending,
-                               "open_after_bound": [x for x in result["open_positions"] if x not in pending]}
+        # ADR 0077: pending = the evaluator's and the independent replay's positions
+        # entered by the cutoff (they agree here: any difference was PAPER_ERROR above)
+        pending = self._pending_all(plan, st, result, bound)
+        pend_ids = {x.get("event_id") for x in pending}
+        result["positions"] = {"policy": POSITION_POLICY, "completeness": COMPLETENESS_POLICY,
+                               "sample_bound_ts": bound, "closed_in_sample": m["n_trades"], "pending": pending,
+                               "open_after_bound": [x for x in result["open_positions"]
+                                                    if x.get("event_id") not in pend_ids]}
         if pending:
             # the stopping rule holds, but positions of the sample are still open: their
             # result is not known yet, so nothing is concluded (no mark, no forced exit)
@@ -1767,10 +2100,26 @@ class ForwardPaper:
             fails.append(f"late decision share {m['late_share']:.3f} > {c['max_late_trade_share']}")
         return {"verdict": "PAPER_FAILED" if fails else "PAPER_PASSED", "final": True, "reasons": fails}
 
+    @staticmethod
+    def _state_anchor_view(st: Mapping) -> dict:
+        """The state fields a conclusion is anchored to (ADR 0077)."""
+        v = {k: st.get(k) for k in _STATE_ANCHOR_KEYS if k != "evaluation_cutoff_ts"}
+        v["evaluation_cutoff_ts"] = (st.get("evaluation_cutoff") or {}).get("ts") \
+            if isinstance(st.get("evaluation_cutoff"), Mapping) else st.get("evaluation_cutoff")
+        return v
+
     def _conclusion_problems(self, plan: Mapping, result: Mapping, st: Optional[Mapping],
-                             verdict: Optional[Mapping] = None) -> list[str]:
+                             verdict: Optional[Mapping] = None, *, snapshot_sha: Optional[str] = None,
+                             disk: Optional[tuple] = None) -> list[str]:
         """Every precondition of a final verdict, checked again from disk and
-        independently of :meth:`_verdict` (ADR 0073 / 0074)."""
+        independently of :meth:`_verdict` (ADR 0073 / 0074 / 0075 / 0076).
+
+        ADR 0077: the state used here is the one ON DISK (``disk`` = (state,
+        sha256) read by the caller, else read now).  A given in-memory ``st``
+        (the step's state) must equal it on every anchored field, and
+        ``snapshot_sha`` (the bytes the step wrote just before) must be what is
+        on disk: a state changed in between is refused, never overwritten by the
+        memory copy.  Open positions are re-derived by the independent replay."""
         why = []
         if not self._funding_policy(plan):
             why.append("plan has no funding policy (registered before ADR 0073)")
@@ -1782,17 +2131,40 @@ class ForwardPaper:
             why.append("events were dropped for missing funding coverage")
         if why:
             return why
-        if st is None:
-            st = self.state(plan["plan_id"])
         try:
-            fund = self._funding_window_status(plan, st)
-        except (EvidenceIntegrityError, CausalityViolation, JsonlCorruption, OSError, ValueError) as e:
-            return [f"funding evidence unreadable: {e}"]
-        why += [f"{sym}: funding {v['status']} ({v['coverage'].get('reason')})"
-                for sym, v in sorted(fund.items()) if v["status"] not in FUNDING_USABLE]
+            disk_st, disk_sha = disk if disk is not None else self._read_state(plan["plan_id"])
+        except (OSError, ValueError) as e:
+            return [f"STATE_UNREADABLE: {type(e).__name__}: {e}"]
+        bad = self._state_problems(plan, disk_st)
+        if bad:
+            return ["STATE_CORRUPT: " + "; ".join(bad)]
+        if snapshot_sha is not None and disk_sha != snapshot_sha:
+            why.append(f"STATE_SNAPSHOT_MISMATCH: state.json on disk (sha256 {disk_sha[:16]}) is not the state "
+                       f"this step wrote ({snapshot_sha[:16]})")
+        if st is not None:
+            mem, dsk = self._state_anchor_view(st), self._state_anchor_view(disk_st)
+            diff = [k for k in _STATE_ANCHOR_KEYS if canonical_json(mem.get(k)) != canonical_json(dsk.get(k))]
+            if diff:
+                why.append(f"STATE_SNAPSHOT_MISMATCH: the step's state differs from state.json on disk in {diff}")
+        if disk_st.get("status") != "OBSERVING":
+            why.append(f"state status is {disk_st.get('status')!r}, not OBSERVING")
+        if disk_st.get("concluded"):
+            why.append("state already concluded")
+        # funding coverage of the observation window, for the state on disk AND (when
+        # given) the step's state: neither may claim bars the funding does not cover
+        for tag, s_ in (("", disk_st),) + ((("step state: ", st),) if st is not None else ()):
+            try:
+                fund = self._funding_window_status(plan, s_)
+            except (EvidenceIntegrityError, CausalityViolation, JsonlCorruption, OSError, ValueError,
+                    KeyError, TypeError) as e:
+                return why + [f"{tag}funding evidence unreadable: {e}"]
+            why += [f"{tag}{sym}: funding {v['status']} ({v['coverage'].get('reason')})"
+                    for sym, v in sorted(fund.items()) if v["status"] not in FUNDING_USABLE]
+        st = disk_st
         why += self._evidence(plan, dict(st), recover=False)
         why += self._plan_drift(plan)
-        # ADR 0075: positions and the sample, again from disk
+        # ADR 0075 / 0077: positions and the sample, again from disk (the ledger, the
+        # evaluator's list and the independent replay)
         why += self._position_problems(plan, st, result)
         cut = st.get("evaluation_cutoff")
         if not isinstance(cut, Mapping) or not isinstance(cut.get("ts"), int):
@@ -1805,7 +2177,7 @@ class ForwardPaper:
             return why
         if rule_t != cut["ts"]:
             why.append(f"recorded cutoff {cut['ts']} is not the earliest bar at which the rule holds ({rule_t})")
-        pend = self._pending(result, cut["ts"])
+        pend = self._pending_all(plan, st, result, cut["ts"])
         if pend:
             why.append(f"{len(pend)} position(s) of the sample still open: " + ", ".join(
                 str(x.get("event_id")) for x in pend))
@@ -1826,13 +2198,19 @@ class ForwardPaper:
                 why.append(f"the criteria on the ledger give {d['verdict']}, not {verdict.get('verdict')}")
         return why
 
-    def _conclude(self, plan: Mapping, verdict: Mapping, result: Mapping, st: Optional[Mapping] = None) -> None:
-        why = self._conclusion_problems(plan, result, st, verdict)
+    def _conclude(self, plan: Mapping, verdict: Mapping, result: Mapping, st: Optional[Mapping] = None,
+                  *, snapshot_sha: Optional[str] = None) -> None:
+        pid = plan["plan_id"]
+        try:
+            disk = self._read_state(pid)
+        except (OSError, ValueError) as e:
+            raise ConclusionRefused(f"{pid}: final verdict refused: STATE_UNREADABLE: {type(e).__name__}: {e}") from e
+        why = self._conclusion_problems(plan, result, st, verdict, snapshot_sha=snapshot_sha, disk=disk)
         if why:
             # unreachable through _verdict; a second, independent gate so no path records a
             # final paper verdict on unconfirmed funding or unverified evidence (ADR 0073/0074)
-            raise ConclusionRefused(f"{plan['plan_id']}: final verdict refused: " + "; ".join(why[:10]))
-        st_now = st if st is not None else self.state(plan["plan_id"])
+            raise ConclusionRefused(f"{pid}: final verdict refused: " + "; ".join(why[:10]))
+        st_now, sha0 = disk                 # ADR 0077: the verified state ON DISK
         cut_ts = (st_now.get("evaluation_cutoff") or {}).get("ts")
         anchors = self._anchors(plan, st_now)
         sid, ctx = plan["strategy_id"], plan["context_id"]
@@ -1840,22 +2218,39 @@ class ForwardPaper:
               "PAPER_INCONCLUSIVE": "INCONCLUSIVE"}[verdict["verdict"]]
         labels = [] if plan["feed_realtime"] else ["OBSERVED_FROM_ARCHIVE_NOT_REALTIME"]
         prior = self.p.evaluation("paper_forward", sid, ctx)
-        if prior is not None and prior.get("plan_id") == plan["plan_id"]:
-            # concluded before an interruption (state not yet saved): never twice
+        if prior is not None and prior.get("plan_id") == pid:
+            # concluded before an interruption (state not yet saved): never twice.
+            # ADR 0077: and only if the record is the one this state / ledger gives
+            clash = self._record_problems(plan, prior, st_now)
+            if prior.get("verdict") != verdict["verdict"]:
+                clash.append(f"verdict {prior.get('verdict')} != {verdict['verdict']}")
+            if clash:
+                raise ConclusionRefused(f"{pid}: EVALUATION_RECORD_CONFLICT: the recorded conclusion "
+                                        f"{prior.get('record_id')} differs from the evidence now: "
+                                        + "; ".join(clash[:10]))
             if self.p.statuses.status(sid, ctx) != to:
                 self.p.statuses.set(sid, ctx, to, stage="paper_forward", labels=labels,
                                     reasons=list(prior.get("reasons") or []),
                                     evidence={"paper_forward": prior["record_id"]})
+            self._feedback_once(plan, prior["verdict"])
             return
+        if self._state_sha(pid) != sha0:
+            raise ConclusionRefused(f"{pid}: final verdict refused: STATE_SNAPSHOT_MISMATCH: state.json changed "
+                                    "during the last gate")
+        replay = self._reconstruct_positions(plan, st_now)
         rec = self.p._append_eval({"stage": "paper_forward", "strategy_id": sid, "context_id": ctx,
-                                   "status": "OK", "plan_id": plan["plan_id"], "verdict": verdict["verdict"],
+                                   "status": "OK", "plan_id": pid, "verdict": verdict["verdict"],
                                    "reasons": list(verdict["reasons"]), "metrics": result.get("metrics"),
                                    "criteria_hash": plan["criteria_hash"], "labels": labels,
                                    "positions": {"policy": POSITION_POLICY,
+                                                 "completeness": COMPLETENESS_POLICY,
                                                  "evaluation_cutoff_ts": cut_ts,
                                                  "closed_in_sample": (result.get("metrics") or {}).get("n_trades"),
                                                  "open_after_cutoff": (result.get("positions") or {}).get(
-                                                     "open_after_bound", [])},
+                                                     "open_after_bound", []),
+                                                 # ADR 0077: what the independent replay found open
+                                                 "open_replayed": [{k: x.get(k) for k in _OPEN_KEYS}
+                                                                   for x in replay["open"]]},
                                    # ADR 0076: what the verdict was computed from, for a later audit
                                    "anchors": anchors,
                                    "funding_evidence": {"policy": FUNDING_POLICY,
@@ -1866,15 +2261,28 @@ class ForwardPaper:
                             reasons=list(verdict["reasons"]) + [
                                 "forward paper is a research result — never approval for live trading"],
                             evidence={"paper_forward": rec["record_id"]})
-        append_jsonl(self.p.dir / "research_feedback.jsonl",
-                     {"strategy_id": sid, "context_id": ctx, "source": "paper_forward",
-                      "verdict": verdict["verdict"], "use": "human review + failure memory only; never search ranking",
-                      "at": iso_now()})
+        self._feedback_once(plan, verdict["verdict"])
+
+    def _feedback_once(self, plan: Mapping, verdict: str) -> None:
+        """One research-feedback row per concluded plan (a resumed conclusion adds
+        it only if the interrupted one did not get that far, ADR 0077)."""
+        path = self.p.dir / "research_feedback.jsonl"
+        try:
+            rows = list(iter_jsonl(path)) if path.exists() else []
+        except (JsonlCorruption, OSError, ValueError):
+            rows = []
+        if any(r.get("source") == "paper_forward" and r.get("plan_id") == plan["plan_id"] for r in rows):
+            return
+        append_jsonl(path, {"strategy_id": plan["strategy_id"], "context_id": plan["context_id"],
+                            "plan_id": plan["plan_id"], "source": "paper_forward", "verdict": verdict,
+                            "use": "human review + failure memory only; never search ranking", "at": iso_now()})
 
     # -- conclusion anchors (ADR 0076) ------------------------------------------------
     def _anchors(self, plan: Mapping, st: Mapping) -> dict:
         """sha256 / length / chain heads of every file the final verdict was computed from.
-        Part of the evaluation record (and so of its record id)."""
+        Part of the evaluation record (and so of its record id).  ADR 0077: plus the
+        sha256 of the anchored state fields (the state never changes after the
+        conclusion except ``concluded`` / ``verdict``, which are not anchored)."""
         d = self.root / plan["plan_id"]
         ev = d / "events.jsonl"
         raw = ev.read_bytes() if ev.exists() else b""
@@ -1887,31 +2295,29 @@ class ForwardPaper:
                 "events_logged": len(list(iter_jsonl(ev))) if ev.exists() else 0,
                 "events_sha256": hashlib.sha256(raw).hexdigest(), "bar_logs": bars,
                 "quality_head": dict(st.get("quality_head") or {}), "funding_head": dict(st.get("funding_head") or {}),
-                "last_ts": dict(st["last_ts"]), "warmup_sha256": dict(plan.get("warmup_sha256") or {})}
+                "last_ts": dict(st["last_ts"]), "warmup_sha256": dict(plan.get("warmup_sha256") or {}),
+                "state_fields_sha256": hashlib.sha256(
+                    canonical_json(self._state_anchor_view(st)).encode()).hexdigest(),
+                "completeness": COMPLETENESS_POLICY}
 
-    def verify_conclusion(self, plan_id: str) -> list[str]:
-        """Re-check a concluded plan against the anchors of its evaluation record
-        (ADR 0076).  Returns the problems found ([] = the files on disk are the ones
-        the verdict was computed from, and they still give the same cutoff, metrics
-        and verdict).  Read only: nothing is repaired or written."""
-        plan = self.plan(plan_id)
-        rec = self.p.evaluation("paper_forward", plan["strategy_id"], plan["context_id"])
-        if rec is None or rec.get("plan_id") != plan_id:
-            return ["no final evaluation record for this plan"]
+    def _record_problems(self, plan: Mapping, rec: Mapping, st: Mapping) -> list[str]:
+        """The evaluation record ``rec`` against the files and the state on disk
+        (ADR 0076 anchors; ADR 0077: the anchored state fields and the
+        independent position replay).  [] = the record is the one they give."""
         a = rec.get("anchors")
         if not isinstance(a, Mapping):
             return ["evaluation record has no anchors (concluded before ADR 0076)"]
         out = []
-        try:
-            st = self.state(plan_id)
-        except (OSError, ValueError) as e:
-            return [f"state unreadable: {type(e).__name__}: {e}"]
+        plan_id = plan["plan_id"]
         try:
             now = self._anchors(plan, st)
         except (CausalityViolation, JsonlCorruption, OSError, ValueError, KeyError) as e:
             return [f"evidence unreadable: {type(e).__name__}: {e}"]
-        for k in ("events_sha256", "events_logged", "evaluation_cutoff_ts", "quality_head", "funding_head",
-                  "last_ts", "warmup_sha256"):
+        keys = ["events_sha256", "events_logged", "evaluation_cutoff_ts", "quality_head", "funding_head",
+                "last_ts", "warmup_sha256"]
+        if "state_fields_sha256" in a:          # records written since ADR 0077
+            keys.append("state_fields_sha256")
+        for k in keys:
             if canonical_json(now.get(k)) != canonical_json(a.get(k)):
                 out.append(f"{k} differs from the evaluation record")
         for sym, b in (a.get("bar_logs") or {}).items():
@@ -1938,4 +2344,64 @@ class ForwardPaper:
             d = self._decide(plan, m)
             if d["verdict"] != rec.get("verdict"):
                 out.append(f"the ledger gives {d['verdict']}, the record {rec.get('verdict')}")
+            # ADR 0077: no position of the sample is open under the independent replay
+            rp = self._reconstruct_positions(plan, st)
+            out += rp["problems"]
+            pend = [x["event_id"] for x in rp["open"] if x["entry_ts"] <= rule_t]
+            if pend:
+                out.append(f"position(s) of the sample open under the registered rules: {pend}")
         return out
+
+    def _resume_conclusion(self, plan: Mapping, st: dict, base_sha: str, prior: Mapping, now: int) -> dict:
+        """ADR 0077: finish a conclusion interrupted after its record was appended
+        (status, feedback, state).  Never a second record; a record that the
+        evidence on disk does not give is PAPER_ERROR and nothing is changed."""
+        pid = plan["plan_id"]
+        d = self.root / pid
+        why = self._record_problems(plan, prior, st)
+        if why:
+            res = {"plan_id": pid, "status": st["status"], "verdict": "PAPER_ERROR",
+                   "reasons": ["EVALUATION_RECORD_CONFLICT: the recorded conclusion "
+                               f"{prior.get('record_id')} is not what the evidence on disk gives: "
+                               + "; ".join(why[:10])]}
+            append_jsonl(d / "steps.jsonl", {"at": iso_now(), "clock_ms": now, **res})
+            return res
+        sid, ctx = plan["strategy_id"], plan["context_id"]
+        to = {"PAPER_PASSED": "PAPER_PASSED", "PAPER_FAILED": "PAPER_FAILED",
+              "PAPER_INCONCLUSIVE": "INCONCLUSIVE"}[prior["verdict"]]
+        if self.p.statuses.status(sid, ctx) != to:
+            labels = [] if plan["feed_realtime"] else ["OBSERVED_FROM_ARCHIVE_NOT_REALTIME"]
+            self.p.statuses.set(sid, ctx, to, stage="paper_forward", labels=labels,
+                                reasons=list(prior.get("reasons") or []) + [
+                                    "forward paper is a research result — never approval for live trading"],
+                                evidence={"paper_forward": prior["record_id"]})
+        self._feedback_once(plan, prior["verdict"])
+        st["concluded"], st["verdict"] = True, prior["verdict"]
+        st.setdefault("recovered", []).append({"conclusion": prior["record_id"], "at": iso_now()})
+        res = {"plan_id": pid, "status": "CONCLUDED", "verdict": prior["verdict"],
+               "reasons": list(prior.get("reasons") or []), "resumed_conclusion": prior["record_id"]}
+        try:
+            self._commit_state(pid, st, base_sha)
+        except StateChanged as e:
+            res["state_not_saved"] = str(e)
+        append_jsonl(d / "steps.jsonl", {"at": iso_now(), "clock_ms": now, **res})
+        return res
+
+    def verify_conclusion(self, plan_id: str) -> list[str]:
+        """Re-check a concluded plan against the anchors of its evaluation record
+        (ADR 0076).  Returns the problems found ([] = the files on disk are the ones
+        the verdict was computed from, and they still give the same cutoff, metrics
+        and verdict).  ADR 0077: also the anchored state fields and the independent
+        position replay (no position of the sample open).  Read only: nothing is
+        repaired or written."""
+        plan = self.plan(plan_id)
+        rec = self.p.evaluation("paper_forward", plan["strategy_id"], plan["context_id"])
+        if rec is None or rec.get("plan_id") != plan_id:
+            return ["no final evaluation record for this plan"]
+        if not isinstance(rec.get("anchors"), Mapping):
+            return ["evaluation record has no anchors (concluded before ADR 0076)"]
+        try:
+            st = self.state(plan_id)
+        except (OSError, ValueError) as e:
+            return [f"state unreadable: {type(e).__name__}: {e}"]
+        return self._record_problems(plan, rec, st)
