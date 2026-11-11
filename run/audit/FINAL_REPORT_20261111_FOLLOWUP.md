@@ -9,7 +9,7 @@
 | 시작 커밋 | `89fcc6d` (main, PR #72 병합, ADR 0071). 그 뒤 main 추가 커밋 없음 |
 | 종료 커밋 | 이 PR의 병합 커밋 (PR 본문·스레드 보고에 기록) |
 | 작업 브랜치 | `claude/project-thread-091ziv` |
-| PR | __PR__ |
+| PR | #73 |
 | 수정 파일 | `run/discovery/data_quality.py`, `runner.py`, `evaluator.py`, `pipeline.py`, `portfolio_multi.py`, `data_fetch.py`, `data_manifest.py`, `paper_forward.py`, `config/portfolio_validation_v2.json`, `tests/test_portfolio_core_defects_20261111.py`(기대값 2곳), `docs/adr/README.md` |
 | 추가 파일 | `run/discovery/tests/test_followup_defects_20261111.py`(41개), `docs/adr/0072-…md`, 이 보고서 |
 | 추가 ADR | 0072 (ADR 0071은 수정하지 않음) |
@@ -41,7 +41,7 @@
 | 차등 검사 | 합성 400건, 이전(`89fcc6d`)·새 evaluator 비교. 이벤트·순수익·거절 수·거절률이 400건 모두 동일. `signals_total`은 354건 증가, truncated 합계 +2065 |
 | GitHub Actions | 실패, 확인 불가. 아래 참조 |
 
-GitHub Actions: #313(PR #72, `b586876`)과 #314(main 병합, `89fcc6d`) 모두 `failure`다. 두 job(3.11, 3.13)은 `runner_id 0`, `runner_name` 빈 값, 과금 0 ms, 실행 4초, 로그 404, check run 출력이 비어 있다. runner가 배정되지 않았고 어떤 단계도 실행되지 않았다. 11-09 이후 모든 실행이 같은 형태다. 결제나 사용량 한도가 원인일 가능성이 높지만 API로는 정확한 원인을 확인할 수 없다(**확인 불가**). 이 PR의 실행 번호와 결과는 PR 본문에 적는다. 로컬 CI 통과가 Actions 통과를 뜻하지는 않는다.
+GitHub Actions: #313(PR #72, `b586876`)과 #314(main 병합, `89fcc6d`) 모두 `failure`다. 두 job(3.11, 3.13)은 `runner_id 0`, `runner_name` 빈 값, 과금 0 ms, 실행 4초, 로그 404, check run 출력이 비어 있다. runner가 배정되지 않았고 어떤 단계도 실행되지 않았다. 11-09 이후 모든 실행이 같은 형태다. 결제나 사용량 한도가 원인일 가능성이 높지만 API로는 정확한 원인을 확인할 수 없다(**확인 불가**). 이 PR의 실행 #315(push)·#316(pull_request, `7cdd8ca`)도 같은 형태로 실패했다. 2 job 모두 4초에 끝났고, 과금 0 ms, 단계 없음이었다. 로컬 CI 통과가 Actions 통과를 뜻하지는 않는다.
 
 ## D. 기존 기능 영향
 
