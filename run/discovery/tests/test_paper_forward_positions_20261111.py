@@ -37,8 +37,26 @@ def write_log(path: Path, rows) -> None:
     path.write_text("".join(json.dumps(r, sort_keys=True) + "\n" for r in rows))
 
 
+#: ADR 0076: the cutoff is the earliest bar at which the rule holds.  With these
+#: criteria it is 00:30 of day 70, inside the day-70 holding period (00:15-02:15),
+#: so the open-position scenarios below keep a position of the sample open.
+OPEN_AT_RULE = {"min_days": 70 + 45 / 1440}
+
+
 class PositionCase(FundingCase):
     """EDGE (hour 0-2 drift) enters at 00:15 and holds 8 bars (exit 02:15)."""
+
+    CRIT: dict = {}
+
+    def fp(self, p, feed):
+        from paper_forward import DEFAULT_CRITERIA, ForwardPaper
+        path = None
+        if self.CRIT:
+            c = json.loads(DEFAULT_CRITERIA.read_text())
+            c.update(self.CRIT)
+            path = self.td / "criteria.json"
+            path.write_text(json.dumps(c, indent=1))
+        return ForwardPaper(p, feed, criteria_path=path, clock=lambda: self.now[0])
 
     def plan(self):
         p, edge, feed = self.setup_feed(iv_h=4)
@@ -53,7 +71,9 @@ class PositionCase(FundingCase):
     def open_at_end(self, *, crash=None):
         """Observe 70 days and stop 2 bars into the day-70 position (entry
         00:15, last observed bar 00:45).  ``crash``: multiply every price after
-        the entry bar by this factor (the open position runs into a loss)."""
+        the entry bar by this factor (the open position runs into a loss).
+        ADR 0076: criteria ``OPEN_AT_RULE`` put the rule's cutoff at 00:30."""
+        self.CRIT = OPEN_AT_RULE
         p, edge, feed, fp, plan = self.plan()
         entry = plan["start_ts"] + 70 * DAY + MIN15
         if crash is not None:
@@ -150,7 +170,7 @@ class TestOpenPositionPolicy(PositionCase):
         self.assertIsNone(p.evaluation("paper_forward", edge))
         st = fp.state(pid)
         cut = st["evaluation_cutoff"]["ts"]
-        self.assertEqual(cut, st["last_ts"]["BTCUSDT"])
+        self.assertEqual(cut, entry + MIN15)          # ADR 0076: the earliest bar the rule holds
         self.assertNotIn(eid, {x["event_id"] for x in iter_jsonl(fp.root / pid / "events.jsonl")})
         n_closed = r["metrics"]["n_trades"]
         # two more days: the pending trade closes, later entries are outside the sample
@@ -177,6 +197,7 @@ class TestOpenPositionPolicy(PositionCase):
         self.assertEqual(p.statuses.status(edge, p.context_id()), "PAPER_FAILED")
 
     def test_holding_position_stays_open_across_steps_and_is_logged_once(self):
+        self.CRIT = OPEN_AT_RULE
         p, edge, feed, fp, plan = self.plan()
         pid = plan["plan_id"]
         entry = plan["start_ts"] + 70 * DAY + MIN15
@@ -399,9 +420,9 @@ class TestConclusionRecheck(PositionCase):
 
     def test_position_opened_after_the_verdict(self):
         p, edge, fp, plan, st, result, v, ev = self._passed()
-        last = st["last_ts"]["BTCUSDT"]
-        result["open_positions"].append({"event_id": f"BTCUSDT:{last}", "symbol": "BTCUSDT", "side": 1,
-                                         "entry_ts": last, "status": "OPEN", "unrealized_gross_bp": 1.0,
+        last, cut = st["last_ts"]["BTCUSDT"], v["evaluation_cutoff"]
+        result["open_positions"].append({"event_id": f"BTCUSDT:{cut}", "symbol": "BTCUSDT", "side": 1,
+                                         "entry_ts": cut, "status": "OPEN", "unrealized_gross_bp": 1.0,
                                          "marked_at": last})
         self._refused(p, edge, fp, plan, v, result, st)
 
@@ -490,8 +511,9 @@ class TestExceptionsAndCompatibility(PositionCase):
         self.assertEqual(r["verdict"], "PAPER_PASSED", r["reasons"])
 
     def test_3_normal_closed_positions_conclude_as_before(self):
-        """Test 3 of the directive: nothing open at the end -> concluded at once,
-        the sample is every trade observed (same as before ADR 0075)."""
+        """Test 3 of the directive: nothing open at the cutoff -> concluded at once.
+        ADR 0076: the sample is every trade entered by the earliest bar at which
+        the rule holds (start + 60 days - 15 m), not every trade observed."""
         p, edge, feed, fp, plan = self.plan()
         pid = plan["plan_id"]
         self.at(plan, 70, 0)
@@ -499,11 +521,13 @@ class TestExceptionsAndCompatibility(PositionCase):
         self.assertEqual(r["verdict"], "PAPER_PASSED", r["reasons"])
         self.assertEqual(r["open_positions"], [])
         st = fp.state(pid)
-        self.assertEqual(st["evaluation_cutoff"]["ts"], st["last_ts"]["BTCUSDT"])
+        cut = plan["start_ts"] + 60 * DAY - MIN15
+        self.assertEqual(st["evaluation_cutoff"]["ts"], cut)
         led = list(iter_jsonl(fp.root / pid / "events.jsonl"))
-        self.assertEqual(r["metrics"]["trades_entered_after_bound"], 0)
+        self.assertEqual(r["metrics"]["trades_entered_after_bound"], sum(1 for t in led if t["entry_ts"] > cut))
         self.assertEqual(r["metrics"]["n_trades"],
-                         sum(1 for t in led if t["exec_status"] in ("FILLED", "PARTIAL", "LIQUIDATED")))
+                         sum(1 for t in led if t["exec_status"] in ("FILLED", "PARTIAL", "LIQUIDATED")
+                             and t["entry_ts"] <= cut))
         self.assertEqual(st["events_logged"], len(led))
         self.assertEqual(p.statuses.status(edge, p.context_id()), "PAPER_PASSED")
 

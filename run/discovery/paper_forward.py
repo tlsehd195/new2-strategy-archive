@@ -60,8 +60,10 @@ interval observed today (``/fapi/v1/fundingInfo``) is applied to a past
 settlement.  Plans registered before ADR 0074 are never concluded.
 
 Positions (ADR 0075, ``POSITION_POLICY``): the verdict is computed on CLOSED
-trades only.  When the stopping rule first holds, the last observed bar
-becomes the evaluation cutoff (kept in the state); a position entered by the
+trades only.  The evaluation cutoff (kept in the state) is the earliest bar
+at which the stopping rule holds (ADR 0076, ``CUTOFF_POLICY``: derived from
+the ledger, independent of the step cadence, capped at ``max_days``); a
+position entered by the
 cutoff that is still open keeps the verdict at PAPER_OBSERVING
 (OPEN_POSITIONS_PENDING) until its exit is observed — it is neither marked to
 market into the result nor closed by force — and trades entered after the
@@ -127,6 +129,14 @@ FUNDING_INTEGRITY = "paper-forward-integrity-v1"
 #: part of the sample.  The closed-trade ledger (events.jsonl) must agree with the
 #: evaluator and with itself (no duplicate / overlapping / unobserved / malformed record).
 POSITION_POLICY = "paper-forward-positions-v1"
+#: ADR 0076: where the sample ends.  The evaluation cutoff is the EARLIEST bar time T of the
+#: preregistered window at which the stopping rule holds, derived from the closed-trade ledger
+#: alone: T = max(min_days bar, exit of the min_trades-th counted trade), capped at the last
+#: bar of the max_days window, and only once every symbol is observed through T.  It does not
+#: depend on how often or when step() runs, it never lies past start + max_days, and a cutoff
+#: in the state that is not this T is PAPER_ERROR.  A window that the clock has passed but the
+#: data does not cover is PAPER_BLOCKED_DATA (never INCONCLUSIVE on bars nobody observed).
+CUTOFF_POLICY = "paper-forward-cutoff-v1"
 #: execution statuses of a closed-trade record and the fill fraction each one allows
 _EXEC_FILL = {"FILLED": "one", "PARTIAL": "part", "LIQUIDATED": "positive",
               "REJECTED_NO_LIQUIDITY": "zero", "REJECTED_PARTICIPATION": "zero"}
@@ -930,9 +940,10 @@ class ForwardPaper:
         verdict = self._verdict(plan, st, result)
         cut = verdict.get("evaluation_cutoff")
         if cut is not None and st.get("evaluation_cutoff") is None:
-            # ADR 0075: the stopping rule held at this bar for the first time: the sample of
-            # the final verdict is every trade entered up to here (kept, never moved)
-            st["evaluation_cutoff"] = {"ts": cut, "step": st["steps"], "policy": POSITION_POLICY}
+            # ADR 0075/0076: the earliest bar at which the stopping rule holds: the sample of
+            # the final verdict is every trade entered up to there (kept, never moved)
+            st["evaluation_cutoff"] = {"ts": cut, "step": st["steps"], "policy": POSITION_POLICY,
+                                       "rule": CUTOFF_POLICY}
         if st.get("evaluation_cutoff") is not None:
             result["evaluation_cutoff"] = st["evaluation_cutoff"]["ts"]
         if verdict["final"]:
@@ -1420,11 +1431,54 @@ class ForwardPaper:
             raise EvidenceIntegrityError("TRADE_LOG_UNREADABLE", f"events.jsonl: {type(e).__name__}: {e}") from e
 
     @staticmethod
-    def _sample_bound(st: Mapping) -> int:
+    def _grid_bar(plan: Mapping, days: float) -> int:
+        """Bar time T at which ``days`` of observation are complete: (T + 15m - start) >= days."""
+        span = -(-int(math.ceil(float(days) * DAY_MS)) // MS15) * MS15
+        return plan["start_ts"] + max(span, MS15) - MS15
+
+    @classmethod
+    def _window_end(cls, plan: Mapping) -> int:
+        """Last bar of the preregistered observation window (start + max_days)."""
+        return cls._grid_bar(plan, plan["criteria"]["max_days"])
+
+    @staticmethod
+    def _counted(plan: Mapping, trades: Sequence[Mapping]) -> list:
+        """Closed trades that count for the verdict (filled, and in time for a real-time feed)."""
+        out = [t for t in trades if t.get("exec_status") in ("FILLED", "PARTIAL", "LIQUIDATED")]
+        return [t for t in out if not t.get("late")] if plan["feed_realtime"] else out
+
+    @classmethod
+    def _rule_cutoff(cls, plan: Mapping, st: Mapping, ledger: Sequence[Mapping]) -> Optional[int]:
+        """ADR 0076: the earliest bar T at which the preregistered stopping rule holds,
+        or None while it does not hold on what every symbol has observed.
+
+        At bar T the rule holds when min_days are complete and min_trades counted
+        trades have EXITED by T (a trade is known closed once its exit bar is
+        observed), or when T is the last bar of the max_days window.  T only
+        depends on the ledger (which is checked against the evaluator), never on
+        when or how often step() ran.  The common observation time is the minimum
+        over the symbols: a later bound would cut the sample at a time some symbol
+        has not been observed to, whose entries before it (closed or open) are not
+        known yet."""
+        c = plan["criteria"]
+        wend = cls._window_end(plan)
+        k = int(c["min_trades"])
+        exits = sorted(int(t["exit_ts"]) for t in cls._counted(plan, ledger))
+        t_days = cls._grid_bar(plan, c["min_days"])
+        if k <= 0:
+            cand = t_days
+        else:
+            cand = max(t_days, exits[k - 1]) if len(exits) >= k else wend
+        t = min(cand, wend)
+        return t if t <= min(st["last_ts"].values()) else None
+
+    @classmethod
+    def _sample_bound(cls, plan: Mapping, st: Mapping) -> int:
         """Last entry time of the verdict's sample: the recorded evaluation cutoff,
-        or (before the stopping rule held) the last bar observed for every symbol."""
+        or (before the stopping rule held) the last bar observed for every symbol,
+        never past the max_days window (ADR 0076)."""
         cut = st.get("evaluation_cutoff")
-        return int(cut["ts"]) if cut else min(st["last_ts"].values())
+        return int(cut["ts"]) if cut else min(min(st["last_ts"].values()), cls._window_end(plan))
 
     @staticmethod
     def _pending(result: Mapping, bound: int) -> list[dict]:
@@ -1550,19 +1604,17 @@ class ForwardPaper:
         for eid in sorted(set(now) - set(logged)):
             append_jsonl(path, {**now[eid], "logged_at": iso_now()})
 
-    def metrics(self, plan_id: str, st: Optional[Mapping] = None) -> dict:
+    def metrics(self, plan_id: str, st: Optional[Mapping] = None, *, bound: Optional[int] = None) -> dict:
         plan = self.plan(plan_id)
         st = st if st is not None else self.state(plan_id)
         # ADR 0075: the sample is every closed trade ENTERED by the sample bound (the
-        # evaluation cutoff once recorded); open positions are never part of it
-        bound = self._sample_bound(st)
+        # evaluation cutoff once recorded); open positions are never part of it.
+        # ADR 0076: ``bound`` is given by the verdict (the rule's cutoff before it is recorded)
+        bound = self._sample_bound(plan, st) if bound is None else int(bound)
         allt = list(iter_jsonl(self.root / plan_id / "events.jsonl"))
         trades = [t for t in allt if t["entry_ts"] <= bound]
         counted = [t for t in trades if t["exec_status"] in ("FILLED", "PARTIAL", "LIQUIDATED")]
-        if plan["feed_realtime"]:
-            counted_v = [t for t in counted if not t["late"]]
-        else:
-            counted_v = counted
+        counted_v = self._counted(plan, trades)
         nets = [t["net_bp_exec"] for t in sorted(counted_v, key=lambda t: t["exit_ts"])]
         n = len(nets)
         mean = sum(nets) / n if n else None
@@ -1578,8 +1630,14 @@ class ForwardPaper:
             mdd = max(mdd, peak - cum)
             daily[t["exit_ts"] // DAY_MS] = daily.get(t["exit_ts"] // DAY_MS, 0.0) + x
         days = max(0.0, (bound + MS15 - plan["start_ts"]) / DAY_MS)
-        expected = sum(max(0, (st["last_ts"][s] - plan["start_ts"]) // MS15 + 1) for s in plan["symbols"])
-        missing = sum(st["missing_bars"].values())
+        # ADR 0076: data coverage of the sample period [start, bound] only (bars observed
+        # after the cutoff, and their gaps, are not part of the verdict)
+        expected = sum(max(0, (min(st["last_ts"][s], bound) - plan["start_ts"]) // MS15 + 1)
+                       for s in plan["symbols"])
+        missing = 0
+        for s in plan["symbols"]:
+            for a, b, _ in st["gaps"][s]:
+                missing += max(0, (min(b - MS15, bound) - a) // MS15)
         return {"n_trades": n, "mean_net_bp": mean, "hac_t": tstat if math.isfinite(tstat) else None,
                 "hac_p_one_sided": pval, "stressed_mean_bp": (sum(stress) / len(stress)) if stress else None,
                 "mdd_bp": mdd, "days_observed": days, "missing_bar_share": (missing / expected) if expected else None,
@@ -1590,7 +1648,7 @@ class ForwardPaper:
                 "daily_net_bp": {str(k): v for k, v in sorted(daily.items())},
                 "bars_observed": dict(st["bars"]), "duplicates_skipped": dict(st["duplicates"]),
                 "incomplete_skipped": st["incomplete_skipped"],
-                "sample_bound_ts": bound,
+                "sample_bound_ts": bound, "window_end_ts": self._window_end(plan),
                 "evaluation_cutoff_ts": (st.get("evaluation_cutoff") or {}).get("ts"),
                 "trades_entered_after_bound": len(allt) - len(trades)}
 
@@ -1626,16 +1684,45 @@ class ForwardPaper:
         pos = self._position_problems(plan, st, result)
         if pos:
             return {"verdict": "PAPER_ERROR", "final": False, "reasons": ["POSITION_INTEGRITY: " + "; ".join(pos[:10])]}
-        bound = self._sample_bound(st)
-        m = self.metrics(plan["plan_id"], st)
+        # ADR 0076: the cutoff is the earliest bar at which the rule holds (from the ledger)
+        ledger = list(iter_jsonl(self.root / plan["plan_id"] / "events.jsonl"))
+        rule_t = self._rule_cutoff(plan, st, ledger)
+        observed = min(st["last_ts"].values())
+        wend = self._window_end(plan)
+        now = self.clock()
+        result["observation_clock"] = {"clock_ms": now, "data_through_ts": observed, "window_end_ts": wend,
+                                       "clock_days": (now - plan["start_ts"]) / DAY_MS,
+                                       "data_days": max(0.0, (observed + MS15 - plan["start_ts"]) / DAY_MS)}
+        cut = st.get("evaluation_cutoff")
+        if cut is not None and cut.get("ts") != rule_t:
+            return {"verdict": "PAPER_ERROR", "final": False,
+                    "reasons": [f"EVALUATION_CUTOFF_INVALID: recorded cutoff {cut.get('ts')} is not the earliest "
+                                f"bar at which the stopping rule holds ({rule_t}; {CUTOFF_POLICY})"]}
+        bound = rule_t if rule_t is not None else self._sample_bound(plan, st)
+        m = self.metrics(plan["plan_id"], st, bound=bound)
         result["metrics"] = dict(m)          # always this call's metrics, never an earlier one
         d = self._decide(plan, m)
-        if st.get("evaluation_cutoff") is not None and not d["final"]:
+        if rule_t is None:
+            if now >= wend + MS15:
+                # the preregistered window is over on the clock but its bars were not observed
+                return {"verdict": "PAPER_BLOCKED_DATA", "final": False,
+                        "reasons": [f"OBSERVATION_WINDOW_NOT_COVERED: the {plan['criteria']['max_days']}-day window "
+                                    f"ended at {wend} on the clock ({result['observation_clock']['clock_days']:.1f} "
+                                    f"days), data observed through {observed} "
+                                    f"({result['observation_clock']['data_days']:.1f} days): no verdict on "
+                                    f"bars that were not observed"]}
+            c = plan["criteria"]
+            n_closed = sum(1 for t in self._counted(plan, ledger) if t["exit_ts"] <= bound)
+            why = [f"{m['days_observed']:.1f}/{c['min_days']} days, {n_closed}/{c['min_trades']} trades"]
+            lag = result["observation_clock"]["clock_days"] - result["observation_clock"]["data_days"]
+            if lag > 1.0:
+                why.append(f"DATA_LAG: data observed through {result['observation_clock']['data_days']:.1f} "
+                           f"days at {result['observation_clock']['clock_days']:.1f} days on the clock")
+            return {"verdict": "PAPER_OBSERVING", "final": False, "reasons": why}
+        if not d["final"]:      # cannot happen: the rule's cutoff always gives a final decision
             return {"verdict": "PAPER_ERROR", "final": False,
-                    "reasons": [f"EVALUATION_CUTOFF_INVALID: the stopping rule does not hold at the recorded "
-                                f"cutoff {bound} ({'; '.join(d['reasons'])})"]}
-        if not d["final"]:
-            return d
+                    "reasons": [f"EVALUATION_CUTOFF_INVALID: the criteria are not final at the rule's cutoff "
+                                f"{bound} ({'; '.join(d['reasons'])})"]}
         pending = self._pending(result, bound)
         result["positions"] = {"policy": POSITION_POLICY, "sample_bound_ts": bound,
                                "closed_in_sample": m["n_trades"], "pending": pending,
@@ -1711,6 +1798,13 @@ class ForwardPaper:
         if not isinstance(cut, Mapping) or not isinstance(cut.get("ts"), int):
             why.append("no evaluation cutoff recorded for a final verdict")
             return why
+        try:
+            rule_t = self._rule_cutoff(plan, st, list(iter_jsonl(self.root / plan["plan_id"] / "events.jsonl")))
+        except (JsonlCorruption, OSError, ValueError, KeyError, TypeError) as e:
+            why.append(f"cutoff cannot be derived from the ledger: {type(e).__name__}: {e}")
+            return why
+        if rule_t != cut["ts"]:
+            why.append(f"recorded cutoff {cut['ts']} is not the earliest bar at which the rule holds ({rule_t})")
         pend = self._pending(result, cut["ts"])
         if pend:
             why.append(f"{len(pend)} position(s) of the sample still open: " + ", ".join(
@@ -1738,7 +1832,9 @@ class ForwardPaper:
             # unreachable through _verdict; a second, independent gate so no path records a
             # final paper verdict on unconfirmed funding or unverified evidence (ADR 0073/0074)
             raise ConclusionRefused(f"{plan['plan_id']}: final verdict refused: " + "; ".join(why[:10]))
-        cut_ts = ((st if st is not None else self.state(plan["plan_id"])).get("evaluation_cutoff") or {}).get("ts")
+        st_now = st if st is not None else self.state(plan["plan_id"])
+        cut_ts = (st_now.get("evaluation_cutoff") or {}).get("ts")
+        anchors = self._anchors(plan, st_now)
         sid, ctx = plan["strategy_id"], plan["context_id"]
         to = {"PAPER_PASSED": "PAPER_PASSED", "PAPER_FAILED": "PAPER_FAILED",
               "PAPER_INCONCLUSIVE": "INCONCLUSIVE"}[verdict["verdict"]]
@@ -1760,6 +1856,8 @@ class ForwardPaper:
                                                  "closed_in_sample": (result.get("metrics") or {}).get("n_trades"),
                                                  "open_after_cutoff": (result.get("positions") or {}).get(
                                                      "open_after_bound", [])},
+                                   # ADR 0076: what the verdict was computed from, for a later audit
+                                   "anchors": anchors,
                                    "funding_evidence": {"policy": FUNDING_POLICY,
                                                         "schedule": result.get("funding_schedule"),
                                                         "symbols": result.get("funding")},
@@ -1772,3 +1870,72 @@ class ForwardPaper:
                      {"strategy_id": sid, "context_id": ctx, "source": "paper_forward",
                       "verdict": verdict["verdict"], "use": "human review + failure memory only; never search ranking",
                       "at": iso_now()})
+
+    # -- conclusion anchors (ADR 0076) ------------------------------------------------
+    def _anchors(self, plan: Mapping, st: Mapping) -> dict:
+        """sha256 / length / chain heads of every file the final verdict was computed from.
+        Part of the evaluation record (and so of its record id)."""
+        d = self.root / plan["plan_id"]
+        ev = d / "events.jsonl"
+        raw = ev.read_bytes() if ev.exists() else b""
+        bars = {}
+        for sym in plan["symbols"]:
+            rows = read_bar_log(d / f"bars_{sym}.jsonl")
+            bars[sym] = {"rows": len(rows), "head": rows[-1]["hash"] if rows else ""}
+        cut = st.get("evaluation_cutoff") or {}
+        return {"policy": CUTOFF_POLICY, "evaluation_cutoff_ts": cut.get("ts"), "cutoff_rule": cut.get("rule"),
+                "events_logged": len(list(iter_jsonl(ev))) if ev.exists() else 0,
+                "events_sha256": hashlib.sha256(raw).hexdigest(), "bar_logs": bars,
+                "quality_head": dict(st.get("quality_head") or {}), "funding_head": dict(st.get("funding_head") or {}),
+                "last_ts": dict(st["last_ts"]), "warmup_sha256": dict(plan.get("warmup_sha256") or {})}
+
+    def verify_conclusion(self, plan_id: str) -> list[str]:
+        """Re-check a concluded plan against the anchors of its evaluation record
+        (ADR 0076).  Returns the problems found ([] = the files on disk are the ones
+        the verdict was computed from, and they still give the same cutoff, metrics
+        and verdict).  Read only: nothing is repaired or written."""
+        plan = self.plan(plan_id)
+        rec = self.p.evaluation("paper_forward", plan["strategy_id"], plan["context_id"])
+        if rec is None or rec.get("plan_id") != plan_id:
+            return ["no final evaluation record for this plan"]
+        a = rec.get("anchors")
+        if not isinstance(a, Mapping):
+            return ["evaluation record has no anchors (concluded before ADR 0076)"]
+        out = []
+        try:
+            st = self.state(plan_id)
+        except (OSError, ValueError) as e:
+            return [f"state unreadable: {type(e).__name__}: {e}"]
+        try:
+            now = self._anchors(plan, st)
+        except (CausalityViolation, JsonlCorruption, OSError, ValueError, KeyError) as e:
+            return [f"evidence unreadable: {type(e).__name__}: {e}"]
+        for k in ("events_sha256", "events_logged", "evaluation_cutoff_ts", "quality_head", "funding_head",
+                  "last_ts", "warmup_sha256"):
+            if canonical_json(now.get(k)) != canonical_json(a.get(k)):
+                out.append(f"{k} differs from the evaluation record")
+        for sym, b in (a.get("bar_logs") or {}).items():
+            got = now["bar_logs"].get(sym) or {}
+            if got.get("rows", 0) < b.get("rows", 0):
+                out.append(f"bars_{sym}.jsonl is shorter than when the verdict was computed")
+                continue
+            rows = read_bar_log(self.root / plan_id / f"bars_{sym}.jsonl")
+            if b.get("rows") and rows[b["rows"] - 1]["hash"] != b.get("head"):
+                out.append(f"bars_{sym}.jsonl was rewritten after the verdict")
+        ledger = list(iter_jsonl(self.root / plan_id / "events.jsonl"))
+        try:
+            rule_t = self._rule_cutoff(plan, st, ledger)
+        except (KeyError, TypeError, ValueError) as e:
+            return out + [f"cutoff cannot be derived from the ledger: {type(e).__name__}: {e}"]
+        if rule_t != a.get("evaluation_cutoff_ts"):
+            out.append(f"the ledger gives cutoff {rule_t}, the record {a.get('evaluation_cutoff_ts')}")
+        if rule_t is not None:
+            m = self.metrics(plan_id, st, bound=rule_t)
+            same = lambda x: canonical_json({k: v for k, v in dict(x or {}).items()  # noqa: E731
+                                             if k not in ("evaluation_cutoff_ts",)})
+            if same(m) != same(rec.get("metrics")):
+                out.append("metrics recomputed from the ledger differ from the evaluation record")
+            d = self._decide(plan, m)
+            if d["verdict"] != rec.get("verdict"):
+                out.append(f"the ledger gives {d['verdict']}, the record {rec.get('verdict')}")
+        return out

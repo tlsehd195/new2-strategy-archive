@@ -692,14 +692,12 @@ class TestForwardVerdict(FundingCase):
         feed.funding_checked = real
         self.now[0] += HOUR
         r = fp.step(plan["plan_id"])
-        # ADR 0075: the retry is accepted (funding confirmed), but its last bar (00:45) is
-        # inside the day-75 holding period: the stopping rule holds and the plan waits
-        # for that position instead of concluding without it
-        self.assertEqual(r["verdict"], "PAPER_OBSERVING", r["reasons"])
-        self.assertIn("OPEN_POSITIONS_PENDING", r["reasons"][0])
-        self.now[0] += 4 * HOUR
-        r = fp.step(plan["plan_id"])
+        # ADR 0076: the retry is accepted (funding confirmed).  The sample ends at the
+        # earliest bar at which the rule holds (start + 60 days - 15 m), so the position
+        # open at day 75 is outside it and the plan concludes on this step
         self.assertEqual(r["verdict"], "PAPER_PASSED", r["reasons"])
+        self.assertEqual(r["evaluation_cutoff"], plan["start_ts"] + 60 * DAY - 900_000)
+        self.assertEqual(r["positions"]["pending"], [])
 
     def test_d7_e5_changed_or_removed_source_file(self):
         for action in ("change", "remove"):
