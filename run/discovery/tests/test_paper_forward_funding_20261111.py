@@ -518,17 +518,19 @@ class TestBinanceFeedFunding(unittest.TestCase):
     INFO4 = [{"symbol": "BTCUSDT", "fundingIntervalHours": 4}]
 
     def test_f1_normal_answer(self):
+        # ADR 0074: was VALID with today's fundingInfo interval copied onto every past
+        # settlement (the defect).  The snapshot is kept as evidence, never back-dated.
         fr = self.feed(MockApi(self.INFO4, [self.rows()])).funding_checked("BTCUSDT", self.AFTER)
-        self.assertEqual(fr["status"], "VALID")
+        self.assertEqual(fr["status"], "SCHEDULE_UNKNOWN")
         self.assertEqual(len(fr["rows"]), 6)
-        self.assertTrue(all(v == 4 * HOUR for v in fr["intervals"].values()))
-        self.assertIn("fundingInfo", fr["schedule_source"])
+        self.assertEqual(fr["intervals"], {})
+        self.assertEqual(fr["schedule_observation"]["interval_ms"], 4 * HOUR)
         self.assertTrue(all(x["sha256"] for x in fr["source_files"]))
 
     def test_f2_empty_answer_is_not_an_error_and_not_coverage(self):
         from funding_schedule import coverage_check
         fr = self.feed(MockApi(self.INFO4, [[]])).funding_checked("BTCUSDT", self.AFTER)
-        self.assertEqual((fr["status"], fr["rows"]), ("VALID", []))
+        self.assertEqual((fr["status"], fr["rows"]), ("SCHEDULE_UNKNOWN", []))     # ADR 0074 (was VALID)
         self.assertEqual(coverage_check(fr["rows"], fr["intervals"], self.AFTER, self.NOW)["status"],
                          "FUNDING_DATA_MISSING")
 
@@ -548,7 +550,7 @@ class TestBinanceFeedFunding(unittest.TestCase):
         self.assertEqual(len(fr["rows"]), 3)
         api = MockApi(self.INFO4, [self.rows(n=3), self.rows(n=6)[3:]])          # paged: complete
         fr = self.feed(api, FUNDING_LIMIT=3).funding_checked("BTCUSDT", self.AFTER)
-        self.assertEqual((fr["status"], len(fr["rows"])), ("VALID", 6))
+        self.assertEqual((fr["status"], len(fr["rows"])), ("SCHEDULE_UNKNOWN", 6))   # ADR 0074 (was VALID)
         self.assertIn(f"startTime={self.rows(n=3)[-1]['fundingTime'] + 1}&", api.urls[2])
 
     def test_f5_f6_duplicate_and_inverted_settlements(self):
@@ -573,9 +575,9 @@ class TestBinanceFeedFunding(unittest.TestCase):
         r = self.rows(n=6)
         del r[3]
         fr = self.feed(MockApi(self.INFO4, [r])).funding_checked("BTCUSDT", self.AFTER)
-        self.assertEqual(fr["status"], "VALID")
+        self.assertEqual(fr["status"], "SCHEDULE_UNKNOWN")                          # ADR 0074 (was VALID)
         c = coverage_check(fr["rows"], fr["intervals"], _ms("2024-05-01"), r[-1]["fundingTime"])
-        self.assertEqual(c["status"], "FUNDING_SETTLEMENT_GAP")
+        self.assertNotEqual(c["status"], "OK")                                      # (was GAP via back-dating)
 
 
 # ---------------------------------------------------------------------------

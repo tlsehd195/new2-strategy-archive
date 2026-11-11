@@ -150,31 +150,90 @@ def worst(statuses: Sequence[str]) -> str:
     return max(statuses, key=lambda s: FUNDING_STATUS_RANK[s]) if statuses else "OK"
 
 
+#: version of the observation-window coverage rule (ADR 0074)
+COVERAGE_VERSION = "funding-coverage-v2"
+
+
+def _step_status(times: Sequence[int], intervals: Mapping[int, int], j: int, tol_ms: int) -> tuple:
+    """Contiguity of the step ``times[j-1] -> times[j]`` (ADR 0074).
+
+    The archive column ``funding_interval_hours`` is stored per settlement,
+    but no Binance document says whether it is the length of the period
+    ENDING at that settlement or of the period STARTING there.  The step is
+    therefore judged under both readings at once: with ``lo``/``hi`` the
+    smaller/larger of the two declared values,
+
+    * ``step <= lo + tol``          -> contiguous under either reading (OK)
+    * ``lo + tol < step <= hi + tol`` -> contiguous under one reading only
+      (a schedule change whose meaning is unproven): SCHEDULE_UNKNOWN
+    * ``step > hi + tol``           -> settlements missing under both: GAP
+
+    Returns (status, lo, hi); status None = OK."""
+    a, b = times[j - 1], times[j]
+    iv_b, iv_a = intervals.get(b), intervals.get(a)
+    if not (isinstance(iv_b, (int, float)) and iv_b > 0) or not (isinstance(iv_a, (int, float)) and iv_a > 0):
+        return "FUNDING_SCHEDULE_UNKNOWN", None, None
+    lo, hi = min(iv_a, iv_b), max(iv_a, iv_b)
+    step = b - a
+    if step <= lo + tol_ms:
+        return None, lo, hi
+    if step <= hi + tol_ms:
+        return "SCHEDULE_CHANGE_AMBIGUOUS", lo, hi
+    return "FUNDING_SETTLEMENT_GAP", lo, hi
+
+
 def coverage_check(pairs: Optional[Sequence], intervals: Optional[Mapping[int, int]],
                    start_ts: int, end_ts: int, *, tol_ms: int = FUNDING_TOL_MS) -> dict:
     """Dataset-level completeness of an OBSERVATION window [start_ts, end_ts]
-    (ADR 0073, Paper Forward): every settlement that was due from the last
-    settlement at or before ``start_ts`` up to ``end_ts`` is present.
+    (Paper Forward; ADR 0073, boundary and schedule rules ADR 0074).
 
-    Built on :func:`settlement_check` (same series rules, same declared
-    interval per settlement, same tolerance) plus two edges the per-trade
-    check cannot see:
+    Time definitions (ms, UTC):
 
-    * head — a settlement at or before ``start_ts`` must exist (otherwise
-      nothing proves the first settlement after the start was not missed);
-    * tail — from the last settlement at or before ``end_ts``, the next one
-      is due one DECLARED interval later; if that moment is before
-      ``end_ts`` (+ tolerance) and no settlement was recorded, it is missing.
+    * ``start_ts``  first bar open of the plan; ``end_ts`` open of the last
+      observed (closed) bar.  A trade holds the settlements t with
+      ``entry < t <= exit`` (:class:`evaluator.FundingIndex`), so every
+      settlement t with ``start_ts < t <= end_ts`` can be charged.
+    * ``tol_ms``    timestamp jitter of a recorded settlement (calc_time is a
+      few ms after the nominal time).  It is ONLY used to compare recorded
+      times with each other / with a due time; it never makes a due
+      settlement optional.
+    * a settlement interval ``iv`` is DECLARED per settlement by the source.
+
+    Rules:
+
+    * head  — a settlement at or before ``start_ts`` must exist;
+    * interior — every step between consecutive recorded settlements from the
+      last one at or before ``start_ts`` to the last one at or before
+      ``end_ts`` is judged by :func:`_step_status` (both readings of the
+      declared interval, see there);
+    * tail  — with ``L`` the last recorded settlement at or before ``end_ts``
+      and ``iv`` its declared interval, the next settlement is DUE at
+      ``D = L + iv``.  It is due inside the window iff ``D - tol_ms <= end_ts``
+      (so a settlement due exactly at ``end_ts`` — or a few ms after it
+      because ``L`` itself carries jitter — is due).  A due settlement must
+      be recorded: the next recorded settlement after ``L`` must exist and
+      its step must pass :func:`_step_status`; otherwise
+      FUNDING_SETTLEMENT_GAP (``TAIL_DUE_MISSING``).  When ``D - tol_ms >
+      end_ts`` nothing is due yet (OK).  Residual assumption, recorded in
+      ``tail_assumption``: the interval after ``L`` is the one declared for
+      ``L`` (a schedule SHORTENED right after ``L`` is only seen when the next
+      settlement arrives; no trade is charged past ``L`` before that, because
+      the per-trade check needs a recorded settlement at or after the exit).
+
+    The per-trade check (:func:`settlement_check`) uses the same holding
+    window and tolerance and only the interval declared for the later
+    settlement; this window check is never weaker than it (``lo <= iv_b``).
 
     Statuses: the :data:`FUNDING_STATUS_RANK` vocabulary.  ``kind`` says
-    which edge failed (``NO_SERIES``, ``HEAD_NOT_COVERED``, ``INTERIOR``,
-    ``TAIL_DUE_MISSING``).  ``zero_rate_settlements`` counts recorded rates of
-    exactly 0 in the window — real observations, never a stand-in for a
-    missing settlement."""
+    which part failed (``NO_SERIES``, ``SERIES``, ``HEAD_NOT_COVERED``,
+    ``INTERIOR``, ``SCHEDULE_CHANGE_AMBIGUOUS``, ``TAIL_DUE_MISSING``,
+    ``TAIL_SCHEDULE_UNKNOWN``).  ``zero_rate_settlements`` counts recorded
+    rates of exactly 0 in the window — real observations, never a stand-in
+    for a missing settlement."""
     out = {"status": "OK", "kind": None, "start_ts": start_ts, "end_ts": end_ts, "settlements": 0,
            "zero_rate_settlements": 0, "first_ts": None, "last_ts": None, "gaps": [],
-           "missing_estimate": 0, "schedule_changes": 0, "reason": None,
-           "version": FUNDING_SCHEDULE_VERSION}
+           "missing_estimate": 0, "schedule_changes": 0, "next_due_ts": None, "tail_assumption": None,
+           "reason": None, "version": COVERAGE_VERSION}
     if pairs is None or len(pairs) == 0:
         out.update(status="FUNDING_DATA_MISSING", kind="NO_SERIES", reason="no funding series")
         return out
@@ -194,23 +253,59 @@ def coverage_check(pairs: Optional[Sequence], intervals: Optional[Mapping[int, i
     k1 = bisect_right(times, end_ts) - 1             # last settlement at or before the end
     out["settlements"] = k1 - k0
     out["zero_rate_settlements"] = sum(1 for _, r in pairs[k0 + 1:k1 + 1] if r == 0)
-    if k1 > k0:
-        chk = settlement_check(pairs, intervals, times[k0], times[k1], tol_ms=tol_ms, issues=[])
-        out["schedule_changes"] = chk["schedule_changes"]
-        if chk["status"] != "OK":
-            out.update(status=chk["status"], kind="INTERIOR", gaps=chk["gaps"],
-                       missing_estimate=chk["missing_estimate"], reason=chk["reason"])
-            return out
-    iv = (intervals or {}).get(times[k1])
-    if not (isinstance(iv, (int, float)) and iv > 0):
-        out.update(status="FUNDING_SCHEDULE_UNKNOWN", kind="TAIL_DUE_MISSING",
-                   reason=f"settlement {times[k1]} has no declared interval: the next due time is unknown")
+    ivs = intervals or {}
+    if intervals is None and k1 > k0:
+        out.update(status="FUNDING_SCHEDULE_UNKNOWN", kind="INTERIOR", reason="no declared settlement interval")
         return out
-    if end_ts - times[k1] > iv + tol_ms:
-        due = times[k1] + int(iv)
-        n = max(1, int((end_ts - times[k1]) // iv))
-        out.update(status="FUNDING_SETTLEMENT_GAP", kind="TAIL_DUE_MISSING",
-                   gaps=[[times[k1], end_ts, int(iv)]], missing_estimate=n,
-                   reason=f"settlement due at {due} (declared interval {int(iv)} ms after {times[k1]}) "
-                          f"not recorded by {end_ts}")
+    prev_iv = None
+    for j in range(k0 + 1, k1 + 1):
+        st, lo, hi = _step_status(times, ivs, j, tol_ms)
+        iv_j = ivs.get(times[j])
+        if prev_iv is not None and iv_j is not None and iv_j != prev_iv:
+            out["schedule_changes"] += 1
+        prev_iv = iv_j if iv_j is not None else prev_iv
+        if st is None:
+            continue
+        a, b = times[j - 1], times[j]
+        if st == "FUNDING_SCHEDULE_UNKNOWN":
+            out.update(status=st, kind="INTERIOR",
+                       reason=f"settlement {b if not ivs.get(b) else a} has no declared interval")
+        elif st == "SCHEDULE_CHANGE_AMBIGUOUS":
+            out.update(status="FUNDING_SCHEDULE_UNKNOWN", kind="SCHEDULE_CHANGE_AMBIGUOUS", gaps=[[a, b, int(lo)]],
+                       reason=f"step {a} -> {b} ({b - a} ms) fits the declared interval of one side only "
+                              f"({int(lo)} / {int(hi)} ms): which period the value belongs to is not documented")
+        else:
+            n = sum(max(1, int(round((y - x) / max(1, min(ivs[x], ivs[y])))) - 1)
+                    for x, y in zip(times[k0:k1], times[k0 + 1:k1 + 1])
+                    if ivs.get(x) and ivs.get(y) and y - x > max(ivs[x], ivs[y]) + tol_ms)
+            gaps = [[x, y, int(min(ivs[x], ivs[y]))] for x, y in zip(times[k0:k1], times[k0 + 1:k1 + 1])
+                    if ivs.get(x) and ivs.get(y) and y - x > max(ivs[x], ivs[y]) + tol_ms]
+            out.update(status=st, kind="INTERIOR", gaps=gaps, missing_estimate=n,
+                       reason=f"{n} settlements missing in {len(gaps)} gaps")
+        return out
+    L = times[k1]
+    iv = ivs.get(L)
+    if not (isinstance(iv, (int, float)) and iv > 0):
+        out.update(status="FUNDING_SCHEDULE_UNKNOWN", kind="TAIL_SCHEDULE_UNKNOWN",
+                   reason=f"settlement {L} has no declared interval: the next due time is unknown")
+        return out
+    due = L + int(iv)
+    out["next_due_ts"] = due
+    out["tail_assumption"] = "interval after the last settlement = the interval declared for it"
+    if due - tol_ms > end_ts:
+        return out                                   # not due inside the window yet
+    if k1 + 1 >= len(times):
+        n = 1 + max(0, int((end_ts - due + tol_ms) // iv))
+        out.update(status="FUNDING_SETTLEMENT_GAP", kind="TAIL_DUE_MISSING", gaps=[[L, end_ts, int(iv)]],
+                   missing_estimate=n,
+                   reason=f"settlement due at {due} (declared interval {int(iv)} ms after {L}) "
+                          f"not recorded by the window end {end_ts}")
+        return out
+    st, lo, hi = _step_status(times, ivs, k1 + 1, tol_ms)
+    if st is not None:
+        b = times[k1 + 1]
+        out.update(status="FUNDING_SETTLEMENT_GAP" if st == "FUNDING_SETTLEMENT_GAP" else "FUNDING_SCHEDULE_UNKNOWN",
+                   kind="TAIL_DUE_MISSING" if st == "FUNDING_SETTLEMENT_GAP" else "TAIL_SCHEDULE_UNKNOWN",
+                   gaps=[[L, b, int(lo or iv)]], missing_estimate=1 if st == "FUNDING_SETTLEMENT_GAP" else 0,
+                   reason=f"settlement due at {due} inside the window: next recorded settlement {b} ({st})")
     return out
