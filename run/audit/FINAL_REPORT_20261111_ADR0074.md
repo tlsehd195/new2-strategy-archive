@@ -8,10 +8,10 @@
 |---|---|
 | 시작 main HEAD | `ead5e178e3a85dc72c0c43e41176683d2805e04a` (PR #74 ADR 0073 병합 커밋, 작업 시작 시 main HEAD와 동일, 추가 커밋 없음) |
 | 작업 브랜치 | `claude/project-thread-09brl0` |
-| 코드 커밋 | __CODE_COMMIT__ |
-| PR | __PR__ |
+| 코드 커밋 | `bbe0541` (코드·테스트·ADR), 이 보고서 갱신 커밋은 그 뒤에 있다 |
+| PR | #75 https://github.com/tlsehd195/new2-strategy-archive/pull/75 |
 | ADR | 0074 (`docs/adr/0074-paper-forward-temporal-funding-integrity.md`), ADR 0073은 수정하지 않음 |
-| 병합 | __MERGE__ |
+| 병합 | 메모리 정책(로컬 CI 3.11/3.13 통과 시 스레드가 직접 병합)에 따라 병합한다. 병합 커밋은 PR #75에 기록된다. 이 보고서는 병합 전에 작성했다. |
 
 변경 파일:
 - `run/discovery/funding_schedule.py`: `coverage_check` 재작성(funding-coverage-v2), `_step_status` 추가, `COVERAGE_VERSION`. `settlement_check`·`series_issues`는 바뀌지 않음.
@@ -132,7 +132,7 @@
 - `test_legacy_plan_is_never_passed`: `_integrity()`가 정책 없는 계획에도 참이 되어 레거시 펀딩 로그를 seq 체인으로 읽었다. 코드를 고쳤다(`_integrity`가 `funding_policy`도 요구).
 - 신규 테스트 2개의 시나리오 오류: 끝 경계 기대값, 롤백 시나리오의 역순 위치. 테스트를 고쳤다.
 
-GitHub Actions: __ACTIONS_DETAIL__
+GitHub Actions: run #325 (push, id 42969744062)와 #326 (pull_request, id 42969792110)는 커밋 `bbe0541`에서 실행됐다. 두 run 모두 결과는 `failure`다. Job `test (3.11)` / `test (3.13)`은 3~4초 만에 끝났다. `runner_id` 0, runner 이름이 비어 있고, step 목록이 없다. 즉 runner가 배정되지 않아 **테스트 단계가 하나도 실행되지 않았다**. 로그는 확보할 수 없었다. 2026-11-09 이후 #287~#324와 같은 양상이다. 원인(계정 단위 결제·한도 추정)은 API로 확정할 수 없다. 코드 통과로 보고하지 않는다.
 
 ## G. 남은 문제
 
@@ -145,7 +145,7 @@ GitHub Actions: __ACTIONS_DETAIL__
   - 모든 파일과 계획 기록을 일관되게 다시 쓰는 경우(키 없는 sha256)
   - 이 세 경우는 감지하지 못한다.
 - **실제 시장 데이터로는 검증하지 않았다**(금지 범위).
-- **GitHub Actions:** __ACTIONS__
+- **GitHub Actions:** run #325/#326은 runner가 배정되지 않아 step이 없다(F 참조). 원격 CI 통과는 확인되지 않았다.
 
 ## H. 최종 판정
 
@@ -167,4 +167,4 @@ GitHub Actions: __ACTIONS_DETAIL__
 | 실제 시장 데이터 검증 | NOT_VERIFIED (금지 범위) |
 | Python 3.11 로컬 CI | COMPLETE (918 + 152 + legacy 통과) |
 | Python 3.13 로컬 CI | COMPLETE (918 + 152 + legacy 통과) |
-| GitHub Actions | __GHA__ |
+| GitHub Actions | NOT_VERIFIED (runner 미배정, step 없음) |
