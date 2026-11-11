@@ -109,6 +109,8 @@ jobs:
           git diff --exit-code -- run/audit/RESEARCH_SCRIPTS_20261110.json run/audit/RESEARCH_SCRIPTS_20261110.md run/audit/RESEARCH_STRATEGIES_20261110.jsonl
       - name: Source audit table covers every script (run/audit/SOURCE_AUDIT_20261110.*; ADR 0070)
         run: python run/audit/source_audit_20261110.py check
+      - name: Audit provenance separates reviewer claims from author checks (run/audit/AUDIT_PROVENANCE_20261111.*; ADR 0071)
+        run: python run/audit/audit_provenance_20261111.py check
       # src/*.ts are the collectors / paper monitors that run on the user's machines
       # (never in CI): transpile-only syntax check, package manifests must parse
       - uses: oven-sh/setup-bun@v2

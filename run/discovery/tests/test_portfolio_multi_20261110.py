@@ -48,7 +48,21 @@ def tr(m, sym, side, d, e, x, px=None, reason="time"):
             "entry_ts": T0 + e * M15, "exit_ts": T0 + x * M15, "exit_price": px, "exit_reason": reason}
 
 
+def declared(funding):
+    """Declared settlement interval of each settlement = the step from the
+    previous one (what the CSV column funding_interval_hours states for a
+    complete series; ADR 0071).  The first settlement gets the next step."""
+    out = {}
+    for sym, f in funding.items():
+        ts = [t for t, _ in f]
+        out[sym] = {t: (ts[i] - ts[i - 1] if i else (ts[1] - ts[0] if len(ts) > 1 else 8 * 3_600_000))
+                    for i, t in enumerate(ts)}
+    return out
+
+
 def run(bars_by, trades, members, cfg=None, cost=None, funding=None, **kw):
+    if funding and "funding_intervals_by_symbol" not in kw:
+        kw["funding_intervals_by_symbol"] = declared(funding)
     return simulate_multi(bars_by, trades, funding or {}, cost or fee_cost(), cfg or MultiConfig(),
                           members=members, **kw)
 
@@ -445,6 +459,7 @@ class TestPipelineLayer(PipelineCase):
         def boom(*_a, **_k):
             raise RuntimeError("strategy failed")
         p._validation_events = boom
+        p._validation_study = boom        # the portfolio inputs read events + diagnostics (ADR 0071)
         out = p._portfolio_run(ids)
         self.assertEqual(out["status"], "PORTFOLIO_SIMULATION_ERROR")
 
@@ -512,8 +527,11 @@ class TestPipelineLayer(PipelineCase):
 class TestConfig(unittest.TestCase):
     def test_default_config_and_promo_v5_unchanged(self):
         from pipeline import DEFAULT_PROMOTION_CONFIG, load_portfolio_config
-        cfg, h = load_portfolio_config()
+        # ADR 0071: v2 is the default; v1 stays loadable and unchanged (checked below)
+        cfg, h = load_portfolio_config(HERE.parent / "config" / "portfolio_validation_v1.json")
         self.assertEqual((cfg["version"], len(h)), ("portfolio-validation-v1", 16))
+        v2, _ = load_portfolio_config()
+        self.assertEqual(v2["version"], "portfolio-validation-v2")
         self.assertTrue(cfg["gating"])
         self.assertEqual(DEFAULT_PROMOTION_CONFIG.name, "promotion_v5.json")
         base = cfg["scenarios"]["base"]["checks"]
