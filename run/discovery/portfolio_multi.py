@@ -55,7 +55,7 @@ from typing import Mapping, Optional, Sequence
 from costs_bridge import CostContext, CostDataMissing, CostError, CostRefused
 from data_quality import Bar
 
-PORTFOLIO_MULTI_VERSION = "portfolio-multi-v2"
+PORTFOLIO_MULTI_VERSION = "portfolio-multi-v3"
 DAY_MS = 86_400_000
 
 #: result statuses (ADR 0068).  PASS_INDIVIDUAL is the individual pipeline's
@@ -68,7 +68,7 @@ PORTFOLIO_STATUSES = ("PASS_PORTFOLIO", "FAIL_PORTFOLIO", "INSUFFICIENT_PORTFOLI
 #: previously counted only per strategy)
 SKIP_REASONS = ("capacity", "margin", "gross_exposure", "same_symbol", "cost_refused",
                 "cost_data_missing", "cost_error", "inactive", "halted", "zero_allocation",
-                "latency_beyond_data", "duplicate_signal")
+                "latency_beyond_data", "duplicate_signal", "account_valuation_incomplete")
 #: classification of every exclusion (ADR 0071).  Strategy-rule exclusions and
 #: the window end are not rejections and are outside the rejection denominator.
 SKIP_CLASS = {"duplicate_signal": "strategy_rule", "inactive": "strategy_rule",
@@ -76,7 +76,11 @@ SKIP_CLASS = {"duplicate_signal": "strategy_rule", "inactive": "strategy_rule",
               "cost_refused": "cost_refused", "cost_data_missing": "data_missing",
               "cost_error": "data_missing",
               "margin": "capital", "gross_exposure": "capital", "capacity": "capital",
-              "same_symbol": "capital", "zero_allocation": "capital", "halted": "halted"}
+              "same_symbol": "capital", "zero_allocation": "capital", "halted": "halted",
+              # ADR 0072: cross margin, an open position's symbol has no bar at the entry
+              # timestamp, so the account (equity, margin, liquidation) cannot be valued
+              # on prices of one moment: a data fact, the signal's outcome is unknown
+              "account_valuation_incomplete": "data_missing"}
 
 
 class PortfolioInputError(ValueError):
@@ -202,7 +206,16 @@ def simulate_multi(bars_by_symbol: Mapping[str, Sequence[Bar]],
     FUNDING_DATA_INVALID).
     ``signal_diagnostics``: {"member/symbol": evaluator diagnostics} of the
     studies that produced ``trades``; with it the result carries the full
-    signal accounting from the first signal to the executed position."""
+    signal accounting from the first signal to the executed position.
+
+    ADR 0072 (portfolio-multi-v3): cross margin never confirms an account
+    check on a stale mark.  When an open position's symbol has no bar at a
+    timestamp, the open-gap and intrabar account liquidation checks of that
+    timestamp are deferred (nothing booked; ``cross_account_valuation``
+    records what the stale-mark check would have said) and no entry is made
+    there (``account_valuation_incomplete``, class data_missing).  A result
+    with any deferred check is INCOMPLETE -> UNDETERMINED_PORTFOLIO.  Isolated
+    margin is unchanged (each position on its own bar)."""
     from funding_schedule import series_issues, settlement_check
     cfg.validate()
     members = list(members)
@@ -341,6 +354,22 @@ def simulate_multi(bars_by_symbol: Mapping[str, Sequence[Bar]],
     margin_hist: list[float] = []
     stack_same = stack_opposite = 0
     unfilled_notional = 0.0
+    # ADR 0072: cross-margin account checks that could not be made on prices of one
+    # moment (an open position's symbol has no bar at ts -> its mark is a stale close)
+    xval = {"checks_deferred": 0, "would_liquidate_with_stale_marks": 0, "entries_blocked": 0,
+            "events": [], "stale_symbols": set()}
+    XVAL_EVENTS_KEPT = 200
+
+    def _xdefer(ts: int, phase: str, stale: Sequence[str], eq: float, maint: float) -> None:
+        xval["checks_deferred"] += 1
+        would = eq <= maint
+        xval["would_liquidate_with_stale_marks"] += int(would)
+        xval["stale_symbols"].update(stale)
+        if len(xval["events"]) < XVAL_EVENTS_KEPT:
+            xval["events"].append({"ts": ts, "phase": phase, "stale_symbols": sorted(set(stale)),
+                                   "equity_with_stale_marks": eq, "maintenance_with_stale_marks": maint,
+                                   "would_liquidate_with_stale_marks": would,
+                                   "action": "account liquidation check NOT confirmed (deferred)"})
 
     def _skip(reason: str, t: Mapping) -> None:
         skips[reason] += 1
@@ -472,7 +501,12 @@ def simulate_multi(bars_by_symbol: Mapping[str, Sequence[Bar]],
                 maint_o += cfg.mmr * p.qty * px
                 if st_:
                     stale_o.append(p.symbol)
-            if eq_o <= maint_o:
+            if stale_o:
+                # ADR 0072: a mixed-time valuation (this open for some symbols, an older
+                # close for others) is not the account at any real moment: no account
+                # liquidation is confirmed or booked from it
+                _xdefer(ts, "open", stale_o, eq_o, maint_o)
+            elif eq_o <= maint_o:
                 account_liqs += 1
                 for p in sorted(open_, key=_key):
                     px, st_ = _mark(p, ts, "open")
@@ -495,6 +529,9 @@ def simulate_multi(bars_by_symbol: Mapping[str, Sequence[Bar]],
         if not halted:
             equity_open = cash + sum(p.side * (_mark(p, ts, "open")[0] - p.entry_price) * p.qty
                                      for p in open_)
+        # ADR 0072: cross margin sizes and admits an entry on the WHOLE account; with a
+        # stale mark the equity / free margin are unknown, so no entry at this ts
+        x_incomplete = cfg.margin_mode == "cross" and any(p.symbol not in active_syms for p in open_)
         for t in sched.get(ts, []):
             m, sym = t["strategy"], t["symbol"]
             if halted:
@@ -508,6 +545,11 @@ def simulate_multi(bars_by_symbol: Mapping[str, Sequence[Bar]],
                 # one strategy never holds two positions on one symbol: a repeated
                 # signal while the first trade is open is a duplicate, not new size
                 _skip("duplicate_signal", t)
+                continue
+            if x_incomplete:
+                # after the strategy's own rules (inactive, duplicate), before any sizing
+                _skip("account_valuation_incomplete", t)
+                xval["entries_blocked"] += 1
                 continue
             bi = idx[sym][ts]
             bar = bars_by_symbol[sym][bi]
@@ -643,11 +685,18 @@ def simulate_multi(bars_by_symbol: Mapping[str, Sequence[Bar]],
             # cross: one account; all adverse extremes at the same moment (conservative)
             worst = cash
             maint = 0.0
+            stale_w = []
             for p in open_:
-                adv, _ = _mark(p, ts, "adverse")
+                adv, st_ = _mark(p, ts, "adverse")
                 worst += p.side * (adv - p.entry_price) * p.qty
                 maint += cfg.mmr * p.qty * adv
-            if open_ and worst <= maint:
+                if st_:
+                    stale_w.append(p.symbol)
+            if open_ and stale_w:
+                # ADR 0072: the simultaneous adverse extremes of the account cannot be
+                # formed without every open symbol's bar: not confirmed (deferred)
+                _xdefer(ts, "intrabar", stale_w, worst, maint)
+            elif open_ and worst <= maint:
                 account_liqs += 1
                 for p in sorted(open_, key=_key):
                     adv, st_ = _mark(p, ts, "adverse")
@@ -713,6 +762,19 @@ def simulate_multi(bars_by_symbol: Mapping[str, Sequence[Bar]],
                                  "rule": "settlements in (entry, exit] against the declared "
                                          "interval per settlement (funding_schedule-v1)"},
         "signal_accounting": accounting,
+        "cross_account_valuation": (
+            {"status": "NOT_APPLICABLE", "reason": "isolated margin: each position is valued on its own bar"}
+            if cfg.margin_mode != "cross" else
+            {"status": "INCOMPLETE" if (xval["checks_deferred"] or xval["entries_blocked"]) else "COMPLETE",
+             "checks_deferred": xval["checks_deferred"],
+             "would_liquidate_with_stale_marks": xval["would_liquidate_with_stale_marks"],
+             "entries_blocked": xval["entries_blocked"],
+             "stale_symbols": sorted(xval["stale_symbols"]),
+             "events": xval["events"], "events_kept_max": XVAL_EVENTS_KEPT,
+             "rule": "an account check (open-gap or intrabar liquidation, entry sizing) is made only "
+                     "when every open position's symbol has a bar at that timestamp; otherwise it is "
+                     "deferred (no liquidation booked, no entry) and the result is INCOMPLETE "
+                     "(UNDETERMINED_PORTFOLIO), ADR 0072"}),
         "liquidations": liq_records,
         "totals": tot,
         "cost_components": cost_completeness(cost, cfg),
@@ -725,7 +787,8 @@ def simulate_multi(bars_by_symbol: Mapping[str, Sequence[Bar]],
                         "liquidation_at_price": "open or extreme exactly AT the liquidation price "
                                                 "liquidates (<= long, >= short)",
                         "cross_liquidation": "all adverse bar extremes at one moment; loss to the "
-                                             "extreme plus mmr*notional",
+                                             "extreme plus mmr*notional; never on a stale mark "
+                                             "(deferred, ADR 0072)",
                         "intrabar_conflict": "liquidation vs stop/take-profit in one bar: larger loss",
                         "simultaneous_signals": "member order, then symbol",
                         "same_symbol": cfg.same_symbol_policy,
@@ -1063,6 +1126,7 @@ def result_id(res: Mapping) -> str:
 JUDGE_KEYS_V1 = frozenset({"final_equity_gt_initial", "max_drawdown_lt", "liquidation_events_eq",
                            "no_bankruptcy", "min_trades", "min_days", "max_margin_skip_share"})
 JUDGE_KEYS_V2 = JUDGE_KEYS_V1 | {"max_drawdown_close_lt", "max_drawdown_intrabar_lt",
+                                 "max_drawdown_equity_peak_to_trough_lt",
                                  "require_signal_accounting", "max_data_missing_signals",
                                  "max_cost_refusal_share", "max_capital_refusal_share"}
 _FUNDING_INSUFFICIENT = ("FUNDING_DATA_MISSING", "FUNDING_SETTLEMENT_GAP", "FUNDING_DATA_INVALID")
@@ -1076,8 +1140,9 @@ def judge(res: Mapping, criteria: Mapping, *, data_issues: Sequence[str] = ()) -
        trades or days, more data-missing signals than allowed
        -> INSUFFICIENT_PORTFOLIO_DATA;
     2. unknown funding schedule, signal accounting absent or inconsistent,
-       unpriced fills, a drawdown that is not OK / not finite
-       -> UNDETERMINED_PORTFOLIO;
+       unpriced fills, a cross account valuation with stale marks (ADR 0072),
+       a gated drawdown (close / intrabar worst case / envelope) that is not
+       OK / not finite -> UNDETERMINED_PORTFOLIO;
     3. every numeric check -> FAIL_PORTFOLIO with the reasons;
     4. refusals of a class whose share limit is ``null`` (not preregistered,
        ADR 0071) -> UNDETERMINED_PORTFOLIO: no threshold is invented after
@@ -1113,16 +1178,29 @@ def judge(res: Mapping, criteria: Mapping, *, data_issues: Sequence[str] = ()) -
                                           "signals cannot be traced"]
     if res.get("cost_status") != "OK":
         return "UNDETERMINED_PORTFOLIO", [f"cost status {res.get('cost_status')}: fills could not be priced"]
+    xv = res.get("cross_account_valuation") or {}
+    if xv.get("status") == "INCOMPLETE":
+        return "UNDETERMINED_PORTFOLIO", [
+            f"cross account valuation incomplete: {xv.get('checks_deferred')} account checks deferred "
+            f"({xv.get('would_liquidate_with_stale_marks')} would liquidate on stale marks), "
+            f"{xv.get('entries_blocked')} entries blocked; stale symbols {xv.get('stale_symbols')} (ADR 0072)"]
     fe, ic = res.get("final_equity"), res.get("initial_capital")
     mdd = (met.get("max_drawdown") or {}).get("value")
     if not all(isinstance(v, (int, float)) and math.isfinite(v) for v in (fe, ic, mdd)):
         return "UNDETERMINED_PORTFOLIO", ["final equity / drawdown not finite"]
     for key, metric in (("max_drawdown_close_lt", "max_drawdown_close"),
-                        ("max_drawdown_intrabar_lt", "max_drawdown_intrabar_worst_case")):
+                        ("max_drawdown_intrabar_lt", "max_drawdown_intrabar_worst_case"),
+                        # ADR 0072: the envelope (favourable extreme taken before the
+                        # adverse one inside a bar) gates with the same account limit
+                        ("max_drawdown_equity_peak_to_trough_lt", "max_drawdown_equity_peak_to_trough")):
         if key in criteria:
             d = met.get(metric) or {}
-            if d.get("status") != "OK" or not isinstance(d.get("value"), (int, float)):
-                return "UNDETERMINED_PORTFOLIO", [f"{metric} {d.get('status')}: {d.get('reason')}"]
+            v_ = d.get("value")
+            if d.get("status") != "OK" or isinstance(v_, bool) or not isinstance(v_, (int, float)) \
+                    or not math.isfinite(v_):
+                # NaN / inf / None / stale marks are never read as a number
+                return "UNDETERMINED_PORTFOLIO", [f"{metric} {d.get('status')}: "
+                                                  f"{d.get('reason') or f'value {v_!r}'}"]
             if not d["value"] < float(criteria[key]):
                 why.append(f"{metric} {d['value']:.4f} >= {criteria[key]}")
     if criteria.get("final_equity_gt_initial") and not fe > ic:

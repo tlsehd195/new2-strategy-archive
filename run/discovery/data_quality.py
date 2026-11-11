@@ -47,7 +47,7 @@ import json
 import math
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable, Optional, Sequence
+from typing import Iterable, Mapping, Optional, Sequence
 
 MAX_MS_GAP_15M = 15 * 60 * 1000
 INTERVAL_15M_MS = MAX_MS_GAP_15M
@@ -410,13 +410,40 @@ FUNDING_NOMINAL_MS = 8 * 3_600_000
 FUNDING_TOL_MS = 60_000
 
 
+#: kinds of a SOURCE order error (ADR 0072).  Recorded in the order the rows
+#: appear in the file(s), BEFORE the pairs are sorted for computation: a sort
+#: is a normalisation for the calculations, never a repair of the source.
+SOURCE_ORDER_KINDS = ("SOURCE_TIME_INVERSION", "SOURCE_DUPLICATE_TS",
+                      "CROSS_FILE_TIME_INVERSION", "CROSS_FILE_DUPLICATE_TS")
+SOURCE_ORDER_EFFECT = ("FUNDING_DATA_INVALID: funding_quality fails (SOURCE_ORDER_INVALID); the "
+                       "series is not handed to the evaluator / portfolio (fail-closed, never 0)")
+
+
+def source_order_error(kind: str, file: str, line: int, prev_ts: int, ts: int, **extra) -> dict:
+    assert kind in SOURCE_ORDER_KINDS
+    return {"kind": kind, "file": file, "line": line, "prev_ts": prev_ts, "ts": ts,
+            **extra, "effect": SOURCE_ORDER_EFFECT}
+
+
 def load_funding_csv_checked(path: Path) -> tuple[list[tuple[int, float]], dict]:
     """Parse a funding CSV (calc_time, funding_interval_hours, rate).
 
     Returns (pairs sorted by time, report).  A header on the first line is
     recognised; every other unparsable row is a parse error (fail-closed in
-    :func:`funding_quality`), the torn last line is reported separately."""
-    raw = Path(path).read_bytes()
+    :func:`funding_quality`), the torn last line is reported separately.
+
+    ADR 0072: the SOURCE row order is checked while reading, before the sort.
+    Each parsed row is compared with the previous parsed row of the file; a
+    smaller timestamp is ``SOURCE_TIME_INVERSION``, an equal one
+    ``SOURCE_DUPLICATE_TS`` (``source_order_errors``: file, 1-based line,
+    previous / current timestamp, kind, effect).  The returned pairs are still
+    sorted (the calculations need it), but the errors stay in the report and
+    make :func:`funding_quality` fail.  Rows whose interval column is missing
+    or not a positive number are listed in ``interval_missing_rows`` (their
+    settlement then has no declared interval: FUNDING_SCHEDULE_UNKNOWN for a
+    holding window through it, never "assumed 8h")."""
+    path = Path(path)
+    raw = path.read_bytes()
     text = raw.decode("utf-8", errors="replace")
     ends = text.endswith("\n")
     lines = text.split("\n")
@@ -425,7 +452,12 @@ def load_funding_csv_checked(path: Path) -> tuple[list[tuple[int, float]], dict]
     out: list[tuple[int, float]] = []
     intervals: dict[int, int] = {}
     errors: list[int] = []
+    order_errors: list[dict] = []
+    interval_missing: list[int] = []
     torn = False
+    prev_ts: Optional[int] = None
+    first_src: Optional[list] = None
+    prev_line: Optional[int] = None
     for i, line in enumerate(lines):
         line = line.strip().rstrip("\r")
         if not line:
@@ -446,16 +478,34 @@ def load_funding_csv_checked(path: Path) -> tuple[list[tuple[int, float]], dict]
             else:
                 errors.append(i + 1)
             continue
+        if prev_ts is not None and t <= prev_ts:
+            order_errors.append(source_order_error(
+                "SOURCE_TIME_INVERSION" if t < prev_ts else "SOURCE_DUPLICATE_TS",
+                path.name, i + 1, prev_ts, t))
+        prev_ts, prev_line = t, i + 1
+        if first_src is None:
+            first_src = [i + 1, t]
         try:
             h = float(parts[1])
-            if math.isfinite(h) and h > 0:
-                intervals[t] = int(round(h * 3_600_000))
+            ok_h = math.isfinite(h) and h > 0
         except ValueError:
-            pass
+            ok_h = False
+        if ok_h:
+            intervals[t] = int(round(h * 3_600_000))
+        else:
+            interval_missing.append(i + 1)
         out.append((t, r))
+    n_source = len(out)
     out.sort(key=lambda x: x[0])
     return out, {"parse_errors": errors, "torn_tail": torn, "intervals": intervals,
-                 "sha256": hashlib.sha256(raw).hexdigest()}
+                 "sha256": hashlib.sha256(raw).hexdigest(),
+                 "source_order_errors": order_errors,
+                 "interval_missing_rows": interval_missing,
+                 "rows": n_source,
+                 # first / last parsed row in SOURCE order ([line, ts]): the cross-file check
+                 "first_source_row": first_src,
+                 "last_source_row": None if prev_ts is None else [prev_line, prev_ts],
+                 "pairs_sorted_for_computation": True}
 
 
 def load_funding_csv(path: Path) -> list[tuple[int, float]]:
@@ -479,11 +529,31 @@ def funding_gaps(pairs: Sequence[tuple[int, float]],
 
 def funding_quality(pairs: Sequence[tuple[int, float]], *,
                     parse_errors: Iterable[int] = (), torn_tail: bool = False,
-                    intervals: Optional[dict] = None) -> dict:
+                    intervals: Optional[dict] = None,
+                    source_order_errors: Iterable[Mapping] = (),
+                    interval_missing_rows: Iterable = ()) -> dict:
+    """Dataset-level funding verdict.  ``status``: OK, FUNDING_DATA_MISSING
+    (no rows) or FUNDING_DATA_INVALID (any issue).  ``source_order_errors``
+    (ADR 0072) are the order errors of the SOURCE rows found before the sort
+    (:func:`load_funding_csv_checked`, ``runner.load_funding_window_checked``):
+    the sorted ``pairs`` cannot show them any more, so they are passed in and
+    every one of them blocks (SOURCE_ORDER_INVALID)."""
     issues: list[str] = []
     warnings: list[str] = []
+    soe = [dict(e) for e in source_order_errors]
     if not pairs:
-        return {"ok": False, "issues": ["no funding rows"], "warnings": [], "gaps": []}
+        return {"ok": False, "status": "FUNDING_DATA_MISSING", "issues": ["no funding rows"],
+                "warnings": [], "gaps": [], "source_order_errors": soe}
+    if soe:
+        kinds = sorted({e.get("kind") for e in soe})
+        first = soe[0]
+        issues.append(f"SOURCE_ORDER_INVALID: {len(soe)} rows out of source order ({', '.join(kinds)}; "
+                      f"first {first.get('file')}:{first.get('line')} {first.get('ts')} after "
+                      f"{first.get('prev_ts')})")
+    imr = list(interval_missing_rows)
+    if imr:
+        warnings.append(f"{len(imr)} rows without a declared settlement interval "
+                        "(FUNDING_SCHEDULE_UNKNOWN for windows through them)")
     ts = [t for t, _ in pairs]
     dup = len(ts) - len(set(ts))
     if dup:
@@ -505,8 +575,10 @@ def funding_quality(pairs: Sequence[tuple[int, float]], *,
         warnings.append(f"{len(gaps)} gaps in the settlement series")
     return {
         "ok": not issues,
+        "status": "OK" if not issues else "FUNDING_DATA_INVALID",
         "issues": issues,
         "warnings": warnings,
+        "source_order_errors": soe,
         "n": len(pairs),
         "first": ts[0],
         "last": ts[-1],

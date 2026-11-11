@@ -133,7 +133,8 @@ class FileFeed:
         out = {}
         for p in self._files("funding", f"{sym}-fundingRate-*.csv"):
             pairs, rep = load_funding_csv_checked(p)
-            if rep["parse_errors"] or rep["torn_tail"]:
+            if rep["parse_errors"] or rep["torn_tail"] or rep["source_order_errors"]:
+                # a file with unparsable rows or rows out of SOURCE order (ADR 0072) is not used
                 continue
             for t, r in pairs:
                 if after_ts < t <= now:
