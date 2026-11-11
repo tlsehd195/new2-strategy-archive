@@ -508,6 +508,73 @@ def load_funding_csv_checked(path: Path) -> tuple[list[tuple[int, float]], dict]
                  "pairs_sorted_for_computation": True}
 
 
+def funding_file_issues(rep: Mapping) -> list[str]:
+    """Integrity problems of ONE funding file report from
+    :func:`load_funding_csv_checked` (ADR 0073: one shared definition for
+    every caller that has to say whether a file is usable)."""
+    out = []
+    if rep.get("parse_errors"):
+        out.append(f"PARSE_ERROR: {len(rep['parse_errors'])} unparsable rows "
+                   f"(lines {list(rep['parse_errors'])[:5]})")
+    if rep.get("torn_tail"):
+        out.append("TORN_TAIL: incomplete last row")
+    for e in rep.get("source_order_errors") or ():
+        out.append(f"{e.get('kind')}: line {e.get('line')} ts {e.get('ts')} after {e.get('prev_ts')}")
+    return out
+
+
+def load_funding_files_checked(paths: Sequence[Path]) -> tuple[list[tuple[int, float]], dict]:
+    """Funding files merged IN THE ORDER GIVEN (month order), with the ADR 0072
+    checks: per file (:func:`load_funding_csv_checked`) and across files (the
+    first row of a file must be later than the last row of the previous
+    non-empty file: ``CROSS_FILE_TIME_INVERSION`` / ``CROSS_FILE_DUPLICATE_TS``).
+
+    Shared by ``runner.load_funding_window_checked`` (research windows) and
+    ``paper_forward.FileFeed`` (ADR 0073), so both use one definition of a
+    valid funding file.  ``files`` lists name, sha256 and rows per file
+    (unchanged ADR 0072 format); ``file_status`` adds the per-file verdict
+    (``VALID`` / ``DATA_INVALID``) with its reasons — a cross-file error marks
+    BOTH files.  The returned pairs are sorted for computation; the errors
+    stay in the report."""
+    rep = {"parse_errors": [], "torn_tail": False, "intervals": {}, "source_order_errors": [],
+           "interval_missing_rows": [], "files": [], "file_status": []}
+    out: list[tuple[int, float]] = []
+    prev_last: Optional[tuple[str, int]] = None       # (file, last source ts) of the previous file
+    status_by_name: dict = {}
+    for p in paths:
+        p = Path(p)
+        pairs, r = load_funding_csv_checked(p)
+        out.extend(pairs)
+        rep["parse_errors"] += [f"{p.name}:{ln}" for ln in r["parse_errors"]]
+        rep["torn_tail"] = rep["torn_tail"] or r["torn_tail"]
+        rep["intervals"].update(r["intervals"])
+        rep["source_order_errors"] += r["source_order_errors"]
+        rep["interval_missing_rows"] += [f"{p.name}:{ln}" for ln in r["interval_missing_rows"]]
+        rep["files"].append({"name": p.name, "sha256": r["sha256"], "rows": r["rows"]})
+        fs = {"name": p.name, "sha256": r["sha256"], "rows": r["rows"],
+              "first_ts": r["first_source_row"][1] if r["first_source_row"] else None,
+              "last_ts": r["last_source_row"][1] if r["last_source_row"] else None,
+              "interval_missing_rows": len(r["interval_missing_rows"]),
+              "errors": funding_file_issues(r)}
+        status_by_name[p.name] = fs
+        rep["file_status"].append(fs)
+        if r["first_source_row"] is not None:
+            ln0, t0 = r["first_source_row"]
+            t_last = r["last_source_row"][1]
+            if prev_last is not None and t0 <= prev_last[1]:
+                kind = "CROSS_FILE_TIME_INVERSION" if t0 < prev_last[1] else "CROSS_FILE_DUPLICATE_TS"
+                rep["source_order_errors"].append(source_order_error(
+                    kind, p.name, ln0, prev_last[1], t0, prev_file=prev_last[0]))
+                fs["errors"].append(f"{kind}: first row {t0} not after {prev_last[1]} of {prev_last[0]}")
+                status_by_name[prev_last[0]]["errors"].append(
+                    f"{kind}: last row {prev_last[1]} not before {t0} of {p.name}")
+            prev_last = (p.name, t_last)
+    for fs in rep["file_status"]:
+        fs["status"] = "DATA_INVALID" if fs["errors"] else "VALID"
+    out.sort(key=lambda x: x[0])
+    return out, rep
+
+
 def load_funding_csv(path: Path) -> list[tuple[int, float]]:
     """Compatibility wrapper: pairs only.  Callers that gate on quality use
     :func:`load_funding_csv_checked` (parse errors are no longer invisible)."""

@@ -329,6 +329,20 @@ from `paper_forward.py` on bars that closed after the plan was registered,
 and plan registration requires a VERIFIED cost.  No strategy is
 `PAPER_PASSED`.
 
+Funding of a forward plan (ADR 0073, `paper-forward-funding-v1`): funding
+statuses `VALID`, `VALID_ZERO_RATE` (settlements recorded with rate exactly
+0 — real observations), `DATA_MISSING`, `DATA_INVALID`, `COVERAGE_INCOMPLETE`,
+`SCHEDULE_UNKNOWN`, `SOURCE_ERROR`.  Only the first two allow an evaluation;
+every other one keeps the verdict at `PAPER_BLOCKED_DATA` (non-final, no
+status change — neither `PAPER_PASSED` nor `PAPER_FAILED`).  The evaluator
+is called with `require_funding=True` (never `funding=None` = 0 bp, never the
+`NOMINAL_8H_LEGACY` rule); the declared interval per settlement comes from the
+source (CSV column `funding_interval_hours`, or `/fapi/v1/fundingInfo` for
+the public REST feed).  `DATA_INVALID` (corrupt file, a file read earlier that
+changed or vanished, a bad API answer) stops the plan for good; plans
+registered before ADR 0073 are never concluded.  No new strategy status was
+added.
+
 ## 10. Directive 2026-10-20: one search family, evidence vocabulary, duplicates
 
 ### 10.1 One FWER family for the whole search (`promotion_v3.json`)

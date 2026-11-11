@@ -35,6 +35,19 @@ Verdict (preregistered, never relaxed after observation):
 * ``PAPER_FAILED``      — enough observation, a criterion failed -> PAPER_FAILED
 * ``PAPER_BLOCKED_DATA`` / ``PAPER_ERROR`` — no status change, reasons recorded
 
+Funding (ADR 0073, ``FUNDING_POLICY``): every funding fetch is checked
+(``funding_checked``: per-file and cross-file source order, parse errors,
+torn rows, sha256 per file, declared interval per settlement) and recorded in
+``funding_quality_<SYM>.jsonl``; settlements go to a hash-chained
+``funding_<SYM>.jsonl`` with their declared interval.  Before any evaluation
+the observation window [start, last bar] must be covered without a missing
+settlement under the DECLARED schedule (``funding_schedule.coverage_check``).
+Missing, invalid, gapped or schedule-less funding is never charged as 0: the
+evaluator is not run, the verdict is ``PAPER_BLOCKED_DATA`` (non-final, no
+status change).  A corrupt or changed source file blocks the plan for good;
+a state file that does not validate gives ``PAPER_ERROR`` and is not
+overwritten.  Plans registered before ADR 0073 are never concluded.
+
 PAPER_PASSED is a research result.  It is not an approval to trade and it
 says nothing about profits outside the observed period.  Forward results
 are never read by the search (``search.dev_feedback`` accepts DEV only).
@@ -51,7 +64,7 @@ from typing import Callable, Mapping, Optional, Sequence
 
 from data_quality import Bar, check_bars
 from engine_lib import (
-    append_jsonl, atomic_write_json, canonical_json, iso_now, iter_jsonl, nw_tstat, t_sf,
+    JsonlCorruption, append_jsonl, atomic_write_json, canonical_json, iso_now, iter_jsonl, nw_tstat, t_sf,
 )
 from evaluator import PrefixView, run_event_study
 from execution_sim import EXECUTION_SIM_VERSION, ExecutionConfig, apply_execution
@@ -65,8 +78,31 @@ DAY_MS = 86_400_000
 GAP_EMBARGO_BARS = 96
 
 
+#: ADR 0073: funding of a plan must be real, complete and under a declared schedule
+FUNDING_POLICY = "paper-forward-funding-v1"
+#: status of one funding fetch and of a symbol's funding over the observation window
+FUNDING_SOURCE_STATUSES = ("VALID", "VALID_ZERO_RATE", "DATA_MISSING", "DATA_INVALID",
+                           "COVERAGE_INCOMPLETE", "SCHEDULE_UNKNOWN", "SOURCE_ERROR")
+#: the only statuses an evaluation may use
+FUNDING_USABLE = ("VALID", "VALID_ZERO_RATE")
+#: a fetch with one of these stops the plan for good (BLOCKED_DATA): the source itself is bad.
+#: The other non-usable statuses block the verdict of the step and are re-checked next step.
+FUNDING_STICKY = ("DATA_INVALID",)
+FUNDING_TOL_MS = 60_000
+#: funding_schedule status -> funding status of the observation window
+_COVERAGE_STATUS = {"OK": "VALID", "FUNDING_DATA_INVALID": "DATA_INVALID",
+                    "FUNDING_SCHEDULE_UNKNOWN": "SCHEDULE_UNKNOWN",
+                    "FUNDING_SETTLEMENT_GAP": "COVERAGE_INCOMPLETE"}
+
+
 class ForwardRefused(RuntimeError):
     pass
+
+
+class FundingSourceInvalid(RuntimeError):
+    """A funding source could not be confirmed (ADR 0073).  Raised by the
+    list interface ``FileFeed.funding`` instead of returning a partial or
+    empty series that a caller could charge as 0."""
 
 
 class CausalityViolation(RuntimeError):
@@ -80,6 +116,93 @@ def load_criteria(path: Optional[Path] = None) -> tuple[dict, str]:
     if c.get("schema") != "paper_forward_criteria_v1":
         raise ValueError(f"{p}: not a paper_forward_criteria_v1 file")
     return c, hashlib.sha256(raw).hexdigest()[:16]
+
+
+# ---------------------------------------------------------------------------
+# funding fetch results (ADR 0073)
+# ---------------------------------------------------------------------------
+
+def funding_fetch_result(rows: Sequence, intervals: Mapping, *, source_files: Sequence[Mapping] = (),
+                         schedule_source: Optional[str] = None, query: Optional[Mapping] = None,
+                         status: Optional[str] = None, issues: Sequence[str] = (),
+                         extra: Optional[Mapping] = None) -> dict:
+    """The checked answer of a feed's ``funding_checked(sym, after_ts)``.
+
+    ``rows`` are the settlements in the queried range in SOURCE order (never
+    sorted or de-duplicated here), ``intervals`` the DECLARED interval in ms
+    per settlement time (absent = not declared), ``source_files`` one entry
+    per source read (name, sha256, rows, status, errors).  When ``status`` is
+    not given it is derived: series problems -> DATA_INVALID, a row without a
+    declared interval -> SCHEDULE_UNKNOWN, no source at all -> DATA_MISSING,
+    every rate exactly 0 -> VALID_ZERO_RATE (real observations), else VALID.
+    An empty ``rows`` from a source that answered is VALID: "no settlement in
+    the range" — whether one was DUE is decided by the coverage check of the
+    observation window, never here."""
+    from funding_schedule import series_issues
+    rows = [(t, r) for t, r in rows]
+    iv = {int(t): int(v) for t, v in (intervals or {}).items() if isinstance(v, (int, float)) and v > 0}
+    issues = list(issues)
+    if status is None:
+        bad = series_issues(rows)
+        if bad:
+            status, issues = "DATA_INVALID", issues + bad
+        elif not source_files:
+            status = "DATA_MISSING"
+            issues.append("no funding source for the queried period")
+        elif any(t not in iv for t, _ in rows):
+            status = "SCHEDULE_UNKNOWN"
+            issues.append(f"{sum(1 for t, _ in rows if t not in iv)} settlements without a declared interval")
+        elif rows and all(r == 0 for _, r in rows):
+            status = "VALID_ZERO_RATE"
+        else:
+            status = "VALID"
+    if status not in FUNDING_SOURCE_STATUSES:
+        raise ValueError(f"unknown funding status {status!r}")
+    out = {"status": status, "rows": [[t, r] for t, r in rows], "intervals": iv,
+           "issues": issues, "source_files": [dict(f) for f in source_files],
+           "schedule_source": schedule_source, "query": dict(query or {}),
+           "zero_rate_rows": sum(1 for _, r in rows if r == 0), "policy": FUNDING_POLICY}
+    out.update(extra or {})
+    return out
+
+
+def _fetch_summary(fr: Mapping) -> dict:
+    """What is kept on disk about one fetch (no rows)."""
+    return {"status": fr["status"], "issues": list(fr.get("issues") or [])[:20],
+            "rows": len(fr.get("rows") or []), "query": fr.get("query"),
+            "schedule_source": fr.get("schedule_source"),
+            "source_files": [{k: f.get(k) for k in ("name", "sha256", "rows", "status", "errors")}
+                             for f in fr.get("source_files") or []],
+            **{k: fr[k] for k in ("missing_files", "future_rows") if k in fr}}
+
+
+def _month_span(name: str, prefix: str) -> Optional[tuple[int, int]]:
+    """[start, end) in ms of a ``<prefix>YYYY-MM.csv`` / ``<prefix>YYYY-MM-DD.csv`` file."""
+    import datetime as dt
+    stem = name[len(prefix):-4] if name.startswith(prefix) and name.endswith(".csv") else ""
+    try:
+        if len(stem) == 7:
+            d0 = dt.datetime.strptime(stem, "%Y-%m").replace(tzinfo=dt.timezone.utc)
+            d1 = (d0.replace(day=28) + dt.timedelta(days=6)).replace(day=1)
+        elif len(stem) == 10:
+            d0 = dt.datetime.strptime(stem, "%Y-%m-%d").replace(tzinfo=dt.timezone.utc)
+            d1 = d0 + dt.timedelta(days=1)
+        else:
+            return None
+    except ValueError:
+        return None
+    return int(d0.timestamp() * 1000), int(d1.timestamp() * 1000)
+
+
+def _months_between(a_ms: int, b_ms: int) -> list[str]:
+    import datetime as dt
+    cur = dt.datetime.fromtimestamp(a_ms / 1000, tz=dt.timezone.utc).date().replace(day=1)
+    end = dt.datetime.fromtimestamp(b_ms / 1000, tz=dt.timezone.utc).date()
+    out = []
+    while cur <= end:
+        out.append(f"{cur:%Y-%m}")
+        cur = (cur.replace(day=28) + dt.timedelta(days=6)).replace(day=1)
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -127,22 +250,67 @@ class FileFeed:
                 out[b.ts] = b
         return [out[k] for k in sorted(out)], info
 
-    def funding(self, sym: str, after_ts: int) -> list[tuple[int, float]]:
-        from data_quality import load_funding_csv_checked
+    def funding_checked(self, sym: str, after_ts: int) -> dict:
+        """Funding settlements in ``(after_ts, now]`` with their quality (ADR 0073).
+
+        Every file whose period overlaps the queried range is read with the
+        shared checks (``data_quality.load_funding_files_checked``: parse
+        errors, torn last row, source order inside a file and across files,
+        sha256 per file).  If ANY of these files is bad the whole answer is
+        DATA_INVALID — a corrupt month is never skipped while its neighbours
+        are returned as if the series were complete.  Months of the range
+        without a file are listed in ``missing_files``; whether a settlement
+        was due in them is decided by the coverage check of the observation
+        window (declared intervals), not by the file list."""
+        from data_quality import load_funding_files_checked
         now = self.clock()
-        out = {}
-        for p in self._files("funding", f"{sym}-fundingRate-*.csv"):
-            pairs, rep = load_funding_csv_checked(p)
-            if rep["parse_errors"] or rep["torn_tail"] or rep["source_order_errors"]:
-                # a file with unparsable rows or rows out of SOURCE order (ADR 0072) is not used
-                continue
-            for t, r in pairs:
-                if after_ts < t <= now:
-                    out[t] = r
-        return sorted(out.items())
+        prefix = f"{sym}-fundingRate-"
+        query = {"after_ts": after_ts, "until_ts": now, "source": str(self.data_dir / "funding")}
+        sched = "csv column funding_interval_hours (public archive fundingRate files)"
+        paths = self._files("funding", f"{prefix}*.csv")
+        rel = []
+        for p in paths:
+            span = _month_span(p.name, prefix)
+            if span is None or (span[1] > after_ts and span[0] <= now):
+                rel.append(p)                     # an unrecognised name is never assumed irrelevant
+        present = {p.name for p in paths}
+        missing = [f"{prefix}{m}.csv" for m in _months_between(after_ts + 1, now)
+                   if f"{prefix}{m}.csv" not in present]
+        if not rel:
+            return funding_fetch_result([], {}, status="DATA_MISSING", schedule_source=sched, query=query,
+                                        issues=["no funding file for the queried period"],
+                                        extra={"missing_files": missing, "future_rows": 0})
+        try:
+            pairs, rep = load_funding_files_checked(rel)
+        except OSError as e:
+            return funding_fetch_result([], {}, status="SOURCE_ERROR", schedule_source=sched, query=query,
+                                        issues=[f"{type(e).__name__}: {e}"],
+                                        extra={"missing_files": missing, "future_rows": 0})
+        rows = [(t, r) for t, r in pairs if after_ts < t <= now]
+        ivs = {t: rep["intervals"][t] for t, _ in rows if t in rep["intervals"]}
+        issues = [f"{fs['name']}: {e}" for fs in rep["file_status"] for e in fs["errors"]]
+        return funding_fetch_result(rows, ivs, source_files=rep["file_status"], schedule_source=sched,
+                                    query=query, status="DATA_INVALID" if issues else None, issues=issues,
+                                    extra={"missing_files": missing,
+                                           "future_rows": sum(1 for t, _ in pairs if t > now)})
+
+    def funding(self, sym: str, after_ts: int) -> list[tuple[int, float]]:
+        """List interface (pre-ADR 0073 callers).  Fail-closed: a fetch that is
+        not VALID / VALID_ZERO_RATE raises :class:`FundingSourceInvalid`
+        instead of returning a partial or empty series."""
+        fr = self.funding_checked(sym, after_ts)
+        if fr["status"] not in FUNDING_USABLE:
+            raise FundingSourceInvalid(f"{sym}: funding {fr['status']}: {'; '.join(fr['issues'][:5])}")
+        return [(t, r) for t, r in fr["rows"]]
+
+    def funding_source_hashes(self, sym: str) -> dict:
+        """sha256 of every funding file of ``sym`` now on disk (a file read
+        earlier by a plan must not change or vanish, ADR 0073)."""
+        return {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+                for p in self._files("funding", f"{sym}-fundingRate-*.csv")}
 
 
-class BinancePublicFeed:  # pragma: no cover - network; exercised only with explicit opt-in
+class BinancePublicFeed:
     """Public USD-M endpoints (``/fapi/v1/klines``, ``/fapi/v1/fundingRate``):
     market data only, no key, no account, no order endpoint.  Disabled
     unless ``allow_network=True``.  Bounded retries with exponential backoff."""
@@ -159,11 +327,16 @@ class BinancePublicFeed:  # pragma: no cover - network; exercised only with expl
         self.attempts, self.sleep = attempts, sleep
         self.opener = opener
 
-    def _get(self, path: str) -> list:
+    FUNDING_LIMIT = 1000
+    MAX_FUNDING_PAGES = 20
+
+    def _get_raw(self, path: str) -> bytes:
         from data_fetch import fetch_with_retry
-        blob = fetch_with_retry(self.BASE + path, opener=self.opener, attempts=self.attempts,
+        return fetch_with_retry(self.BASE + path, opener=self.opener, attempts=self.attempts,
                                 sleep=self.sleep)
-        return json.loads(blob)
+
+    def _get(self, path: str) -> list:
+        return json.loads(self._get_raw(path))
 
     def closed_bars(self, sym: str, after_ts: int) -> tuple[list[Bar], dict]:
         now = self.clock()
@@ -176,10 +349,98 @@ class BinancePublicFeed:  # pragma: no cover - network; exercised only with expl
             out.append(Bar.from_row([str(x) for x in r]))
         return out, {"incomplete_skipped": skipped, "rows": len(rows)}
 
+    def funding_checked(self, sym: str, after_ts: int) -> dict:
+        """Settlements in ``(after_ts, now]`` from ``/fapi/v1/fundingRate``
+        (paged, bounded) and the DECLARED interval from ``/fapi/v1/fundingInfo``
+        (ADR 0073).  A request failure or an error object is SOURCE_ERROR (not
+        "no funding"); an unparsable / out-of-range / duplicated / unsorted row
+        is DATA_INVALID; a still-full last page is COVERAGE_INCOMPLETE (the
+        rows received are kept, the next step continues after them); a symbol
+        without a declared interval in ``fundingInfo`` is SCHEDULE_UNKNOWN —
+        never "8h by default".  The interval is the one declared at the time
+        of the fetch (``schedule_source`` records the endpoint and time)."""
+        from data_fetch import FetchFailure
+        now = self.clock()
+        query = {"after_ts": after_ts, "until_ts": now, "source": self.BASE}
+        sources: list[dict] = []
+
+        def err(msg):
+            return funding_fetch_result([], {}, status="SOURCE_ERROR", source_files=sources, query=query,
+                                        issues=[msg], schedule_source=None)
+        try:
+            blob = self._get_raw("/fapi/v1/fundingInfo")
+            info = json.loads(blob)
+        except (FetchFailure, ValueError) as e:
+            return err(f"/fapi/v1/fundingInfo: {type(e).__name__}: {e}")
+        if not isinstance(info, list):
+            return err(f"/fapi/v1/fundingInfo: unexpected response {str(info)[:200]}")
+        sources.append({"name": "/fapi/v1/fundingInfo", "sha256": hashlib.sha256(blob).hexdigest(),
+                        "rows": len(info), "status": "VALID", "errors": []})
+        iv = None
+        for x in info:
+            if isinstance(x, dict) and x.get("symbol") == sym:
+                h = x.get("fundingIntervalHours")
+                if isinstance(h, (int, float)) and not isinstance(h, bool) and h > 0:
+                    iv = int(round(h * 3_600_000))
+        rows: list[tuple[int, float]] = []
+        issues: list[str] = []
+        start, full = after_ts + 1, False
+        for _ in range(self.MAX_FUNDING_PAGES):
+            path = (f"/fapi/v1/fundingRate?symbol={sym}&startTime={start}&endTime={now}"
+                    f"&limit={self.FUNDING_LIMIT}")
+            try:
+                blob = self._get_raw(path)
+                data = json.loads(blob)
+            except (FetchFailure, ValueError) as e:
+                return err(f"{path}: {type(e).__name__}: {e}")
+            if not isinstance(data, list):
+                return err(f"{path}: unexpected response {str(data)[:200]}")
+            errs = []
+            for x in data:
+                try:
+                    t, r = int(x["fundingTime"]), float(x["fundingRate"])
+                except (KeyError, TypeError, ValueError):
+                    errs.append(f"unparsable row {str(x)[:80]}")
+                    continue
+                if not math.isfinite(r):
+                    errs.append(f"non-finite rate at {t}")
+                elif x.get("symbol", sym) != sym:
+                    errs.append(f"row of {x.get('symbol')!r} in the {sym} answer")
+                elif t <= after_ts or t > now:
+                    errs.append(f"settlement {t} outside the queried range ({after_ts}, {now}]")
+                elif rows and t <= rows[-1][0]:
+                    errs.append(f"{'SOURCE_DUPLICATE_TS' if t == rows[-1][0] else 'SOURCE_TIME_INVERSION'}: "
+                                f"{t} after {rows[-1][0]}")
+                else:
+                    rows.append((t, r))
+            sources.append({"name": path, "sha256": hashlib.sha256(blob).hexdigest(), "rows": len(data),
+                            "status": "DATA_INVALID" if errs else "VALID", "errors": errs})
+            issues += errs
+            full = len(data) >= self.FUNDING_LIMIT
+            if not full or not rows:
+                break
+            start = rows[-1][0] + 1
+        sched = (f"/fapi/v1/fundingInfo fundingIntervalHours observed at {now}" if iv is not None else None)
+        ivs = {t: iv for t, _ in rows} if iv is not None else {}
+        if issues:
+            status = "DATA_INVALID"
+        elif full:
+            status = "COVERAGE_INCOMPLETE"
+            issues.append(f"answer still full after {self.MAX_FUNDING_PAGES} pages: later settlements not fetched")
+        elif iv is None:
+            status = "SCHEDULE_UNKNOWN"
+            issues.append(f"{sym} has no declared fundingIntervalHours in /fapi/v1/fundingInfo "
+                          "(no interval is assumed)")
+        else:
+            status = None
+        return funding_fetch_result(rows, ivs, source_files=sources, schedule_source=sched, query=query,
+                                    status=status, issues=issues)
+
     def funding(self, sym: str, after_ts: int) -> list[tuple[int, float]]:
-        rows = self._get(f"/fapi/v1/fundingRate?symbol={sym}&startTime={after_ts + 1}&limit=1000")
-        return [(int(r["fundingTime"]), float(r["fundingRate"])) for r in rows
-                if int(r["fundingTime"]) <= self.clock()]
+        fr = self.funding_checked(sym, after_ts)
+        if fr["status"] not in FUNDING_USABLE:
+            raise FundingSourceInvalid(f"{sym}: funding {fr['status']}: {'; '.join(fr['issues'][:5])}")
+        return [(t, r) for t, r in fr["rows"]]
 
 
 # ---------------------------------------------------------------------------
@@ -200,16 +461,21 @@ def _chain(prev: str, row: Mapping) -> str:
     return hashlib.sha256((prev + canonical_json(row)).encode()).hexdigest()
 
 
-def read_bar_log(path: Path) -> list[dict]:
-    """Rows of a hash-chained bar log; a broken chain raises (fail-closed)."""
+def read_chained_log(path: Path, what: str) -> list[dict]:
+    """Rows of a hash-chained log; a broken chain raises (fail-closed)."""
     rows, prev = [], ""
     for r in iter_jsonl(path):
         body = {k: v for k, v in r.items() if k not in ("hash", "prev")}
         if r.get("prev") != prev or r.get("hash") != _chain(prev, body):
-            raise CausalityViolation(f"{path}: bar log chain broken at ts={r.get('ts')}")
+            raise CausalityViolation(f"{path}: {what} chain broken at ts={r.get('ts')}")
         rows.append(r)
         prev = r["hash"]
     return rows
+
+
+def read_bar_log(path: Path) -> list[dict]:
+    """Rows of a hash-chained bar log; a broken chain raises (fail-closed)."""
+    return read_chained_log(path, "bar log")
 
 
 # ---------------------------------------------------------------------------
@@ -258,45 +524,70 @@ class ForwardPaper:
                 if src.get("bars"):
                     newest = max(newest, src["bars"][-1].ts)
         start = max(-(-now // MS15) * MS15, newest + MS15)
+        # warm-up: history strictly before the start (features only, never evaluated).
+        # ADR 0073: computed BEFORE anything is written, so a plan whose funding cannot
+        # be confirmed is refused without leaving a half-registered plan behind
+        warm = {}
+        for sym in spec["symbols"]:
+            bars, _ = self.feed.closed_bars(sym, start - (self.crit["warmup_bars"] + 1) * MS15)
+            wb = [b for b in bars if b.ts < start]
+            tail = []                              # keep the contiguous tail ending at start-15m
+            for b in reversed(wb):
+                if (tail and tail[-1].ts - b.ts != MS15) or (not tail and b.ts != start - MS15):
+                    break
+                tail.append(b)
+            tail.reverse()
+            fr = self._fetch_funding(sym, start - 30 * DAY_MS)
+            if fr["status"] not in FUNDING_USABLE:
+                raise ForwardRefused(f"{sym}: warm-up funding {fr['status']} "
+                                     f"({'; '.join(fr['issues'][:3])}): funding cannot be confirmed")
+            wf = [(t, r) for t, r in fr["rows"] if t < start]
+            if not wf:
+                raise ForwardRefused(f"{sym}: no funding settlement before the start (DATA_MISSING): "
+                                     "the first holding window's funding cannot be proven complete")
+            warm[sym] = {"bars": tail, "funding": wf,
+                         "intervals": {t: v for t, v in fr["intervals"].items() if t < start},
+                         "fetch": _fetch_summary(fr), "sources": self._consumed_sources(fr)}
         body = {"strategy_id": sid, "context_id": ctx, "symbols": spec["symbols"], "start_ts": start,
                 "registered_ms": now, "criteria": self.crit, "criteria_hash": self.crit_hash,
                 "execution": self.exec_cfg.to_json(), "execution_version": EXECUTION_SIM_VERSION,
                 "cost": self.p.cost.identity(), "order_value": self.p.order_value,
                 "spec_sha256": hashlib.sha256(canonical_json(spec).encode()).hexdigest(),
                 "feed": self.feed.kind, "feed_realtime": bool(self.feed.realtime),
+                "funding_policy": FUNDING_POLICY,
                 "mode": FORWARD_MODE, "version": FORWARD_VERSION, "orders_sent": 0}
         body["plan_id"] = "FP-" + hashlib.sha256(canonical_json(body).encode()).hexdigest()[:16]
         body["at"] = iso_now()
         d = self.root / body["plan_id"]
         d.mkdir(parents=True, exist_ok=True)
-        # warm-up: history strictly before the start (features only, never evaluated)
-        for sym in spec["symbols"]:
-            bars, _ = self.feed.closed_bars(sym, start - (self.crit["warmup_bars"] + 1) * MS15)
-            warm = [b for b in bars if b.ts < start]
-            tail = []                              # keep the contiguous tail ending at start-15m
-            for b in reversed(warm):
-                if (tail and tail[-1].ts - b.ts != MS15) or (not tail and b.ts != start - MS15):
-                    break
-                tail.append(b)
-            tail.reverse()
-            wf = [x for x in self.feed.funding(sym, start - 30 * DAY_MS) if x[0] < start]
-            atomic_write_json(d / f"warmup_{sym}.json", {"rows": [_bar_row(b) for b in tail],
-                                                         "funding": [list(x) for x in wf],
-                                                         "contiguous_to_start": bool(tail)})
+        for sym, w in warm.items():
+            atomic_write_json(d / f"warmup_{sym}.json", {
+                "rows": [_bar_row(b) for b in w["bars"]],
+                "funding": [list(x) for x in w["funding"]],
+                "funding_intervals": {str(t): v for t, v in w["intervals"].items()},
+                "funding_fetch": w["fetch"], "funding_sources": w["sources"],
+                "contiguous_to_start": bool(w["bars"])})
         append_jsonl(self.plans_path, body)
         if st == "PAPER_TEST_READY":
             self.p.statuses.set(sid, ctx, "PAPER_TESTING", stage="paper_forward",
                                 reasons=[f"forward observation plan {body['plan_id']} registered"])
-        self._save_state(body["plan_id"], self._new_state(body))
+        self._save_state(body["plan_id"], self._new_state(body, warm))
         return body
 
     # -- state ------------------------------------------------------------------
-    def _new_state(self, plan: Mapping) -> dict:
+    def _new_state(self, plan: Mapping, warm: Optional[Mapping] = None) -> dict:
+        syms = plan["symbols"]
+        warm = warm or {}
         return {"plan_id": plan["plan_id"], "status": "OBSERVING", "steps": 0,
-                "last_ts": {s: plan["start_ts"] - MS15 for s in plan["symbols"]},
-                "last_funding_ts": {s: plan["start_ts"] - 8 * 3_600_000 for s in plan["symbols"]},
-                "bars": {s: 0 for s in plan["symbols"]}, "missing_bars": {s: 0 for s in plan["symbols"]},
-                "duplicates": {s: 0 for s in plan["symbols"]}, "gaps": {s: [] for s in plan["symbols"]},
+                "last_ts": {s: plan["start_ts"] - MS15 for s in syms},
+                # ADR 0073: funding is collected right after the last warm-up settlement
+                # (no "start - 8h" rule: the schedule is whatever the source declares)
+                "last_funding_ts": {s: (warm[s]["funding"][-1][0] if s in warm else plan["start_ts"] - 1)
+                                    for s in syms},
+                "funding_sources": {s: dict(warm[s]["sources"]) if s in warm else {} for s in syms},
+                "funding_status": {s: (warm[s]["fetch"]["status"] if s in warm else None) for s in syms},
+                "bars": {s: 0 for s in syms}, "missing_bars": {s: 0 for s in syms},
+                "duplicates": {s: 0 for s in syms}, "gaps": {s: [] for s in syms},
                 "incomplete_skipped": 0, "errors": [], "verdict": None, "concluded": False}
 
     def _state_path(self, plan_id: str) -> Path:
@@ -311,12 +602,19 @@ class ForwardPaper:
     # -- one step -----------------------------------------------------------------
     def step(self, plan_id: str) -> dict:
         plan = self.plan(plan_id)
-        st = self.state(plan_id)
+        try:
+            st = self.state(plan_id)
+        except (OSError, ValueError) as e:
+            return self._state_unusable(plan, [f"state file unreadable: {type(e).__name__}: {e}"])
+        bad = self._state_problems(plan, st)
+        if bad:
+            return self._state_unusable(plan, bad)
         if st["concluded"]:
             return {"plan_id": plan_id, "status": "CONCLUDED", "verdict": st["verdict"]}
         d = self.root / plan_id
         now = self.clock()
         new_counts = {}
+        policy = self._funding_policy(plan)
         if st["status"] == "OBSERVING":
             drift = self._plan_drift(plan)
             if drift:
@@ -330,9 +628,13 @@ class ForwardPaper:
             log = d / f"bars_{sym}.jsonl"
             try:
                 rows = read_bar_log(log)
-            except CausalityViolation as e:
+                if policy:
+                    self._recover_funding(plan, st, sym, now)
+            except (CausalityViolation, JsonlCorruption) as e:
                 st["status"] = "ERROR"
-                st["errors"].append({"at": now, "symbol": sym, "kind": "BAR_LOG_TAMPERED", "detail": str(e)})
+                st["errors"].append({"at": now, "symbol": sym, "kind": "LOG_TAMPERED", "detail": str(e)})
+                break
+            if st["status"] != "OBSERVING":
                 break
             self._recover_from_logs(plan, st, sym, rows)
             prev_hash = rows[-1]["hash"] if rows else ""
@@ -368,15 +670,33 @@ class ForwardPaper:
                 st["last_ts"][sym] = b.ts
                 st["bars"][sym] += 1
                 added += 1
-            for t, r in self.feed.funding(sym, st["last_funding_ts"][sym]):
-                if t <= st["last_funding_ts"][sym]:
-                    continue
-                append_jsonl(d / f"funding_{sym}.jsonl", {"ts": t, "rate": r, "observed_at": now})
-                st["last_funding_ts"][sym] = t
+            if policy:
+                if st["status"] == "OBSERVING":
+                    self._collect_funding(plan, st, sym, now)
+            else:
+                # plan registered before ADR 0073 (no declared schedule, no provenance):
+                # collected as before, but its verdict is always PAPER_BLOCKED_DATA
+                try:
+                    legacy = list(self.feed.funding(sym, st["last_funding_ts"][sym]))
+                except Exception as e:  # noqa: BLE001 - recorded; the verdict is blocked anyway
+                    st["errors"].append({"at": now, "symbol": sym, "kind": "FUNDING_SOURCE_ERROR",
+                                         "detail": f"{type(e).__name__}: {e}"})
+                    legacy = []
+                for t, r in legacy:
+                    if t <= st["last_funding_ts"][sym]:
+                        continue
+                    append_jsonl(d / f"funding_{sym}.jsonl", {"ts": t, "rate": r, "observed_at": now})
+                    st["last_funding_ts"][sym] = t
             new_counts[sym] = added
         st["steps"] += 1
         result = {"plan_id": plan_id, "new_bars": new_counts, "status": st["status"]}
-        if st["status"] == "OBSERVING":
+        if st["status"] == "OBSERVING" and policy:
+            fund = self._funding_window_status(plan, st)
+            result["funding"] = fund
+            result["funding_ok"] = all(v["status"] in FUNDING_USABLE for v in fund.values())
+        if st["status"] == "OBSERVING" and (result.get("funding_ok") or not policy):
+            # ADR 0073: the evaluator is only run on funding confirmed for the whole
+            # observation window; otherwise nothing is evaluated (never charged 0)
             try:
                 ev = self._evaluate(plan, st)
             except CausalityViolation as e:
@@ -385,6 +705,10 @@ class ForwardPaper:
                 ev = None
             if ev is not None:
                 result.update(ev)
+                if policy and ev["excluded"]["no_funding_coverage"]:
+                    result["funding_ok"] = False
+                    result["funding_dropped"] = {"events": ev["excluded"]["no_funding_coverage"],
+                                                 "reasons": ev.get("funding_drop_reasons", {})}
         verdict = self._verdict(plan, st, result)
         result["verdict"] = verdict["verdict"]
         result["reasons"] = verdict["reasons"]
@@ -396,6 +720,214 @@ class ForwardPaper:
         append_jsonl(d / "steps.jsonl", {"at": iso_now(), "clock_ms": now,
                                          **{k: v for k, v in result.items() if k != "trades"}})
         return result
+
+    # -- funding (ADR 0073) ----------------------------------------------------------
+    @staticmethod
+    def _funding_policy(plan: Mapping) -> bool:
+        return plan.get("funding_policy") == FUNDING_POLICY
+
+    def _fetch_funding(self, sym: str, after_ts: int) -> dict:
+        """One checked funding fetch.  A feed without ``funding_checked`` (a
+        plain list, no declared schedule) is SCHEDULE_UNKNOWN; any exception of
+        the feed is SOURCE_ERROR — never an empty series."""
+        q = {"after_ts": after_ts, "until_ts": self.clock(), "feed": self.feed.kind}
+        try:
+            if hasattr(self.feed, "funding_checked"):
+                fr = self.feed.funding_checked(sym, after_ts)
+                if not isinstance(fr, Mapping) or fr.get("status") not in FUNDING_SOURCE_STATUSES:
+                    return funding_fetch_result([], {}, status="SOURCE_ERROR", query=q,
+                                                issues=[f"feed returned no valid funding result: {str(fr)[:200]}"])
+                return dict(fr)
+            pairs = list(self.feed.funding(sym, after_ts))
+        except Exception as e:  # noqa: BLE001 - any feed failure is a SOURCE_ERROR, never "no funding"
+            return funding_fetch_result([], {}, status="SOURCE_ERROR", query=q,
+                                        issues=[f"{type(e).__name__}: {e}"])
+        from funding_schedule import series_issues
+        bad = series_issues(pairs)
+        return funding_fetch_result(pairs, {}, query=q, status="DATA_INVALID" if bad else "SCHEDULE_UNKNOWN",
+                                    source_files=[{"name": f"legacy_feed:{self.feed.kind}", "sha256": None,
+                                                   "rows": len(pairs), "status": "SCHEDULE_UNKNOWN",
+                                                   "errors": []}],
+                                    issues=bad + ["feed declares no settlement interval (list interface)"])
+
+    def _consumed_sources(self, fr: Mapping) -> dict:
+        """{file: sha256} of a fetch from a file feed (re-checked every step)."""
+        if not hasattr(self.feed, "funding_source_hashes"):
+            return {}
+        return {f["name"]: f["sha256"] for f in fr.get("source_files") or [] if f.get("sha256")}
+
+    def _source_changes(self, st: Mapping, sym: str) -> list[str]:
+        known = st["funding_sources"].get(sym) or {}
+        if not known or not hasattr(self.feed, "funding_source_hashes"):
+            return []
+        cur = self.feed.funding_source_hashes(sym)
+        out = []
+        for name, sha in sorted(known.items()):
+            if name not in cur:
+                out.append(f"FUNDING_SOURCE_REMOVED: {name} (read earlier with sha256 {sha[:16]}) is gone")
+            elif cur[name] != sha:
+                out.append(f"FUNDING_SOURCE_CHANGED: {name} sha256 {sha[:16]} -> {cur[name][:16]}")
+        return out
+
+    def _collect_funding(self, plan: Mapping, st: dict, sym: str, now: int) -> None:
+        """Fetch, record and append the funding of one symbol.
+
+        The fetch summary goes to ``funding_quality_<sym>.jsonl`` BEFORE the
+        state changes (it is the durable record a restart re-reads).  A
+        DATA_INVALID source (corrupt file, a file read earlier that changed
+        or vanished, a bad API answer) stops the plan: BLOCKED_DATA, which no
+        later step undoes.  SOURCE_ERROR appends nothing and is retried.
+        Otherwise the settlements are appended to the hash-chained funding log
+        up to the first one that would leave a gap under its declared
+        interval; the rest is fetched again next step."""
+        d = self.root / plan["plan_id"]
+        try:
+            changed = self._source_changes(st, sym)
+        except OSError as e:
+            changed = []
+            fr = funding_fetch_result([], {}, status="SOURCE_ERROR", issues=[f"re-hash failed: {e}"])
+        else:
+            fr = self._fetch_funding(sym, st["last_funding_ts"][sym])
+        summ = _fetch_summary(fr)
+        if changed:
+            summ.update(status="DATA_INVALID", kind="FUNDING_SOURCE_CHANGED", issues=changed + summ["issues"])
+        summ.update(at=now, symbol=sym, last_funding_ts=st["last_funding_ts"][sym])
+        append_jsonl(d / f"funding_quality_{sym}.jsonl", summ)
+        before = st["funding_status"].get(sym)
+        st["funding_status"][sym] = summ["status"]
+        if summ["status"] in FUNDING_STICKY:
+            st["status"] = "BLOCKED_DATA"
+            st["errors"].append({"at": now, "symbol": sym, "kind": summ.get("kind") or "FUNDING_DATA_INVALID",
+                                 "detail": summ["issues"][:10]})
+            return
+        if summ["status"] == "SOURCE_ERROR":
+            if before != "SOURCE_ERROR":
+                st["errors"].append({"at": now, "symbol": sym, "kind": "FUNDING_SOURCE_ERROR",
+                                     "detail": summ["issues"][:5]})
+            return
+        log = d / f"funding_{sym}.jsonl"
+        logged = read_chained_log(log, "funding log")
+        prev_hash = logged[-1]["hash"] if logged else ""
+        prev = st["last_funding_ts"][sym]
+        srcs = self._consumed_sources(fr)
+        stop = None
+        for t, r in fr["rows"]:
+            if t <= prev:
+                continue
+            iv = fr["intervals"].get(t)
+            if iv and t - prev > iv + FUNDING_TOL_MS:
+                stop = [prev, t, iv]
+                break
+            body = {"ts": t, "rate": r, "interval_ms": iv, "observed_at": now, "fetch_status": summ["status"],
+                    "sources": srcs}
+            h = _chain(prev_hash, body)
+            append_jsonl(log, {**body, "prev": prev_hash, "hash": h})
+            prev_hash, prev = h, t
+        st["last_funding_ts"][sym] = prev
+        if srcs:
+            st["funding_sources"][sym].update(srcs)
+        if stop is not None:
+            st["funding_status"][sym] = "COVERAGE_INCOMPLETE"
+            if before != "COVERAGE_INCOMPLETE":
+                st["errors"].append({"at": now, "symbol": sym, "kind": "FUNDING_SETTLEMENT_GAP",
+                                     "detail": f"no settlement between {stop[0]} and {stop[1]} "
+                                               f"(declared interval {stop[2]} ms): not appended past it"})
+
+    def _recover_funding(self, plan: Mapping, st: dict, sym: str, now: int) -> None:
+        """Restart: the hash-chained funding log and the funding quality log are
+        the record.  ``last_funding_ts`` / consumed sources are re-derived from
+        the log (a step killed after appending never appends twice), and a
+        blocking quality record re-blocks a plan whose state does not show it
+        (a state rolled back or lost never brings back OBSERVING)."""
+        d = self.root / plan["plan_id"]
+        rows = read_chained_log(d / f"funding_{sym}.jsonl", "funding log")
+        if rows and rows[-1]["ts"] > st["last_funding_ts"][sym]:
+            st["last_funding_ts"][sym] = rows[-1]["ts"]
+            st.setdefault("recovered", []).append({"symbol": sym, "last_funding_ts": rows[-1]["ts"],
+                                                   "at": iso_now()})
+        for r in rows:
+            for name, sha in (r.get("sources") or {}).items():
+                st["funding_sources"][sym].setdefault(name, sha)
+        sticky = [q for q in iter_jsonl(d / f"funding_quality_{sym}.jsonl") if q.get("status") in FUNDING_STICKY]
+        if sticky and st["status"] == "OBSERVING":
+            st["status"] = "BLOCKED_DATA"
+            st["errors"].append({"at": now, "symbol": sym, "kind": "FUNDING_BLOCK_RESTORED",
+                                 "detail": list(sticky[-1].get("issues") or [])[:5]})
+
+    def _funding_series(self, plan: Mapping, sym: str) -> tuple[list, dict]:
+        """Warm-up settlements + the funding log, with the declared interval per
+        settlement (legacy plans: no intervals)."""
+        d = self.root / plan["plan_id"]
+        wj = json.loads((d / f"warmup_{sym}.json").read_text())
+        fund = [(int(t), r) for t, r in wj.get("funding", [])]
+        ivs = {int(t): v for t, v in (wj.get("funding_intervals") or {}).items() if v}
+        if self._funding_policy(plan):
+            logged = read_chained_log(d / f"funding_{sym}.jsonl", "funding log")
+        else:
+            logged = list(iter_jsonl(d / f"funding_{sym}.jsonl"))
+        for r in logged:
+            fund.append((r["ts"], r["rate"]))
+            if r.get("interval_ms"):
+                ivs[r["ts"]] = r["interval_ms"]
+        return fund, ivs
+
+    def _funding_window_status(self, plan: Mapping, st: Mapping) -> dict:
+        """Funding of each symbol over the observation window [start, last
+        observed bar] (``funding_schedule.coverage_check``) combined with the
+        status of this step's fetch.  Anything but VALID / VALID_ZERO_RATE
+        keeps the verdict at PAPER_BLOCKED_DATA."""
+        from funding_schedule import coverage_check
+        out = {}
+        for sym in plan["symbols"]:
+            fund, ivs = self._funding_series(plan, sym)
+            cov = coverage_check(fund, ivs, plan["start_ts"], st["last_ts"][sym])
+            status = _COVERAGE_STATUS.get(cov["status"])
+            if cov["status"] == "FUNDING_DATA_MISSING":
+                status = "DATA_MISSING" if cov["kind"] == "NO_SERIES" else "COVERAGE_INCOMPLETE"
+            if status == "VALID" and cov["settlements"] and cov["zero_rate_settlements"] == cov["settlements"]:
+                status = "VALID_ZERO_RATE"
+            fetch = st["funding_status"].get(sym)
+            if status in FUNDING_USABLE and fetch not in FUNDING_USABLE + ("DATA_MISSING",):
+                # complete so far, but this step's fetch could not be confirmed
+                status = fetch if fetch in FUNDING_SOURCE_STATUSES else "SOURCE_ERROR"
+            out[sym] = {"status": status, "fetch_status": fetch, "coverage": cov,
+                        "sources": dict(st["funding_sources"].get(sym) or {})}
+        return out
+
+    # -- state integrity (ADR 0073) ------------------------------------------------
+    def _state_problems(self, plan: Mapping, st) -> list[str]:
+        if not isinstance(st, dict):
+            return ["state is not an object"]
+        out = []
+        if st.get("status") not in ("OBSERVING", "BLOCKED_DATA", "ERROR"):
+            out.append(f"state status {st.get('status')!r}")
+        if not isinstance(st.get("concluded"), bool) or not isinstance(st.get("errors"), list):
+            out.append("state 'concluded' / 'errors' missing")
+        keys = ["last_ts", "last_funding_ts", "bars", "missing_bars", "duplicates", "gaps"]
+        if self._funding_policy(plan):
+            keys += ["funding_sources", "funding_status"]
+        for k in keys:
+            v = st.get(k)
+            if not isinstance(v, dict) or set(v) != set(plan["symbols"]):
+                out.append(f"state '{k}' missing or not per symbol")
+                continue
+            if k in ("last_ts", "last_funding_ts") and not all(
+                    isinstance(x, int) and not isinstance(x, bool) for x in v.values()):
+                out.append(f"state '{k}' is not an integer time per symbol")
+            if k == "funding_sources" and not all(isinstance(x, dict) for x in v.values()):
+                out.append("state 'funding_sources' is not a file map per symbol")
+            if k == "funding_status" and not all(x is None or x in FUNDING_SOURCE_STATUSES for x in v.values()):
+                out.append("state 'funding_status' holds an unknown status")
+        return out
+
+    def _state_unusable(self, plan: Mapping, why: Sequence[str]) -> dict:
+        """The state file cannot be trusted: nothing is observed, evaluated or
+        overwritten (the damaged file stays as evidence), no status changes."""
+        d = self.root / plan["plan_id"]
+        res = {"plan_id": plan["plan_id"], "status": "ERROR", "verdict": "PAPER_ERROR",
+               "reasons": ["STATE_CORRUPT: " + "; ".join(why)]}
+        append_jsonl(d / "steps.jsonl", {"at": iso_now(), "clock_ms": self.clock(), **res})
+        return res
 
     def _plan_drift(self, plan: Mapping) -> list[str]:
         """What differs between the registered plan and what a step would run."""
@@ -436,34 +968,49 @@ class ForwardPaper:
         st.setdefault("recovered", []).append({"symbol": sym, "last_ts": rows[-1]["ts"], "at": iso_now()})
 
     # -- evaluation ------------------------------------------------------------------
-    def _series(self, plan: Mapping, sym: str) -> tuple[list[Bar], int, list[dict], list]:
+    def _series(self, plan: Mapping, sym: str) -> tuple[list[Bar], int, list[dict], list, dict]:
         d = self.root / plan["plan_id"]
         wj = json.loads((d / f"warmup_{sym}.json").read_text())
         warm = [_row_bar(r) for r in wj["rows"]]
         obs = read_bar_log(d / f"bars_{sym}.jsonl")
-        fund = [tuple(x) for x in wj.get("funding", [])]
-        fund += [(r["ts"], r["rate"]) for r in iter_jsonl(d / f"funding_{sym}.jsonl")]
-        return warm + [_row_bar(r) for r in obs], len(warm), obs, fund
+        fund, ivs = self._funding_series(plan, sym)
+        return warm + [_row_bar(r) for r in obs], len(warm), obs, fund, ivs
 
     def _evaluate(self, plan: Mapping, st: Mapping) -> dict:
         spec = canonicalize_spec(self.p.specs.get(plan["strategy_id"]))
         # the plan's own (registered) rules, never the current config files
         exec_cfg = ExecutionConfig(**plan["execution"])
         mp = float(plan["cost"]["params"]["max_participation"])
+        policy = self._funding_policy(plan)
         trades, open_pos, excluded = [], [], {"gap": 0, "no_funding_coverage": 0}
+        drop_reasons: dict = {}
+        schedules: dict = {}
         for sym in plan["symbols"]:
-            bars, w, obs, fund = self._series(plan, sym)
+            bars, w, obs, fund, ivs = self._series(plan, sym)
             if len(bars) - w < 2:
                 continue
             gaps = [(a, b) for a, b, _ in st["gaps"][sym]]
             fng = self.p.provider.fng() if "fng" in spec["data"] else None
             funding = sorted(set(fund))
-            aux = build_spec_aux(bars, spec, funding or None, fng)
-            sig = build_spec_signal(spec, aux)
-            res = run_event_study(bars, sym, sig, spec["exit"]["horizon"], self.p.cost,
-                                  plan["order_value"], funding or None, warmup=max(1, w),
-                                  exit_rule=stop_exit_rule(spec))
+            if policy:
+                # ADR 0073: confirmed funding with its DECLARED schedule — never None
+                # (= 0 bp) and never the nominal-8h legacy rule
+                aux = build_spec_aux(bars, spec, funding, fng)
+                sig = build_spec_signal(spec, aux)
+                res = run_event_study(bars, sym, sig, spec["exit"]["horizon"], self.p.cost,
+                                      plan["order_value"], funding, warmup=max(1, w),
+                                      exit_rule=stop_exit_rule(spec), funding_intervals=ivs,
+                                      require_funding=True)
+            else:   # pre-ADR 0073 plan: evaluated as before, its verdict is blocked
+                aux = build_spec_aux(bars, spec, funding or None, fng)
+                sig = build_spec_signal(spec, aux)
+                res = run_event_study(bars, sym, sig, spec["exit"]["horizon"], self.p.cost,
+                                      plan["order_value"], funding or None, warmup=max(1, w),
+                                      exit_rule=stop_exit_rule(spec))
             excluded["no_funding_coverage"] += res.dropped_missing_funding
+            for k, v in res.funding_drop_reasons.items():
+                drop_reasons[k] = drop_reasons.get(k, 0) + v
+            schedules[sym] = res.funding_schedule
             delay = {r["ts"]: r["delay_ms"] for r in obs}
             for e in res.events:
                 x = e.to_json()
@@ -491,7 +1038,8 @@ class ForwardPaper:
                                          "note": "approximate mark-to-market (costs at exit not yet known)"})
                     break
         self._reconcile_trades(plan, trades)
-        return {"trades": trades, "open_positions": open_pos, "excluded": excluded}
+        return {"trades": trades, "open_positions": open_pos, "excluded": excluded,
+                "funding_drop_reasons": drop_reasons, "funding_schedule": schedules}
 
     def _reconcile_trades(self, plan: Mapping, trades: Sequence[Mapping]) -> None:
         path = self.root / plan["plan_id"] / "events.jsonl"
@@ -554,6 +1102,20 @@ class ForwardPaper:
         if st["status"] == "BLOCKED_DATA":
             return {"verdict": "PAPER_BLOCKED_DATA", "final": False,
                     "reasons": [json.dumps(e, default=str) for e in st["errors"][-1:]]}
+        # ADR 0073: funding not confirmed -> no verdict at all (neither PASSED nor FAILED)
+        if not self._funding_policy(plan):
+            return {"verdict": "PAPER_BLOCKED_DATA", "final": False,
+                    "reasons": ["LEGACY_PLAN_FUNDING_UNVERIFIED: plan registered before ADR 0073 "
+                                "(no declared funding schedule / source record); re-verify with a new plan"]}
+        if result.get("funding_ok") is not True:
+            why = [f"FUNDING_{v['status']}: {sym}: {v['coverage'].get('reason') or v['fetch_status']}"
+                   for sym, v in sorted((result.get("funding") or {}).items())
+                   if v["status"] not in FUNDING_USABLE]
+            if result.get("funding_dropped"):
+                why.append(f"FUNDING_COVERAGE_INCOMPLETE: {result['funding_dropped']['events']} events "
+                           f"without funding coverage {result['funding_dropped']['reasons']}")
+            return {"verdict": "PAPER_BLOCKED_DATA", "final": False,
+                    "reasons": why or ["FUNDING_UNVERIFIED: funding was not checked in this step"]}
         m = self.metrics(plan["plan_id"], st)
         result_m = dict(m)
         result.setdefault("metrics", result_m)
@@ -583,6 +1145,10 @@ class ForwardPaper:
         return {"verdict": "PAPER_FAILED" if fails else "PAPER_PASSED", "final": True, "reasons": fails}
 
     def _conclude(self, plan: Mapping, verdict: Mapping, result: Mapping) -> None:
+        if not (self._funding_policy(plan) and result.get("funding_ok") is True):
+            # unreachable through _verdict; a second gate so no path records a final
+            # paper verdict on unconfirmed funding (ADR 0073)
+            raise RuntimeError(f"{plan['plan_id']}: final verdict without confirmed funding refused")
         sid, ctx = plan["strategy_id"], plan["context_id"]
         to = {"PAPER_PASSED": "PAPER_PASSED", "PAPER_FAILED": "PAPER_FAILED",
               "PAPER_INCONCLUSIVE": "INCONCLUSIVE"}[verdict["verdict"]]
@@ -599,6 +1165,9 @@ class ForwardPaper:
                                    "status": "OK", "plan_id": plan["plan_id"], "verdict": verdict["verdict"],
                                    "reasons": list(verdict["reasons"]), "metrics": result.get("metrics"),
                                    "criteria_hash": plan["criteria_hash"], "labels": labels,
+                                   "funding_evidence": {"policy": FUNDING_POLICY,
+                                                        "schedule": result.get("funding_schedule"),
+                                                        "symbols": result.get("funding")},
                                    "is_simulation": True, "orders_sent": 0})
         self.p.statuses.set(sid, ctx, to, stage="paper_forward", labels=labels,
                             reasons=list(verdict["reasons"]) + [

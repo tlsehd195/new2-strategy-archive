@@ -148,3 +148,69 @@ def settlement_check(pairs: Optional[Sequence], intervals: Optional[Mapping[int,
 
 def worst(statuses: Sequence[str]) -> str:
     return max(statuses, key=lambda s: FUNDING_STATUS_RANK[s]) if statuses else "OK"
+
+
+def coverage_check(pairs: Optional[Sequence], intervals: Optional[Mapping[int, int]],
+                   start_ts: int, end_ts: int, *, tol_ms: int = FUNDING_TOL_MS) -> dict:
+    """Dataset-level completeness of an OBSERVATION window [start_ts, end_ts]
+    (ADR 0073, Paper Forward): every settlement that was due from the last
+    settlement at or before ``start_ts`` up to ``end_ts`` is present.
+
+    Built on :func:`settlement_check` (same series rules, same declared
+    interval per settlement, same tolerance) plus two edges the per-trade
+    check cannot see:
+
+    * head — a settlement at or before ``start_ts`` must exist (otherwise
+      nothing proves the first settlement after the start was not missed);
+    * tail — from the last settlement at or before ``end_ts``, the next one
+      is due one DECLARED interval later; if that moment is before
+      ``end_ts`` (+ tolerance) and no settlement was recorded, it is missing.
+
+    Statuses: the :data:`FUNDING_STATUS_RANK` vocabulary.  ``kind`` says
+    which edge failed (``NO_SERIES``, ``HEAD_NOT_COVERED``, ``INTERIOR``,
+    ``TAIL_DUE_MISSING``).  ``zero_rate_settlements`` counts recorded rates of
+    exactly 0 in the window — real observations, never a stand-in for a
+    missing settlement."""
+    out = {"status": "OK", "kind": None, "start_ts": start_ts, "end_ts": end_ts, "settlements": 0,
+           "zero_rate_settlements": 0, "first_ts": None, "last_ts": None, "gaps": [],
+           "missing_estimate": 0, "schedule_changes": 0, "reason": None,
+           "version": FUNDING_SCHEDULE_VERSION}
+    if pairs is None or len(pairs) == 0:
+        out.update(status="FUNDING_DATA_MISSING", kind="NO_SERIES", reason="no funding series")
+        return out
+    bad = series_issues(pairs)
+    if bad:
+        out.update(status="FUNDING_DATA_INVALID", kind="SERIES", reason="; ".join(bad))
+        return out
+    times = [t for t, _ in pairs]
+    out["first_ts"], out["last_ts"] = times[0], times[-1]
+    if end_ts < start_ts:
+        return out                                   # nothing observed yet
+    k0 = bisect_right(times, start_ts) - 1
+    if k0 < 0:
+        out.update(status="FUNDING_DATA_MISSING", kind="HEAD_NOT_COVERED",
+                   reason=f"first settlement {times[0]} is after the observation start {start_ts}")
+        return out
+    k1 = bisect_right(times, end_ts) - 1             # last settlement at or before the end
+    out["settlements"] = k1 - k0
+    out["zero_rate_settlements"] = sum(1 for _, r in pairs[k0 + 1:k1 + 1] if r == 0)
+    if k1 > k0:
+        chk = settlement_check(pairs, intervals, times[k0], times[k1], tol_ms=tol_ms, issues=[])
+        out["schedule_changes"] = chk["schedule_changes"]
+        if chk["status"] != "OK":
+            out.update(status=chk["status"], kind="INTERIOR", gaps=chk["gaps"],
+                       missing_estimate=chk["missing_estimate"], reason=chk["reason"])
+            return out
+    iv = (intervals or {}).get(times[k1])
+    if not (isinstance(iv, (int, float)) and iv > 0):
+        out.update(status="FUNDING_SCHEDULE_UNKNOWN", kind="TAIL_DUE_MISSING",
+                   reason=f"settlement {times[k1]} has no declared interval: the next due time is unknown")
+        return out
+    if end_ts - times[k1] > iv + tol_ms:
+        due = times[k1] + int(iv)
+        n = max(1, int((end_ts - times[k1]) // iv))
+        out.update(status="FUNDING_SETTLEMENT_GAP", kind="TAIL_DUE_MISSING",
+                   gaps=[[times[k1], end_ts, int(iv)]], missing_estimate=n,
+                   reason=f"settlement due at {due} (declared interval {int(iv)} ms after {times[k1]}) "
+                          f"not recorded by {end_ts}")
+    return out

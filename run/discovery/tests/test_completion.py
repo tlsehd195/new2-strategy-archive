@@ -340,6 +340,19 @@ class SynthFeed:
     def funding(self, sym, after_ts):
         return [(t, r) for t, r in self.fund if after_ts < t <= self.clock()]
 
+    #: synth_funding() writes one settlement every 8 hours; the fixture DECLARES
+    #: that interval per settlement (ADR 0073: a feed must declare its schedule)
+    FUNDING_INTERVAL_MS = 8 * 3_600_000
+
+    def funding_checked(self, sym, after_ts):
+        from paper_forward import funding_fetch_result
+        rows = self.funding(sym, after_ts)
+        return funding_fetch_result(
+            rows, {t: self.FUNDING_INTERVAL_MS for t, _ in rows},
+            source_files=[{"name": "synth_funding", "sha256": None, "rows": len(rows), "status": "VALID",
+                           "errors": []}],
+            schedule_source="declared by the synthetic fixture", query={"after_ts": after_ts})
+
 
 class ForwardCase(PipelineCase):
     def ready(self, *, drift=(0, 1, 2), start="2024-08-25"):
