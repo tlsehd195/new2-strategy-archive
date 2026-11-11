@@ -69,8 +69,9 @@ EVO_CODE_FILES = tuple(sorted(set(CODE_FILES) | {"public_cost_estimate.py", "por
                                                  "config/exit_fill_v1.json",
                                                  "config/candidate_selection_v1.json",
                                                  "config/candidate_selection_v2.json",
-                                                 "portfolio_multi.py",
-                                                 "config/portfolio_validation_v1.json"}))
+                                                 "portfolio_multi.py", "funding_schedule.py",
+                                                 "config/portfolio_validation_v1.json",
+                                                 "config/portfolio_validation_v2.json"}))
 #: which DEV screen-pass candidates go into a validation batch (ADR 0031, v2: ADR 0033)
 DEFAULT_SELECTION_CONFIG = Path(__file__).resolve().parent / "config" / "candidate_selection_v2.json"
 
@@ -86,8 +87,9 @@ def load_selection_config(path: Path = DEFAULT_SELECTION_CONFIG) -> dict:
     return {"one_per_near_entry_signal": False, **cfg}
 #: one default policy (ADR 0064): promo-v5 = v4 + DSR and bootstrap-CI gates
 DEFAULT_PROMOTION_CONFIG = Path(__file__).resolve().parent / "config" / "promotion_v5.json"
-#: portfolio validation layer (ADR 0068): separate criteria, promo-v5 unchanged
-DEFAULT_PORTFOLIO_CONFIG = Path(__file__).resolve().parent / "config" / "portfolio_validation_v1.json"
+#: portfolio validation layer (ADR 0068): separate criteria, promo-v5 unchanged.
+#: v2 (ADR 0071): intrabar drawdown, signal accounting, data-missing and refusal checks
+DEFAULT_PORTFOLIO_CONFIG = Path(__file__).resolve().parent / "config" / "portfolio_validation_v2.json"
 #: append-only record of validation batches run on the real validation windows
 #: in state directories that no longer exist (ADR 0013).  Alpha spending is per
 #: window, not per state directory: a fresh directory must not restart at k = 1.
@@ -164,11 +166,11 @@ def load_portfolio_config(path: Optional[Path] = None) -> tuple[dict, str]:
     p = Path(path or DEFAULT_PORTFOLIO_CONFIG)
     raw = p.read_bytes()
     cfg = json.loads(raw)
-    if cfg.get("schema") != "portfolio_validation_v1":
-        raise ValueError(f"{p}: not a portfolio_validation_v1 file")
-    from portfolio_multi import MultiConfig
-    known = {"final_equity_gt_initial", "max_drawdown_lt", "liquidation_events_eq", "no_bankruptcy",
-             "min_trades", "min_days", "max_margin_skip_share"}
+    from portfolio_multi import JUDGE_KEYS_V1, JUDGE_KEYS_V2, MultiConfig
+    known = {"portfolio_validation_v1": JUDGE_KEYS_V1,
+             "portfolio_validation_v2": JUDGE_KEYS_V2}.get(cfg.get("schema"))
+    if known is None:
+        raise ValueError(f"{p}: not a portfolio_validation_v1/v2 file")
     for name, sc in cfg["scenarios"].items():
         MultiConfig(**sc["config"]).validate()
         bad = set(sc.get("checks") or {}) - known
@@ -177,6 +179,10 @@ def load_portfolio_config(path: Optional[Path] = None) -> tuple[dict, str]:
             raise ValueError(f"{p}: scenario {name} has unknown checks {sorted(bad)}")
         if not isinstance(sc.get("gating"), bool) or not isinstance(sc.get("checks"), dict):
             raise ValueError(f"{p}: scenario {name} needs bool gating and checks")
+        for k in ("max_cost_refusal_share", "max_capital_refusal_share"):
+            v = sc["checks"].get(k, 0.0)
+            if v is not None and not (isinstance(v, (int, float)) and 0 <= v <= 1):
+                raise ValueError(f"{p}: scenario {name} {k} must be null or in [0, 1]")
     return cfg, hashlib.sha256(raw).hexdigest()[:16]
 
 
@@ -281,6 +287,12 @@ class RunnerDataProvider:
                 e["funding"] = f
                 e["identity"]["funding_sha256"] = hashlib.sha256(
                     repr(sorted(f)).encode()).hexdigest()
+                # declared settlement interval per settlement (CSV column
+                # funding_interval_hours, ADR 0071): a settlement without one
+                # makes every window through it FUNDING_SCHEDULE_UNKNOWN
+                e["funding_intervals"] = dict(rep.get("intervals") or {})
+                e["funding_meta"] = {"symbol": sym, "exchange": "binance_usdm",
+                                     "source": "data.binance.vision fundingRate"}
             else:
                 e["missing"] = [f"{sym}: funding unavailable/quality {fq['issues']}"]
         self._cache[sym] = e
@@ -551,7 +563,28 @@ class EvolutionPipeline:
     def _study(self, spec: Mapping, sym: str, bars, funding, fng, lo: int, hi: int,
                cost=None) -> list[dict]:
         """Events with entry decisions in [lo, hi) and exits <= hi; features
-        computed causally on bars[:hi+1] (history before ``lo`` is warm-up)."""
+        computed causally on bars[:hi+1] (history before ``lo`` is warm-up).
+
+        Interface kept for every existing caller (events only).  The signal
+        accounting of the same study (signals, refusals, missing data) is
+        returned by :meth:`_study_result` (ADR 0071)."""
+        return self._study_result(spec, sym, bars, funding, fng, lo, hi, cost)[0]
+
+    def _funding_schedule_of(self, sym: str, funding) -> Optional[dict]:
+        """Declared settlement intervals of the provider's funding series for
+        ``sym`` ({ts: ms}), only when ``funding`` IS that series; else None
+        (the evaluator then records NOMINAL_8H_LEGACY)."""
+        try:
+            e = self.provider.symbol(sym)
+        except Exception:  # noqa: BLE001 — a provider without the symbol: no schedule
+            return None
+        if funding is not None and funding is e.get("funding"):
+            return e.get("funding_intervals")
+        return None
+
+    def _study_result(self, spec: Mapping, sym: str, bars, funding, fng, lo: int, hi: int,
+                      cost=None) -> tuple[list[dict], dict]:
+        """(events, signal diagnostics) of one study (ADR 0071)."""
         sub = bars[:hi + 1]
         # features on the FULL list (causal => identical on every prefix), cached
         # per input identity so strategies sharing a feature compute it once
@@ -562,10 +595,18 @@ class EvolutionPipeline:
             self._feat_cache.clear()
         aux = build_spec_aux(bars, spec, funding, fng, cache=self._feat_cache if stable else None,
                              cache_ns=ns)
+        ctx = cost or self.cost
         es = run_event_study(sub, sym, build_spec_signal(spec, aux), spec["exit"]["horizon"],
-                             cost or self.cost, self.order_value, funding,
-                             warmup=max(1, lo), exit_rule=stop_exit_rule(spec))
-        return [e.to_json() for e in es.events]
+                             ctx, self.order_value, funding,
+                             warmup=max(1, lo), exit_rule=stop_exit_rule(spec),
+                             funding_intervals=self._funding_schedule_of(sym, funding))
+        diag = es.diagnostics()
+        diag.update(window_ts=[bars[max(0, lo)].ts if bars else None,
+                               bars[min(hi, len(bars) - 1)].ts if bars else None],
+                    cost_model_version=getattr(ctx, "version", None),
+                    cost_model_status=getattr(ctx, "status", None),
+                    order_value=self.order_value)
+        return [e.to_json() for e in es.events], diag
 
     def _inputs(self, spec: Mapping) -> tuple[dict, Optional[dict], list[str]]:
         data, missing = {}, []
@@ -636,11 +677,13 @@ class EvolutionPipeline:
             for sym, e in data.items():
                 win = self.provider.windows(sym, spec["exit"]["horizon"])
                 d1 = win["dev"][1]
-                ev = self._study(spec, sym, e["bars"], e["funding"], fng, 1, d1)
+                ev, diag = self._study_result(spec, sym, e["bars"], e["funding"], fng, 1, d1)
                 cs = cell_stats([_Ev(x) for x in ev], sym, f"{sid}|dev")
                 per[sym] = {"n": cs["n"], "mean_bp": cs.get("mean_bp"), "t": cs.get("t"),
                             "p": cs.get("p"), "status": cs["status"],
-                            "dev_end_ts": e["bars"][d1].ts, **cost_attribution(ev)}
+                            "dev_end_ts": e["bars"][d1].ts, **cost_attribution(ev),
+                            # signal accounting (ADR 0071; reporting, not read by the search)
+                            "signal_diagnostics": diag}
                 events += ev
                 t0, t1 = e["bars"][0].ts, e["bars"][d1].ts
                 span = [t0 if span[0] is None else min(span[0], t0),
@@ -854,14 +897,21 @@ class EvolutionPipeline:
         return self._evaluate_batch(batch)
 
     def _validation_events(self, sid: str, sym: str) -> tuple[list[dict], int, int]:
+        ev, v0, v1, _diag = self._validation_study(sid, sym)
+        return ev, v0, v1
+
+    def _validation_study(self, sid: str, sym: str) -> tuple[list[dict], int, int, Optional[dict]]:
+        """Validation events with the study's signal diagnostics (ADR 0071);
+        diagnostics None when there is no validation window."""
         spec = canonicalize_spec(self.specs.get(sid))
         e = self.provider.symbol(sym)
         fng = self.provider.fng() if "fng" in spec["data"] else None
         win = self.provider.windows(sym, spec["exit"]["horizon"])
         v0, v1 = win["validation"]
         if not (0 <= v0 < v1 < len(e["bars"])):
-            return [], 0, -1
-        return self._study(spec, sym, e["bars"], e["funding"], fng, v0, v1), v0, v1
+            return [], 0, -1, None
+        ev, diag = self._study_result(spec, sym, e["bars"], e["funding"], fng, v0, v1)
+        return ev, v0, v1, diag
 
     def _evaluate_batch(self, batch: Mapping) -> dict:
         ctx = self.context_id()
@@ -875,8 +925,9 @@ class EvolutionPipeline:
                 bars = self.provider.symbol(sym)["bars"]
                 grid0, grid1 = None, None
                 evs = {}
+                diags = {}
                 for m in w["members"]:
-                    ev, v0, v1 = self._validation_events(m, sym)
+                    ev, v0, v1, diags[m] = self._validation_study(m, sym)
                     evs[m] = (ev, v0, v1)
                     if v1 > v0:
                         grid0 = bars[v0].ts if grid0 is None else min(grid0, bars[v0].ts)
@@ -889,7 +940,9 @@ class EvolutionPipeline:
                             "hac_t": t if math.isfinite(t) else None,
                             "hac_p": p if math.isfinite(p) else None,
                             "window": [bars[v0].ts, bars[v1].ts] if v1 > v0 else None,
-                            **cost_attribution(ev)}
+                            **cost_attribution(ev),
+                            # signal accounting (ADR 0071): reporting, the StepM test is unchanged
+                            "signal_diagnostics": diags.get(m)}
                     if grid0 is not None and nets:
                         s = daily_series(ev, grid0, grid1)
                         if any(abs(x) > 0 for x in s) and len(s) >= vc["min_days"]:
@@ -1348,9 +1401,13 @@ class EvolutionPipeline:
 
     def _portfolio_inputs(self, members: Sequence[str]):
         """Validation-window bars, funding and trades of every member; the
-        list of data issues (never filled in)."""
+        list of data issues (never filled in); the declared funding schedule,
+        series identity and signal diagnostics per member/symbol (ADR 0071)."""
         from portfolio_multi import trades_from_events
         bars_by, fund_by, trades, issues, as_of = {}, {}, [], [], None
+        # ADR 0071: declared funding schedule, series identity and the signal
+        # accounting of every study that produced the trades
+        extra = {"intervals": {}, "meta": {}, "diagnostics": {}}
         for m in members:
             spec = canonicalize_spec(self.specs.get(m))
             for sym in spec["symbols"]:
@@ -1358,10 +1415,14 @@ class EvolutionPipeline:
                 if e["missing"] or not e["bars"]:
                     issues.append(f"{m}/{sym}: data missing ({'; '.join(e['missing']) or 'no bars'})")
                     continue
-                ev, v0, v1 = self._validation_events(m, sym)
+                ev, v0, v1, diag = self._validation_study(m, sym)
                 if not v1 > v0:
                     issues.append(f"{m}/{sym}: no validation window")
                     continue
+                extra["diagnostics"][f"{m}/{sym}"] = diag
+                extra["intervals"][sym] = e.get("funding_intervals")
+                if e.get("funding_meta") is not None:
+                    extra["meta"][sym] = e["funding_meta"]
                 bars = e["bars"]
                 if sym not in bars_by:
                     bars_by[sym] = (v0, v1)
@@ -1377,14 +1438,14 @@ class EvolutionPipeline:
             bars = self.provider.symbol(sym)["bars"]
             sliced[sym] = list(bars[v0:v1 + 1])
             as_of = bars[v1].ts if as_of is None else max(as_of, bars[v1].ts)
-        return sliced, fund_by, trades, issues, as_of
+        return sliced, fund_by, trades, issues, as_of, extra
 
     def _portfolio_run(self, members: Sequence[str]) -> dict:
         from portfolio_multi import (MultiConfig, PortfolioInputError, combine, judge,
                                      simulate_multi)
         out: dict = {"members": list(members), "scenarios": {}}
         try:
-            bars_by, fund_by, trades, issues, as_of = self._portfolio_inputs(members)
+            bars_by, fund_by, trades, issues, as_of, extra = self._portfolio_inputs(members)
         except (CostComputationError, CostConfigError) as err:
             out.update(status="UNDETERMINED_PORTFOLIO", reasons=[f"cost: {err}"])
             return out
@@ -1407,7 +1468,10 @@ class EvolutionPipeline:
                     res = simulate_multi(bars_by, trades, fund_by, self.cost, MultiConfig(**sc["config"]),
                                          members=list(members), as_of_ts=as_of,
                                          member_symbols={m: sp["symbols"] for m, sp in specs.items()},
-                                         exit_rules=rules)
+                                         exit_rules=rules,
+                                         funding_intervals_by_symbol=extra.get("intervals") or {},
+                                         funding_meta_by_symbol=extra.get("meta") or None,
+                                         signal_diagnostics=extra.get("diagnostics"))
                     st, why = judge(res, sc["checks"], data_issues=issues)
                 except PortfolioInputError as err:
                     st, why, res = "PORTFOLIO_SIMULATION_ERROR", [f"input: {err}"], None

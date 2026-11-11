@@ -111,7 +111,13 @@ class SyntheticProvider:
                                       "identity": {}}
             else:
                 b = self._sym[sym]["pre"]
-                self._entries[sym] = {"bars": b, "funding": synth_funding(b), "missing": [],
+                f = synth_funding(b)
+                # declared 8h schedule per settlement, as the real CSV column
+                # funding_interval_hours provides it (ADR 0071)
+                self._entries[sym] = {"bars": b, "funding": f, "missing": [],
+                                      "funding_intervals": {t: 8 * 3_600_000 for t, _ in f},
+                                      "funding_meta": {"symbol": sym, "exchange": "binance_usdm",
+                                                       "source": "synthetic"},
                                       "identity": {"synthetic": True, "n": len(b), "last": b[-1].ts}}
         return self._entries[sym]
 

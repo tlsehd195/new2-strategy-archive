@@ -1,0 +1,113 @@
+{
+  "schema": "portfolio_validation_v2",
+  "version": "portfolio-validation-v2",
+  "status": "DEFAULT (pipeline.DEFAULT_PORTFOLIO_CONFIG, ADR 0071). Written before any evolve strategy has reached the portfolio stage (0 VALIDATION_SURVIVOR in every recorded context) and without looking at any market-data portfolio result. v1 stays loadable and unchanged. A change needs a new versioned file and an ADR.",
+  "note": "Separate from promotion_v5.json: promo-v5 (the individual-strategy criteria) is unchanged. This is an ADDITIONAL veto layer: a VALIDATION_SURVIVOR (= PASS_INDIVIDUAL) enters a locked campaign and promotion only with portfolio_status PASS_PORTFOLIO. Passing it is a necessary condition about account risk, never evidence of an edge (the members were selected on the same validation window).",
+  "gating": true,
+  "data": "validation window of each member symbol (already read by the StepM batch and robustness of these members). Never the locked TEST window, IW0/IW1 or any sealed data.",
+  "composition": {
+    "rule": "standalone (the candidate alone) AND joint (the candidate + the book). Book = strategies of the same experiment context whose latest portfolio record is PASS_PORTFOLIO and whose current status is not REJECTED, INCONCLUSIVE or PAPER_FAILED. Members sorted by strategy id; equal weights; no weight is fitted to data.",
+    "weights": "equal",
+    "max_book_members": 20
+  },
+  "scenarios": {
+    "base": {
+      "config": {
+        "initial_capital": 10000.0,
+        "leverage": 1.0,
+        "margin_mode": "isolated",
+        "mmr": 0.005,
+        "max_concurrent": 4,
+        "max_gross_exposure": 1.0,
+        "position_fraction": 1.0,
+        "same_symbol_policy": "hedge",
+        "fill_ratio": 1.0,
+        "latency_bars": 0
+      },
+      "gating": true,
+      "checks": {
+        "final_equity_gt_initial": true,
+        "liquidation_events_eq": 0,
+        "no_bankruptcy": true,
+        "min_trades": 30,
+        "min_days": 30,
+        "max_drawdown_close_lt": 0.5,
+        "max_drawdown_intrabar_lt": 0.5,
+        "require_signal_accounting": true,
+        "max_data_missing_signals": 0,
+        "max_cost_refusal_share": null,
+        "max_capital_refusal_share": null
+      }
+    },
+    "stress_cross_3x": {
+      "config": {
+        "initial_capital": 10000.0,
+        "leverage": 3.0,
+        "margin_mode": "cross",
+        "mmr": 0.005,
+        "max_concurrent": 4,
+        "max_gross_exposure": 3.0,
+        "position_fraction": 1.0,
+        "same_symbol_policy": "hedge",
+        "fill_ratio": 1.0,
+        "latency_bars": 0
+      },
+      "gating": true,
+      "checks": {
+        "liquidation_events_eq": 0,
+        "no_bankruptcy": true,
+        "min_trades": 30,
+        "min_days": 30,
+        "max_drawdown_close_lt": 0.5,
+        "max_drawdown_intrabar_lt": 0.5,
+        "require_signal_accounting": true,
+        "max_data_missing_signals": 0,
+        "max_cost_refusal_share": null,
+        "max_capital_refusal_share": null
+      }
+    },
+    "stress_partial_latency": {
+      "config": {
+        "initial_capital": 10000.0,
+        "leverage": 1.0,
+        "margin_mode": "isolated",
+        "mmr": 0.005,
+        "max_concurrent": 4,
+        "max_gross_exposure": 1.0,
+        "position_fraction": 1.0,
+        "same_symbol_policy": "hedge",
+        "fill_ratio": 0.5,
+        "latency_bars": 1
+      },
+      "gating": false,
+      "checks": {
+        "final_equity_gt_initial": true,
+        "liquidation_events_eq": 0,
+        "no_bankruptcy": true,
+        "min_trades": 30,
+        "min_days": 30,
+        "max_drawdown_close_lt": 0.5,
+        "max_drawdown_intrabar_lt": 0.5,
+        "require_signal_accounting": true,
+        "max_data_missing_signals": 0,
+        "max_cost_refusal_share": null,
+        "max_capital_refusal_share": null
+      },
+      "note": "diagnostic only: fill_ratio = share filled at the decision's entry open, the remainder fills at the next open with its own price and cost (cancelled if that is at/after the exit); latency = entry 1 bar later with the exit re-derived from the strategy's own exit rule. Uncalibrated (no real fills exist)."
+    }
+  },
+  "max_gross_exposure": "sum of entry notionals / equity at the entry open (not multiplied by leverage): 1.0 at 1x, 3.0 for the 3x stress",
+  "thresholds_source": "base and cross 3x: portfolio.PORTFOLIO_PASS_CRITERIA (final equity > initial, MDD < 0.5, 0 liquidations, not bankrupt) and the promo-v5 validation minima (30 events, 30 days); ADR 0071 adds no new numeric threshold: 0 data-missing signals (no tolerance) and null (undefined) refusal limits.",
+  "supersedes": "portfolio-validation-v1 (ADR 0068)",
+  "model_version_required": "portfolio-multi-v2",
+  "checks_v2": {
+    "max_drawdown_close_lt": "v1 max_drawdown_lt renamed: drawdown of the equity at bar closes (same number, same meaning).",
+    "max_drawdown_intrabar_lt": "same account-level limit 0.5 applied to the worst-case intrabar drawdown (every open long at its low, short at its high at one moment; isolated floored at -margin). Stricter than the close drawdown by construction (worst case <= close equity), never a relaxation. Status not OK (stale marks, < 2 bars) -> UNDETERMINED_PORTFOLIO.",
+    "require_signal_accounting": "the evaluator diagnostics of every member/symbol must be present and every signal must land in exactly one bucket (signals_total = entered + rejections + strategy-rule + window-end); else UNDETERMINED_PORTFOLIO.",
+    "max_data_missing_signals": "0: a signal that could not be priced (no traded value / cost error) or funded (funding coverage, settlement gap, unknown schedule) has an unknown outcome; any such signal -> INSUFFICIENT_PORTFOLIO_DATA. Zero is not a tuned number: any positive tolerance would be an unjustified choice.",
+    "max_cost_refusal_share": "null = no preregistered limit exists (none in promo-v1..v5, portfolio-validation-v1 or the NEW2 ADRs). With null, ANY participation-cap refusal (evaluator at the research order size or account at the actual notional) makes the scenario UNDETERMINED_PORTFOLIO instead of PASS. A numeric limit needs a new version and an ADR with a source, written before results are seen.",
+    "max_capital_refusal_share": "null, same rule for margin / gross-exposure / concurrent-position / same-symbol / zero-allocation refusals: real constraints of running the members together on one account; reported per reason with its denominator, never passed without a limit.",
+    "rates_denominator": "execution_candidates = signals_total - strategy_rule (evaluator non-overlap, duplicate signal, inactive member) - window_end (exit or delayed fill beyond the data). Rejections: cost_refused, data_missing, capital, halted."
+  },
+  "stress_cross_3x_risk": "Cross 3x now has the same account-level drawdown limits as base (close 0.5, intrabar worst case 0.5). Relation to the risk policy: the only preregistered account-loss limit in this repository is portfolio.PORTFOLIO_PASS_CRITERIA max_drawdown_lt 0.5 (equity, not notional); it is a limit on the ACCOUNT's loss and does not depend on leverage, so the leveraged stress is held to the same account limit rather than a leverage-scaled number. A stricter cross-specific limit has no source in the repository and is not invented; the minimum equity / maintenance-margin ratio is recorded as a diagnostic (metrics.min_equity_to_maintenance_ratio), not gated."
+}

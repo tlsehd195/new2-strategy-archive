@@ -78,6 +78,49 @@ class EventStudyResult:
     participation_refusals: int = 0
     cost_data_missing: int = 0
     signals_total: int = 0
+    #: signals whose exit would lie beyond the evaluated bars (end of the window):
+    #: counted so that every signal lands in exactly one bucket (ADR 0071)
+    truncated_end_of_window: int = 0
+    #: split of ``dropped_missing_funding`` by funding status (ADR 0071)
+    funding_drop_reasons: dict = field(default_factory=dict)
+    #: "DECLARED" (per-settlement intervals given) or "NOMINAL_8H_LEGACY"
+    funding_schedule: str = "NONE"
+
+    def diagnostics(self) -> dict:
+        """Signal accounting of this study (ADR 0071).  Every signal is in
+        exactly one bucket: ``signals_total == accepted_events +
+        skipped_overlapped + truncated_end_of_window + participation_refusals
+        + cost_data_missing + dropped_missing_funding``.
+
+        ``rejection_rate`` = (participation_refusals + cost_data_missing +
+        dropped_missing_funding) / execution_candidates, where
+        execution_candidates = signals_total - skipped_overlapped -
+        truncated_end_of_window (the signals that reached pricing).  The
+        strategy's own non-overlap rule and the window end are NOT rejections."""
+        cand = self.signals_total - self.skipped_overlapped - self.truncated_end_of_window
+        rej = self.participation_refusals + self.cost_data_missing + self.dropped_missing_funding
+        n = len(self.events)
+        return {
+            "symbol": self.symbol,
+            "signals_total": self.signals_total,
+            "skipped_overlapped": self.skipped_overlapped,
+            "truncated_end_of_window": self.truncated_end_of_window,
+            "participation_refusals": self.participation_refusals,
+            "cost_data_missing": self.cost_data_missing,
+            "dropped_missing_funding": self.dropped_missing_funding,
+            "funding_drop_reasons": dict(self.funding_drop_reasons),
+            "accepted_events": n,
+            "execution_candidates": cand,
+            "rejected": rej,
+            "rejection_rate": (rej / cand) if cand > 0 else None,
+            "cost_refusal_rate": (self.participation_refusals / cand) if cand > 0 else None,
+            "data_missing_rate": ((self.cost_data_missing + self.dropped_missing_funding) / cand)
+            if cand > 0 else None,
+            "accounting_ok": cand == n + rej,
+            "funding_schedule": self.funding_schedule,
+            "denominator": "execution_candidates = signals_total - skipped_overlapped - "
+                           "truncated_end_of_window",
+        }
 
     def to_json(self) -> dict:
         return {
@@ -88,6 +131,8 @@ class EventStudyResult:
             "participation_refusals": self.participation_refusals,
             "cost_data_missing": self.cost_data_missing,
             "signals_total": self.signals_total,
+            "truncated_end_of_window": self.truncated_end_of_window,
+            "funding_drop_reasons": dict(self.funding_drop_reasons),
             "events": [e.to_json() for e in self.events],
         }
 
@@ -122,25 +167,48 @@ class FundingIndex:
     NOT covered — the sum over the recorded settlements would understate the
     cost, so ``paid_bp`` returns None and the event is dropped."""
 
-    __slots__ = ("funding", "times", "gaps")
+    __slots__ = ("funding", "times", "gaps", "intervals", "issues", "last_status")
 
     def __init__(self, funding: Sequence[tuple[int, float]],
-                 gaps: Optional[Sequence[tuple[int, int]]] = None):
+                 gaps: Optional[Sequence[tuple[int, int]]] = None,
+                 intervals: Optional[dict] = None):
+        """``intervals`` ({settlement ts: interval ms}, as
+        ``data_quality.load_funding_csv_checked`` reports them): when given,
+        every holding window is checked against the DECLARED schedule
+        (funding_schedule.settlement_check, ADR 0071).  Without it the legacy
+        rule applies (gaps against the nominal 8h interval) — a 4h or 2h
+        series can then hide a missing settlement, so the pipeline always
+        passes the declared intervals."""
         from data_quality import funding_gaps
+        from funding_schedule import series_issues
         self.funding = list(funding)
         self.times = [t for t, _ in self.funding]
-        self.gaps = list(gaps) if gaps is not None else funding_gaps(self.funding)
+        self.intervals = intervals
+        self.issues = series_issues(self.funding) if intervals is not None else None
+        self.gaps = list(gaps) if gaps is not None else funding_gaps(self.funding, intervals)
+        self.last_status = None
 
     def paid_bp(self, start_ts: int, end_ts: int, side: int) -> Optional[float]:
         """Funding in bp for a position opened at the open of ``start_ts`` and
         closed at the open of ``end_ts``: settlements t with start < t <= end
         (fills happen just after the bar open, so a settlement stamped exactly
-        at the entry open is not held, one stamped at the exit open is)."""
-        if not self.times or self.times[0] > start_ts or self.times[-1] < end_ts:
-            return None
-        for a, b in self.gaps:
-            if a < end_ts and b > start_ts:
+        at the entry open is not held, one stamped at the exit open is).
+        ``last_status`` says why None was returned."""
+        if self.intervals is not None:
+            from funding_schedule import settlement_check
+            chk = settlement_check(self.funding, self.intervals, start_ts, end_ts, issues=self.issues)
+            self.last_status = chk["status"]
+            if chk["status"] != "OK":
                 return None
+        else:
+            if not self.times or self.times[0] > start_ts or self.times[-1] < end_ts:
+                self.last_status = "FUNDING_DATA_MISSING"
+                return None
+            for a, b in self.gaps:
+                if a < end_ts and b > start_ts:
+                    self.last_status = "FUNDING_SETTLEMENT_GAP"
+                    return None
+            self.last_status = "OK"
         lo = bisect_right(self.times, start_ts)
         hi = bisect_right(self.times, end_ts)   # events in (start, end]
         total = 0.0
@@ -152,14 +220,17 @@ class FundingIndex:
 def run_event_study(bars: Sequence[Bar], symbol: str, signal_fn: SignalFn,
                     horizon: int, cost: CostContext, order_value: float,
                     funding: Optional[Sequence[tuple[int, float]]] = None,
-                    *, warmup: int = 1, exit_rule: Optional[Callable] = None) -> EventStudyResult:
+                    *, warmup: int = 1, exit_rule: Optional[Callable] = None,
+                    funding_intervals: Optional[dict] = None) -> EventStudyResult:
     """Evaluate one strategy definition on one symbol.
 
     Events whose holding window would overlap a previously accepted event
     are skipped and COUNTED — they are not independent observations.
     """
     res = EventStudyResult(symbol=symbol)
-    fidx = FundingIndex(funding) if funding is not None else None
+    fidx = FundingIndex(funding, intervals=funding_intervals) if funding is not None else None
+    res.funding_schedule = ("NONE" if funding is None else
+                            "DECLARED" if funding_intervals is not None else "NOMINAL_8H_LEGACY")
     n = len(bars)
     last_exit_index = -1
     for t in range(warmup, n - 1):
@@ -174,12 +245,14 @@ def run_event_study(bars: Sequence[Bar], symbol: str, signal_fn: SignalFn,
             res.skipped_overlapped += 1
             continue
         if exit_i >= n:
+            res.truncated_end_of_window += 1
             break
         exit_px = None
         if exit_rule is not None:
             # intrabar stop / take-profit (spec strategies): (index, price, reason)
             ex = exit_rule(bars, entry_i, side, horizon)
             if ex is None:
+                res.truncated_end_of_window += 1
                 break
             exit_i, exit_px, _reason = ex
         entry_bar, exit_bar = bars[entry_i], bars[exit_i]
@@ -203,6 +276,8 @@ def run_event_study(bars: Sequence[Bar], symbol: str, signal_fn: SignalFn,
             fp = fidx.paid_bp(entry_bar.ts, exit_bar.ts, side)
             if fp is None:
                 res.dropped_missing_funding += 1
+                why = fidx.last_status or "FUNDING_DATA_MISSING"
+                res.funding_drop_reasons[why] = res.funding_drop_reasons.get(why, 0) + 1
                 continue
         else:
             fp = 0.0
