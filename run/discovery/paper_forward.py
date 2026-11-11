@@ -59,6 +59,21 @@ settlement due at the end of the observation window must be recorded, and no
 interval observed today (``/fapi/v1/fundingInfo``) is applied to a past
 settlement.  Plans registered before ADR 0074 are never concluded.
 
+Positions (ADR 0075, ``POSITION_POLICY``): the verdict is computed on CLOSED
+trades only.  When the stopping rule first holds, the last observed bar
+becomes the evaluation cutoff (kept in the state); a position entered by the
+cutoff that is still open keeps the verdict at PAPER_OBSERVING
+(OPEN_POSITIONS_PENDING) until its exit is observed — it is neither marked to
+market into the result nor closed by force — and trades entered after the
+cutoff are outside the sample.  The closed-trade ledger is checked against
+the evaluator every step, by the verdict and again by the last gate
+(duplicate, overlapping, malformed, unobserved or missing records, a state
+whose ledger count is ahead of the file): any mismatch is PAPER_ERROR.
+PAPER_PASSED therefore means: every trade entered in [start, cutoff] was
+observed to its exit and realised under the plan's cost, funding and
+execution rules, and the ledger the verdict was computed from is the one on
+disk at the moment of the conclusion.
+
 PAPER_PASSED is a research result.  It is not an approval to trade and it
 says nothing about profits outside the observed period.  Forward results
 are never read by the search (``search.dev_feedback`` accepts DEV only).
@@ -104,6 +119,20 @@ FUNDING_TOL_MS = 60_000
 #: sequenced funding / funding-quality logs anchored in the state).  A plan without it
 #: (registered under ADR 0073 only) is never concluded.
 FUNDING_INTEGRITY = "paper-forward-integrity-v1"
+#: ADR 0075: positions of a plan.  The sample of a final verdict is every trade ENTERED
+#: in [start, evaluation cutoff]; the cutoff is the last observed bar of the step at which
+#: the preregistered stopping rule (min_days + min_trades, or max_days) first held.  A
+#: position entered by the cutoff and still open is waited for (non-final), never marked to
+#: market into the verdict, never closed by force; trades entered after the cutoff are not
+#: part of the sample.  The closed-trade ledger (events.jsonl) must agree with the
+#: evaluator and with itself (no duplicate / overlapping / unobserved / malformed record).
+POSITION_POLICY = "paper-forward-positions-v1"
+#: execution statuses of a closed-trade record and the fill fraction each one allows
+_EXEC_FILL = {"FILLED": "one", "PARTIAL": "part", "LIQUIDATED": "positive",
+              "REJECTED_NO_LIQUIDITY": "zero", "REJECTED_PARTICIPATION": "zero"}
+#: fields of a closed-trade record that must equal the evaluator's re-computation
+_TRADE_KEYS = ("symbol", "side", "entry_ts", "exit_ts", "entry_index", "exit_index", "exec_status",
+               "fill_fraction", "net_bp_exec", "cost_bp", "liquidated", "late", "holding_minutes")
 #: what a declared per-settlement interval rests on (recorded with every fetch)
 INTERVAL_BASIS_DECLARED = "DECLARED_PER_SETTLEMENT_MEANING_UNDOCUMENTED"
 INTERVAL_BASIS_NONE = "NO_PER_SETTLEMENT_INTERVAL"
@@ -866,6 +895,12 @@ class ForwardPaper:
             # ADR 0073: the evaluator is only run on funding confirmed for the whole
             # observation window; otherwise nothing is evaluated (never charged 0)
             try:
+                # ADR 0075: a ledger shorter than the state recorded lost closed trades
+                n_log = self._trade_log_len(plan)
+                if n_log < int(st.get("events_logged") or 0):
+                    raise EvidenceIntegrityError("TRADE_LOG_TRUNCATED",
+                                                 f"events.jsonl has {n_log} records, the state recorded "
+                                                 f"{st['events_logged']}")
                 ev = self._evaluate(plan, st)
             except EvidenceIntegrityError as e:
                 st["status"] = "ERROR"
@@ -877,11 +912,29 @@ class ForwardPaper:
                 ev = None
             if ev is not None:
                 result.update(ev)
+                # ADR 0075: the closed-trade ledger now on disk is the evaluator's output;
+                # a ledger that disagrees with it or with itself stops the plan
+                try:
+                    st["events_logged"] = self._trade_log_len(plan)
+                except EvidenceIntegrityError as e:
+                    pos = [str(e)]
+                else:
+                    pos = self._position_problems(plan, st, result)
+                if pos:
+                    st["status"] = "ERROR"
+                    st["errors"].append({"at": now, "kind": "POSITION_INTEGRITY", "detail": "; ".join(pos[:10])})
                 if policy and ev["excluded"]["no_funding_coverage"]:
                     result["funding_ok"] = False
                     result["funding_dropped"] = {"events": ev["excluded"]["no_funding_coverage"],
                                                  "reasons": ev.get("funding_drop_reasons", {})}
         verdict = self._verdict(plan, st, result)
+        cut = verdict.get("evaluation_cutoff")
+        if cut is not None and st.get("evaluation_cutoff") is None:
+            # ADR 0075: the stopping rule held at this bar for the first time: the sample of
+            # the final verdict is every trade entered up to here (kept, never moved)
+            st["evaluation_cutoff"] = {"ts": cut, "step": st["steps"], "policy": POSITION_POLICY}
+        if st.get("evaluation_cutoff") is not None:
+            result["evaluation_cutoff"] = st["evaluation_cutoff"]["ts"]
         if verdict["final"]:
             try:
                 self._conclude(plan, verdict, result, st)
@@ -1189,6 +1242,17 @@ class ForwardPaper:
             keys += ["funding_sources", "funding_status"]
         if self._integrity(plan):
             keys += ["quality_head", "funding_head"]
+        # ADR 0075 (optional keys: states saved before ADR 0075 have neither)
+        n = st.get("events_logged")
+        if n is not None and (not isinstance(n, int) or isinstance(n, bool) or n < 0):
+            out.append("state 'events_logged' is not a record count")
+        cut = st.get("evaluation_cutoff")
+        if cut is not None:
+            lt = st.get("last_ts")
+            ts = cut.get("ts") if isinstance(cut, dict) else None
+            if not isinstance(ts, int) or isinstance(ts, bool) or ts < plan["start_ts"] or ts % MS15 \
+                    or not isinstance(lt, dict) or not lt or any(not isinstance(x, int) or ts > x for x in lt.values()):
+                out.append(f"state 'evaluation_cutoff' {cut!r} is not a bar time within the observation")
         for k in keys:
             v = st.get(k)
             if not isinstance(v, dict) or set(v) != set(plan["symbols"]):
@@ -1314,21 +1378,161 @@ class ForwardPaper:
                 y["event_id"] = f"{sym}:{x['entry_ts']}"
                 y["holding_minutes"] = (x["exit_ts"] - x["entry_ts"]) / 60_000
                 trades.append(y)
-            # open position (decided, not yet exited): marked to the last close
-            last_exit = max([e.exit_index for e in res.events] + [w - 1])
-            for t in range(max(w, last_exit), len(bars) - 1):
-                side = sig(PrefixView(bars, t + 1))
-                if side in (1, -1):
-                    ent = t + 1
-                    if ent + spec["exit"]["horizon"] >= len(bars):
-                        u = side * (bars[-1].close / bars[ent].open - 1.0) * 1e4
-                        open_pos.append({"symbol": sym, "entry_ts": bars[ent].ts, "side": side,
-                                         "unrealized_gross_bp": u, "marked_at": bars[-1].ts,
-                                         "note": "approximate mark-to-market (costs at exit not yet known)"})
-                    break
+            open_pos += self._open_positions(sym, bars, w, sig, spec["exit"]["horizon"], res.events)
         self._reconcile_trades(plan, trades)
         return {"trades": trades, "open_positions": open_pos, "excluded": excluded,
                 "funding_drop_reasons": drop_reasons, "funding_schedule": schedules}
+
+    @staticmethod
+    def _open_positions(sym: str, bars: Sequence[Bar], w: int, sig, horizon: int, events) -> list[dict]:
+        """The position the strategy holds at the last observed bar, if any (ADR 0075).
+
+        Mirrors ``run_event_study``: after the last ACCEPTED exit, a signal whose
+        holding period fits the bars and is not an event was refused (participation,
+        cost data) or dropped (funding) — no position, the scan continues (the
+        earlier ``break`` here stopped at it and missed a later open position); the
+        first signal whose holding period runs past the bars is the open position
+        (every later signal overlaps it).  The mark is informational only: it is
+        never part of a verdict."""
+        last_exit = max([e.exit_index for e in events] + [w - 1])
+        for t in range(max(w, last_exit), len(bars) - 1):
+            side = sig(PrefixView(bars, t + 1))
+            if side not in (1, -1):
+                continue
+            ent = t + 1
+            if ent + horizon < len(bars):
+                continue
+            p0, p1 = bars[ent].open, bars[-1].close
+            ok = all(isinstance(x, (int, float)) and math.isfinite(x) and x > 0 for x in (p0, p1))
+            return [{"event_id": f"{sym}:{bars[ent].ts}", "symbol": sym, "status": "OPEN", "side": side,
+                     "entry_ts": bars[ent].ts, "entry_index": ent, "decision_ts": bars[t].ts,
+                     "planned_exit_ts": bars[ent].ts + horizon * MS15, "bars_held": len(bars) - ent,
+                     "unrealized_gross_bp": side * (p1 / p0 - 1.0) * 1e4 if ok else None,
+                     "marked_at": bars[-1].ts,
+                     "note": "approximate gross mark-to-market (no cost / funding / execution); "
+                             "informational, never part of a verdict"}]
+        return []
+
+    def _trade_log_len(self, plan: Mapping) -> int:
+        try:
+            return len(list(iter_jsonl(self.root / plan["plan_id"] / "events.jsonl")))
+        except (JsonlCorruption, OSError, ValueError) as e:
+            raise EvidenceIntegrityError("TRADE_LOG_UNREADABLE", f"events.jsonl: {type(e).__name__}: {e}") from e
+
+    @staticmethod
+    def _sample_bound(st: Mapping) -> int:
+        """Last entry time of the verdict's sample: the recorded evaluation cutoff,
+        or (before the stopping rule held) the last bar observed for every symbol."""
+        cut = st.get("evaluation_cutoff")
+        return int(cut["ts"]) if cut else min(st["last_ts"].values())
+
+    @staticmethod
+    def _pending(result: Mapping, bound: int) -> list[dict]:
+        return [x for x in result.get("open_positions") or [] if x.get("entry_ts") is None or x["entry_ts"] <= bound]
+
+    def _position_problems(self, plan: Mapping, st: Mapping, result: Mapping) -> list[str]:
+        """Consistency of the closed-trade ledger on disk, the evaluator's trades and
+        open positions of ``result`` and the state (ADR 0075).  Read from disk on
+        every call: nothing an earlier call saw is trusted."""
+        syms, start = set(plan["symbols"]), plan["start_ts"]
+        try:
+            logged = list(iter_jsonl(self.root / plan["plan_id"] / "events.jsonl"))
+        except (JsonlCorruption, OSError, ValueError) as e:
+            return [f"trade ledger unreadable: {type(e).__name__}: {e}"]
+        out: list[str] = []
+        n_state = st.get("events_logged")
+        if n_state is not None and n_state != len(logged):
+            out.append(f"trade ledger has {len(logged)} records, the state recorded {n_state}")
+
+        def num(x):
+            return isinstance(x, (int, float)) and not isinstance(x, bool) and math.isfinite(x)
+
+        def integer(x):
+            return isinstance(x, int) and not isinstance(x, bool)
+
+        seen: dict = {}
+        by_sym: dict = {}
+        for i, r in enumerate(logged):
+            sym, eid = r.get("symbol"), r.get("event_id")
+            tag = f"trade record {i + 1} ({eid!r})"
+            if sym not in syms:
+                out.append(f"{tag}: symbol {sym!r} not in the plan")
+                continue
+            if eid in seen:
+                out.append(f"{tag}: DUPLICATE_CLOSE: event {eid} recorded {seen[eid] + 1} times")
+                seen[eid] += 1
+                continue
+            seen[eid] = 1
+            e0, e1 = r.get("entry_ts"), r.get("exit_ts")
+            if not all(integer(r.get(k)) for k in ("entry_ts", "exit_ts", "entry_index", "exit_index")) \
+                    or r.get("side") not in (1, -1):
+                out.append(f"{tag}: side / entry / exit missing or not integer")
+                continue
+            if eid != f"{sym}:{e0}":
+                out.append(f"{tag}: event id does not name its symbol and entry")
+            if e0 % MS15 or e1 % MS15 or e0 < start or e1 <= e0:
+                out.append(f"{tag}: entry {e0} / exit {e1} off the grid, before the start or not ordered")
+            elif e1 > st["last_ts"][sym]:
+                out.append(f"{tag}: recorded as closed at {e1}, but the last observed bar is "
+                           f"{st['last_ts'][sym]} (position still open)")
+            status, ff = r.get("exec_status"), r.get("fill_fraction")
+            rule = _EXEC_FILL.get(status)
+            if rule is None or not num(ff) or not (
+                    (rule == "one" and ff == 1.0) or (rule == "zero" and ff == 0.0)
+                    or (rule == "part" and 0.0 < ff < 1.0) or (rule == "positive" and 0.0 < ff <= 1.0)):
+                out.append(f"{tag}: execution status {status!r} with fill fraction {ff!r}")
+            if not (num(r.get("net_bp_exec")) and num(r.get("cost_bp"))):
+                out.append(f"{tag}: net / cost not a finite number")
+            if not (isinstance(r.get("liquidated"), bool) and isinstance(r.get("late"), bool)) \
+                    or r.get("liquidated") != (status == "LIQUIDATED"):
+                out.append(f"{tag}: liquidated / late flags inconsistent")
+            by_sym.setdefault(sym, []).append((e0, e1, eid))
+        last_exit = {}
+        for sym, xs in by_sym.items():
+            xs.sort()
+            for (a0, a1, ea), (b0, b1, eb) in zip(xs, xs[1:]):
+                if b0 <= a1:
+                    out.append(f"DUPLICATE_POSITION: {eb} entered at {b0} while {ea} was held until {a1}")
+            last_exit[sym] = xs[-1][1]
+        trades, opens = result.get("trades"), result.get("open_positions")
+        if not isinstance(trades, list) or not isinstance(opens, list):
+            return out + ["POSITIONS_NOT_EVALUATED: no trades / open positions from the evaluator in this step"]
+        now = {}
+        for t in trades:
+            if t.get("event_id") in now:
+                out.append(f"evaluator produced trade {t.get('event_id')} twice")
+            now[t.get("event_id")] = t
+        led = {r.get("event_id"): r for r in logged}
+        for eid in sorted(set(now) - set(led), key=str):
+            out.append(f"closed trade {eid} of the evaluator is not in the ledger")
+        for eid in sorted(set(led) - set(now), key=str):
+            out.append(f"ledger record {eid} is not a trade of the evaluator")
+        for eid in sorted(set(now) & set(led), key=str):
+            a, b = now[eid], led[eid]
+            diff = [k for k in _TRADE_KEYS if not (
+                a.get(k) == b.get(k) or (num(a.get(k)) and num(b.get(k)) and abs(a[k] - b[k]) <= 1e-9))]
+            if diff:
+                out.append(f"ledger record {eid} differs from the evaluator in {diff}")
+        per_sym: dict = {}
+        for x in opens:
+            sym, e0 = x.get("symbol"), x.get("entry_ts")
+            tag = f"open position {x.get('event_id')!r}"
+            if sym not in syms or x.get("side") not in (1, -1) or not integer(e0) or e0 % MS15:
+                out.append(f"{tag}: symbol / side / entry missing or invalid")
+                continue
+            per_sym[sym] = per_sym.get(sym, 0) + 1
+            if per_sym[sym] > 1:
+                out.append(f"DUPLICATE_POSITION: {per_sym[sym]} open positions on {sym}")
+            if not (start <= e0 <= st["last_ts"][sym]):
+                out.append(f"{tag}: entry {e0} outside [start, last observed bar]")
+            if x.get("marked_at") != st["last_ts"][sym] or not num(x.get("unrealized_gross_bp")):
+                out.append(f"{tag}: MARK_MISSING: no valid mark at the last observed bar "
+                           f"({x.get('marked_at')!r}, {x.get('unrealized_gross_bp')!r})")
+            if x.get("event_id") != f"{sym}:{e0}" or x.get("event_id") in led:
+                out.append(f"{tag}: also recorded as a closed trade (or misnamed)")
+            if sym in last_exit and e0 <= last_exit[sym]:
+                out.append(f"{tag}: entered at {e0}, before the last recorded exit {last_exit[sym]}")
+        return out
 
     def _reconcile_trades(self, plan: Mapping, trades: Sequence[Mapping]) -> None:
         path = self.root / plan["plan_id"] / "events.jsonl"
@@ -1349,7 +1553,11 @@ class ForwardPaper:
     def metrics(self, plan_id: str, st: Optional[Mapping] = None) -> dict:
         plan = self.plan(plan_id)
         st = st if st is not None else self.state(plan_id)
-        trades = list(iter_jsonl(self.root / plan_id / "events.jsonl"))
+        # ADR 0075: the sample is every closed trade ENTERED by the sample bound (the
+        # evaluation cutoff once recorded); open positions are never part of it
+        bound = self._sample_bound(st)
+        allt = list(iter_jsonl(self.root / plan_id / "events.jsonl"))
+        trades = [t for t in allt if t["entry_ts"] <= bound]
         counted = [t for t in trades if t["exec_status"] in ("FILLED", "PARTIAL", "LIQUIDATED")]
         if plan["feed_realtime"]:
             counted_v = [t for t in counted if not t["late"]]
@@ -1369,8 +1577,7 @@ class ForwardPaper:
             peak = max(peak, cum)
             mdd = max(mdd, peak - cum)
             daily[t["exit_ts"] // DAY_MS] = daily.get(t["exit_ts"] // DAY_MS, 0.0) + x
-        last = min(st["last_ts"].values())
-        days = max(0.0, (last + MS15 - plan["start_ts"]) / DAY_MS)
+        days = max(0.0, (bound + MS15 - plan["start_ts"]) / DAY_MS)
         expected = sum(max(0, (st["last_ts"][s] - plan["start_ts"]) // MS15 + 1) for s in plan["symbols"])
         missing = sum(st["missing_bars"].values())
         return {"n_trades": n, "mean_net_bp": mean, "hac_t": tstat if math.isfinite(tstat) else None,
@@ -1382,10 +1589,12 @@ class ForwardPaper:
                 "mean_holding_minutes": (sum(t["holding_minutes"] for t in counted) / len(counted)) if counted else None,
                 "daily_net_bp": {str(k): v for k, v in sorted(daily.items())},
                 "bars_observed": dict(st["bars"]), "duplicates_skipped": dict(st["duplicates"]),
-                "incomplete_skipped": st["incomplete_skipped"]}
+                "incomplete_skipped": st["incomplete_skipped"],
+                "sample_bound_ts": bound,
+                "evaluation_cutoff_ts": (st.get("evaluation_cutoff") or {}).get("ts"),
+                "trades_entered_after_bound": len(allt) - len(trades)}
 
     def _verdict(self, plan: Mapping, st: Mapping, result: Mapping) -> dict:
-        c = plan["criteria"]
         if st["status"] == "ERROR":
             return {"verdict": "PAPER_ERROR", "final": False, "reasons": [e["detail"] for e in st["errors"][-1:]]}
         if st["status"] == "BLOCKED_DATA":
@@ -1413,9 +1622,39 @@ class ForwardPaper:
                            f"without funding coverage {result['funding_dropped']['reasons']}")
             return {"verdict": "PAPER_BLOCKED_DATA", "final": False,
                     "reasons": why or ["FUNDING_UNVERIFIED: funding was not checked in this step"]}
+        # ADR 0075: positions — the ledger, the evaluator's trades and open positions agree
+        pos = self._position_problems(plan, st, result)
+        if pos:
+            return {"verdict": "PAPER_ERROR", "final": False, "reasons": ["POSITION_INTEGRITY: " + "; ".join(pos[:10])]}
+        bound = self._sample_bound(st)
         m = self.metrics(plan["plan_id"], st)
-        result_m = dict(m)
-        result.setdefault("metrics", result_m)
+        result["metrics"] = dict(m)          # always this call's metrics, never an earlier one
+        d = self._decide(plan, m)
+        if st.get("evaluation_cutoff") is not None and not d["final"]:
+            return {"verdict": "PAPER_ERROR", "final": False,
+                    "reasons": [f"EVALUATION_CUTOFF_INVALID: the stopping rule does not hold at the recorded "
+                                f"cutoff {bound} ({'; '.join(d['reasons'])})"]}
+        if not d["final"]:
+            return d
+        pending = self._pending(result, bound)
+        result["positions"] = {"policy": POSITION_POLICY, "sample_bound_ts": bound,
+                               "closed_in_sample": m["n_trades"], "pending": pending,
+                               "open_after_bound": [x for x in result["open_positions"] if x not in pending]}
+        if pending:
+            # the stopping rule holds, but positions of the sample are still open: their
+            # result is not known yet, so nothing is concluded (no mark, no forced exit)
+            return {"verdict": "PAPER_OBSERVING", "final": False, "evaluation_cutoff": bound,
+                    "reasons": [f"OPEN_POSITIONS_PENDING: {len(pending)} position(s) entered by the evaluation "
+                                f"cutoff {bound} not closed yet: "
+                                + ", ".join(f"{x['event_id']} (planned exit {x.get('planned_exit_ts')})"
+                                            for x in pending)]}
+        return {**d, "evaluation_cutoff": bound}
+
+    @staticmethod
+    def _decide(plan: Mapping, m: Mapping) -> dict:
+        """The preregistered criteria on the metrics of the sample (shared by the
+        verdict and the last gate, ADR 0075)."""
+        c = plan["criteria"]
         if m["days_observed"] < c["min_days"] or m["n_trades"] < c["min_trades"]:
             if m["days_observed"] >= c["max_days"]:
                 return {"verdict": "PAPER_INCONCLUSIVE", "final": True,
@@ -1441,7 +1680,8 @@ class ForwardPaper:
             fails.append(f"late decision share {m['late_share']:.3f} > {c['max_late_trade_share']}")
         return {"verdict": "PAPER_FAILED" if fails else "PAPER_PASSED", "final": True, "reasons": fails}
 
-    def _conclusion_problems(self, plan: Mapping, result: Mapping, st: Optional[Mapping]) -> list[str]:
+    def _conclusion_problems(self, plan: Mapping, result: Mapping, st: Optional[Mapping],
+                             verdict: Optional[Mapping] = None) -> list[str]:
         """Every precondition of a final verdict, checked again from disk and
         independently of :meth:`_verdict` (ADR 0073 / 0074)."""
         why = []
@@ -1465,14 +1705,40 @@ class ForwardPaper:
                 for sym, v in sorted(fund.items()) if v["status"] not in FUNDING_USABLE]
         why += self._evidence(plan, dict(st), recover=False)
         why += self._plan_drift(plan)
+        # ADR 0075: positions and the sample, again from disk
+        why += self._position_problems(plan, st, result)
+        cut = st.get("evaluation_cutoff")
+        if not isinstance(cut, Mapping) or not isinstance(cut.get("ts"), int):
+            why.append("no evaluation cutoff recorded for a final verdict")
+            return why
+        pend = self._pending(result, cut["ts"])
+        if pend:
+            why.append(f"{len(pend)} position(s) of the sample still open: " + ", ".join(
+                str(x.get("event_id")) for x in pend))
+        try:
+            fresh = self.metrics(plan["plan_id"], st)
+        except (JsonlCorruption, OSError, ValueError, KeyError, TypeError) as e:
+            why.append(f"metrics cannot be recomputed from the ledger: {type(e).__name__}: {e}")
+            return why
+        # the verdict computed them before the cutoff was recorded: the bound is the
+        # same (sample_bound_ts is compared), only the cutoff field differs
+        def same(m):
+            return canonical_json({k: v for k, v in dict(m or {}).items() if k != "evaluation_cutoff_ts"})
+        if not isinstance(result.get("metrics"), Mapping) or same(fresh) != same(result.get("metrics")):
+            why.append("metrics of the verdict differ from the ledger on disk")
+        if verdict is not None:
+            d = self._decide(plan, fresh)
+            if not d["final"] or d["verdict"] != verdict.get("verdict"):
+                why.append(f"the criteria on the ledger give {d['verdict']}, not {verdict.get('verdict')}")
         return why
 
     def _conclude(self, plan: Mapping, verdict: Mapping, result: Mapping, st: Optional[Mapping] = None) -> None:
-        why = self._conclusion_problems(plan, result, st)
+        why = self._conclusion_problems(plan, result, st, verdict)
         if why:
             # unreachable through _verdict; a second, independent gate so no path records a
             # final paper verdict on unconfirmed funding or unverified evidence (ADR 0073/0074)
             raise ConclusionRefused(f"{plan['plan_id']}: final verdict refused: " + "; ".join(why[:10]))
+        cut_ts = ((st if st is not None else self.state(plan["plan_id"])).get("evaluation_cutoff") or {}).get("ts")
         sid, ctx = plan["strategy_id"], plan["context_id"]
         to = {"PAPER_PASSED": "PAPER_PASSED", "PAPER_FAILED": "PAPER_FAILED",
               "PAPER_INCONCLUSIVE": "INCONCLUSIVE"}[verdict["verdict"]]
@@ -1489,6 +1755,11 @@ class ForwardPaper:
                                    "status": "OK", "plan_id": plan["plan_id"], "verdict": verdict["verdict"],
                                    "reasons": list(verdict["reasons"]), "metrics": result.get("metrics"),
                                    "criteria_hash": plan["criteria_hash"], "labels": labels,
+                                   "positions": {"policy": POSITION_POLICY,
+                                                 "evaluation_cutoff_ts": cut_ts,
+                                                 "closed_in_sample": (result.get("metrics") or {}).get("n_trades"),
+                                                 "open_after_cutoff": (result.get("positions") or {}).get(
+                                                     "open_after_bound", [])},
                                    "funding_evidence": {"policy": FUNDING_POLICY,
                                                         "schedule": result.get("funding_schedule"),
                                                         "symbols": result.get("funding")},
