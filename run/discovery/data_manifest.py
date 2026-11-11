@@ -168,7 +168,8 @@ def build_manifest(data_dir: Path, *, now_ms: Optional[int] = None,
         sym, y, mo = m["sym"], int(m["y"]), int(m["m"])
         pairs, rep = load_funding_csv_checked(p)
         fq = funding_quality(pairs, parse_errors=rep["parse_errors"], torn_tail=rep["torn_tail"],
-                             intervals=rep["intervals"])
+                             intervals=rep["intervals"], source_order_errors=rep["source_order_errors"],
+                             interval_missing_rows=rep["interval_missing_rows"])
         entry.update({"symbol": sym, "period": f"{y:04d}-{mo:02d}", "rows": len(pairs),
                       "verdict": "OK" if fq["ok"] else "BLOCK", "issues": fq["issues"],
                       "warnings": fq["warnings"], "first_ts": pairs[0][0] if pairs else None,

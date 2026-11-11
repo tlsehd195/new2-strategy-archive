@@ -137,7 +137,8 @@ def _quality_ok(kind: str, sym: str, path: Path) -> tuple[bool, str, dict]:
     from data_quality import funding_quality, load_funding_csv_checked
     pairs, rep = load_funding_csv_checked(path)
     fq = funding_quality(pairs, parse_errors=rep["parse_errors"], torn_tail=rep["torn_tail"],
-                         intervals=rep["intervals"])
+                         intervals=rep["intervals"], source_order_errors=rep["source_order_errors"],
+                         interval_missing_rows=rep["interval_missing_rows"])
     summ = {"verdict": "OK" if fq["ok"] else "BLOCK", "rows": fq.get("n"), "first_ts": fq.get("first"),
             "last_ts": fq.get("last"), "gaps": len(fq.get("gaps", [])), "warnings": fq.get("warnings", [])}
     return (True, rep["sha256"], summ) if fq["ok"] else (False, f"funding quality {fq['issues']}", summ)

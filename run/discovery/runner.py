@@ -207,16 +207,27 @@ def merged_bars(data_dir: Path, symbol: str, start_iso: str, end_iso: str) -> Da
 def load_funding_window_checked(data_dir: Path, symbol: str, start_iso: str,
                                 end_iso: str) -> tuple[list[tuple[int, float]], dict]:
     """Monthly funding files merged; parse errors / torn tails of ANY file are
-    reported (and make :func:`funding_quality` fail) instead of vanishing."""
-    from data_quality import load_funding_csv_checked
+    reported (and make :func:`funding_quality` fail) instead of vanishing.
+
+    ADR 0072: the source order is checked twice before the merge sort —
+    inside each file (``data_quality.load_funding_csv_checked``) and across
+    the files, in month order: the first row of a file must be later than the
+    last row of the previous non-empty file (``CROSS_FILE_TIME_INVERSION`` /
+    ``CROSS_FILE_DUPLICATE_TS``, with both file names).  Both kinds are kept
+    in ``source_order_errors``; the sort that follows prepares the series for
+    the calculations and never removes them.  ``files`` lists each file read
+    with its sha256 and row count."""
+    from data_quality import load_funding_csv_checked, source_order_error
     fdir = data_dir / "funding"
-    rep = {"parse_errors": [], "torn_tail": False, "intervals": {}}
+    rep = {"parse_errors": [], "torn_tail": False, "intervals": {}, "source_order_errors": [],
+           "interval_missing_rows": [], "files": []}
     if not fdir.exists():
         return [], rep
     import datetime as dt
     d0 = dt.date.fromisoformat(start_iso).replace(day=1)
     d1 = dt.date.fromisoformat(end_iso)
     out: list[tuple[int, float]] = []
+    prev_last: Optional[tuple[str, int]] = None       # (file, last source ts) of the previous file
     cur = d0
     while cur <= d1:
         p = fdir / f"{symbol}-fundingRate-{cur:%Y-%m}.csv"
@@ -226,6 +237,17 @@ def load_funding_window_checked(data_dir: Path, symbol: str, start_iso: str,
             rep["parse_errors"] += [f"{p.name}:{ln}" for ln in r["parse_errors"]]
             rep["torn_tail"] = rep["torn_tail"] or r["torn_tail"]
             rep["intervals"].update(r["intervals"])
+            rep["source_order_errors"] += r["source_order_errors"]
+            rep["interval_missing_rows"] += [f"{p.name}:{ln}" for ln in r["interval_missing_rows"]]
+            rep["files"].append({"name": p.name, "sha256": r["sha256"], "rows": r["rows"]})
+            if r["first_source_row"] is not None:
+                ln0, t0 = r["first_source_row"]
+                t_last = r["last_source_row"][1]
+                if prev_last is not None and t0 <= prev_last[1]:
+                    rep["source_order_errors"].append(source_order_error(
+                        "CROSS_FILE_TIME_INVERSION" if t0 < prev_last[1] else "CROSS_FILE_DUPLICATE_TS",
+                        p.name, ln0, prev_last[1], t0, prev_file=prev_last[0]))
+                prev_last = (p.name, t_last)
         cur = (cur.replace(day=28) + dt.timedelta(days=6)).replace(day=1)
     out.sort(key=lambda x: x[0])
     return out, rep
@@ -238,7 +260,9 @@ def load_funding_window(data_dir: Path, symbol: str, start_iso: str, end_iso: st
 def checked_funding_quality(pairs, rep: Mapping) -> dict:
     return funding_quality(pairs, parse_errors=rep.get("parse_errors", ()),
                            torn_tail=rep.get("torn_tail", False),
-                           intervals=rep.get("intervals"))
+                           intervals=rep.get("intervals"),
+                           source_order_errors=rep.get("source_order_errors", ()),
+                           interval_missing_rows=rep.get("interval_missing_rows", ()))
 
 
 # ---------------------------------------------------------------------------

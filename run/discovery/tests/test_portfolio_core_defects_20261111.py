@@ -355,7 +355,9 @@ class TestEvaluatorDiagnostics(unittest.TestCase):
         d = es.diagnostics()
         self.assertTrue(d["accounting_ok"])
         self.assertGreater(d["skipped_overlapped"], 0)
-        self.assertEqual(d["truncated_end_of_window"], 1)
+        # ADR 0072: entries 38 and 39 both run past the 40 bars (the ADR 0071 version
+        # asserted 1 because the evaluator stopped at the first truncated signal)
+        self.assertEqual(d["truncated_end_of_window"], 2)
         self.assertEqual(d["signals_total"], d["accepted_events"] + d["skipped_overlapped"]
                          + d["truncated_end_of_window"] + d["rejected"])
         self.assertEqual(d["rejection_rate"], 0.0)
@@ -610,7 +612,7 @@ class TestPipelineWiring(PipelineCase):
         self.assertTrue(val["per_symbol"]["BTCUSDT"]["signal_diagnostics"]["accounting_ok"])
         rec = p.evaluation("portfolio", ids[0])
         self.assertEqual(rec["portfolio_config_version"], "portfolio-validation-v2")
-        self.assertEqual(rec["model_version"], "portfolio-multi-v2")
+        self.assertEqual(rec["model_version"], "portfolio-multi-v3")   # ADR 0072 (was v2, ADR 0071)
         base = rec["compositions"]["standalone"]["scenarios"]["base"]["result"]
         self.assertEqual(base["signal_accounting"]["status"], "OK")
         self.assertEqual(base["funding_completeness"]["trades_by_status"].keys(), {"OK"})

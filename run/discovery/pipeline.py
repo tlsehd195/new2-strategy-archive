@@ -179,6 +179,14 @@ def load_portfolio_config(path: Optional[Path] = None) -> tuple[dict, str]:
             raise ValueError(f"{p}: scenario {name} has unknown checks {sorted(bad)}")
         if not isinstance(sc.get("gating"), bool) or not isinstance(sc.get("checks"), dict):
             raise ValueError(f"{p}: scenario {name} needs bool gating and checks")
+        if cfg["schema"] == "portfolio_validation_v2" and sc["gating"]:
+            # ADR 0072: a gating v2 scenario judges all three drawdowns; a missing key
+            # would silently drop one of them, so the file is refused
+            need = ("max_drawdown_close_lt", "max_drawdown_intrabar_lt",
+                    "max_drawdown_equity_peak_to_trough_lt")
+            miss = [k for k in need if k not in sc["checks"]]
+            if miss:
+                raise ValueError(f"{p}: gating v2 scenario {name} lacks drawdown checks {miss}")
         for k in ("max_cost_refusal_share", "max_capital_refusal_share"):
             v = sc["checks"].get(k, 0.0)
             if v is not None and not (isinstance(v, (int, float)) and 0 <= v <= 1):
@@ -283,6 +291,11 @@ class RunnerDataProvider:
             first = dt.datetime.fromtimestamp(h.first_ts / 1000, tz=dt.timezone.utc).date().isoformat()
             f, rep = load_funding_window_checked(self.data_dir, sym, first, read_end)
             fq = checked_funding_quality(f, rep)
+            # dataset-level funding verdict incl. SOURCE order errors (ADR 0072) and
+            # the source files read (name, sha256, rows), kept for the record
+            e["funding_quality"] = {k: fq.get(k) for k in ("ok", "status", "issues", "warnings",
+                                                           "source_order_errors")}
+            e["funding_files"] = list(rep.get("files") or [])
             if fq["ok"]:
                 e["funding"] = f
                 e["identity"]["funding_sha256"] = hashlib.sha256(

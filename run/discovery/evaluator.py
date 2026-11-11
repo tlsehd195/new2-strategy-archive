@@ -226,6 +226,13 @@ def run_event_study(bars: Sequence[Bar], symbol: str, signal_fn: SignalFn,
 
     Events whose holding window would overlap a previously accepted event
     are skipped and COUNTED — they are not independent observations.
+
+    Every decision bar t in [warmup, n-2] is scanned (ADR 0072); each signal
+    lands in exactly one bucket: accepted, skipped_overlapped (entry at or
+    before the last ACCEPTED exit), truncated_end_of_window (entry + horizon
+    beyond the bars, or the exit rule returned None), participation_refusals,
+    cost_data_missing, dropped_missing_funding.  A decision on the last bar
+    has no entry bar and is not a signal of this window.
     """
     res = EventStudyResult(symbol=symbol)
     fidx = FundingIndex(funding, intervals=funding_intervals) if funding is not None else None
@@ -245,15 +252,22 @@ def run_event_study(bars: Sequence[Bar], symbol: str, signal_fn: SignalFn,
             res.skipped_overlapped += 1
             continue
         if exit_i >= n:
+            # the full holding period runs past the evaluated bars.  ADR 0072: counted
+            # and the scan CONTINUES (a ``break`` here left every later signal
+            # unclassified).  Checked before the exit rule is asked, so whether a
+            # near-end trade is included never depends on a stop happening to fire.
+            # A truncated signal is not a trade: last_exit_index is not moved.
             res.truncated_end_of_window += 1
-            break
+            continue
         exit_px = None
         if exit_rule is not None:
             # intrabar stop / take-profit (spec strategies): (index, price, reason)
             ex = exit_rule(bars, entry_i, side, horizon)
             if ex is None:
+                # the rule could not decide within the data: not evaluable, counted,
+                # and the scan continues (ADR 0072)
                 res.truncated_end_of_window += 1
-                break
+                continue
             exit_i, exit_px, _reason = ex
         entry_bar, exit_bar = bars[entry_i], bars[exit_i]
         try:
