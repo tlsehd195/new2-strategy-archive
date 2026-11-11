@@ -48,6 +48,17 @@ status change).  A corrupt or changed source file blocks the plan for good;
 a state file that does not validate gives ``PAPER_ERROR`` and is not
 overwritten.  Plans registered before ADR 0073 are never concluded.
 
+Evidence integrity (ADR 0074, ``FUNDING_INTEGRITY``): the warm-up file's
+sha256 is part of the plan id; the funding log and the funding quality log
+are sequenced hash chains whose last committed record ({seq, hash}) is kept
+in the state.  Every step, every verdict and the conclusion re-check them: a
+changed / missing warm-up, an edited, reordered, truncated or deleted log, or
+a state ahead of its evidence is PAPER_ERROR; a log ahead of the state (killed
+step, older state put back) is replayed and keeps any DATA_INVALID.  A
+settlement due at the end of the observation window must be recorded, and no
+interval observed today (``/fapi/v1/fundingInfo``) is applied to a past
+settlement.  Plans registered before ADR 0074 are never concluded.
+
 PAPER_PASSED is a research result.  It is not an approval to trade and it
 says nothing about profits outside the observed period.  Forward results
 are never read by the search (``search.dev_feedback`` accepts DEV only).
@@ -89,6 +100,13 @@ FUNDING_USABLE = ("VALID", "VALID_ZERO_RATE")
 #: The other non-usable statuses block the verdict of the step and are re-checked next step.
 FUNDING_STICKY = ("DATA_INVALID",)
 FUNDING_TOL_MS = 60_000
+#: ADR 0074: evidence integrity of a plan (warm-up sha256 in the plan id, hash-chained and
+#: sequenced funding / funding-quality logs anchored in the state).  A plan without it
+#: (registered under ADR 0073 only) is never concluded.
+FUNDING_INTEGRITY = "paper-forward-integrity-v1"
+#: what a declared per-settlement interval rests on (recorded with every fetch)
+INTERVAL_BASIS_DECLARED = "DECLARED_PER_SETTLEMENT_MEANING_UNDOCUMENTED"
+INTERVAL_BASIS_NONE = "NO_PER_SETTLEMENT_INTERVAL"
 #: funding_schedule status -> funding status of the observation window
 _COVERAGE_STATUS = {"OK": "VALID", "FUNDING_DATA_INVALID": "DATA_INVALID",
                     "FUNDING_SCHEDULE_UNKNOWN": "SCHEDULE_UNKNOWN",
@@ -107,6 +125,21 @@ class FundingSourceInvalid(RuntimeError):
 
 class CausalityViolation(RuntimeError):
     pass
+
+
+class EvidenceIntegrityError(RuntimeError):
+    """An evidence file of a plan (warm-up, funding log, funding quality log)
+    does not match what the plan / state recorded (ADR 0074).  ``kind`` is
+    the error kind recorded in the state; the plan stops with PAPER_ERROR and
+    no file is repaired or overwritten."""
+
+    def __init__(self, kind: str, detail: str):
+        super().__init__(f"{kind}: {detail}")
+        self.kind = kind
+
+
+class ConclusionRefused(RuntimeError):
+    """The last gate before a final verdict is recorded found a problem."""
 
 
 def load_criteria(path: Optional[Path] = None) -> tuple[dict, str]:
@@ -161,7 +194,9 @@ def funding_fetch_result(rows: Sequence, intervals: Mapping, *, source_files: Se
     out = {"status": status, "rows": [[t, r] for t, r in rows], "intervals": iv,
            "issues": issues, "source_files": [dict(f) for f in source_files],
            "schedule_source": schedule_source, "query": dict(query or {}),
-           "zero_rate_rows": sum(1 for _, r in rows if r == 0), "policy": FUNDING_POLICY}
+           "zero_rate_rows": sum(1 for _, r in rows if r == 0), "policy": FUNDING_POLICY,
+           "interval_basis": INTERVAL_BASIS_DECLARED if iv else INTERVAL_BASIS_NONE,
+           "schedule_observation": None}
     out.update(extra or {})
     return out
 
@@ -173,6 +208,7 @@ def _fetch_summary(fr: Mapping) -> dict:
             "schedule_source": fr.get("schedule_source"),
             "source_files": [{k: f.get(k) for k in ("name", "sha256", "rows", "status", "errors")}
                              for f in fr.get("source_files") or []],
+            "interval_basis": fr.get("interval_basis"), "schedule_observation": fr.get("schedule_observation"),
             **{k: fr[k] for k in ("missing_files", "future_rows") if k in fr}}
 
 
@@ -266,7 +302,11 @@ class FileFeed:
         now = self.clock()
         prefix = f"{sym}-fundingRate-"
         query = {"after_ts": after_ts, "until_ts": now, "source": str(self.data_dir / "funding")}
-        sched = "csv column funding_interval_hours (public archive fundingRate files)"
+        # ADR 0074: the column is stored per settlement; whether it is the period ending or
+        # starting at calc_time is not documented by Binance, so coverage_check judges each
+        # step under both readings (funding_schedule._step_status)
+        sched = ("csv column funding_interval_hours (public archive fundingRate files; "
+                 "period ending vs starting at calc_time undocumented)")
         paths = self._files("funding", f"{prefix}*.csv")
         rel = []
         for p in paths:
@@ -351,22 +391,34 @@ class BinancePublicFeed:
 
     def funding_checked(self, sym: str, after_ts: int) -> dict:
         """Settlements in ``(after_ts, now]`` from ``/fapi/v1/fundingRate``
-        (paged, bounded) and the DECLARED interval from ``/fapi/v1/fundingInfo``
-        (ADR 0073).  A request failure or an error object is SOURCE_ERROR (not
-        "no funding"); an unparsable / out-of-range / duplicated / unsorted row
-        is DATA_INVALID; a still-full last page is COVERAGE_INCOMPLETE (the
-        rows received are kept, the next step continues after them); a symbol
-        without a declared interval in ``fundingInfo`` is SCHEDULE_UNKNOWN —
-        never "8h by default".  The interval is the one declared at the time
-        of the fetch (``schedule_source`` records the endpoint and time)."""
+        (paged, bounded) plus one snapshot of ``/fapi/v1/fundingInfo``.
+
+        ADR 0074: the Binance documentation describes ``fundingInfo`` as the
+        funding info of "symbols that had FundingRateCap/FundingRateFloor /
+        fundingIntervalHours adjustment" — a CURRENT snapshot without any
+        effective time or history — and ``fundingRate`` rows carry no interval
+        at all.  So no settlement of this answer has a proven interval: the
+        snapshot is recorded as ``schedule_observation`` (time, value, sha256
+        of the raw answer) and NEVER copied onto past settlements (ADR 0073
+        did that: a 1h history with a missing settlement looked complete
+        under today's 4h).  ``intervals`` is always empty and a successful,
+        complete answer is SCHEDULE_UNKNOWN, so Paper Forward refuses a plan
+        on this feed (the warm-up schedule cannot be proven) and never
+        evaluates REST rows.  Other statuses as before: a request failure or
+        an error object is SOURCE_ERROR (the snapshot, if taken, is kept); an
+        unparsable / out-of-range / duplicated / unsorted / foreign-symbol row
+        is DATA_INVALID; a still-full last page is COVERAGE_INCOMPLETE."""
         from data_fetch import FetchFailure
         now = self.clock()
         query = {"after_ts": after_ts, "until_ts": now, "source": self.BASE}
         sources: list[dict] = []
+        obs: dict = {}
 
         def err(msg):
             return funding_fetch_result([], {}, status="SOURCE_ERROR", source_files=sources, query=query,
-                                        issues=[msg], schedule_source=None)
+                                        issues=[msg], schedule_source=None,
+                                        extra={"schedule_observation": dict(obs) or None,
+                                               "interval_basis": INTERVAL_BASIS_NONE})
         try:
             blob = self._get_raw("/fapi/v1/fundingInfo")
             info = json.loads(blob)
@@ -376,12 +428,16 @@ class BinancePublicFeed:
             return err(f"/fapi/v1/fundingInfo: unexpected response {str(info)[:200]}")
         sources.append({"name": "/fapi/v1/fundingInfo", "sha256": hashlib.sha256(blob).hexdigest(),
                         "rows": len(info), "status": "VALID", "errors": []})
-        iv = None
+        iv, listed = None, False
         for x in info:
             if isinstance(x, dict) and x.get("symbol") == sym:
+                listed = True
                 h = x.get("fundingIntervalHours")
                 if isinstance(h, (int, float)) and not isinstance(h, bool) and h > 0:
                     iv = int(round(h * 3_600_000))
+        obs.update(source="/fapi/v1/fundingInfo", observed_at=now, symbol=sym, listed=listed,
+                   interval_ms=iv, sha256=sources[-1]["sha256"],
+                   meaning="current snapshot; not valid for any past settlement (ADR 0074)")
         rows: list[tuple[int, float]] = []
         issues: list[str] = []
         start, full = after_ts + 1, False
@@ -420,21 +476,22 @@ class BinancePublicFeed:
             if not full or not rows:
                 break
             start = rows[-1][0] + 1
-        sched = (f"/fapi/v1/fundingInfo fundingIntervalHours observed at {now}" if iv is not None else None)
-        ivs = {t: iv for t, _ in rows} if iv is not None else {}
         if issues:
             status = "DATA_INVALID"
         elif full:
             status = "COVERAGE_INCOMPLETE"
             issues.append(f"answer still full after {self.MAX_FUNDING_PAGES} pages: later settlements not fetched")
-        elif iv is None:
-            status = "SCHEDULE_UNKNOWN"
-            issues.append(f"{sym} has no declared fundingIntervalHours in /fapi/v1/fundingInfo "
-                          "(no interval is assumed)")
         else:
-            status = None
-        return funding_fetch_result(rows, ivs, source_files=sources, schedule_source=sched, query=query,
-                                    status=status, issues=issues)
+            status = "SCHEDULE_UNKNOWN"
+            issues.append("no per-settlement interval: /fapi/v1/fundingRate rows carry none and "
+                          + (f"/fapi/v1/fundingInfo gives only the current {iv} ms (observed at {now}), "
+                             "not the interval of past settlements" if iv is not None else
+                             f"{sym} is not declared in /fapi/v1/fundingInfo")
+                          + " (ADR 0074: no interval is assumed or back-dated)")
+        return funding_fetch_result(rows, {}, source_files=sources, schedule_source=None, query=query,
+                                    status=status, issues=issues,
+                                    extra={"schedule_observation": dict(obs),
+                                           "interval_basis": INTERVAL_BASIS_NONE})
 
     def funding(self, sym: str, after_ts: int) -> list[tuple[int, float]]:
         fr = self.funding_checked(sym, after_ts)
@@ -476,6 +533,84 @@ def read_chained_log(path: Path, what: str) -> list[dict]:
 def read_bar_log(path: Path) -> list[dict]:
     """Rows of a hash-chained bar log; a broken chain raises (fail-closed)."""
     return read_chained_log(path, "bar log")
+
+
+def read_seq_chain(path: Path, what: str) -> list[dict]:
+    """Records of a sequenced hash-chained log (ADR 0074: funding log and
+    funding quality log).  Record i (from 1) must carry ``seq == i``,
+    ``prev`` = hash of record i-1 ("" for the first) and ``hash`` =
+    sha256(prev + canonical JSON of the record without prev/hash).  Any
+    edit, reordering, inserted / removed interior record or corrupt interior
+    line raises :class:`EvidenceIntegrityError` (``<what>_SEQUENCE`` /
+    ``<what>_CHAIN`` / ``<what>_CORRUPT``).  A torn LAST line (interrupted
+    write) is not a record; whether a missing tail was already committed is
+    decided by the state head (:func:`check_log_head`)."""
+    rows, prev = [], ""
+    try:
+        recs = list(iter_jsonl(path))
+    except JsonlCorruption as e:
+        raise EvidenceIntegrityError(f"{what}_CORRUPT", str(e)) from e
+    for i, r in enumerate(recs, 1):
+        if r.get("seq") != i:
+            raise EvidenceIntegrityError(f"{what}_SEQUENCE",
+                                         f"{Path(path).name}: record {i} carries seq {r.get('seq')!r}")
+        body = {k: v for k, v in r.items() if k not in ("hash", "prev")}
+        if r.get("prev") != prev or r.get("hash") != _chain(prev, body):
+            raise EvidenceIntegrityError(f"{what}_CHAIN", f"{Path(path).name}: chain broken at seq {i}")
+        rows.append(r)
+        prev = r["hash"]
+    return rows
+
+
+def append_seq_chain(path: Path, head: dict, body: Mapping) -> dict:
+    """Append ``body`` after ``head`` ({seq, hash}) and return the new head."""
+    rec = {**body, "seq": head["seq"] + 1}
+    h = _chain(head["hash"], rec)
+    append_jsonl(path, {**rec, "prev": head["hash"], "hash": h})
+    return {"seq": rec["seq"], "hash": h}
+
+
+def check_log_head(rows: Sequence[Mapping], head: Mapping, what: str) -> bool:
+    """Cross-check a verified log with the head the state remembers.
+
+    * head beyond the log            -> ``<what>_TRUNCATED`` (committed records gone)
+    * record at head.seq has another hash -> ``<what>_REWRITTEN``
+    * log longer than the head       -> True: records appended after the last
+      state save (a step killed before saving, or an older state put back);
+      the log is the record and the caller re-derives the state from it.
+    Returns whether the log is ahead of the state."""
+    n, hs, hh = len(rows), head["seq"], head["hash"]
+    if hs > n:
+        raise EvidenceIntegrityError(f"{what}_TRUNCATED",
+                                     f"state remembers record {hs} ({hh[:16]}), the log holds {n}")
+    if hs and rows[hs - 1]["hash"] != hh:
+        raise EvidenceIntegrityError(f"{what}_REWRITTEN",
+                                     f"record {hs} hash {rows[hs - 1]['hash'][:16]} != state {hh[:16]}")
+    return n > hs
+
+
+def _warmup_bytes(obj: Mapping) -> bytes:
+    """The exact bytes of a warm-up file; its sha256 is fixed in the plan id."""
+    return (canonical_json(obj) + "\n").encode("utf-8")
+
+
+def _atomic_write_bytes(path: Path, raw: bytes) -> None:
+    import os
+    import tempfile
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=str(path.parent), prefix=path.name + ".", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "wb") as f:
+            f.write(raw)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
 
 
 # ---------------------------------------------------------------------------
@@ -548,25 +683,36 @@ class ForwardPaper:
             warm[sym] = {"bars": tail, "funding": wf,
                          "intervals": {t: v for t, v in fr["intervals"].items() if t < start},
                          "fetch": _fetch_summary(fr), "sources": self._consumed_sources(fr)}
+        # ADR 0074: the warm-up file bytes are built first, their sha256 goes into the
+        # plan body (and so into the plan id); files are written and read back before
+        # the plan record exists, so a plan never points at a file it was not built from
+        blobs = {}
+        for sym, w in warm.items():
+            blobs[sym] = _warmup_bytes({
+                "symbol": sym, "start_ts": start,
+                "rows": [_bar_row(b) for b in w["bars"]],
+                "funding": [list(x) for x in w["funding"]],
+                "funding_intervals": {str(t): v for t, v in w["intervals"].items()},
+                "funding_fetch": w["fetch"], "funding_sources": w["sources"],
+                "contiguous_to_start": bool(w["bars"])})
         body = {"strategy_id": sid, "context_id": ctx, "symbols": spec["symbols"], "start_ts": start,
                 "registered_ms": now, "criteria": self.crit, "criteria_hash": self.crit_hash,
                 "execution": self.exec_cfg.to_json(), "execution_version": EXECUTION_SIM_VERSION,
                 "cost": self.p.cost.identity(), "order_value": self.p.order_value,
                 "spec_sha256": hashlib.sha256(canonical_json(spec).encode()).hexdigest(),
                 "feed": self.feed.kind, "feed_realtime": bool(self.feed.realtime),
-                "funding_policy": FUNDING_POLICY,
+                "funding_policy": FUNDING_POLICY, "funding_integrity": FUNDING_INTEGRITY,
+                "warmup_sha256": {sym: hashlib.sha256(b).hexdigest() for sym, b in blobs.items()},
+                "warmup_hash_basis": "sha256 of the exact file bytes (canonical JSON + newline)",
                 "mode": FORWARD_MODE, "version": FORWARD_VERSION, "orders_sent": 0}
         body["plan_id"] = "FP-" + hashlib.sha256(canonical_json(body).encode()).hexdigest()[:16]
         body["at"] = iso_now()
         d = self.root / body["plan_id"]
         d.mkdir(parents=True, exist_ok=True)
-        for sym, w in warm.items():
-            atomic_write_json(d / f"warmup_{sym}.json", {
-                "rows": [_bar_row(b) for b in w["bars"]],
-                "funding": [list(x) for x in w["funding"]],
-                "funding_intervals": {str(t): v for t, v in w["intervals"].items()},
-                "funding_fetch": w["fetch"], "funding_sources": w["sources"],
-                "contiguous_to_start": bool(w["bars"])})
+        for sym, raw in blobs.items():
+            _atomic_write_bytes(d / f"warmup_{sym}.json", raw)
+            if hashlib.sha256((d / f"warmup_{sym}.json").read_bytes()).hexdigest() != body["warmup_sha256"][sym]:
+                raise ForwardRefused(f"{sym}: warm-up file does not read back with its sha256")
         append_jsonl(self.plans_path, body)
         if st == "PAPER_TEST_READY":
             self.p.statuses.set(sid, ctx, "PAPER_TESTING", stage="paper_forward",
@@ -586,6 +732,9 @@ class ForwardPaper:
                                     for s in syms},
                 "funding_sources": {s: dict(warm[s]["sources"]) if s in warm else {} for s in syms},
                 "funding_status": {s: (warm[s]["fetch"]["status"] if s in warm else None) for s in syms},
+                # ADR 0074: last committed record of each evidence log ({seq, hash})
+                "quality_head": {s: {"seq": 0, "hash": ""} for s in syms},
+                "funding_head": {s: {"seq": 0, "hash": ""} for s in syms},
                 "bars": {s: 0 for s in syms}, "missing_bars": {s: 0 for s in syms},
                 "duplicates": {s: 0 for s in syms}, "gaps": {s: [] for s in syms},
                 "incomplete_skipped": 0, "errors": [], "verdict": None, "concluded": False}
@@ -615,6 +764,14 @@ class ForwardPaper:
         now = self.clock()
         new_counts = {}
         policy = self._funding_policy(plan)
+        if policy and not self._integrity(plan):
+            # ADR 0074: registered under ADR 0073 only (no warm-up sha256, unchained
+            # quality log): nothing is collected, evaluated or concluded
+            res = {"plan_id": plan_id, "status": st["status"], "verdict": "PAPER_BLOCKED_DATA",
+                   "reasons": ["LEGACY_PLAN_INTEGRITY_UNVERIFIED: plan registered before ADR 0074 "
+                               "(no warm-up sha256 / evidence chain); re-verify with a new plan"]}
+            append_jsonl(d / "steps.jsonl", {"at": iso_now(), "clock_ms": now, **res})
+            return res
         if st["status"] == "OBSERVING":
             drift = self._plan_drift(plan)
             if drift:
@@ -622,14 +779,20 @@ class ForwardPaper:
                 # being observed: anything else would be a different experiment
                 st["status"] = "ERROR"
                 st["errors"].append({"at": now, "kind": "PLAN_CONTEXT_CHANGED", "detail": "; ".join(drift)})
+        if policy and st["status"] != "ERROR":
+            # ADR 0074: warm-up sha256, both evidence logs and their state heads are
+            # verified (and a state left behind the logs is re-derived) before anything
+            try:
+                self._evidence(plan, st, recover=True, now=now)
+            except EvidenceIntegrityError as e:
+                st["status"] = "ERROR"
+                st["errors"].append({"at": now, "kind": e.kind, "detail": str(e)})
         for sym in plan["symbols"]:
             if st["status"] != "OBSERVING":
                 break
             log = d / f"bars_{sym}.jsonl"
             try:
                 rows = read_bar_log(log)
-                if policy:
-                    self._recover_funding(plan, st, sym, now)
             except (CausalityViolation, JsonlCorruption) as e:
                 st["status"] = "ERROR"
                 st["errors"].append({"at": now, "symbol": sym, "kind": "LOG_TAMPERED", "detail": str(e)})
@@ -691,14 +854,23 @@ class ForwardPaper:
         st["steps"] += 1
         result = {"plan_id": plan_id, "new_bars": new_counts, "status": st["status"]}
         if st["status"] == "OBSERVING" and policy:
-            fund = self._funding_window_status(plan, st)
-            result["funding"] = fund
-            result["funding_ok"] = all(v["status"] in FUNDING_USABLE for v in fund.values())
+            try:
+                fund = self._funding_window_status(plan, st)
+            except EvidenceIntegrityError as e:
+                st["status"] = "ERROR"
+                st["errors"].append({"at": now, "kind": e.kind, "detail": str(e)})
+            else:
+                result["funding"] = fund
+                result["funding_ok"] = all(v["status"] in FUNDING_USABLE for v in fund.values())
         if st["status"] == "OBSERVING" and (result.get("funding_ok") or not policy):
             # ADR 0073: the evaluator is only run on funding confirmed for the whole
             # observation window; otherwise nothing is evaluated (never charged 0)
             try:
                 ev = self._evaluate(plan, st)
+            except EvidenceIntegrityError as e:
+                st["status"] = "ERROR"
+                st["errors"].append({"at": now, "kind": e.kind, "detail": str(e)})
+                ev = None
             except CausalityViolation as e:
                 st["status"] = "ERROR"
                 st["errors"].append({"at": now, "kind": "CAUSALITY_VIOLATION", "detail": str(e)})
@@ -710,12 +882,17 @@ class ForwardPaper:
                     result["funding_dropped"] = {"events": ev["excluded"]["no_funding_coverage"],
                                                  "reasons": ev.get("funding_drop_reasons", {})}
         verdict = self._verdict(plan, st, result)
+        if verdict["final"]:
+            try:
+                self._conclude(plan, verdict, result, st)
+            except ConclusionRefused as e:
+                # ADR 0074: the last gate found a problem: nothing was recorded
+                verdict = {"verdict": "PAPER_BLOCKED_DATA", "final": False, "reasons": [f"CONCLUSION_REFUSED: {e}"]}
+            else:
+                st["concluded"] = True
         result["verdict"] = verdict["verdict"]
         result["reasons"] = verdict["reasons"]
         st["verdict"] = verdict["verdict"]
-        if verdict["final"]:
-            self._conclude(plan, verdict, result)
-            st["concluded"] = True
         self._save_state(plan_id, st)
         append_jsonl(d / "steps.jsonl", {"at": iso_now(), "clock_ms": now,
                                          **{k: v for k, v in result.items() if k != "trades"}})
@@ -725,6 +902,11 @@ class ForwardPaper:
     @staticmethod
     def _funding_policy(plan: Mapping) -> bool:
         return plan.get("funding_policy") == FUNDING_POLICY
+
+    @staticmethod
+    def _integrity(plan: Mapping) -> bool:
+        return (plan.get("funding_policy") == FUNDING_POLICY and plan.get("funding_integrity") == FUNDING_INTEGRITY
+                and isinstance(plan.get("warmup_sha256"), dict))
 
     def _fetch_funding(self, sym: str, after_ts: int) -> dict:
         """One checked funding fetch.  A feed without ``funding_checked`` (a
@@ -791,8 +973,11 @@ class ForwardPaper:
         summ = _fetch_summary(fr)
         if changed:
             summ.update(status="DATA_INVALID", kind="FUNDING_SOURCE_CHANGED", issues=changed + summ["issues"])
-        summ.update(at=now, symbol=sym, last_funding_ts=st["last_funding_ts"][sym])
-        append_jsonl(d / f"funding_quality_{sym}.jsonl", summ)
+        summ.update(at=now, symbol=sym, last_funding_ts=st["last_funding_ts"][sym],
+                    policy=FUNDING_POLICY, integrity=FUNDING_INTEGRITY)
+        # ADR 0074: sequenced + hash-chained, anchored by state["quality_head"]
+        st["quality_head"][sym] = append_seq_chain(d / f"funding_quality_{sym}.jsonl",
+                                                   st["quality_head"][sym], summ)
         before = st["funding_status"].get(sym)
         st["funding_status"][sym] = summ["status"]
         if summ["status"] in FUNDING_STICKY:
@@ -806,8 +991,7 @@ class ForwardPaper:
                                      "detail": summ["issues"][:5]})
             return
         log = d / f"funding_{sym}.jsonl"
-        logged = read_chained_log(log, "funding log")
-        prev_hash = logged[-1]["hash"] if logged else ""
+        head = st["funding_head"][sym]               # verified against the log at step start
         prev = st["last_funding_ts"][sym]
         srcs = self._consumed_sources(fr)
         stop = None
@@ -819,10 +1003,11 @@ class ForwardPaper:
                 stop = [prev, t, iv]
                 break
             body = {"ts": t, "rate": r, "interval_ms": iv, "observed_at": now, "fetch_status": summ["status"],
-                    "sources": srcs}
-            h = _chain(prev_hash, body)
-            append_jsonl(log, {**body, "prev": prev_hash, "hash": h})
-            prev_hash, prev = h, t
+                    "sources": srcs, "interval_basis": fr.get("interval_basis"),
+                    "quality_seq": st["quality_head"][sym]["seq"]}
+            head = append_seq_chain(log, head, body)
+            prev = t
+        st["funding_head"][sym] = head
         st["last_funding_ts"][sym] = prev
         if srcs:
             st["funding_sources"][sym].update(srcs)
@@ -833,35 +1018,131 @@ class ForwardPaper:
                                      "detail": f"no settlement between {stop[0]} and {stop[1]} "
                                                f"(declared interval {stop[2]} ms): not appended past it"})
 
-    def _recover_funding(self, plan: Mapping, st: dict, sym: str, now: int) -> None:
-        """Restart: the hash-chained funding log and the funding quality log are
-        the record.  ``last_funding_ts`` / consumed sources are re-derived from
-        the log (a step killed after appending never appends twice), and a
-        blocking quality record re-blocks a plan whose state does not show it
-        (a state rolled back or lost never brings back OBSERVING)."""
+    def _warmup(self, plan: Mapping, sym: str) -> dict:
+        """The warm-up file of ``sym``.  ADR 0074 plans: its bytes must have the
+        sha256 fixed in the plan (and so in the plan id); a missing, changed,
+        truncated, unparsable or foreign-symbol file raises
+        :class:`EvidenceIntegrityError` and is never rewritten."""
+        path = self.root / plan["plan_id"] / f"warmup_{sym}.json"
+        if not self._integrity(plan):
+            return json.loads(path.read_text())
+        want = plan["warmup_sha256"].get(sym)
+        try:
+            raw = path.read_bytes()
+        except FileNotFoundError:
+            raise EvidenceIntegrityError("WARMUP_MISSING", f"{path.name} is gone") from None
+        got = hashlib.sha256(raw).hexdigest()
+        if not want or got != want:
+            raise EvidenceIntegrityError("WARMUP_TAMPERED",
+                                         f"{path.name} sha256 {got[:16]} != plan {str(want)[:16]}")
+        wj = json.loads(raw)
+        if wj.get("symbol") != sym or wj.get("start_ts") != plan["start_ts"]:
+            raise EvidenceIntegrityError("WARMUP_MISMATCH", f"{path.name} is not the warm-up of {sym} at "
+                                                            f"{plan['start_ts']}")
+        return wj
+
+    def _evidence(self, plan: Mapping, st: dict, *, recover: bool, now: Optional[int] = None) -> list[str]:
+        """Cross-check of every evidence file with the plan and the state (ADR 0074).
+
+        Per symbol: warm-up sha256; funding quality log and funding log
+        (sequence, chain, head in the state); funding log content (integer,
+        strictly increasing times after the last warm-up settlement, finite
+        rates; a chain recomputed by hand is caught by the head); quality
+        records belong to the symbol and carry a known status; the state's
+        ``last_funding_ts`` equals the time of the record at its funding head
+        (or the last warm-up settlement) — a state ahead of its evidence is
+        STATE_AHEAD_OF_EVIDENCE, any other mismatch STATE_FUNDING_TS_MISMATCH.
+
+        A log AHEAD of the head (records appended after the last state save:
+        a killed step, or an older state put back) is the record: with
+        ``recover`` the heads, ``last_funding_ts`` and consumed sources are
+        re-derived from it, and a DATA_INVALID quality record anywhere in the
+        log re-blocks an OBSERVING state (FUNDING_BLOCK_RESTORED).  Without
+        ``recover`` (final gate) a log ahead is a problem.  Integrity errors
+        raise with ``recover`` and are returned as problems without it."""
         d = self.root / plan["plan_id"]
-        rows = read_chained_log(d / f"funding_{sym}.jsonl", "funding log")
-        if rows and rows[-1]["ts"] > st["last_funding_ts"][sym]:
-            st["last_funding_ts"][sym] = rows[-1]["ts"]
-            st.setdefault("recovered", []).append({"symbol": sym, "last_funding_ts": rows[-1]["ts"],
-                                                   "at": iso_now()})
-        for r in rows:
-            for name, sha in (r.get("sources") or {}).items():
-                st["funding_sources"][sym].setdefault(name, sha)
-        sticky = [q for q in iter_jsonl(d / f"funding_quality_{sym}.jsonl") if q.get("status") in FUNDING_STICKY]
-        if sticky and st["status"] == "OBSERVING":
-            st["status"] = "BLOCKED_DATA"
-            st["errors"].append({"at": now, "symbol": sym, "kind": "FUNDING_BLOCK_RESTORED",
-                                 "detail": list(sticky[-1].get("issues") or [])[:5]})
+        problems: list[str] = []
+        for sym in plan["symbols"]:
+            try:
+                wj = self._warmup(plan, sym)
+                q = read_seq_chain(d / f"funding_quality_{sym}.jsonl", "QUALITY_LOG")
+                f = read_seq_chain(d / f"funding_{sym}.jsonl", "FUNDING_LOG")
+                q_ahead = check_log_head(q, st["quality_head"][sym], "QUALITY_LOG")
+                f_ahead = check_log_head(f, st["funding_head"][sym], "FUNDING_LOG")
+                for r in q:
+                    if r.get("symbol") != sym or r.get("status") not in FUNDING_SOURCE_STATUSES:
+                        raise EvidenceIntegrityError("QUALITY_LOG_INVALID",
+                                                     f"record {r.get('seq')}: symbol {r.get('symbol')!r} "
+                                                     f"status {r.get('status')!r}")
+                wf = wj.get("funding") or []
+                w_last = int(wf[-1][0]) if wf else None
+                prev = w_last
+                for r in f:
+                    t, rate = r.get("ts"), r.get("rate")
+                    if isinstance(t, bool) or not isinstance(t, int) or isinstance(rate, bool) \
+                            or not isinstance(rate, (int, float)) or not math.isfinite(rate):
+                        raise EvidenceIntegrityError("FUNDING_LOG_INVALID", f"record {r.get('seq')}: {t!r} {rate!r}")
+                    if prev is not None and t <= prev:
+                        what = "the last warm-up settlement" if prev == w_last and r["seq"] == 1 else "the previous record"
+                        raise EvidenceIntegrityError("FUNDING_LOG_ORDER",
+                                                     f"record {r['seq']} ts {t} not after {what} ({prev})")
+                    prev = t
+                hs = st["funding_head"][sym]["seq"]
+                head_ts = f[hs - 1]["ts"] if hs else w_last
+                lf = st["last_funding_ts"][sym]
+                tip_ts = f[-1]["ts"] if f else w_last
+                if tip_ts is not None and lf > tip_ts:
+                    raise EvidenceIntegrityError("STATE_AHEAD_OF_EVIDENCE",
+                                                 f"{sym}: state last_funding_ts {lf} after the last recorded "
+                                                 f"settlement {tip_ts}")
+                if head_ts is not None and lf != head_ts:
+                    raise EvidenceIntegrityError("STATE_FUNDING_TS_MISMATCH",
+                                                 f"{sym}: state last_funding_ts {lf} != {head_ts} at its funding head")
+            except EvidenceIntegrityError as e:
+                if recover:
+                    raise
+                problems.append(f"{sym}: {e}")
+                continue
+            except (OSError, ValueError, KeyError, TypeError) as e:
+                err = EvidenceIntegrityError("EVIDENCE_UNREADABLE", f"{sym}: {type(e).__name__}: {e}")
+                if recover:
+                    raise err from e
+                problems.append(str(err))
+                continue
+            if not recover:
+                if q_ahead or f_ahead:
+                    problems.append(f"{sym}: state behind its evidence logs")
+                continue
+            if q_ahead or f_ahead:
+                st["quality_head"][sym] = {"seq": len(q), "hash": q[-1]["hash"] if q else ""}
+                st["funding_head"][sym] = {"seq": len(f), "hash": f[-1]["hash"] if f else ""}
+                if tip_ts is not None:
+                    st["last_funding_ts"][sym] = tip_ts
+                if q:
+                    st["funding_status"][sym] = q[-1]["status"]
+                st.setdefault("recovered", []).append({"symbol": sym, "last_funding_ts": st["last_funding_ts"][sym],
+                                                       "quality_seq": len(q), "funding_seq": len(f),
+                                                       "at": iso_now()})
+            for r in f:
+                for name, sha in (r.get("sources") or {}).items():
+                    st["funding_sources"][sym].setdefault(name, sha)
+            sticky = [x for x in q if x.get("status") in FUNDING_STICKY]
+            if sticky and st["status"] == "OBSERVING":
+                st["status"] = "BLOCKED_DATA"
+                st["errors"].append({"at": now, "symbol": sym, "kind": "FUNDING_BLOCK_RESTORED",
+                                     "detail": list(sticky[-1].get("issues") or [])[:5]})
+        return problems
 
     def _funding_series(self, plan: Mapping, sym: str) -> tuple[list, dict]:
         """Warm-up settlements + the funding log, with the declared interval per
         settlement (legacy plans: no intervals)."""
         d = self.root / plan["plan_id"]
-        wj = json.loads((d / f"warmup_{sym}.json").read_text())
+        wj = self._warmup(plan, sym)
         fund = [(int(t), r) for t, r in wj.get("funding", [])]
         ivs = {int(t): v for t, v in (wj.get("funding_intervals") or {}).items() if v}
-        if self._funding_policy(plan):
+        if self._integrity(plan):
+            logged = read_seq_chain(d / f"funding_{sym}.jsonl", "FUNDING_LOG")
+        elif self._funding_policy(plan):
             logged = read_chained_log(d / f"funding_{sym}.jsonl", "funding log")
         else:
             logged = list(iter_jsonl(d / f"funding_{sym}.jsonl"))
@@ -906,6 +1187,8 @@ class ForwardPaper:
         keys = ["last_ts", "last_funding_ts", "bars", "missing_bars", "duplicates", "gaps"]
         if self._funding_policy(plan):
             keys += ["funding_sources", "funding_status"]
+        if self._integrity(plan):
+            keys += ["quality_head", "funding_head"]
         for k in keys:
             v = st.get(k)
             if not isinstance(v, dict) or set(v) != set(plan["symbols"]):
@@ -918,6 +1201,11 @@ class ForwardPaper:
                 out.append("state 'funding_sources' is not a file map per symbol")
             if k == "funding_status" and not all(x is None or x in FUNDING_SOURCE_STATUSES for x in v.values()):
                 out.append("state 'funding_status' holds an unknown status")
+            if k in ("quality_head", "funding_head") and not all(
+                    isinstance(x, dict) and set(x) == {"seq", "hash"} and isinstance(x["seq"], int)
+                    and not isinstance(x["seq"], bool) and x["seq"] >= 0 and isinstance(x["hash"], str)
+                    and (x["seq"] == 0) == (x["hash"] == "") for x in v.values()):
+                out.append(f"state '{k}' is not a {{seq, hash}} head per symbol")
         return out
 
     def _state_unusable(self, plan: Mapping, why: Sequence[str]) -> dict:
@@ -962,15 +1250,16 @@ class ForwardPaper:
             prev = r["ts"]
         st["last_ts"][sym], st["bars"][sym] = rows[-1]["ts"], len(rows)
         st["gaps"][sym], st["missing_bars"][sym] = gaps, missing
-        fl = list(iter_jsonl(self.root / plan["plan_id"] / f"funding_{sym}.jsonl"))
-        if fl:
-            st["last_funding_ts"][sym] = max(st["last_funding_ts"][sym], max(r["ts"] for r in fl))
+        if not self._funding_policy(plan):     # policy plans: re-derived by _evidence (verified chain)
+            fl = list(iter_jsonl(self.root / plan["plan_id"] / f"funding_{sym}.jsonl"))
+            if fl:
+                st["last_funding_ts"][sym] = max(st["last_funding_ts"][sym], max(r["ts"] for r in fl))
         st.setdefault("recovered", []).append({"symbol": sym, "last_ts": rows[-1]["ts"], "at": iso_now()})
 
     # -- evaluation ------------------------------------------------------------------
     def _series(self, plan: Mapping, sym: str) -> tuple[list[Bar], int, list[dict], list, dict]:
         d = self.root / plan["plan_id"]
-        wj = json.loads((d / f"warmup_{sym}.json").read_text())
+        wj = self._warmup(plan, sym)
         warm = [_row_bar(r) for r in wj["rows"]]
         obs = read_bar_log(d / f"bars_{sym}.jsonl")
         fund, ivs = self._funding_series(plan, sym)
@@ -1107,6 +1396,14 @@ class ForwardPaper:
             return {"verdict": "PAPER_BLOCKED_DATA", "final": False,
                     "reasons": ["LEGACY_PLAN_FUNDING_UNVERIFIED: plan registered before ADR 0073 "
                                 "(no declared funding schedule / source record); re-verify with a new plan"]}
+        if not self._integrity(plan):
+            return {"verdict": "PAPER_BLOCKED_DATA", "final": False,
+                    "reasons": ["LEGACY_PLAN_INTEGRITY_UNVERIFIED: plan registered before ADR 0074"]}
+        # ADR 0074: the evidence is re-verified against the state right before any verdict
+        problems = self._evidence(plan, st, recover=False) + self._plan_drift(plan)
+        if problems:
+            return {"verdict": "PAPER_ERROR", "final": False,
+                    "reasons": ["EVIDENCE_INTEGRITY: " + "; ".join(problems[:10])]}
         if result.get("funding_ok") is not True:
             why = [f"FUNDING_{v['status']}: {sym}: {v['coverage'].get('reason') or v['fetch_status']}"
                    for sym, v in sorted((result.get("funding") or {}).items())
@@ -1144,11 +1441,38 @@ class ForwardPaper:
             fails.append(f"late decision share {m['late_share']:.3f} > {c['max_late_trade_share']}")
         return {"verdict": "PAPER_FAILED" if fails else "PAPER_PASSED", "final": True, "reasons": fails}
 
-    def _conclude(self, plan: Mapping, verdict: Mapping, result: Mapping) -> None:
-        if not (self._funding_policy(plan) and result.get("funding_ok") is True):
-            # unreachable through _verdict; a second gate so no path records a final
-            # paper verdict on unconfirmed funding (ADR 0073)
-            raise RuntimeError(f"{plan['plan_id']}: final verdict without confirmed funding refused")
+    def _conclusion_problems(self, plan: Mapping, result: Mapping, st: Optional[Mapping]) -> list[str]:
+        """Every precondition of a final verdict, checked again from disk and
+        independently of :meth:`_verdict` (ADR 0073 / 0074)."""
+        why = []
+        if not self._funding_policy(plan):
+            why.append("plan has no funding policy (registered before ADR 0073)")
+        if not self._integrity(plan):
+            why.append("plan has no evidence integrity record (registered before ADR 0074)")
+        if result.get("funding_ok") is not True:
+            why.append("funding of this step not confirmed")
+        if (result.get("excluded") or {}).get("no_funding_coverage") or result.get("funding_dropped"):
+            why.append("events were dropped for missing funding coverage")
+        if why:
+            return why
+        if st is None:
+            st = self.state(plan["plan_id"])
+        try:
+            fund = self._funding_window_status(plan, st)
+        except (EvidenceIntegrityError, CausalityViolation, JsonlCorruption, OSError, ValueError) as e:
+            return [f"funding evidence unreadable: {e}"]
+        why += [f"{sym}: funding {v['status']} ({v['coverage'].get('reason')})"
+                for sym, v in sorted(fund.items()) if v["status"] not in FUNDING_USABLE]
+        why += self._evidence(plan, dict(st), recover=False)
+        why += self._plan_drift(plan)
+        return why
+
+    def _conclude(self, plan: Mapping, verdict: Mapping, result: Mapping, st: Optional[Mapping] = None) -> None:
+        why = self._conclusion_problems(plan, result, st)
+        if why:
+            # unreachable through _verdict; a second, independent gate so no path records a
+            # final paper verdict on unconfirmed funding or unverified evidence (ADR 0073/0074)
+            raise ConclusionRefused(f"{plan['plan_id']}: final verdict refused: " + "; ".join(why[:10]))
         sid, ctx = plan["strategy_id"], plan["context_id"]
         to = {"PAPER_PASSED": "PAPER_PASSED", "PAPER_FAILED": "PAPER_FAILED",
               "PAPER_INCONCLUSIVE": "INCONCLUSIVE"}[verdict["verdict"]]
