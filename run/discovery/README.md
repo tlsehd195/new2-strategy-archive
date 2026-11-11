@@ -287,7 +287,7 @@ audit report.
 - `evolution_report.py` — read-only stage counts and per-member failure classes from an evolution state directory (ADR 0013)
 - `data_manifest.py` — dataset manifest (SHA-256 per file, provenance, cross-month/funding checks)
 - `execution_sim.py` — partial fill / reject / liquidation / late-observation layer
-- `paper_forward.py` + `config/paper_forward_v1.json` — forward paper observation on bars that close after registration; the only source of PAPER_PASSED
+- `paper_forward.py` + `config/paper_forward_v1.json` — forward paper observation on bars that close after registration; the only source of PAPER_PASSED; funding must be confirmed complete under the declared schedule, else PAPER_BLOCKED_DATA (ADR 0073)
 - `ops.py` — `health` (read-only state check) and bounded `loop`
 - `portfolio_sim.py`, `funding_cost.py` — legacy v1 diagnostics (NOT used by
   the runner; `portfolio_sim.py` references the v1 `engine_lib.RUN` and does not run against v2)

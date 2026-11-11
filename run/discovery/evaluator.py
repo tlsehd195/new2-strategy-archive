@@ -137,6 +137,14 @@ class EventStudyResult:
         }
 
 
+class FundingRequired(ValueError):
+    """A caller that needs REAL funding (``require_funding=True``, ADR 0073:
+    Paper Forward) handed no series or no declared schedule.  ``funding=None``
+    means "funding deliberately not charged" (0 bp) and
+    ``funding_intervals=None`` the NOMINAL_8H_LEGACY rule — neither is
+    allowed there."""
+
+
 def funding_paid_bp(funding: Sequence[tuple[int, float]], start_ts: int, end_ts: int,
                     side: int) -> Optional[float]:
     """Funding cost in bp of notional over (start_ts, end_ts] for `side`.
@@ -221,7 +229,8 @@ def run_event_study(bars: Sequence[Bar], symbol: str, signal_fn: SignalFn,
                     horizon: int, cost: CostContext, order_value: float,
                     funding: Optional[Sequence[tuple[int, float]]] = None,
                     *, warmup: int = 1, exit_rule: Optional[Callable] = None,
-                    funding_intervals: Optional[dict] = None) -> EventStudyResult:
+                    funding_intervals: Optional[dict] = None,
+                    require_funding: bool = False) -> EventStudyResult:
     """Evaluate one strategy definition on one symbol.
 
     Events whose holding window would overlap a previously accepted event
@@ -233,7 +242,26 @@ def run_event_study(bars: Sequence[Bar], symbol: str, signal_fn: SignalFn,
     beyond the bars, or the exit rule returned None), participation_refusals,
     cost_data_missing, dropped_missing_funding.  A decision on the last bar
     has no entry bar and is not a signal of this window.
+
+    Funding semantics (ADR 0073):
+
+    * ``funding=None`` — funding is NOT charged (0 bp, ``funding_schedule``
+      "NONE").  Only for studies where no funding applies by design;
+    * a sequence (possibly empty) — every event is charged from it, and an
+      event whose holding window is not covered is dropped and counted
+      (``funding_drop_reasons``), never charged 0;
+    * ``funding_intervals`` — the declared interval per settlement
+      ("DECLARED"); without it the legacy nominal-8h gap rule applies
+      ("NOMINAL_8H_LEGACY");
+    * ``require_funding=True`` — :class:`FundingRequired` is raised for
+      ``funding=None`` or ``funding_intervals=None``: the caller needs real
+      funding under the declared schedule (Paper Forward).
     """
+    if require_funding:
+        if funding is None:
+            raise FundingRequired("funding series required: None would charge 0 bp funding")
+        if funding_intervals is None:
+            raise FundingRequired("declared settlement intervals required: NOMINAL_8H_LEGACY not allowed")
     res = EventStudyResult(symbol=symbol)
     fidx = FundingIndex(funding, intervals=funding_intervals) if funding is not None else None
     res.funding_schedule = ("NONE" if funding is None else
