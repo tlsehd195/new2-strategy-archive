@@ -282,13 +282,12 @@ class TestBoundaryForward(FundingCase):
                 feed.rows.sort()
                 self.now[0] = boundary + HOUR
                 r = fp.step(plan["plan_id"])
-                # ADR 0075: funding is confirmed now, but the last bar (00:45) is inside the
-                # day-75 holding period: the plan waits for that position's exit
-                self.assertEqual(r["verdict"], "PAPER_OBSERVING", r["reasons"])
-                self.assertIn("OPEN_POSITIONS_PENDING", r["reasons"][0])
-                self.now[0] = boundary + 9 * HOUR       # exit 02:15 and the next settlement observed
-                r = fp.step(plan["plan_id"])
+                # ADR 0076: funding is confirmed now; the sample ends at the earliest bar at
+                # which the rule holds (start + 60 days - 15 m), the day-75 position is
+                # outside it, so the plan concludes on this step
                 self.assertEqual(r["verdict"], "PAPER_PASSED", r["reasons"])
+                self.assertEqual(r["evaluation_cutoff"], plan["start_ts"] + 60 * DAY - MIN15)
+                self.assertEqual(r["positions"]["pending"], [])
 
 
 # ---------------------------------------------------------------------------
