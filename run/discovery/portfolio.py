@@ -59,7 +59,7 @@ from typing import Mapping, Optional, Sequence
 from costs_bridge import CostComputationError, CostContext, CostDataMissing, CostError, CostRefused
 from data_quality import Bar
 
-PORTFOLIO_MODEL_VERSION = "portfolio-mtm-v3"
+PORTFOLIO_MODEL_VERSION = "portfolio-mtm-v4"   # v4: funding completeness per closed position (ADR 0078)
 END_POLICY = "force_close_at_last_open"
 
 
@@ -129,6 +129,10 @@ class PortfolioResult:
     margin_model: str = "isolated"
     costs_applied: bool = True
     funding_applied: bool = False
+    #: ADR 0078 (E-02): worst funding_schedule.settlement_check status over the
+    #: closed positions ("OK" only when every held settlement is accounted for)
+    funding_status: str = "OK"
+    funding_issues: list = field(default_factory=list)
     config: dict = field(default_factory=dict)
     context_id: Optional[str] = None
     result_id: str = ""
@@ -153,7 +157,9 @@ def simulate_portfolio(bars_by_symbol: Mapping[str, Sequence[Bar]],
                        signals: Sequence[dict],
                        funding_by_symbol: Mapping[str, Sequence[tuple[int, float]]],
                        cost: CostContext, cfg: PortfolioConfig,
-                       *, context_id: Optional[str] = None) -> PortfolioResult:
+                       *, context_id: Optional[str] = None,
+                       funding_intervals_by_symbol: Optional[Mapping[str, Mapping[int, int]]] = None
+                       ) -> PortfolioResult:
     """Run the portfolio.
 
     ``signals`` items: {"symbol", "decision_index", "side", "horizon"} —
@@ -218,6 +224,19 @@ def simulate_portfolio(bars_by_symbol: Mapping[str, Sequence[Bar]],
         res.total_fees += fee
         pos.qty -= qty
         if pos.qty <= 1e-12 * max(1.0, pos.notional0 / pos.entry_price):
+            # ADR 0078 (E-02): an empty / truncated / gapped series used to charge 0
+            # silently; every closed position's holding window is now checked against
+            # the declared schedule and a failure is recorded (portfolio_passes fails)
+            from funding_schedule import FUNDING_STATUS_RANK, settlement_check
+            chk = settlement_check(funding_by_symbol.get(sym) or [],
+                                   (funding_intervals_by_symbol or {}).get(sym),
+                                   grids[sym][pos.entry_index], grids[sym][i])
+            if chk["status"] != "OK":
+                res.funding_issues.append({"symbol": sym, "entry_index": pos.entry_index,
+                                           "exit_index": i, "status": chk["status"],
+                                           "reason": chk["reason"]})
+                if FUNDING_STATUS_RANK[chk["status"]] > FUNDING_STATUS_RANK[res.funding_status]:
+                    res.funding_status = chk["status"]
             res.trades += 1
             if end:
                 res.forced_end_closes += 1
@@ -245,6 +264,19 @@ def simulate_portfolio(bars_by_symbol: Mapping[str, Sequence[Bar]],
                 res.total_funding += pay
                 j += 1
             pos.fi = j
+        # 1b) ADR 0078 (E-03): a bar that OPENS beyond the liquidation price
+        # liquidates the position before any exit at that open (the loss is the
+        # posted margin, as in the intrabar check and in portfolio_multi)
+        for sym, pos in list(positions.items()):
+            o = bars_by_symbol[sym][i].open
+            if (pos.side == 1 and o <= pos.liq_price) or (pos.side == -1 and o >= pos.liq_price):
+                loss = pos.margin(cfg.leverage)
+                cash -= loss
+                res.realized_pnl -= loss
+                res.liquidation_losses += loss
+                res.liquidation_events += 1
+                res.total_funding_bp += pos.funding_paid / max(pos.notional0, 1e-9) * 1e4
+                del positions[sym]
         # 2) time exits, reductions and the end-of-data forced close (at open)
         for sym, pos in list(positions.items()):
             if i >= pos.exit_index:
@@ -407,6 +439,9 @@ def portfolio_passes(res: Mapping) -> tuple[bool, list[str]]:
         fails.append(f"cost status {res.get('cost_status')!r}")
     if res.get("bankrupt", True):
         fails.append("account bankrupt")
+    if res.get("funding_status", "MISSING") != "OK":
+        # ADR 0078 (E-02): funding not fully accounted is never a pass
+        fails.append(f"funding status {res.get('funding_status')!r}")
     if int(res.get("trades", 0) or 0) < PORTFOLIO_PASS_CRITERIA["min_trades"]:
         fails.append("no completed trades")
     return (not fails), fails

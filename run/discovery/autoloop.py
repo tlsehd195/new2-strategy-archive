@@ -163,7 +163,9 @@ def _run_evolution_cycle(state_dir: Path, provider, cost, *, symbols: Sequence[s
         return out
 
     # 3) pending DEV evaluations (seeds, interrupted rounds) — neighbours excluded
-    neighbour_ids = {r["strategy_id"] for r in _spec_sources(pipe) if r["source"].startswith("neighbour_of:")}
+    # a neighbour that the search later proposed itself is in the search pool (B-04)
+    neighbour_ids = {r["strategy_id"] for r in _spec_sources(pipe)
+                     if r["source"].startswith("neighbour_of:")} - pipe.search_pool()
     seed_budget = max_dev_evals if rounds <= 0 else max(1, max_dev_evals // 2)
     for sid in _pending():
         if evaluated >= seed_budget:
@@ -176,7 +178,9 @@ def _run_evolution_cycle(state_dir: Path, provider, cost, *, symbols: Sequence[s
     for _ in range(rounds):
         if st.status != "ACTIVE":
             break
-        if st.round_index >= cfg.max_rounds or len(pipe.specs.all()) >= cfg.max_specs_total:
+        # ADR 0078 (B-03): the budget counts the SEARCH pool — robustness neighbours
+        # exist only because a centre passed validation and must not cut the search
+        if st.round_index >= cfg.max_rounds or len(pipe.search_pool()) >= cfg.max_specs_total:
             st.status = "BUDGET_EXHAUSTED"
             break
         if evaluated >= max_dev_evals:
@@ -200,21 +204,28 @@ def _run_evolution_cycle(state_dir: Path, provider, cost, *, symbols: Sequence[s
                                                if pipe.specs.get(x) is not None} - {None},
                                    known_specs={x: pipe.specs.get(x) for x in sorted(pool)
                                                 if _bkey(pipe.specs.get(x)) is not None})
+        # ADR 0078 (B-05): a round is registered whole or not at all — a DEV budget
+        # running out mid-round dropped the rest of the round for good (the round
+        # index advanced past children that were never registered)
+        if evaluated + len(props) > max_dev_evals and evaluated > 0:
+            s.notes.append(f"per-cycle DEV evaluation budget reached before round {round_index} "
+                           f"({len(props)} children): the round runs next cycle")
+            break
         for p in props:
-            if evaluated >= max_dev_evals:
-                break
             sid, created = pipe.register(p["spec"], source="evolution", parents=p["parents"],
                                          operator=p["operator"], detail=p["detail"],
                                          round_index=round_index, seed=cfg.seed, budget=budget)
-            if created:
+            # ADR 0078 (B-04): a child equal to an existing robustness neighbour has a
+            # DEV record (written without a status): it gets its screen status now
+            if created or pipe.statuses.status(sid, ctx) is None:
                 pipe.dev_evaluate(sid)
-                evaluated += 1
+                evaluated += created
         st.round_index = round_index
         st.proposed += len(props)
         st.invalid += cnt["invalid"]
         st.duplicates += cnt["duplicates"]
         st.semantic_duplicates += cnt["semantic_duplicates"]
-        st.registered = len(pipe.specs.all())
+        st.registered = len(pipe.search_pool())
         fh = first_front_hash(pipe.dev_feedback_all(), cfg)
         st.rounds_without_front_change = 0 if fh != st.front_hash else st.rounds_without_front_change + 1
         st.front_hash = fh
