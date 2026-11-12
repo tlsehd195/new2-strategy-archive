@@ -310,9 +310,6 @@ class TestD01PowerAnalysis(unittest.TestCase):
         self.assertIn("bootstrap_B_for(a_w", src)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
 
 # ---------------------------------------------------------------------------
 # G-04 — Fear & Greed data of a forward plan
@@ -527,3 +524,137 @@ class TestF11ForwardPlan(FundingCase):
         self.assertEqual(len([x for x in fp.plans() if x["strategy_id"] == edge]), 1)
         self.assertEqual((len(plans), len(errs)), (1, 1), errs)
         self.assertIn("already exists", errs[0])
+
+
+# ---------------------------------------------------------------------------
+# runner.py / engine_lib.py author review (R-1)
+# ---------------------------------------------------------------------------
+
+class TestR01RunnerErrorClass(unittest.TestCase):
+    """R-1: run_one / reevaluate_prior_pass caught LookupError as DATA_MISSING —
+    KeyError / IndexError (a programming error, or a signal reading a bar
+    outside the PrefixView = look-ahead) became DATA_MISSING, which is
+    re-verifiable when data arrives, instead of a permanent LOGIC_ERROR."""
+
+    def setUp(self):
+        self.td = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.td, True)
+
+    def _runner(self, sub="a"):
+        import test_engine
+        from costs_bridge import FUTURES_COST_DEFAULTS, CostContext
+        from engine_lib import normalize_strategy, strategy_id
+        from runner import PathConfig, Runner
+        T = test_engine.TestPromotion
+        defn = dict(T.TOD_DEFN, symbols=["ETHUSDT"], primary_cell={"symbol": "ETHUSDT", "horizon": 16})
+        td = self.td / sub
+        (td / "data" / "klines").mkdir(parents=True, exist_ok=True)
+        paths = PathConfig(root=td / "disc", data_dir=td / "data", state_dir=td / "state",
+                           results_dir=td / "results", audit_dir=td / "audit")
+        cost = CostContext.from_params(FUTURES_COST_DEFAULTS, version="T", verified=True, test_only=True)
+        sid = strategy_id(defn)
+        r = Runner(paths, cost=cost, allow_test_cost=True,
+                   candidates_fn=lambda: ([(sid, normalize_strategy(defn))], []))
+        self.addCleanup(r.restore_signal_handlers)
+        r.register_all()
+        return r, sid
+
+    def _run(self, exc, sub="a"):
+        r, sid = self._runner(sub)
+        with mock.patch.object(r, "_evaluate", side_effect=exc):
+            out = r.run_one(sid, r._defn_by_sid[sid])
+        return r, sid, out
+
+    def test_lookahead_index_error_is_a_logic_error(self):
+        from engine_lib import CandidateState
+        r, sid, out = self._run(IndexError("index outside the visible (closed) history"))
+        self.assertEqual(out["status"], "ERROR")
+        self.assertEqual(out["record"]["error_code"], "LOGIC_ERROR")
+        self.assertEqual(r.store.entry(sid).state, CandidateState.ERROR.value)
+
+    def test_key_error_is_a_logic_error(self):
+        r, sid, out = self._run(KeyError("funding_z"))
+        self.assertEqual((out["status"], out["record"]["error_code"]), ("ERROR", "LOGIC_ERROR"))
+
+    def test_declared_missing_data_stays_data_missing(self):
+        """Control: the deliberate LookupError of a missing dataset."""
+        for exc in (LookupError("FNG dataset absent"), FileNotFoundError("klines")):
+            with self.subTest(exc=type(exc).__name__):
+                r, sid, out = self._run(exc, sub=type(exc).__name__)
+                self.assertEqual(out["status"], "DATA_MISSING")
+
+    def test_prior_pass_reevaluation_same_rule(self):
+        r, sid = self._runner()
+        r._current_context()
+        with mock.patch.object(r, "_evaluate", side_effect=IndexError("future bar")):
+            out = r.reevaluate_prior_pass(sid, r._defn_by_sid[sid])
+        self.assertEqual(out["status"], "ERROR")
+
+
+# ---------------------------------------------------------------------------
+# G-03 — what the independent replay shares with the evaluator (ADR 0079 §G-03)
+# ---------------------------------------------------------------------------
+
+class TestG03SharedSurface(unittest.TestCase):
+    """The replay (ADR 0077) is independent in its position walk only.  The
+    functions below are called on BOTH sides, so a defect in any of them is
+    reproduced by the replay and cannot be detected by it.  This test pins
+    the list documented in ADR 0079: a new shared call (or a removed one) must
+    update the documentation, never silently widen the shared surface."""
+
+    SHARED = ("build_spec_aux", "build_spec_signal", "stop_exit_rule", "_funding_series",
+              "_warmup", "read_bar_log", "_row_bar", "provider.fng", "GAP_EMBARGO_BARS",
+              "_funding_policy")
+    # used by the evaluator only (through run_event_study / directly)
+    EVALUATOR_ONLY = ("run_event_study", "apply_execution", "_open_positions", "_reconcile_trades")
+
+    @staticmethod
+    def _names(fn) -> set:
+        """Identifiers a function's CODE uses (names and attribute names; the
+        docstring and comments are not code)."""
+        import ast
+        import inspect
+        import textwrap
+        tree = ast.parse(textwrap.dedent(inspect.getsource(fn)))
+        out = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Name):
+                out.add(node.id)
+            elif isinstance(node, ast.Attribute):
+                out.add(node.attr)
+                if isinstance(node.value, ast.Attribute):
+                    out.add(f"{node.value.attr}.{node.attr}")
+        return out
+
+    def _sides(self):
+        import paper_forward as pf
+        F = pf.ForwardPaper
+        ev = self._names(F._evaluate) | self._names(F._series)
+        rp = self._names(F._replay_from_disk) | self._names(F._replay_positions)
+        return ev, rp
+
+    def test_shared_calls_are_the_documented_ones(self):
+        ev, rp = self._sides()
+        for name in self.SHARED:
+            with self.subTest(name=name):
+                self.assertIn(name, ev)
+                self.assertIn(name, rp)
+        for name in self.EVALUATOR_ONLY:
+            with self.subTest(name=name):
+                self.assertIn(name, ev)
+                self.assertNotIn(name, rp)
+
+    def test_run_event_study_shares_funding_cost_and_causality_primitives(self):
+        """The evaluator reaches FundingIndex / PrefixView / round_trip_bp through
+        run_event_study; the replay calls them directly: same code, both sides."""
+        import evaluator
+        res = self._names(evaluator.run_event_study)
+        _ev, rp = self._sides()
+        for name in ("FundingIndex", "PrefixView", "round_trip_bp"):
+            with self.subTest(name=name):
+                self.assertIn(name, res)
+                self.assertIn(name, rp)
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -930,6 +930,11 @@ class Runner:
         except LockedWindowError as e:
             # selection must never read the locked window — hard stop
             rec = {"status": "ERROR", "error_code": "CONFIG_ERROR", "error_message": str(e)}
+        except (KeyError, IndexError) as e:
+            # ADR 0079 (R-1): LookupError subclasses that are programming errors — an
+            # IndexError is also a signal reading a bar outside its PrefixView
+            # (look-ahead).  They were DATA_MISSING (re-verifiable when data arrives)
+            rec = _logic_error(e)
         except (FileNotFoundError, LookupError) as e:
             rec = {"status": "DATA_MISSING", "missing": [str(e)]}
         except Exception as e:  # noqa: BLE001 — classified below
@@ -988,6 +993,8 @@ class Runner:
             rec = self._evaluate(sid, defn)
         except LockedWindowError as e:
             rec = {"status": "ERROR", "error_code": "CONFIG_ERROR", "error_message": str(e)}
+        except (KeyError, IndexError) as e:              # ADR 0079 (R-1)
+            rec = _logic_error(e)
         except (FileNotFoundError, LookupError) as e:
             rec = {"status": "DATA_MISSING", "missing": [str(e)]}
         except Exception as e:  # noqa: BLE001
@@ -1736,6 +1743,13 @@ class Runner:
         s.finished_at = iso_now()
         atomic_write_json(self.paths.results_dir / "cycle_summary.json", s.to_json())
         return s
+
+
+def _logic_error(e: BaseException) -> dict:
+    """ADR 0079 (R-1): KeyError / IndexError raised by an evaluation."""
+    return {"status": "ERROR", "error_code": "LOGIC_ERROR",
+            "error_message": f"{type(e).__name__}: {e} (a programming error or a read outside the "
+                             "visible history — never DATA_MISSING)"}
 
 
 def win_for(h: DatasetHandle, horizon: int) -> tuple[int, int]:
