@@ -1377,3 +1377,9 @@ Stage Summary:
 - Critical 2(A-01 잠금 창 월초 시작, G-01 데이터 구멍으로 PAPER_PASSED), High 6(ME-01, D-01, F-01~F-03, G-02) 및 Medium·Low 다수 수정. 수용 한계: E-01, ME-04, A-05, B-06 일부, C-04, C-07
 - 신규 회귀 테스트 55개(`test_integrated_audit_20261112.py`, 수정 전 52개 실패). 버전 갱신: datapol-v2, funding-schedule-v2, mc-v4, evo-pipeline-v2, fp-v3, evo-gen-v2, power-analysis-v2, portfolio-multi-v4, portfolio-mtm-v4
 - 보호 데이터·잠금/IW1 창·사전등록·기존 원장 손대지 않음. 보고서: `run/audit/FINAL_REPORT_20261112.md`, 현재 상태: `run/audit/STATUS_CURRENT_20261112.md`
+
+## 2026-11-12 ADR 0078 보완 감사 (ADR 0079)
+
+- 기준 PR #79 `757114f`. 사용자 지시(14:00Z): D-01 해상도 불일치 최우선, Paper Forward G-03/G-04, 잠금 밖 쓰기(F-11), runner.py·engine_lib.py 작성자 전수 검토
+- D-01: 검사를 5(`MIN_TAIL_DRAWS`)로 통일, 해상도 부족 구 배치는 BLOCKED_STATISTICS. G-04: FNG 전진 계획 거부. F-11: 4개 경로 잠금. R-1: 미래 봉 읽기 오류를 LOGIC_ERROR로
+- 신규 테스트 33개(`test_audit_followup_20261112.py`, `757114f`에서 22개 실패). 보호 데이터·창·사전등록·기존 기록 변경 없음. 보고서: `run/audit/FINAL_REPORT_ADR0079_20261112.md`
