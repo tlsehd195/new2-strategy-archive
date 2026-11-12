@@ -52,4 +52,19 @@
 | `run/discovery/strategy_spec.py` | PARTIAL | A-02 nondegenerate_sd, B-06 -0.0 | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
 | `run/discovery/validation_registry.py` | PARTIAL | F-07 torn tail tolerated, interior corruption fails, flock-serialised writes | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
 
+## 2026-11-12 후속 감사 (ADR 0079)
+
+- FULL = 작성자가 이 스레드에서 파일의 모든 줄을 읽음 (`reviewed_sha256`의 판). 파일이 바뀌면 `check`가 실패한다(재검토하거나 PARTIAL로 내릴 것). 검토 에이전트의 주장은 FULL로 기록하지 않는다.
+
+| 파일 | 작성자 재검토 | 범위 | 실행 | 결함 재현 | 수정 | 회귀 테스트 |
+|---|---|---|---|---|---|---|
+| `run/discovery/campaigns.py` | PARTIAL | F-11 preregister under the ledger lock | 예 | 예 | ADR 0079 | run/discovery/tests/test_audit_followup_20261112.py |
+| `run/discovery/engine_lib.py` | FULL | all 1,626 lines: state machine, JSONL, ids, statistics, verdicts, locked registry, locks; findings E-1..E-4 recorded, no fix | 예 | 아니오 | - | run/discovery/tests/test_audit_followup_20261112.py |
+| `run/discovery/independent_window.py` | PARTIAL | D-01 resolution refused before opening, in-run block | 예 | 예 | ADR 0079 | run/discovery/tests/test_audit_followup_20261112.py |
+| `run/discovery/paper_forward.py` | PARTIAL | G-03 evaluator/replay shared calls, G-04 FNG refusal/block, F-11 register_plan lock | 예 | 예 | ADR 0079 | run/discovery/tests/test_audit_followup_20261112.py |
+| `run/discovery/pipeline.py` | PARTIAL | D-01 _evaluate_batch blocked windows, F-11 StatusStore.set, context_id, _history_guard | 예 | 예 | ADR 0079 | run/discovery/tests/test_audit_followup_20261112.py |
+| `run/discovery/runner.py` | FULL | all 2,107 lines (ADR 0079 R-1 fix included): input/state/recovery/locks/exit codes/look-ahead; findings R-1 (fixed), R-2..R-5 (recorded) | 예 | 예 | ADR 0079 | run/discovery/tests/test_audit_followup_20261112.py |
+| `run/discovery/stats_mc.py` | PARTIAL | D-01 _require_resolution / bootstrap_B_for / alpha-B checks, stepm, step_spa, mcs | 예 | 예 | ADR 0079 | run/discovery/tests/test_audit_followup_20261112.py |
+| `run/discovery/validation_registry.py` | PARTIAL | BLOCKED_STATISTICS member outcome | 예 | 아니오 | ADR 0079 | run/discovery/tests/test_audit_followup_20261112.py |
+
 나머지 행은 `AUDIT_PROVENANCE_20261111.jsonl` 참조.

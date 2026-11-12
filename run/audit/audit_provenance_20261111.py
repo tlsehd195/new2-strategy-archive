@@ -24,6 +24,7 @@ file separates the kinds of evidence per file:
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -95,6 +96,34 @@ AUTHOR_2026_11_12 = {
     'run/discovery/validation_registry.py': ("PARTIAL", 'F-07 torn tail tolerated, interior corruption fails, flock-serialised writes', True, True, "ADR 0078", 'run/discovery/tests/test_integrated_audit_20261112.py'),
     'run/discovery/run_cycle.sh': ("PARTIAL", 'H-07 traps before mktemp (bash -n + shellcheck; no unit test)', True, True, "ADR 0078", None),
 }
+#: ADR 0079 (2026-11-12 follow-up, user directive 14:00Z).  FULL = every line of
+#: the file was read by the thread author in this thread (runner.py 2,107 and
+#: engine_lib.py 1,626 lines, all functions / classes and their callers);
+#: ``reviewed_sha256`` pins the version read (it includes the ADR 0079 change), so
+#: a later edit makes the FULL claim stale and ``check`` fails until it is
+#: re-reviewed or downgraded.  PARTIAL rows: the changed functions and callers.
+AUTHOR_2026_11_12B = {
+    "run/discovery/runner.py": ("FULL", "all 2,107 lines (ADR 0079 R-1 fix included): input/state/recovery/"
+                                "locks/exit codes/look-ahead; findings R-1 (fixed), R-2..R-5 (recorded)",
+                                True, True, "ADR 0079", "run/discovery/tests/test_audit_followup_20261112.py",
+                                "b4d71b172e569cf2b8d8b86e9fa38ebb8826757a95d56978d4a665281950d6a9"),
+    "run/discovery/engine_lib.py": ("FULL", "all 1,626 lines: state machine, JSONL, ids, statistics, "
+                                    "verdicts, locked registry, locks; findings E-1..E-4 recorded, no fix",
+                                    True, False, None, "run/discovery/tests/test_audit_followup_20261112.py",
+                                    "81ca101ee2a798cd5d2b866f1df7a958cd34c885fe947d2a5e84bdde32070a21"),
+    "run/discovery/stats_mc.py": ("PARTIAL", "D-01 _require_resolution / bootstrap_B_for / alpha-B checks, "
+                                  "stepm, step_spa, mcs", True, True, "ADR 0079", "run/discovery/tests/test_audit_followup_20261112.py", None),
+    "run/discovery/pipeline.py": ("PARTIAL", "D-01 _evaluate_batch blocked windows, F-11 StatusStore.set, "
+                                  "context_id, _history_guard", True, True, "ADR 0079", "run/discovery/tests/test_audit_followup_20261112.py", None),
+    "run/discovery/independent_window.py": ("PARTIAL", "D-01 resolution refused before opening, in-run block",
+                                            True, True, "ADR 0079", "run/discovery/tests/test_audit_followup_20261112.py", None),
+    "run/discovery/validation_registry.py": ("PARTIAL", "BLOCKED_STATISTICS member outcome", True, False,
+                                             "ADR 0079", "run/discovery/tests/test_audit_followup_20261112.py", None),
+    "run/discovery/paper_forward.py": ("PARTIAL", "G-03 evaluator/replay shared calls, G-04 FNG refusal/block, "
+                                       "F-11 register_plan lock", True, True, "ADR 0079", "run/discovery/tests/test_audit_followup_20261112.py", None),
+    "run/discovery/campaigns.py": ("PARTIAL", "F-11 preregister under the ledger lock", True, True, "ADR 0079",
+                                   "run/discovery/tests/test_audit_followup_20261112.py", None),
+}
 #: claims the 2026-11-10 author re-read (ADR 0070, unchanged)
 SPOT_2026_11_10 = "SPOT (2026-11-10 author, named claims only)"
 
@@ -139,6 +168,16 @@ def build() -> list[dict]:
                     "audit_level_claimed": "PARTIAL", "author_reverified": lvl, "author_note": note,
                     "executed": executed, "executed_by_reviewer": False, "has_test": reg is not None,
                     "defect_reproduced": repro, "fixed_in": fixed, "regression_test": reg})
+    for f, (lvl, note, executed, repro, fixed, reg, sha) in sorted(AUTHOR_2026_11_12B.items()):
+        out.append({"file": f, "source": "AUTHOR_2026_11_12B",
+                    "review_by": "thread author 2026-11-12 follow-up (ADR 0079)",
+                    "whole_file_claim": lvl == "FULL",
+                    "whole_file_claim_is": "author read (every line)" if lvl == "FULL"
+                    else "author read (changed ranges only)",
+                    "audit_level_claimed": "LOGIC_TRACED" if lvl == "FULL" else "PARTIAL",
+                    "author_reverified": lvl, "author_note": note, "reviewed_sha256": sha,
+                    "executed": executed, "executed_by_reviewer": False, "has_test": reg is not None,
+                    "defect_reproduced": repro, "fixed_in": fixed, "regression_test": reg})
     return out
 
 
@@ -170,6 +209,16 @@ def render_md(rows: list[dict]) -> str:
         lines.append(f"| `{r['file']}` | {r['author_reverified']} | {r['author_note']} | "
                      f"{'예' if r['executed'] else '아니오'} | {'예' if r['defect_reproduced'] else '아니오'} | "
                      f"{r['fixed_in'] or '-'} | {r['regression_test'] or '-'} |")
+    auth12b = [r for r in rows if r["source"] == "AUTHOR_2026_11_12B"]
+    lines += ["", "## 2026-11-12 후속 감사 (ADR 0079)", "",
+              "- FULL = 작성자가 이 스레드에서 파일의 모든 줄을 읽음 (`reviewed_sha256`의 판). "
+              "파일이 바뀌면 `check`가 실패한다(재검토하거나 PARTIAL로 내릴 것). "
+              "검토 에이전트의 주장은 FULL로 기록하지 않는다.", "",
+              "| 파일 | 작성자 재검토 | 범위 | 실행 | 결함 재현 | 수정 | 회귀 테스트 |", "|---|---|---|---|---|---|---|"]
+    for r in auth12b:
+        lines.append(f"| `{r['file']}` | {r['author_reverified']} | {r['author_note']} | "
+                     f"{'예' if r['executed'] else '아니오'} | {'예' if r['defect_reproduced'] else '아니오'} | "
+                     f"{r['fixed_in'] or '-'} | {r['regression_test'] or '-'} |")
     lines += ["", "나머지 행은 `AUDIT_PROVENANCE_20261111.jsonl` 참조."]
     return "\n".join(lines) + "\n"
 
@@ -197,8 +246,17 @@ def check() -> list[str]:
             errs.append(f"{r['file']}: a reviewer row cannot claim an author re-read")
         if r["source"] == "AUTHOR_2026_11_12" and r["author_reverified"] == "FULL":
             errs.append(f"{r['file']}: the 2026-11-12 author rows are PARTIAL (changed ranges only)")
-        if r["author_reverified"] == "FULL" and r["file"] not in AUTHOR_2026_11_11:
-            errs.append(f"{r['file']}: FULL author re-read without an author entry")
+        if r["author_reverified"] == "FULL":
+            if r["source"] == "AUTHOR_2026_11_12B":
+                ent = AUTHOR_2026_11_12B.get(r["file"])
+                if ent is None or ent[0] != "FULL" or not ent[6]:
+                    errs.append(f"{r['file']}: FULL ADR 0079 row without a pinned sha256")
+                elif (REPO / r["file"]).exists() and hashlib.sha256(
+                        (REPO / r["file"]).read_bytes()).hexdigest() != ent[6]:
+                    errs.append(f"{r['file']}: changed after its FULL author review (ADR 0079) — "
+                                "re-review it or record PARTIAL")
+            elif r["file"] not in AUTHOR_2026_11_11:
+                errs.append(f"{r['file']}: FULL author re-read without an author entry")
         if "/" in r["file"] and not (REPO / r["file"]).exists():
             errs.append(f"{r['file']}: file missing")
         if r["defect_reproduced"] and not r["fixed_in"]:
