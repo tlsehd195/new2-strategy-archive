@@ -14,7 +14,6 @@ on its own is rejected.
 
 from __future__ import annotations
 
-import json
 import math
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -182,15 +181,15 @@ class PromotionQueue:
             "live_deployed": False,
             "test_only": test_only,
         }
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.path, "a", encoding="utf-8") as f:
-            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+        # ADR 0078 (F-08): the engine's append (fsync, torn-tail quarantine) and
+        # reader — a torn line made every later promotion crash
+        from engine_lib import append_jsonl
+        append_jsonl(self.path, rec)
         return rec
 
     def entries(self) -> list[dict]:
-        if not self.path.exists():
-            return []
-        return [json.loads(l) for l in self.path.read_text(encoding="utf-8").splitlines() if l.strip()]
+        from engine_lib import iter_jsonl
+        return list(iter_jsonl(self.path))
 
     def duplicates(self, strategy_id: str) -> int:
         return sum(1 for e in self.entries() if e["strategy_id"] == strategy_id)
