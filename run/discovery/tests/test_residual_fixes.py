@@ -911,11 +911,13 @@ class TestManifest(unittest.TestCase):
 
 def _pf_evidence(ctx="C2-x", drift=0.001):
     bars = make_bars(n=200, drift=drift, vol=0.0, seed=21, volume=1e9)
-    pf = simulate_portfolio({"A": bars}, [long_sig(40, 20)],
-                            {"A": make_funding(bars[0].ts, bars[-1].ts, rate=0.0)},
+    fund = make_funding(bars[0].ts, bars[-1].ts, rate=0.0)
+    pf = simulate_portfolio({"A": bars}, [long_sig(40, 20)], {"A": fund},
                             CostContext.futures_default(),
                             PortfolioConfig(initial_capital=10_000, size_fraction=0.1),
-                            context_id=ctx)
+                            context_id=ctx,
+                            # ADR 0078 (E-02): the declared schedule is part of the evidence
+                            funding_intervals_by_symbol={"A": {t: 8 * 3_600_000 for t, _ in fund}})
     return pf.to_json()
 
 
