@@ -74,8 +74,13 @@
 
 ## E. 수정 후 결과
 
-- 새 테스트 33개: 3.13 로컬 통과(아래 전체 실행에 포함)
-- 전체 결과(로컬, 이 브랜치): §J 참조. 기존 테스트를 실제로 실행하지 못한 부분이 있으면 그렇게 적는다.
+`1ae372b`에서 로컬 CI 스크립트 전체를 Python 3.11과 3.13 각각의 작업 트리에서 실제로 실행했다. 두 판 모두 `OVERALL fail=0`.
+
+- discovery unit: **1,104개 OK** (기존 1,071 + 신규 33). 3.13 2,088초, 3.11 2,114초. 실패·오류·건너뜀 증가 없음
+- root 테스트: **152개 OK**
+- legacy 테스트, compileall, ruff, shellcheck, `bash -n`: OK
+- 원장 검사(ledger), inventory, source audit, provenance check(FULL sha256 일치 포함): OK
+- 신규 33개는 `757114f`에서 22개 실패(§D) → 수정 후 전부 통과
 
 ## F. 남은 위험
 
@@ -119,8 +124,21 @@ ADR 0078 보고서의 POSSIBLE 13건 중 runner/engine_lib 관련 항목은 이�
 
 ## J. PR·Actions 상태
 
-PR #79에 이어서 커밋(main 직접 커밋·병합 없음). 로컬·Actions 결과는 아래에 실행 후 기록한다.
+- PR #79(브랜치 `claude/project-thread-vjbdnd`)에 이어서 커밋. main 직접 커밋·병합 없음. 병합하지 않음.
+- 커밋: `8dc6f59`(D-01), `9ea7160`(G-04·F-11), `055492b`(R-1·G-03), `31e6dcd`(출처표), `1ae372b`(문서).
+- GitHub Actions `research-ci`, head `1ae372b`:
+  - run #347 (push, id 43244480870): test (3.11) success, test (3.13) success
+  - run #348 (pull_request, id 43244490599): test (3.11) success, test (3.13) success
+- 이 보고서 갱신 커밋은 문서만 바꾼다(그 커밋의 Actions도 확인한다).
 
 ## K. 판정
 
-§J 결과 기록 후 확정.
+**APPROVED WITH LIMITATIONS**
+
+- 지시한 수정(D-01 기준 5 단일화와 기존 소형 B 배치 BLOCKED_STATISTICS, G-04, F-11, runner/engine_lib FULL 검토와 R-1)은 재현 테스트로 결함을 확인한 뒤 고쳤고, 기존 테스트는 줄이거나 완화하지 않았다. 로컬 두 버전과 Actions 모두 통과.
+- 한계(COMPLETE가 아닌 이유):
+  - 사용자 결정 대기: FNG 전진 원천, L-1 캠페인 수 공유, ADR 0078 E-01·ME-04.
+  - FULL 검토는 `runner.py`·`engine_lib.py`뿐. 나머지는 PARTIAL 또는 미검토.
+  - G-03: 재생은 공유 함수 안의 결함과 금액·체결을 검증하지 못한다(문서와 테스트로 범위를 고정했을 뿐).
+  - R-2~R-6, E-1~E-4는 기록만 했다(거짓 PASS 경로는 찾지 못함).
+  - 비용 VERIFIED는 여전히 실계좌 증거가 없다.
