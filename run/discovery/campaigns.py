@@ -153,15 +153,20 @@ class CampaignLedger:
 
     def abort_no_exposure(self, campaign: Mapping, reason: str,
                           windows: Optional[Sequence[str]] = None) -> None:
-        append_jsonl(self.path, {"schema": CAMPAIGN_SCHEMA, "kind": "ABORTED_NO_EXPOSURE",
-                                 "campaign_id": campaign["campaign_id"],
-                                 "windows": list(windows or campaign["windows"]),
-                                 "reason": reason, "at": iso_now()})
+        # ADR 0079 follow-up (F-11): every writer of this ledger takes its lock, so
+        # this append never lands between another writer's tail check and its
+        # write (a writer that died mid-line would be glued to this record)
+        with exclusive_file_lock(self.path):
+            append_jsonl(self.path, {"schema": CAMPAIGN_SCHEMA, "kind": "ABORTED_NO_EXPOSURE",
+                                     "campaign_id": campaign["campaign_id"],
+                                     "windows": list(windows or campaign["windows"]),
+                                     "reason": reason, "at": iso_now()})
 
     def record_result(self, campaign: Mapping, results: Mapping) -> None:
-        append_jsonl(self.path, {"schema": CAMPAIGN_SCHEMA, "kind": "RESULT",
-                                 "campaign_id": campaign["campaign_id"],
-                                 "results": dict(results), "at": iso_now()})
+        with exclusive_file_lock(self.path):           # ADR 0079 follow-up (F-11), as above
+            append_jsonl(self.path, {"schema": CAMPAIGN_SCHEMA, "kind": "RESULT",
+                                     "campaign_id": campaign["campaign_id"],
+                                     "results": dict(results), "at": iso_now()})
 
 
 def member_alpha(campaign: Mapping, symbol: str) -> float:

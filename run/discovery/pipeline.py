@@ -586,7 +586,10 @@ class EvolutionPipeline:
         rec = {**rec, "pipeline": PIPELINE_VERSION}
         rec["record_id"] = record_hash(rec)
         rec["at"] = iso_now()
-        append_jsonl(self.eval_path, rec)
+        # ADR 0079 follow-up (F-11): forward plans of different strategies conclude
+        # concurrently (one step lock per plan) and append here
+        with exclusive_file_lock(self.eval_path):
+            append_jsonl(self.eval_path, rec)
         self._index()[(rec["stage"], rec["strategy_id"], rec["context_id"])] = rec
         return rec
 
@@ -1105,8 +1108,9 @@ class EvolutionPipeline:
             for m in batch["members"]:
                 self.statuses.set(m, ctx, "BLOCKED_COST", stage="validation", reasons=[str(err)],
                                   resume_to="RESEARCH_ONLY")
-            append_jsonl(self.batch_path, {"kind": "RESULT", "batch_id": batch["batch_id"],
-                                           "blocked": "BLOCKED_COST", "error": str(err), "at": iso_now()})
+            with exclusive_file_lock(self.batch_path):     # ADR 0079 follow-up (F-11)
+                append_jsonl(self.batch_path, {"kind": "RESULT", "batch_id": batch["batch_id"],
+                                               "blocked": "BLOCKED_COST", "error": str(err), "at": iso_now()})
             return {"batch_id": batch["batch_id"], "blocked": "BLOCKED_COST"}
         outcome = {}
         for m in batch["members"]:
@@ -1170,7 +1174,10 @@ class EvolutionPipeline:
                                       evidence={"validation": rec["record_id"]})
         result = {"kind": "RESULT", "batch_id": batch["batch_id"], "tests": tests,
                   "outcome": outcome, "at": iso_now()}
-        append_jsonl(self.batch_path, result)
+        # ADR 0079 follow-up (F-11): every writer of the batch ledger takes its lock
+        # (the preregistration appends under it); _evaluate_batch never holds it
+        with exclusive_file_lock(self.batch_path):
+            append_jsonl(self.batch_path, result)
         for m, o in outcome.items():
             if o == "PASSED_STEPM":
                 self.robustness(m)

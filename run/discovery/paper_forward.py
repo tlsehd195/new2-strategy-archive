@@ -923,7 +923,7 @@ class ForwardPaper:
         if bad:
             return self._state_unusable(plan, bad)
         if st["concluded"]:
-            return {"plan_id": plan_id, "status": "CONCLUDED", "verdict": st["verdict"]}
+            return self._concluded_result(plan, st)
         d = self.root / plan_id
         now = self.clock()
         prior = self.p.evaluation("paper_forward", plan["strategy_id"], plan["context_id"])
@@ -1464,6 +1464,28 @@ class ForwardPaper:
         if raw is None:
             return "strategy specification missing"
         return FNG_NOT_PINNED if "fng" in (canonicalize_spec(raw).get("data") or ()) else None
+
+    def _concluded_result(self, plan: Mapping, st: Mapping) -> dict:
+        """What ``step`` returns for a plan whose state says it concluded.
+
+        ADR 0079 follow-up: a plan whose strategy reads FNG (only an older version
+        could register one) concluded on FNG values it never pinned, so its stored
+        verdict is not a verified current result — the same reason
+        :meth:`verify_conclusion` gives (FNG_NOT_PINNED).  The stored conclusion is
+        kept as it is (state.json, the evaluation record and the status ledger are
+        neither rewritten nor re-evaluated); the call returns PAPER_BLOCKED_DATA
+        with the stored verdict under ``recorded_verdict`` and
+        ``conclusion_verified: False``.  Read only: nothing is written.  A plan
+        without FNG returns exactly what it returned before."""
+        pid = plan["plan_id"]
+        fng = self._plan_fng_problem(plan)
+        if fng is None:
+            return {"plan_id": pid, "status": "CONCLUDED", "verdict": st["verdict"]}
+        return {"plan_id": pid, "status": "CONCLUDED", "verdict": "PAPER_BLOCKED_DATA",
+                "recorded_verdict": st["verdict"], "conclusion_verified": False,
+                "reasons": [fng, f"UNVERIFIED_PRIOR_CONCLUSION: the stored verdict {st['verdict']} "
+                            "cannot be verified for the reason above; it is kept as a historical "
+                            "record and is not a current result"]}
 
     def _plan_drift(self, plan: Mapping) -> list[str]:
         """What differs between the registered plan and what a step would run."""
@@ -2369,15 +2391,20 @@ class ForwardPaper:
         """One research-feedback row per concluded plan (a resumed conclusion adds
         it only if the interrupted one did not get that far, ADR 0077)."""
         path = self.p.dir / "research_feedback.jsonl"
-        try:
-            rows = list(iter_jsonl(path)) if path.exists() else []
-        except (JsonlCorruption, OSError, ValueError):
-            rows = []
-        if any(r.get("source") == "paper_forward" and r.get("plan_id") == plan["plan_id"] for r in rows):
-            return
-        append_jsonl(path, {"strategy_id": plan["strategy_id"], "context_id": plan["context_id"],
-                            "plan_id": plan["plan_id"], "source": "paper_forward", "verdict": verdict,
-                            "use": "human review + failure memory only; never search ranking", "at": iso_now()})
+        # ADR 0079 follow-up (F-11): plans of different strategies step concurrently
+        # (one step lock per plan) and all append to this one file: read, decide and
+        # append under its lock
+        with exclusive_file_lock(path):
+            try:
+                rows = list(iter_jsonl(path)) if path.exists() else []
+            except (JsonlCorruption, OSError, ValueError):
+                rows = []
+            if any(r.get("source") == "paper_forward" and r.get("plan_id") == plan["plan_id"] for r in rows):
+                return
+            append_jsonl(path, {"strategy_id": plan["strategy_id"], "context_id": plan["context_id"],
+                                "plan_id": plan["plan_id"], "source": "paper_forward", "verdict": verdict,
+                                "use": "human review + failure memory only; never search ranking",
+                                "at": iso_now()})
 
     # -- conclusion anchors (ADR 0076) ------------------------------------------------
     def _anchors(self, plan: Mapping, st: Mapping) -> dict:
