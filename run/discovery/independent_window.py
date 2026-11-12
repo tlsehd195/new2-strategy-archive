@@ -43,7 +43,8 @@ if str(HERE) not in sys.path:
 from engine_lib import (  # noqa: E402
     LOCKED_TEST_PERIODS, append_jsonl, canonical_json, iso_now, iter_jsonl, strategy_id,
 )
-from stats_mc import by_fdr, daily_series, default_q, spending_alpha, stepm  # noqa: E402
+from stats_mc import (InsufficientBootstrapResolution, _require_resolution, by_fdr, daily_series,  # noqa: E402
+                      default_q, spending_alpha, stepm)
 
 DEFAULT_PREREG = HERE / "config" / "independent_window_v1.json"
 DEFAULT_HISTORY = HERE / "validation_window_history.jsonl"
@@ -349,6 +350,13 @@ def _open_tranche(pre: Mapping, prereg_sha: str, tranche: str, data_dir: Path, m
         raise WindowRefused(f"tranche {tranche}: no eligible symbol")
     k = tranche_index(pre, tranche, history)
     alpha = spending_alpha(k, float(pre["test"]["alpha_total_family"]))
+    try:
+        # ADR 0079 (D-01): the frozen B must resolve this tranche's alpha; refused
+        # BEFORE anything is registered or read, so the tranche stays unspent
+        _require_resolution(alpha, int(pre["test"]["bootstrap_B"]))
+    except InsufficientBootstrapResolution as e:
+        raise WindowRefused(f"{key}: tranche index {k}: {e} — the frozen preregistration "
+                            "cannot test this tranche; a new preregistration version is needed") from e
     data = {s: load_symbol(data_dir, s, pre) for s in syms}
     bad = {s: e["missing"] for s, e in data.items() if e["missing"]}
     if bad:
@@ -403,8 +411,13 @@ def _open_tranche(pre: Mapping, prereg_sha: str, tranche: str, data_dir: Path, m
     if series:
         n = len(next(iter(series.values())))
         q = default_q(n)
-        sm = stepm(series, alpha=alpha, B=int(tc["bootstrap_B"]), q=q, seed=int(tc["bootstrap_seed"]),
-                   studentize=tc.get("studentize", "fixed"))
+        try:
+            sm = stepm(series, alpha=alpha, B=int(tc["bootstrap_B"]), q=q, seed=int(tc["bootstrap_seed"]),
+                       studentize=tc.get("studentize", "fixed"))
+        except InsufficientBootstrapResolution as err:
+            # checked before opening; should it still refuse, nothing is decided (ADR 0079)
+            sm = {"rejected": [], "steps": [], "method": "BLOCKED_STATISTICS"}
+            res["stepm_blocked"] = str(err)
         res.update({"rejected": sorted(sm["rejected"]), "steps": sm["steps"], "q": q, "n_days": n,
                     "stepm_method": sm["method"]})
     hp = {s: v["pooled_hac_p"] for s, v in per_member.items() if v["pooled_hac_p"] is not None}
@@ -415,7 +428,8 @@ def _open_tranche(pre: Mapping, prereg_sha: str, tranche: str, data_dir: Path, m
         v = per_member[sid]
         powered = v["n_events"] >= 60 and v["nonzero_days"] >= 30
         rej = sid in res["rejected"]
-        outcome[sid] = ("PASSED_INDEPENDENT_WINDOW" if rej and powered
+        outcome[sid] = ("BLOCKED_STATISTICS" if "stepm_blocked" in res
+                        else "PASSED_INDEPENDENT_WINDOW" if rej and powered
                         else "REJECTED" if powered else "INCONCLUSIVE")
     result = {"schema": RESULT_SCHEMA, "run_id": run_id, "window_key": key, "tranche": tranche,
               "tranche_index": k, "symbols": syms, "prereg_sha256": prereg_sha,

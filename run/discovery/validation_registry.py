@@ -46,7 +46,8 @@ EVENTS = ("REGISTERED", "STARTED", "COMPLETED", "ABORTED", "INVALIDATED")
 #: replayed state of a run
 STATES = ("REGISTERED", "RUNNING", "COMPLETED", "ABORTED", "INVALIDATED")
 #: outcome vocabulary of one member in one completed run
-MEMBER_OUTCOMES = ("PASSED_INDEPENDENT_WINDOW", "REJECTED", "INCONCLUSIVE")
+MEMBER_OUTCOMES = ("PASSED_INDEPENDENT_WINDOW", "REJECTED", "INCONCLUSIVE",
+                   "BLOCKED_STATISTICS")      # ADR 0079: test refused, nothing decided
 #: the fields a registration must carry (all of them pin what is tested)
 REGISTRATION_FIELDS = ("window_key", "prereg_sha256", "members_sha256", "members",
                        "code_hash", "config", "cost")

@@ -1032,8 +1032,11 @@ class EvolutionPipeline:
                         sm = stepm(series, alpha=w["alpha"], B=B_w, q=q, seed=batch["seed"],
                                    studentize=vc.get("studentize", "fixed"))
                     except InsufficientBootstrapResolution as err:
-                        # batch preregistered before ADR 0078 with too few draws for its
-                        # alpha: no rejection is possible (fail closed, never a PASS)
+                        # batch preregistered (by an older version) with too few draws for
+                        # its alpha: the test cannot be run.  Nobody is rejected and nobody
+                        # passes (fail closed); the stored B / alpha are used as they are and
+                        # never raised — that would be a re-run nobody preregistered
+                        # (ADR 0078, ADR 0079: the rule is alpha*(B+1) >= MIN_TAIL_DRAWS)
                         sm = {"rejected": [], "steps": [], "n": len(next(iter(series.values()))),
                               "method": "BLOCKED_STATISTICS"}
                         res["stepm_blocked"] = str(err)
@@ -1043,8 +1046,11 @@ class EvolutionPipeline:
                         res["spa"] = {k: v for k, v in spa_test(series, B=B_w, q=q,
                                                                  seed=batch["seed"]).items()
                                       if k.startswith("p_") or k == "statistic"}
-                        res["step_spa_rejected"] = step_spa(series, alpha=w["alpha"], B=B_w,
-                                                            q=q, seed=batch["seed"])["rejected"]
+                        try:
+                            res["step_spa_rejected"] = step_spa(series, alpha=w["alpha"], B=B_w,
+                                                                q=q, seed=batch["seed"])["rejected"]
+                        except InsufficientBootstrapResolution as err:
+                            res["step_spa_blocked"] = str(err)       # diagnostic: recorded, not hidden
                         res["reality_check_p"] = reality_check(series, B=B_w, q=q,
                                                                seed=batch["seed"])["p"]
                     except ValueError as err:
@@ -1055,6 +1061,8 @@ class EvolutionPipeline:
                     try:
                         m_ = mcs(series, alpha=0.10, B=vc["bootstrap_B"], q=q, seed=batch["seed"])
                         res["mcs"] = {"set": m_["set"], "p": m_["p"], "alpha": m_["alpha"]}
+                    except InsufficientBootstrapResolution as err:
+                        res["mcs_blocked"] = str(err)
                     except ValueError as err:
                         res["mcs_error"] = str(err)
                 hp = {m: per_member[m][sym]["hac_p"] for m in w["members"]}
@@ -1077,14 +1085,22 @@ class EvolutionPipeline:
             keys = {w["symbol"]: k for k, w in batch["windows"].items()}
             rejected = all(m in tests[keys[s]]["rejected"] for s in syms)
             powered = all((per_member[m][s]["n"] or 0) >= vc["min_events_per_symbol"] for s in syms)
-            fclass = validation_failure_class(per_member[m], syms, rejected=rejected, powered=powered,
-                                              min_events=vc["min_events_per_symbol"])
+            # ADR 0079 (D-01): a window whose StepM could not resolve its alpha decides
+            # nothing for any member on it — not REJECTED, not PASSED
+            blocked = sorted({tests[keys[s]]["stepm_blocked"] for s in syms
+                              if "stepm_blocked" in tests[keys[s]]})
+            fclass = ("BLOCKED_STATISTICS" if blocked else
+                      validation_failure_class(per_member[m], syms, rejected=rejected, powered=powered,
+                                               min_events=vc["min_events_per_symbol"]))
             prev = self.evaluation("validation", m)
             if prev is not None and prev.get("batch_id") == batch["batch_id"]:
                 # resumed batch (the run stopped after this member's record and
                 # before the RESULT row): reuse the record — never a second one —
-                # and require the recomputation to agree with it (ADR 0029)
-                if (prev.get("stepm_rejected"), prev.get("powered")) != (rejected, powered):
+                # and require the recomputation to agree with it (ADR 0029).  A
+                # record written before ADR 0079 has no stepm_blocked field: only
+                # the fields it has are compared
+                if (prev.get("stepm_rejected"), prev.get("powered")) != (rejected, powered) or (
+                        "stepm_blocked" in prev and bool(prev["stepm_blocked"]) != bool(blocked)):
                     raise EvidenceTampered(f"{m}: resumed batch {batch['batch_id']} disagrees with "
                                            f"its stored validation record {prev['record_id']}")
                 rec = prev
@@ -1092,11 +1108,23 @@ class EvolutionPipeline:
                 rec = self._append_eval({"stage": "validation", "strategy_id": m, "context_id": ctx,
                                          "status": "OK", "batch_id": batch["batch_id"],
                                          "per_symbol": per_member[m], "stepm_rejected": rejected,
+                                         "stepm_blocked": blocked or False,
                                          "powered": powered, "failure_class": fclass,
                                          "cost_model": self._cost_block()})
             cur = self.statuses.get(m, ctx) or {}
             done = (cur.get("evidence") or {}).get("validation") == rec["record_id"]
-            if rejected and powered:
+            if blocked:
+                outcome[m] = "BLOCKED_STATISTICS"
+                if not done:
+                    # resume_to stays RESEARCH_ONLY-like but the member is no longer
+                    # RESEARCH_ONLY, so it is never put into another batch on its own:
+                    # re-testing it would be a second look at the validation window
+                    self.statuses.set(m, ctx, "BLOCKED_STATISTICS", stage="validation",
+                                      reasons=["validation StepM refused: bootstrap resolution "
+                                               "alpha*(B+1) < MIN_TAIL_DRAWS (ADR 0079)", *blocked],
+                                      evidence={"validation": rec["record_id"]},
+                                      resume_to="RESEARCH_ONLY")
+            elif rejected and powered:
                 outcome[m] = "PASSED_STEPM"
             elif powered:
                 outcome[m] = "REJECTED"
@@ -2023,7 +2051,7 @@ def cost_attribution(events: Sequence[Mapping]) -> dict:
 
 #: primary reason a validation member did not pass (reporting, never a gate)
 FAILURE_CLASSES = ("PASSED_STEPM", "DATA_MISSING", "INSUFFICIENT_DATA", "NO_EDGE_OUT_OF_SAMPLE",
-                   "FAIL_COST", "FAIL_STAT")
+                   "FAIL_COST", "FAIL_STAT", "BLOCKED_STATISTICS")
 
 
 def validation_failure_class(per_symbol: Mapping, symbols: Sequence[str], *, rejected: bool,
@@ -2090,7 +2118,8 @@ def outcome_label(status: Optional[Mapping], *, dev: Optional[Mapping] = None,
     if fc is not None:
         return {"DATA_MISSING": "DATA_MISSING", "INSUFFICIENT_DATA": "UNDETERMINED_POWER",
                 "NO_EDGE_OUT_OF_SAMPLE": "FAIL_STAT", "FAIL_COST": "FAIL_COST",
-                "FAIL_STAT": "FAIL_STAT", "PASSED_STEPM": "FAIL_STAT"}.get(fc, "FAIL_STAT")
+                "FAIL_STAT": "FAIL_STAT", "PASSED_STEPM": "FAIL_STAT",
+                "BLOCKED_STATISTICS": "UNDETERMINED_POWER"}.get(fc, "FAIL_STAT")
     if st == "INCONCLUSIVE":
         return "UNDETERMINED_POWER"
     # DEV screen rejection: positive before cost, not after -> the cost removed it
