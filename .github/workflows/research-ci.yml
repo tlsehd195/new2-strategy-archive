@@ -5,18 +5,22 @@ name: research-ci
 # cycle runs, the locked-TEST ledger is never touched, nothing is deployed.
 # Self-contained: only this repository is checked out (no other repository,
 # token or path is needed — the cost model lives in run/discovery/cost_model.py).
+# ADR 0078 (H-08): .gitignore (private_fills exclusion) and every workflow file are
+# guarded by tests, so a change to them runs the suite too
 on:
   push:
-    paths: ["run/**", "src/**", ".github/workflows/research-ci.yml", "data/fill_ledger.jsonl"]
+    paths: ["run/**", "src/**", ".github/workflows/**", ".gitignore", "data/fill_ledger.jsonl"]
   pull_request:
-    paths: ["run/**", "src/**", ".github/workflows/research-ci.yml", "data/fill_ledger.jsonl"]
+    paths: ["run/**", "src/**", ".github/workflows/**", ".gitignore", "data/fill_ledger.jsonl"]
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # ADR 0078 (H-04): the unit suite alone takes ~28 min; the cheap gating checks
+    # run first and the job has room to finish (a timeout is red, never green)
+    timeout-minutes: 75
     strategy:
       fail-fast: false
       matrix:
@@ -85,20 +89,6 @@ jobs:
         run: |
           python ledger_check.py . --json /dev/null
           python ledger_check.py state --json /dev/null
-      - name: Unit tests
-        working-directory: run
-        run: python -m unittest discover -s discovery/tests -v 2>&1 | tail -n 40
-        shell: bash -o pipefail {0}
-      - name: Root-level research tests (run/test_*.py, DEV-only tools; ADR 0025)
-        working-directory: run
-        # these DEV-only analysis tools use numpy/pandas (the engine in run/discovery stays stdlib-only)
-        run: |
-          python -m pip install --quiet "numpy==2.2.6" "pandas==2.2.3"
-          python -m unittest -v $(ls test_*.py | sed 's/\.py$//') 2>&1 | tail -n 20
-        shell: bash -o pipefail {0}
-      - name: Legacy pandas module test (funding_cost; ADR 0070)
-        working-directory: run/discovery
-        run: python -m unittest -v tests.test_funding_cost_legacy_20261110
       - name: Compile every run/ script (legacy v1 scripts included — compiled only, never run; ADR 0067)
         run: python -m compileall -q run/*.py run/audit/*.py
       - name: Static analysis of every run/ script (gating — syntax errors and undefined names)
@@ -122,3 +112,17 @@ jobs:
           for f in src/*.ts; do bun build --no-bundle "$f" --outdir "$RUNNER_TEMP/ts" > /dev/null || { echo "FAIL $f"; exit 1; }; echo "ok $f"; done
       - name: Package manifests parse
         run: for f in src/*_package.json; do python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$f"; done
+      - name: Unit tests
+        working-directory: run
+        run: python -m unittest discover -s discovery/tests -v 2>&1 | tail -n 40
+        shell: bash -o pipefail {0}
+      - name: Root-level research tests (run/test_*.py, DEV-only tools; ADR 0025)
+        working-directory: run
+        # these DEV-only analysis tools use numpy/pandas (the engine in run/discovery stays stdlib-only)
+        run: |
+          python -m pip install --quiet "numpy==2.2.6" "pandas==2.2.3"
+          python -m unittest -v $(ls test_*.py | sed 's/\.py$//') 2>&1 | tail -n 20
+        shell: bash -o pipefail {0}
+      - name: Legacy pandas module test (funding_cost; ADR 0070)
+        working-directory: run/discovery
+        run: python -m unittest -v tests.test_funding_cost_legacy_20261110
