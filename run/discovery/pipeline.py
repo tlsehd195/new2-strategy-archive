@@ -46,7 +46,7 @@ from typing import Mapping, Optional, Sequence
 from campaigns import CampaignLedger, WindowRetired, member_alpha
 from costs_bridge import COST_MODEL_SCOPE, CostComputationError, CostConfigError, UNVERIFIED_COST_MODEL
 from engine_lib import (
-    CODE_FILES, LockTestRegistry, append_jsonl, bh_fdr_family, canonical_json,
+    CODE_FILES, LockTestRegistry, append_jsonl, bh_fdr_family, canonical_json, exclusive_file_lock,
     code_identity, experiment_context, iso_now, iter_jsonl, locked_window_for, nw_tstat,
     pbo_cscv, runtime_identity, t_sf,
 )
@@ -209,12 +209,21 @@ class StatusStore:
     def __init__(self, path: Path):
         self.path = Path(path)
         self._cur: Optional[dict] = None
+        self._size: Optional[int] = None
+
+    def _disk_size(self) -> int:
+        try:
+            return self.path.stat().st_size
+        except FileNotFoundError:
+            return 0
 
     def _load(self) -> dict:
         if self._cur is None:
+            size = self._disk_size()
             self._cur = {}
             for r in iter_jsonl(self.path):
                 self._cur[(r["strategy_id"], r["context_id"])] = r
+            self._size = size
         return self._cur
 
     def get(self, sid: str, ctx: str) -> Optional[dict]:
@@ -230,6 +239,19 @@ class StatusStore:
     def set(self, sid: str, ctx: str, status: str, *, stage: str, reasons: Sequence[str] = (),
             evidence: Optional[Mapping] = None, resume_to: Optional[str] = None,
             labels: Sequence[str] = ()) -> dict:
+        """ADR 0079 (F-11): the transition is decided against the file ON DISK
+        under its lock — a status another writer (process or store instance)
+        appended since this store last read the file is seen, so an illegal
+        transition can no longer be written from a stale cache."""
+        with exclusive_file_lock(self.path):
+            if self._cur is not None and self._disk_size() != self._size:
+                self._cur = None                    # changed by another writer: re-read
+            return self._set_locked(sid, ctx, status, stage=stage, reasons=reasons, evidence=evidence,
+                                    resume_to=resume_to, labels=labels)
+
+    def _set_locked(self, sid: str, ctx: str, status: str, *, stage: str, reasons: Sequence[str],
+                    evidence: Optional[Mapping], resume_to: Optional[str],
+                    labels: Sequence[str]) -> dict:
         if status not in STATUSES:
             raise InvalidStatusTransition(f"unknown status {status}")
         cur = self.get(sid, ctx)
@@ -245,8 +267,10 @@ class StatusStore:
                "labels": list(labels), "at": iso_now()}
         if status in _BLOCKED:
             rec["resume_to"] = resume_to or (cur or {}).get("resume_to") or prev or "RESEARCH_ONLY"
+        cache = self._load()
         append_jsonl(self.path, rec)
-        self._load()[(sid, ctx)] = rec
+        cache[(sid, ctx)] = rec
+        self._size = self._disk_size()
         return rec
 
 
@@ -512,8 +536,9 @@ class EvolutionPipeline:
             }
             ctx, norm = experiment_context(comps)
             p = self.dir / "contexts.jsonl"
-            if not any(r.get("context_id") == ctx for r in iter_jsonl(p)):
-                append_jsonl(p, {"context_id": ctx, "components": norm, "at": iso_now()})
+            with exclusive_file_lock(p):         # ADR 0079 (F-11): one row per context
+                if not any(r.get("context_id") == ctx for r in iter_jsonl(p)):
+                    append_jsonl(p, {"context_id": ctx, "components": norm, "at": iso_now()})
             self._ctx = ctx
         return self._ctx
 
@@ -883,12 +908,16 @@ class EvolutionPipeline:
         """Exclusive lock of the shared ``validation_history`` (ADR 0078, D-03):
         the batch index k of a shared window is read and the new batch appended
         under one lock (also taken by ``independent_window open``), so two state
-        directories never spend the same alpha twice."""
+        directories never spend the same alpha twice.  ADR 0079 (F-11): this
+        directory's batch ledger is locked as well (always, history or not), so
+        two writers of one state directory cannot both take the same k.  Lock
+        order: history, then the batch ledger."""
         import contextlib
-        from engine_lib import exclusive_file_lock
-        if self.validation_history is None:
-            return contextlib.nullcontext()
-        return exclusive_file_lock(self.validation_history)
+        stack = contextlib.ExitStack()
+        if self.validation_history is not None:
+            stack.enter_context(exclusive_file_lock(self.validation_history))
+        stack.enter_context(exclusive_file_lock(self.batch_path))
+        return stack
 
     def preregister_batch(self, members: Sequence[str]) -> dict:
         with self._history_guard():

@@ -95,7 +95,8 @@ from typing import Callable, Mapping, Optional, Sequence
 from costs_bridge import CostDataMissing, CostRefused
 from data_quality import Bar, check_bars
 from engine_lib import (
-    JsonlCorruption, append_jsonl, atomic_write_json, canonical_json, iso_now, iter_jsonl, nw_tstat, t_sf,
+    JsonlCorruption, append_jsonl, atomic_write_json, canonical_json, exclusive_file_lock, iso_now, iter_jsonl,
+    nw_tstat, t_sf,
 )
 from evaluator import FundingIndex, PrefixView, run_event_study
 from execution_sim import EXECUTION_SIM_VERSION, ExecutionConfig, apply_execution
@@ -124,6 +125,14 @@ FUNDING_TOL_MS = 60_000
 #: sequenced funding / funding-quality logs anchored in the state).  A plan without it
 #: (registered under ADR 0073 only) is never concluded.
 FUNDING_INTEGRITY = "paper-forward-integrity-v1"
+#: ADR 0079 (G-04): a strategy that reads the Fear & Greed index cannot be observed
+#: forward.  Neither feed has an FNG source, so the plan cannot pin (snapshot +
+#: sha256) the FNG values of its observation period; the evaluator and the replay
+#: would read whatever the research provider's archive holds at each step.  New
+#: plans are refused; a plan registered before ADR 0079 never concludes.
+FNG_NOT_PINNED = ("FNG_NOT_PINNED: the strategy reads the Fear & Greed index; the forward feed has no FNG "
+                  "source and the plan pins no FNG snapshot, so its observation would use unpinned FNG "
+                  "data (ADR 0079)")
 #: ADR 0075: positions of a plan.  The sample of a final verdict is every trade ENTERED
 #: in [start, evaluation cutoff]; the cutoff is the last observed bar of the step at which
 #: the preregistered stopping rule (min_days + min_trades, or max_days) first held.  A
@@ -720,7 +729,14 @@ class ForwardPaper:
         raise KeyError(plan_id)
 
     def register_plan(self, sid: str) -> dict:
+        """ADR 0079 (F-11): under the plan ledger's file lock — the "a plan already
+        exists" check and the append are one step, so two callers never register
+        two plans for one strategy and context."""
         ctx = self.p.context_id()
+        with exclusive_file_lock(self.plans_path):
+            return self._register_plan(sid, ctx)
+
+    def _register_plan(self, sid: str, ctx: str) -> dict:
         st = self.p.statuses.status(sid, ctx)
         if st not in ("PAPER_TEST_READY", "PAPER_TESTING"):
             raise ForwardRefused(f"{sid} is {st}: forward paper needs PAPER_TEST_READY/PAPER_TESTING")
@@ -731,6 +747,9 @@ class ForwardPaper:
             if r.get("strategy_id") == sid and r.get("context_id") == ctx and r.get("verdict") == "PAPER_DEGRADED":
                 raise ForwardRefused(f"{sid}: isolated replay PAPER_DEGRADED in this context")
         spec = canonicalize_spec(self.p.specs.get(sid))
+        why_fng = self._fng_refusal(spec)
+        if why_fng:
+            raise ForwardRefused(f"{sid}: {why_fng}")
         ok, why = self.p.cost.verified_for(spec["symbols"], self.p.order_value)
         if not ok:
             raise ForwardRefused(f"cost model not verified for this use: {why}")
@@ -1433,6 +1452,19 @@ class ForwardPaper:
         append_jsonl(d / "steps.jsonl", {"at": iso_now(), "clock_ms": self.clock(), **res})
         return res
 
+    @staticmethod
+    def _fng_refusal(spec: Mapping) -> Optional[str]:
+        """ADR 0079 (G-04): why a plan for ``spec`` cannot be registered, or None."""
+        return FNG_NOT_PINNED if "fng" in (spec.get("data") or ()) else None
+
+    def _plan_fng_problem(self, plan: Mapping) -> Optional[str]:
+        """ADR 0079 (G-04): a plan (registered before ADR 0079) whose strategy reads
+        FNG: it never concludes.  An unreadable spec is a problem as well."""
+        raw = self.p.specs.get(plan["strategy_id"])
+        if raw is None:
+            return "strategy specification missing"
+        return FNG_NOT_PINNED if "fng" in (canonicalize_spec(raw).get("data") or ()) else None
+
     def _plan_drift(self, plan: Mapping) -> list[str]:
         """What differs between the registered plan and what a step would run."""
         why = []
@@ -2047,6 +2079,9 @@ class ForwardPaper:
         if not self._integrity(plan):
             return {"verdict": "PAPER_BLOCKED_DATA", "final": False,
                     "reasons": ["LEGACY_PLAN_INTEGRITY_UNVERIFIED: plan registered before ADR 0074"]}
+        fng = self._plan_fng_problem(plan)
+        if fng:
+            return {"verdict": "PAPER_BLOCKED_DATA", "final": False, "reasons": [fng]}
         # ADR 0074: the evidence is re-verified against the state right before any verdict
         problems = self._evidence(plan, st, recover=False) + self._plan_drift(plan)
         if problems:
@@ -2185,6 +2220,9 @@ class ForwardPaper:
             why.append("plan has no funding policy (registered before ADR 0073)")
         if not self._integrity(plan):
             why.append("plan has no evidence integrity record (registered before ADR 0074)")
+        fng = self._plan_fng_problem(plan)
+        if fng:
+            why.append(fng)
         if result.get("funding_ok") is not True:
             why.append("funding of this step not confirmed")
         if (result.get("excluded") or {}).get("no_funding_coverage") or result.get("funding_dropped"):
@@ -2372,6 +2410,11 @@ class ForwardPaper:
         if not isinstance(a, Mapping):
             return ["evaluation record has no anchors (concluded before ADR 0076)"]
         out = []
+        fng = self._plan_fng_problem(plan)
+        if fng:
+            # ADR 0079: a conclusion reached on unpinned FNG data is never completed
+            # (resume) nor confirmed (verify_conclusion)
+            out.append(fng)
         plan_id = plan["plan_id"]
         try:
             now = self._anchors(plan, st)

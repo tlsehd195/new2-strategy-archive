@@ -30,7 +30,7 @@ import math
 from pathlib import Path
 from typing import Mapping, Optional, Sequence
 
-from engine_lib import append_jsonl, canonical_json, iso_now, iter_jsonl, locked_window_for
+from engine_lib import append_jsonl, canonical_json, exclusive_file_lock, iso_now, iter_jsonl, locked_window_for
 from stats_mc import spending_alpha
 
 CAMPAIGN_SCHEMA = "locked_campaign_v1"
@@ -110,7 +110,19 @@ class CampaignLedger:
                     max_campaigns: int, method: str, config_hash: str) -> dict:
         """Write the campaign BEFORE any locked data is touched.  ``members``
         maps strategy id -> symbols.  Raises WindowRetired if a window is
-        exhausted (the caller must exclude those members first)."""
+        exhausted (the caller must exclude those members first).
+
+        ADR 0079 (F-11): the window counts are read and the campaign appended
+        under the ledger's file lock (the legacy runner and the evolution
+        pipeline share this file), so two writers never take one campaign index."""
+        with exclusive_file_lock(self.path):
+            return self._preregister(source=source, source_ref=source_ref, context_id=context_id,
+                                     members=members, alpha_total=alpha_total,
+                                     max_campaigns=max_campaigns, method=method, config_hash=config_hash)
+
+    def _preregister(self, *, source: str, source_ref: str, context_id: str,
+                     members: Mapping[str, Sequence[str]], alpha_total: float,
+                     max_campaigns: int, method: str, config_hash: str) -> dict:
         have = self.find(source, source_ref)
         if have is not None:
             return have["preregistered"]

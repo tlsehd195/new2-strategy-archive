@@ -7,7 +7,6 @@ decision or written.
 """
 from __future__ import annotations
 
-import math
 import random
 import shutil
 import sys
@@ -313,3 +312,218 @@ class TestD01PowerAnalysis(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# ---------------------------------------------------------------------------
+# G-04 — Fear & Greed data of a forward plan
+# ---------------------------------------------------------------------------
+
+def _fng_edge_spec():
+    """EDGE (hour 0-2) gated by an FNG filter that is true whenever a value
+    exists (fng_max over 1 day <= 100): it trades like EDGE where FNG is known
+    and not at all where it is not."""
+    sp = tp.hour_spec(0, 2)
+    sp["filters"] = [{"feature": "fng_max", "params": {"days": 1}, "op": "le", "value": 100.0}]
+    return sp
+
+
+def _fng_map(lo_ms, hi_ms, value=10.0):
+    return {d: value for d in range(lo_ms // 86_400_000 - 30, hi_ms // 86_400_000 + 1)}
+
+
+from test_paper_forward_funding_20261111 import DAY, FundingCase  # noqa: E402
+
+
+class TestG04ForwardFng(FundingCase):
+    def _fng_ready(self):
+        """A PAPER_TEST_READY strategy that needs FNG; the provider's FNG series
+        ends at the registration time (what the archive holds then)."""
+        p, edge, feed = self.setup_feed(iv_h=4)
+        self.fng = _fng_map(feed.bars[0].ts, self.now[0])
+        p.provider.fng = lambda: self.fng
+        sid, _ = p.register(_fng_edge_spec(), source="test")
+        ctx = p.context_id()
+        for s in ("RESEARCH_ONLY", "VALIDATION_SURVIVOR", "PAPER_TEST_READY"):
+            p.statuses.set(sid, ctx, s, stage="test", reasons=["synthetic G-04 fixture"])
+        return p, sid, feed
+
+    def test_fng_strategy_plan_is_refused(self):
+        """HEAD 757114f registered the plan: FNG is read from the live provider at
+        every evaluation, nothing about it is in the plan (no hash, no snapshot)."""
+        from paper_forward import ForwardPaper, ForwardRefused
+        p, sid, feed = self._fng_ready()
+        fp = ForwardPaper(p, feed, clock=lambda: self.now[0])
+        with self.assertRaises(ForwardRefused) as cm:
+            fp.register_plan(sid)
+        self.assertIn("FNG", str(cm.exception))
+        self.assertEqual(fp.plans(), [])
+        self.assertEqual(p.statuses.status(sid, p.context_id()), "PAPER_TEST_READY")
+
+    def test_fng_changed_mid_plan_never_passes(self):
+        """A plan for an FNG strategy registered by an older version (the refusal
+        bypassed): the FNG source is extended / revised after registration.  The
+        plan must never conclude on FNG values it did not pin (HEAD: PAPER_PASSED
+        on the new FNG values, unnoticed — the synthetic provider's identity, like
+        any provider that omits FNG from it, does not change the context)."""
+        import paper_forward as pf
+        p, sid, feed = self._fng_ready()
+        fp = pf.ForwardPaper(p, feed, clock=lambda: self.now[0])
+        with mock.patch.object(pf.ForwardPaper, "_fng_refusal", return_value=None, create=True):
+            plan = fp.register_plan(sid)
+        self.now[0] += 20 * DAY
+        fp.step(plan["plan_id"])
+        self.fng = _fng_map(feed.bars[0].ts, feed.bars[-1].ts)       # source revised / extended
+        self.now[0] += 55 * DAY
+        r = fp.step(plan["plan_id"])
+        self.assertNotEqual(r["verdict"], "PAPER_PASSED", r.get("reasons"))
+        self.assertEqual(r["verdict"], "PAPER_BLOCKED_DATA", r.get("reasons"))
+        self.assertTrue(any("FNG" in x for x in r.get("reasons", [])), r.get("reasons"))
+        self.assertNotEqual(p.statuses.status(sid, p.context_id()), "PAPER_PASSED")
+        self.assertIsNone(p.evaluation("paper_forward", sid))
+
+    def test_non_fng_plan_unaffected(self):
+        """Control: the FNG rule does not touch a strategy without FNG."""
+        from paper_forward import ForwardPaper
+        p, edge, feed = self.setup_feed(iv_h=4)
+        fp = ForwardPaper(p, feed, clock=lambda: self.now[0])
+        plan = fp.register_plan(edge)
+        self.now[0] += 75 * DAY
+        self.assertEqual(fp.step(plan["plan_id"])["verdict"], "PAPER_PASSED")
+
+    def test_old_fng_conclusion_is_not_confirmed(self):
+        """A conclusion an older version recorded for an FNG plan is left as it is
+        (no record rewritten) but verify_conclusion no longer confirms it."""
+        import paper_forward as pf
+        p, sid, feed = self._fng_ready()
+        self.fng = _fng_map(feed.bars[0].ts, feed.bars[-1].ts)
+        fp = pf.ForwardPaper(p, feed, clock=lambda: self.now[0])
+        with mock.patch.object(pf.ForwardPaper, "_fng_refusal", return_value=None), \
+                mock.patch.object(pf.ForwardPaper, "_plan_fng_problem", return_value=None):
+            plan = fp.register_plan(sid)
+            self.now[0] += 75 * DAY
+            r = fp.step(plan["plan_id"])
+            self.assertEqual(r["verdict"], "PAPER_PASSED")              # what old code did
+            self.assertEqual(fp.verify_conclusion(plan["plan_id"]), [])
+        evals = (p.dir / "evaluations.jsonl").read_bytes()
+        probs = fp.verify_conclusion(plan["plan_id"])
+        self.assertTrue(any("FNG_NOT_PINNED" in x for x in probs), probs)
+        self.assertEqual((p.dir / "evaluations.jsonl").read_bytes(), evals)   # nothing rewritten
+
+
+# ---------------------------------------------------------------------------
+# F-11 — read-decide-write of shared records under one lock
+# ---------------------------------------------------------------------------
+
+import threading  # noqa: E402
+
+
+class TestF11Locks(unittest.TestCase):
+    def setUp(self):
+        self.td = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.td, True)
+
+    def test_status_transition_decided_on_the_file_not_a_stale_cache(self):
+        """HEAD: a second store instance (another process) with a stale cache
+        wrote RESEARCH_ONLY -> VALIDATION_SURVIVOR over a REJECTED (terminal)."""
+        from pipeline import InvalidStatusTransition, StatusStore
+        path = self.td / "statuses.jsonl"
+        a, b = StatusStore(path), StatusStore(path)
+        a.set("S1", "C", "RESEARCH_ONLY", stage="dev")
+        self.assertEqual(b.status("S1", "C"), "RESEARCH_ONLY")          # b caches the file now
+        a.set("S1", "C", "REJECTED", stage="validation")
+        with self.assertRaises(InvalidStatusTransition):
+            b.set("S1", "C", "VALIDATION_SURVIVOR", stage="validation")
+        rows = list(iter_jsonl(path))
+        self.assertEqual([r["status"] for r in rows], ["RESEARCH_ONLY", "REJECTED"])
+        self.assertEqual(b.status("S1", "C"), "REJECTED")
+        self.assertTrue(path.with_name(path.name + ".lock").exists())
+
+    def test_campaign_index_is_taken_once(self):
+        """HEAD: two writers read the window count before either appended and both
+        preregistered campaign 1 (alpha spent twice) on the same locked window."""
+        import campaigns as cmod
+        from engine_lib import LOCKED_TEST_PERIODS
+        sym = sorted(LOCKED_TEST_PERIODS)[0]
+        path = self.td / "locked_window_campaigns.jsonl"
+        read_done, release = threading.Event(), threading.Event()
+        orig = cmod.CampaignLedger.window_status
+
+        def slow_status(self_, symbol, *, max_campaigns):
+            st = orig(self_, symbol, max_campaigns=max_campaigns)
+            if threading.current_thread().name == "A":
+                read_done.set()
+                release.wait(1.0)          # B runs here (or waits on the lock)
+            return st
+        out = {}
+
+        def run(name, ref):
+            out[name] = cmod.CampaignLedger(path).preregister(
+                source="test", source_ref=ref, context_id="C", members={"S" + name: [sym]},
+                alpha_total=0.05, max_campaigns=5, method="m", config_hash="h")
+        with mock.patch.object(cmod.CampaignLedger, "window_status", slow_status):
+            ta = threading.Thread(target=run, args=("A", "ref-A"), name="A")
+            ta.start()
+            self.assertTrue(read_done.wait(5))
+            tb = threading.Thread(target=run, args=("B", "ref-B"), name="B")
+            tb.start()
+            tb.join(0.5)
+            release.set()
+            ta.join(10)
+            tb.join(10)
+        idx = sorted(w["campaign_index"] for r in out.values() for w in r["windows"].values())
+        self.assertEqual(idx, [1, 2])
+        rows = [r for r in iter_jsonl(path) if r["kind"] == "PREREGISTERED"]
+        self.assertEqual(sorted(w["campaign_index"] for r in rows for w in r["windows"].values()), [1, 2])
+
+    def test_lock_file_helper_serialises_threads(self):
+        """exclusive_file_lock (flock on a fresh descriptor) excludes a second
+        holder in the same process — what the tests above rely on."""
+        from engine_lib import exclusive_file_lock
+        p = self.td / "x.jsonl"
+        got = []
+        with exclusive_file_lock(p):
+            t = threading.Thread(target=lambda: (exclusive_file_lock(p).__enter__(), got.append(1)))
+            t.daemon = True
+            t.start()
+            t.join(0.3)
+            self.assertEqual(got, [])
+        t.join(5)
+        self.assertEqual(got, [1])
+
+
+class TestF11ForwardPlan(FundingCase):
+    def test_one_plan_per_strategy_under_concurrent_registration(self):
+        """HEAD: two ForwardPaper instances both passed the "plan exists" check and
+        appended two plans for one strategy (two observations of one hypothesis)."""
+        import paper_forward as pf
+        p, edge, feed = self.setup_feed(iv_h=4)
+        read_done, release = threading.Event(), threading.Event()
+        orig = pf.ForwardPaper._fetch_funding
+
+        def slow_fetch(self_, sym, after_ts):
+            r = orig(self_, sym, after_ts)
+            if threading.current_thread().name == "A":
+                read_done.set()
+                release.wait(2.0)
+            return r
+        errs, plans = [], []
+
+        def run():
+            try:
+                plans.append(pf.ForwardPaper(p, feed, clock=lambda: self.now[0]).register_plan(edge))
+            except pf.ForwardRefused as e:
+                errs.append(str(e))
+        with mock.patch.object(pf.ForwardPaper, "_fetch_funding", slow_fetch):
+            ta = threading.Thread(target=run, name="A")
+            ta.start()
+            self.assertTrue(read_done.wait(30))
+            tb = threading.Thread(target=run, name="B")
+            tb.start()
+            tb.join(1.0)
+            release.set()
+            ta.join(60)
+            tb.join(60)
+        fp = pf.ForwardPaper(p, feed, clock=lambda: self.now[0])
+        self.assertEqual(len([x for x in fp.plans() if x["strategy_id"] == edge]), 1)
+        self.assertEqual((len(plans), len(errs)), (1, 1), errs)
+        self.assertIn("already exists", errs[0])
