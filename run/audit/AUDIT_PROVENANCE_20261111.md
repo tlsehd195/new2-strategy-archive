@@ -18,4 +18,38 @@
 | `run/discovery/portfolio_multi.py` | FULL | all 808 lines before the change; rewritten parts re-read after the change | 예 | 예 | ADR 0071 | tests/test_portfolio_core_defects_20261111.py |
 | `run/discovery/tests/test_portfolio_multi_20261110.py` | FULL | all tests read and run | 예 | 아니오 | - | - |
 
+## 2026-11-12 작성자 수정 (ADR 0078 통합 전수 감사)
+
+- 27개 파일. 범위는 **변경한 함수와 그 호출부만** 다시 읽음(PARTIAL). 감사 등급을 올리지 않는다. 같은 날 검토 에이전트 보고는 ADR 0078 보고서에 '검토자 주장'으로 따로 둔다.
+
+| 파일 | 작성자 재검토 | 범위 | 실행 | 결함 재현 | 수정 | 회귀 테스트 |
+|---|---|---|---|---|---|---|
+| `run/audit/source_audit_20261110.py` | PARTIAL | H-06 reviewed_against sha256 freshness | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/autoloop.py` | PARTIAL | B-03 budget = search pool, B-04 dev on existing, B-05 whole rounds | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/cost_calibration.py` | PARTIAL | C-06 prediction on the filled notional | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/cost_sensitivity.py` | PARTIAL | C-02 declared funding schedule, C-09 per-symbol volatility label | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/data_fetch.py` | PARTIAL | H-09 symbol / month validation | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/data_quality.py` | PARTIAL | C-01 calc_time snapping in load_funding_csv_checked | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/engine_lib.py` | PARTIAL | D-04 pbo_cscv remainder, F-09 ProcessLock / process_lock_status / exclusive_file_lock, B-06 _round_floats | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/evolution.py` | PARTIAL | B-01/B-02 effective computation keys, FROZEN_PARAMS | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/fills_import.py` | PARTIAL | C-05 decision log keyed by (symbol, order_id) | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/funding_schedule.py` | PARTIAL | C-03 settlement_check under both interval readings | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/independent_window.py` | PARTIAL | F-06 open_tranche under lock, resume of a registered-not-started run | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/ledger_check.py` | PARTIAL | F-09 lock liveness, F-10 latest outcome | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/newlisting_collect.py` | PARTIAL | H-05 discover failures are a failure | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/ops.py` | PARTIAL | H-01 loop-owned SIGTERM/SIGINT, health lock status | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/paper.py` | PARTIAL | F-03 recorded replay re-applied before refusal | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/paper_forward.py` | PARTIAL | G-01 unobservable sample trades block, G-02/A-08 FileFeed hold-back, F-03 degraded replay refusal, G-05 docstring | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/pipeline.py` | PARTIAL | _inputs, preregister_batch, _evaluate_batch, _dsr, _pbo, robustness CI, _apply_robustness, _run_campaign, promotion_review, register, neighbours (D-01/02/03/05/06, ME-01, F-02, F-04, B-03, B-07) | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/portfolio.py` | PARTIAL | E-02 funding not zero-filled, E-03 open-gap liquidation | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/portfolio_multi.py` | PARTIAL | E-04 stop beyond liquidation, E-05 remainder of refused primary, E-06 unknown refusal share | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/power_analysis.py` | PARTIAL | D-01 B scaled to alpha | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/promotion.py` | PARTIAL | F-08 PromotionQueue on append_jsonl / iter_jsonl | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/run_cycle.sh` | PARTIAL | H-07 traps before mktemp (bash -n + shellcheck; no unit test) | 예 | 예 | ADR 0078 | - |
+| `run/discovery/runner.py` | PARTIAL | A-01 merged_bars cut, A-02 z guards, A-03 window-only gate, A-06 FNG gate, A-09 funding known, F-01 locked crash recovery, H-01/H-02/H-03 signals and exit code | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/stats_mc.py` | PARTIAL | D-01 bootstrap resolution (stepm / step_spa / mcs) | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/store.py` | PARTIAL | F-05 enqueue_reverify in reconcile, F-10 latest_by_strategy | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/strategy_spec.py` | PARTIAL | A-02 nondegenerate_sd, B-06 -0.0 | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+| `run/discovery/validation_registry.py` | PARTIAL | F-07 torn tail tolerated, interior corruption fails, flock-serialised writes | 예 | 예 | ADR 0078 | run/discovery/tests/test_integrated_audit_20261112.py |
+
 나머지 행은 `AUDIT_PROVENANCE_20261111.jsonl` 참조.
