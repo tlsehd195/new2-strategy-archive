@@ -1370,3 +1370,10 @@ Stage Summary:
 - 사전등록(데이터 받기 전 커밋) 가설 4개를 바이낸스 USDT-M 897개 종목의 시점별 상위 50개에 적용, DEV만
 - 가정 비용에서 4개 모두 손실(충격항이 대부분). 비용 0에서도 H3 캐리 S1 0.93(베타 뺀 t 1.49), H1 모멘텀 S1 0.59
 - 알트 비용 측정 후 같은 4개를 다시 돌린다
+
+## 2026-11-12 저장소 전체 전수 감사·통합 결함 수정 (ADR 0078)
+
+- 기준 `main` `2d6616a`. 영역별 검토 에이전트 8개(A 데이터 ~ H 운영/CI)와 작성자가 감사, 재현 스크립트는 합성 데이터·임시 디렉터리만
+- Critical 2(A-01 잠금 창 월초 시작, G-01 데이터 구멍으로 PAPER_PASSED), High 6(ME-01, D-01, F-01~F-03, G-02) 및 Medium·Low 다수 수정. 수용 한계: E-01, ME-04, A-05, B-06 일부, C-04, C-07
+- 신규 회귀 테스트 55개(`test_integrated_audit_20261112.py`, 수정 전 52개 실패). 버전 갱신: datapol-v2, funding-schedule-v2, mc-v4, evo-pipeline-v2, fp-v3, evo-gen-v2, power-analysis-v2, portfolio-multi-v4, portfolio-mtm-v4
+- 보호 데이터·잠금/IW1 창·사전등록·기존 원장 손대지 않음. 보고서: `run/audit/FINAL_REPORT_20261112.md`, 현재 상태: `run/audit/STATUS_CURRENT_20261112.md`

@@ -327,7 +327,8 @@ class TestCostSensitivity(unittest.TestCase):
     def test_c09_volatility_label_is_per_symbol(self):
         """C-09: two symbols entering on one bar overwrote each other's label."""
         import cost_sensitivity as cs
-        ev = [{"symbol": "A", "entry_ts": 1, "net_bp": 10.0}, {"symbol": "B", "entry_ts": 1, "net_bp": -4.0}]
+        z = {"gross_bp": 0.0, "cost_bp": 0.0, "funding_bp": 0.0}
+        ev = [dict(z, symbol="A", entry_ts=1, net_bp=10.0), dict(z, symbol="B", entry_ts=1, net_bp=-4.0)]
         row = cs._row(ev, 0, {("A", 1): "high_vol", ("B", 1): "low_vol"})
         self.assertEqual((row["n_high_vol"], row["n_low_vol"]), (1, 1))
         self.assertEqual((row["net_bp_high_vol"], row["net_bp_low_vol"]), (10.0, -4.0))
@@ -430,15 +431,25 @@ class TestPipelineStatistics(PCase):
             self.assertEqual(dsr["gate_value"], dsr.get("dsr_at_trials_searched"))
 
     def test_d05_ci_spans_the_validation_window(self):
-        """D-05: the CI series ran from the first to the last exit day only."""
+        """D-05: the CI series ran from the first to the last exit day only, so
+        flat days of the validation window before / after the trades were left out."""
         from pipeline import DAY_MS
-        p = self._validated()
-        edge = p.register(tp.EDGE, source="test")[0]
-        rec = p.evaluation("robustness", edge)
-        self.assertIsNotNone(rec)
-        _ev, v0, v1 = p._validation_events(edge, "BTCUSDT")
+        p = self.pipe()
+        edge = self.register_all(p, [tp.EDGE] + tp.NOISE)[0]
+        orig = p._validation_events
+        _ev, v0, v1 = orig(edge, "BTCUSDT")
         bars = p.provider.symbol("BTCUSDT")["bars"]
         window_days = bars[v1].ts // DAY_MS - bars[v0].ts // DAY_MS + 1
+        lo = bars[v0].ts + (bars[v1].ts - bars[v0].ts) // 4
+        hi = bars[v0].ts + 3 * (bars[v1].ts - bars[v0].ts) // 4
+
+        def sparse(sid, sym):           # trades only in the middle half of the window
+            ev, a, b = orig(sid, sym)
+            return [x for x in ev if lo <= x["exit_ts"] <= hi], a, b
+        with mock.patch.object(p, "_validation_events", sparse):
+            p.run_validation()
+        rec = p.evaluation("robustness", edge)
+        self.assertIsNotNone(rec)
         self.assertGreaterEqual(rec["checks"]["bootstrap_ci"]["n_days"], window_days)
 
 
@@ -530,14 +541,52 @@ class TestSearchBudget(PCase):
         self.assertEqual([k for k, v in c.items() if v > 1], [])
 
     def test_b03_neighbours_do_not_use_the_search_budget(self):
-        """B-03: robustness neighbours were counted in the search pool / budget."""
-        p = self.pipe()
-        self.register_all(p, [tp.EDGE] + tp.NOISE)
+        """B-03: robustness neighbours (which exist only because their centre passed
+        VALIDATION) consumed max_specs_total: the search stopped after a validation."""
+        from autoloop import run_evolution_cycle
+        from search import SearchConfig
+        cfg = SearchConfig(children_per_round=4, seed=3, max_specs_total=12)
+        out = {}
+        for with_validation in (False, True):
+            d = self._setup(f"v{int(with_validation)}", cfg)
+            if with_validation:
+                from pipeline import EvolutionPipeline
+                q = EvolutionPipeline(d, self.prov, tp.verified_fee_cost(), symbols=["BTCUSDT"], search_cfg=cfg)
+                q.run_validation()
+                self.assertGreater(len(q.specs.all()), len(q.search_pool()))   # neighbours exist
+            s = run_evolution_cycle(d, self.prov, tp.verified_fee_cost(), symbols=["BTCUSDT"], search_cfg=cfg,
+                                    seed_legacy=False, rounds=1, confirmatory=False)
+            out[with_validation] = (s.search_status, s.rounds)
+        self.assertEqual(out[True], out[False])
+        self.assertNotEqual(out[True][0], "BUDGET_EXHAUSTED")
+
+    def test_b04_child_equal_to_a_neighbour_is_screened(self):
+        """B-04: the search proposing a spec that already exists as a neighbour
+        registered it (created=False) without a DEV status: never screened."""
+        import autoloop
+        from autoloop import run_evolution_cycle
+        from pipeline import EvolutionPipeline
+        from search import SearchConfig
+        cfg = SearchConfig(children_per_round=4, seed=3)
+        d = self._setup("n", cfg)
+        p = EvolutionPipeline(d, self.prov, tp.verified_fee_cost(), symbols=["BTCUSDT"], search_cfg=cfg)
         p.run_validation()
-        pool = set(p.search_pool())
-        neigh = [r["strategy_id"] for r in iter_jsonl(p.dir / "specs.jsonl")
-                 if (r.get("source") or "").startswith("neighbour")]
-        self.assertFalse(pool & set(neigh))
+        nb = [r["strategy_id"] for r in iter_jsonl(p.specs.path) if r["source"].startswith("neighbour_of:")]
+        self.assertTrue(nb)
+        n = nb[0]
+        parent = p.register(tp.EDGE, source="test")[0]
+
+        def fake(**kw):
+            return [{"spec": p.specs.get(n), "sid": n, "parents": [parent], "operator": "tweak_threshold",
+                     "detail": {}}], {"attempts": 1, "invalid": 0, "duplicates": 0, "semantic_duplicates": 0,
+                                      "near_duplicates": 0, "dedup_log": []}
+        with mock.patch.object(autoloop, "propose_round", fake):
+            run_evolution_cycle(d, self.prov, tp.verified_fee_cost(), symbols=["BTCUSDT"], search_cfg=cfg,
+                                seed_legacy=False, rounds=1, confirmatory=False)
+        p2 = EvolutionPipeline(d, self.prov, tp.verified_fee_cost(), symbols=["BTCUSDT"], search_cfg=cfg)
+        if n in p2.search_pool():
+            self.assertIsNotNone(p2.statuses.status(n, p2.context_id()))
+            self.assertIsNotNone(p2.evaluation("dev", n))
 
 
 # ---------------------------------------------------------------------------
@@ -594,21 +643,56 @@ class TestPortfolioMulti(unittest.TestCase):
         self.assertGreaterEqual(acc["remainder_legs"]["skipped_by_reason"]["primary_not_entered"], 1)
 
     def test_e06_missing_refusal_share_is_undetermined(self):
+        """E-06: a refusal-share limit was skipped when the accounting lacked the rate."""
         import portfolio_multi as pm
-        res = {"signal_accounting": None}
-        crit = {"max_cost_refusal_share": 0.1, "max_capital_refusal_share": 0.1}
-        with mock.patch.object(pm, "judge", wraps=pm.judge):
-            try:
-                verdict, why = pm.judge(res, crit)
-            except (KeyError, TypeError):
-                self.skipTest("judge needs a full result on this version")
-        self.assertNotEqual(verdict, "PASS_PORTFOLIO")
+        ok = {"status": "OK", "value": 0.01}
+        res = {"trades_closed": 50, "cost_status": "OK", "final_equity": 11_000.0, "initial_capital": 10_000.0,
+               "liquidation_events": 0, "signal_accounting": {"status": "OK"},
+               "metrics": {"span_days": 120, "max_drawdown": {"value": 0.01}, "max_drawdown_close": ok}}
+        self.assertEqual(pm.judge(res, {"min_trades": 1})[0], "PASS_PORTFOLIO")       # control
+        verdict, why = pm.judge(res, {"min_trades": 1, "max_capital_refusal_share": 0.1})
+        self.assertEqual(verdict, "UNDETERMINED_PORTFOLIO")
+        self.assertTrue(any("refusal share unknown" in w for w in why), why)
 
 
 class TestLegacyPortfolio(unittest.TestCase):
-    def test_e02_missing_funding_is_not_zero(self):
-        import portfolio
-        self.assertEqual(portfolio.PORTFOLIO_MODEL_VERSION, "portfolio-mtm-v4")
+    def _run(self, prices, opens=None, funding=None, ivs=None, leverage=1.0, horizon=60):
+        from costs_bridge import CostContext
+        from portfolio import PortfolioConfig, simulate_portfolio
+        bars = [Bar(ts=_ms("2024-01-01") + i * MS15, open=(opens[i] if opens and opens[i] else p),
+                    high=max(p, opens[i] if opens and opens[i] else p) * 1.0001,
+                    low=min(p, opens[i] if opens and opens[i] else p) * 0.9999, close=p,
+                    volume=1e9, quote_volume=1e12) for i, p in enumerate(prices)]
+        cost = CostContext.from_params({"fee_rate": 0.0, "half_spread": 0.0, "impact_coefficient": 0.0,
+                                        "max_participation": 1.0}, version="TEST_ZERO", test_only=True)
+        kw = {} if ivs is None else {"funding_intervals_by_symbol": ivs}
+        return simulate_portfolio({"A": bars}, [{"symbol": "A", "decision_index": 4, "side": 1, "horizon": horizon}],
+                                  {"A": funding if funding is not None else []}, cost,
+                                  PortfolioConfig(initial_capital=10_000.0, size_fraction=1.0,
+                                                  leverage=leverage, max_concurrent=2), **kw)
+
+    def test_e02_missing_funding_is_not_charged_zero_silently(self):
+        """E-02: an empty funding series charged 0 and the portfolio could pass."""
+        from portfolio import portfolio_passes
+        res = self._run([100.0] * 80)
+        self.assertNotEqual(getattr(res, "funding_status", "OK"), "OK")
+        ok, why = portfolio_passes(res.to_json())
+        self.assertFalse(ok)
+        self.assertTrue(any("funding status" in w for w in why), why)
+        t0 = _ms("2024-01-01")
+        fund = [(t0 + k * H8, 0.0) for k in range(-2, 8)]
+        res2 = self._run([100.0] * 80, funding=fund, ivs={"A": {t: H8 for t, _ in fund}})
+        self.assertEqual(res2.funding_status, "OK")
+
+    def test_e03_open_beyond_liquidation_liquidates(self):
+        """E-03: a bar OPENING beyond the liquidation price was exited at that open
+        (loss larger than the margin, no liquidation)."""
+        prices = [100.0] * 10 + [40.0] * 70
+        opens = [None] * 10 + [40.0] + [None] * 69
+        for horizon in (5, 60):           # time exit AT the gap open, and a later one
+            res = self._run(prices, opens=opens, leverage=2.0, horizon=horizon)
+            self.assertEqual(res.liquidation_events, 1, horizon)
+            self.assertGreaterEqual(res.final_equity if hasattr(res, "final_equity") else 0.0, 0.0)
 
 
 # ---------------------------------------------------------------------------

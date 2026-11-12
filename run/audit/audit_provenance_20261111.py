@@ -63,8 +63,8 @@ AUTHOR_2026_11_11 = {
 #: what the thread author of 2026-11-12 (ADR 0078, integrated full audit) changed
 #: and re-read: PARTIAL = the changed functions and their callers (never the
 #: whole file; not an audit-grade upgrade).  Each defect was reproduced by a
-#: script / test on main 2d6616a before the fix (46 of the 53 regression tests
-#: fail on 2d6616a; the others are controls).  Reviewer reports of 2026-11-12
+#: script / test on main 2d6616a before the fix (52 of the 55 regression tests
+#: fail on 2d6616a; the 3 others are controls).  Reviewer reports of 2026-11-12
 #: are not copied here: they live in the ADR 0078 report as reviewer claims.
 AUTHOR_2026_11_12 = {
     'run/audit/source_audit_20261110.py': ("PARTIAL", 'H-06 reviewed_against sha256 freshness', True, True, "ADR 0078", 'run/discovery/tests/test_integrated_audit_20261112.py'),
