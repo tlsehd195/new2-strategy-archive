@@ -211,22 +211,27 @@
 
 ## E. 테스트 결과
 
-로컬은 GitHub Actions `research-ci.yml`과 같은 단계를 `local_ci.sh`로 돌렸다. 결과는 아래 표에 채운다. 실행하지 못한 항목은 "미실행"으로 적는다.
+최종 판정 근거는 GitHub Actions `research-ci` run 43223302754(push)와 43223313166(pull_request)이다. 둘 다 head `f54a0bc`에서 실행했고, 3.11·3.13 모두 success였다. 이 워크플로는 아래 단계를 모두 포함한다.
 
 | 항목 | Python 3.11 | Python 3.13 |
 |---|---|---|
-| 기존 테스트 | (CI_311_EXISTING) | (CI_313_EXISTING) |
-| 신규 테스트(55) | (CI_311_NEW) | (CI_313_NEW) |
-| 전체 unit(discovery) | (CI_311_UNIT) | (CI_313_UNIT) |
-| 루트 연구 테스트 / legacy | (CI_311_ROOT) | (CI_313_ROOT) |
-| 정적 검사(ruff E9/F63/F7/F82, F 전체) | (CI_311_RUFF) | (CI_313_RUFF) |
-| Shell(bash -n, shellcheck) | (CI_311_SHELL) | (CI_313_SHELL) |
-| TypeScript(bun transpile) | (CI_311_TS) | (CI_313_TS) |
-| 원장 검사(ledger_check . / state) | (CI_311_LEDGER) | (CI_313_LEDGER) |
-| source audit check | (CI_311_SA) | (CI_313_SA) |
-| inventory 최신성 | (CI_311_INV) | (CI_313_INV) |
-| provenance check | (CI_311_PROV) | (CI_313_PROV) |
-| GitHub Actions | §G 참조 | §G 참조 |
+| 기존 테스트 | 통과 (Actions) | 통과 (Actions) |
+| 신규 테스트(55) | 통과 (로컬 + Actions) | 통과 (로컬 + Actions) |
+| 전체 unit(discovery, 1,071개) | 통과 (Actions) | 통과 (Actions) |
+| 루트 연구 테스트(152개) / legacy | 통과 (로컬 + Actions) | 통과 (로컬 + Actions) |
+| 정적 검사(ruff E9/F63/F7/F82, F 전체) | 통과 | 통과 |
+| Shell(bash -n, shellcheck) | 통과 | 통과 |
+| TypeScript(bun transpile) | 통과 (Actions) | 통과 (Actions) |
+| 원장 검사(ledger_check . / state) | 통과 | 통과 |
+| source audit check | 통과 | 통과 |
+| inventory 최신성 | 통과 | 통과 |
+| provenance check | 통과 | 통과 |
+| GitHub Actions | success | success |
+
+로컬 실행 경과는 다음과 같다.
+- 로컬 3.13 전체 unit을 `8360ca2`에서 실행했다(1,071개). 기존 테스트 3개만 실패했다. 이 3개는 첫 Actions 실행 #341/#342의 실패와 같다.
+- 세 테스트를 E-04·C-03·C-09 동작에 맞게 고친 뒤(§D, ADR 0078 §4), 해당 파일만 로컬 3.11/3.13에서 다시 돌려 통과를 확인했다.
+- 로컬 3.11 전체 unit은 작업 프로세스가 재시작되면서 중단됐다(미완료). 전체 통과는 Actions 결과로 확인했다.
 
 수정 전 `2d6616a`에서 신규 테스트를 돌리면 55개 중 52개가 실패한다. 나머지 3개는 대조군이다.
 
@@ -260,12 +265,19 @@
 | 항목 | 값 |
 |---|---|
 | 작업 브랜치 | `claude/project-thread-vjbdnd` |
-| 커밋 ID | (GH_COMMITS) |
-| PR | (GH_PR) |
-| 변경 파일 수 / 추가·삭제 줄 | (GH_DIFFSTAT) |
-| GitHub Actions | (GH_ACTIONS) |
-| main 병합 | (GH_MERGE) |
+| 커밋 ID | `c8b733c`, `6cd8e70`, `992b7b1`, `adfb0f4`, `e8f6b1b`, `a0de558`, `8ea4266`, `8360ca2`, `f54a0bc` (+ 이 보고서를 고친 커밋) |
+| PR | [#79](https://github.com/tlsehd195/new2-strategy-archive/pull/79) |
+| 변경 파일 수 / 추가·삭제 줄 | 48개 / +3,337 −674 (`f54a0bc` 기준) |
+| GitHub Actions | 첫 실행 #341/#342(`8360ca2`): 3.11·3.13 실패(기존 테스트 3개). `f54a0bc` 실행(43223302754, 43223313166): 3.11·3.13 모두 success |
+| main 병합 | **안 함.** 지시 §21G에 따라 검토용 PR로 제출했다. mergeable_state clean |
 
 ## H. 최종 판정
 
-(VERDICT)
+**APPROVED WITH LIMITATIONS**
+
+- 확인한 Critical 2건과 High 6건은 모두 수정했다. 각각 수정 전 코드에서 실패하는 회귀 테스트가 있고, Actions 3.11·3.13이 통과했다.
+- 한계는 다음과 같다.
+  - §20의 "모든 핵심 모듈 전체 코드 검토" 기준을 충족하지 못했다(`runner.py`·`engine_lib.py`는 부분 검토). 이 기준으로 보면 "완료"가 아니다.
+  - E-01과 ME-04는 사용자 결정이 필요하다.
+  - POSSIBLE 13건은 확인하지 못했다.
+  - 비용 VERIFIED·검정력·독립 검증 창은 외부 증거가 필요하다.
