@@ -87,7 +87,7 @@ import random
 from typing import Mapping, Optional, Sequence
 
 #: version tag recorded in every decision (changing any rule => new tag)
-MC_METHOD_VERSION = "mc-v3(stationary-bootstrap,RC,SPA,StepM-studentized,StepSPA-diagnostic,MCS-Tmax,BY,alpha-spending-1/k^2)"
+MC_METHOD_VERSION = "mc-v4(stationary-bootstrap,RC,SPA,StepM-studentized,StepSPA-diagnostic,MCS-Tmax,BY,alpha-spending-1/k^2,B>=5/alpha)"
 
 
 # ---------------------------------------------------------------------------
@@ -367,6 +367,31 @@ def spa_test(series: Mapping[str, Sequence[float]], *, B: int = 1000,
             "seed": seed}
 
 
+class InsufficientBootstrapResolution(ValueError):
+    """ADR 0078 (D-01): a bootstrap test cannot be run at level ``alpha`` with ``B``
+    draws when alpha * (B + 1) < 1 — the (1 - alpha) quantile index is clamped to
+    the largest draw and the real level stays near 1/(B + 1) however small alpha
+    is.  Alpha spending (6/pi^2/k^2) drives alpha below 1/B from the 4th batch on a
+    window at B = 1000; the test is refused instead of silently running at ~0.001."""
+
+
+#: draws in the tail beyond the critical value required by :func:`bootstrap_B_for`
+MIN_TAIL_DRAWS = 5
+
+
+def bootstrap_B_for(alpha: float, base_B: int) -> int:
+    """B for a test at level ``alpha``: the configured B, raised so that at least
+    MIN_TAIL_DRAWS draws lie beyond the critical value (ADR 0078)."""
+    return max(int(base_B), int(math.ceil(MIN_TAIL_DRAWS / alpha)) + 1)
+
+
+def _require_resolution(alpha: float, B: int) -> None:
+    if alpha * (B + 1) < 1.0:
+        raise InsufficientBootstrapResolution(
+            f"alpha {alpha:.3g} needs B >= {int(math.ceil(1.0 / alpha))} bootstrap draws, got {B} "
+            "(the critical value would be the largest draw for any smaller alpha)")
+
+
 def stepm(series: Mapping[str, Sequence[float]], *, alpha: float, B: int = 1000,
           q: Optional[float] = None, seed: int = 0, studentize: str = "fixed",
           block_len: Optional[int] = None, lag_window: str = "parzen",
@@ -404,6 +429,7 @@ def stepm(series: Mapping[str, Sequence[float]], *, alpha: float, B: int = 1000,
     q = q or default_q(n)
     if not 0.0 < alpha < 1.0:
         raise ValueError("alpha must be in (0, 1)")
+    _require_resolution(alpha, B)
     rng = random.Random(seed)
     dbar = {k: _mean(series[k]) for k in keys}
     sig = {}
@@ -483,6 +509,7 @@ def step_spa(series: Mapping[str, Sequence[float]], *, alpha: float, B: int = 10
     q = q or default_q(n)
     if not 0.0 < alpha < 1.0:
         raise ValueError("alpha must be in (0, 1)")
+    _require_resolution(alpha, B)
     rng = random.Random(seed)
     dbar = {k: _mean(series[k]) for k in keys}
     w = {}
@@ -550,6 +577,7 @@ def mcs(series: Mapping[str, Sequence[float]], *, alpha: float = 0.10, B: int = 
     q = q or default_q(n)
     if not 0.0 < alpha < 1.0:
         raise ValueError("alpha must be in (0, 1)")
+    _require_resolution(alpha, B)
     if len(keys) < 2:
         return {"method": "hln2011_mcs_tmax", "alpha": alpha, "p": {keys[0]: 1.0},
                 "set": list(keys), "eliminated": [], "B": B, "q": q, "n": n, "seed": seed}
