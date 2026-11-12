@@ -69,12 +69,15 @@ def scenario_cost(base, mult: Mapping[str, float], *, name: str):
                                    test_only=base.test_only)
 
 
-def _events(spec: Mapping, sym: str, bars, funding, fng, lo: int, hi: int, cost, order_value: float):
+def _events(spec: Mapping, sym: str, bars, funding, fng, lo: int, hi: int, cost, order_value: float,
+            funding_intervals: Optional[Mapping] = None):
     from evaluator import run_event_study
     from strategy_spec import build_spec_aux, build_spec_signal, stop_exit_rule
     aux = build_spec_aux(bars, spec, funding, fng)
     es = run_event_study(bars[:hi + 1], sym, build_spec_signal(spec, aux), spec["exit"]["horizon"], cost,
-                         order_value, funding, warmup=max(1, lo), exit_rule=stop_exit_rule(spec))
+                         order_value, funding, warmup=max(1, lo), exit_rule=stop_exit_rule(spec),
+                         # ADR 0078 (C-02): declared schedule whenever funding is charged
+                         funding_intervals=funding_intervals, require_funding=funding is not None)
     return [e.to_json() for e in es.events], es.participation_refusals
 
 
@@ -95,7 +98,9 @@ def _row(ev: Sequence[Mapping], refused: int, vol_split: Optional[Mapping]) -> d
            "net_t": t if math.isfinite(t) else None}
     if vol_split is not None:
         for part in ("high_vol", "low_vol"):
-            xs = [x["net_bp"] for x in ev if vol_split.get(x["entry_ts"]) == part]
+            # ADR 0078 (C-09): keyed by (symbol, entry time) — two symbols entering on
+            # the same bar used to overwrite each other's volatility label
+            xs = [x["net_bp"] for x in ev if vol_split.get((x["symbol"], x["entry_ts"])) == part]
             row[f"net_bp_{part}"] = sum(xs) / len(xs) if xs else None
             row[f"n_{part}"] = len(xs)
     return row
@@ -118,12 +123,12 @@ def sensitivity(spec: Mapping, inputs: Mapping[str, Mapping], base_cost, order_v
         evs, refused = [], 0
         for sym, d in sorted(inputs.items()):
             ev, r = _events(spec, sym, d["bars"], d.get("funding"), d.get("fng"), d["lo"], d["hi"],
-                            cost, order_value * size)
+                            cost, order_value * size, funding_intervals=d.get("funding_intervals"))
             if name == "base":
                 idx = {b.ts: i for i, b in enumerate(d["bars"])}
                 vols = {x["entry_ts"]: _vol_at(d["bars"], idx[x["entry_ts"]] - 1) for x in ev}
                 med = sorted(vols.values())[len(vols) // 2] if vols else 0.0
-                vol_split.update({ts: ("high_vol" if v > med else "low_vol") for ts, v in vols.items()})
+                vol_split.update({(sym, ts): ("high_vol" if v > med else "low_vol") for ts, v in vols.items()})
                 vol_ratio.update({(sym, ts): (v / med if med > 0 else 1.0) for ts, v in vols.items()})
                 base_events += [dict(x, symbol=sym) for x in ev]
             evs += ev
@@ -195,7 +200,8 @@ def dev_inputs(pipe, spec: Mapping) -> dict:
         if e["missing"]:
             continue
         d1 = pipe.provider.windows(sym, spec["exit"]["horizon"])["dev"][1]
-        out[sym] = {"bars": e["bars"], "funding": e["funding"], "fng": fng, "lo": 1, "hi": d1}
+        out[sym] = {"bars": e["bars"], "funding": e["funding"], "funding_intervals": e.get("funding_intervals"),
+                    "fng": fng, "lo": 1, "hi": d1}
     return out
 
 

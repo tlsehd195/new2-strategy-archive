@@ -381,9 +381,13 @@ def fit_parameters(obs: Sequence[Observation], base_params: Mapping[str, float])
 
 
 def predicted_bp(cost_ctx, o: Observation) -> Optional[float]:
+    """Model cost of the notional that was actually FILLED (ADR 0078, C-06):
+    the observed cost is per filled notional, so a partial fill predicted on
+    the requested size compared two different trades (bias towards VERIFIED)."""
     if o.bar_traded_value is None:
         return None
-    return cost_ctx.quote(o.notional, o.bar_traded_value) * 1e4
+    size = o.filled_notional if (o.filled_notional or 0) > 0 else o.notional
+    return cost_ctx.quote(size, o.bar_traded_value) * 1e4
 
 
 def load_criteria(path: Optional[Path] = None) -> tuple[dict, str]:

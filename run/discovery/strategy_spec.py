@@ -112,6 +112,22 @@ def registry_identity() -> dict:
 
 # --- causal helpers -----------------------------------------------------------
 
+#: relative size below which a window's standard deviation is rounding noise
+SD_REL_EPS = 1e-9
+
+
+def nondegenerate_sd(sd: float, xs: Sequence[float]) -> bool:
+    """True when ``sd`` is a real spread of ``xs`` (ADR 0078, A-02).
+
+    A numerically constant window gives sd ~ 1e-20 instead of 0 (float
+    summation), and ``(x - mu) / sd`` then turned a rounding error into a
+    z-score of +-1e12 — a spurious signal.  The spread must exceed
+    ``SD_REL_EPS`` times the largest magnitude in the window."""
+    if not sd > 0:
+        return False
+    scale = max((abs(x) for x in xs), default=0.0)
+    return sd > SD_REL_EPS * scale
+
 def _rolling_z(vals: Sequence[Optional[float]], i: int, window: int) -> Optional[float]:
     """Identical to runner._rolling_z (legacy semantics: window of PRIOR
     values, current value standardised)."""
@@ -123,7 +139,7 @@ def _rolling_z(vals: Sequence[Optional[float]], i: int, window: int) -> Optional
     mu = sum(xs) / len(xs)
     var = sum((x - mu) ** 2 for x in xs) / max(1, len(xs) - 1)
     sd = var ** 0.5
-    if sd <= 0:
+    if not nondegenerate_sd(sd, xs):
         return None
     cur = vals[i]
     if cur is None or cur != cur:
@@ -153,7 +169,7 @@ def _f_breakout_k(ctx: dict, p: Mapping) -> list:
         w = closes[i - vw:i]
         mu = sum(w) / vw
         sd = (sum((x - mu) ** 2 for x in w) / max(1, vw - 1)) ** 0.5
-        if sd > 0:
+        if nondegenerate_sd(sd, w):
             out[i] = (closes[i] - max(w)) / sd
     return out
 
@@ -291,7 +307,7 @@ def _f_ma_dist_z(ctx: dict, p: Mapping) -> list:
         xs = closes[i - w:i]
         mu = sum(xs) / w
         sd = (sum((x - mu) ** 2 for x in xs) / max(1, w - 1)) ** 0.5
-        if sd > 0:
+        if nondegenerate_sd(sd, xs):
             out[i] = max(-8.0, min(8.0, (closes[i] - mu) / sd))
     return out
 
@@ -378,7 +394,8 @@ def _num(v, what: str) -> float:
 
 
 def _round(x: float) -> float:
-    return float(f"{x:.10g}")
+    # ADR 0078 (B-06): -0.0 and 0.0 are one threshold (one id, one behaviour key)
+    return float(f"{x:.10g}") + 0.0
 
 
 def _canon_cond(c: Mapping, where: str) -> dict:
