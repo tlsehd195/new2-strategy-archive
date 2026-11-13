@@ -1391,3 +1391,9 @@ Stage Summary:
 - G-03: AST Call 노드 기반 호출 그래프(`tests/static_callgraph.py`)로 공유 진입 16개, 평가기 전용·재생 전용 목록을 정확 일치로 고정. 변형 테스트와 런타임 추적으로 교차 확인
 - F-11: 잠금 프로토콜이 있는 파일의 단순 추가 4곳(캠페인 RESULT/ABORT, 배치 RESULT, evaluations, research_feedback)을 잠금 안으로
 - 신규 테스트 15개(`3d49e41`에서 5개 테스트 실패와 문서 하위 28개 실패). 로컬 CI 3.11·3.13 unit 1,119, root 152 통과. 보고서 `run/audit/FINAL_REPORT_ADR0079_FOLLOWUP_20261112.md`
+
+## 2026-11-13 C-4 Handoff FNG 결론 차단 (ADR 0079 §6)
+
+- 기준 `66bf37c`(PR #79). `build_handoff`가 과거 FNG PAPER_PASSED를 그대로 내보내던 것을 HandoffRefused(FNG_NOT_PINNED, UNVERIFIED_PRIOR_CONCLUSION)로 바꿨다. PAPER_PASSED 상태는 그 기록과 증거 ID가 맞아야 하고, 명세가 없으면 거부한다
+- 신규 테스트 4개(`TestC04HandoffFng`, 실제 승격 흐름의 합성 FNG 전략). 수정 전 3개가 실패한다. 기록·기존 handoff 파일이 바이트 단위로 보존됨을 확인했다
+- 보고서 `run/audit/FINAL_REPORT_C04_HANDOFF_20261113.md`

@@ -5,7 +5,7 @@
   `spot_checked`가 참인 행만 작성자가 직접 다시 읽어 확인했다.
 - 모든 행에서 lines_read = lines_total(파일 전체를 읽음).
 - ADR 0078: 각 행은 검토한 파일 판본(`reviewed_against`: 표 작성 커밋의 sha256)에 묶인다.
-  그 뒤 바뀐 파일은 `검토 후 변경`에 표시되며, 그 행의 수준은 검토한 판본에만 해당한다 (현재 8개).
+  그 뒤 바뀐 파일은 `검토 후 변경`에 표시되며, 그 행의 수준은 검토한 판본에만 해당한다 (현재 9개).
 
 ## 감사 수준별 개수
 
@@ -275,7 +275,7 @@
 | `run/discovery/execution_sim.py` | TESTED | 131 | NONE_FOUND | POSSIBLE | NONE_FOUND |  |  |
 | `run/discovery/funding_cost.py` | LOGIC_TRACED | 326 | NONE_FOUND | CONFIRMED | POSSIBLE |  | 예 (현재 327줄) |
 | `run/discovery/generation.py` | TESTED | 478 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
-| `run/discovery/handoff.py` | TESTED | 103 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `run/discovery/handoff.py` | TESTED | 103 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  | 예 (현재 148줄) |
 | `run/discovery/newlisting_collect.py` | TESTED | 323 | POSSIBLE | NONE_FOUND | POSSIBLE | 예 | 예 (현재 349줄) |
 | `run/discovery/ops.py` | TESTED | 235 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  | 예 (현재 257줄) |
 | `run/discovery/paper.py` | TESTED | 106 | NONE_FOUND | NONE_FOUND | POSSIBLE |  | 예 (현재 126줄) |

@@ -180,3 +180,23 @@ ADR 0078은 "alpha*(B+1) < 5이면 검정 거부"라고 적었고 `bootstrap_B_f
 
 - 상태 원장에 `PAPER_PASSED`로 남은 과거 FNG 전략을 handoff 등 하류 문서에서 어떻게 표시할지. 지금은 `step()`과 `verify_conclusion()`만 미검증으로 표시한다.
 - 같은 상태 디렉터리에 여러 인스턴스를 지원할지. 지원하려면 평가 단계 전체를 잠가야 한다.
+
+## 6. C-4 Handoff의 FNG 결론 (사용자 지시 2026-11-13 04:21Z, 기준 `66bf37c`)
+
+- 경로: `handoff.build_handoff`가 `pipeline.evaluation("paper_forward", sid)`의 `verdict`를 `paper_forward_verdict`에 그대로 복사했다. 그래서 ADR 0079 이전 코드가 PAPER_PASSED로 끝낸 FNG 전략이 `status: PAPER_PASSED`, `paper_forward_verdict: PAPER_PASSED`로 내보내졌다. 합성 데이터의 실제 승격 흐름(검증 StepM, 잠금 캠페인, 재생, 승격 검토)으로 재현했다.
+- 결정: Handoff를 **거부**한다(`HandoffRefused`).
+  - 이 경로는 원래 증거 불일치를 거부로 처리한다(예: 승격 검토 증거가 다르면 거부).
+  - 봉인 문서에 "미검증 PAPER_PASSED"를 표시하는 방식은 택하지 않았다. 문서의 `status` 필드가 상태 원장의 PAPER_PASSED를 그대로 담기 때문이다. 그러려면 스키마를 바꿔야 하고, 통과로 읽힐 여지도 남는다.
+- 거부 조건과 처리:
+  - **FNG 전략:** `ForwardPaper._fng_refusal`(정규화 명세의 `data`)로 판정한다. Paper Forward 기록이 있으면 판정과 관계없이 FNG_NOT_PINNED와 UNVERIFIED_PRIOR_CONCLUSION으로 거부한다.
+    - FNG 출처·스냅샷을 검증할 구조가 없어서(계획에 FNG 해시 없음, 전진 피드에 FNG 원천 없음), 검증된 FNG 결론이라는 범주가 존재하지 않는다.
+    - FNG 전략이라도 기록이 없는 PAPER_TEST_READY·PAPER_TESTING은 이전과 같이 `NOT_RUN`으로 내보낸다. 노출할 판정이 없기 때문이다.
+  - **PAPER_PASSED 상태:** 그 상태를 만든 Paper Forward 기록과 함께여야 내보낸다. 다음은 거부한다.
+    - 기록이 없을 때(DATA_MISSING)
+    - 기록의 판정이 다를 때
+    - 상태의 증거 ID가 다를 때
+  - **명세가 없거나 읽을 수 없을 때:** 거부한다. FNG가 없는 것으로 취급하지 않는다.
+- 기존 기록과 이미 내보낸 handoff 파일은 바꾸지 않는다. 테스트가 상태 디렉터리 전체와 기존 handoff 파일의 바이트를 비교한다.
+- 우회 경로:
+  - Paper Forward 판정을 증거로 담는 문서는 `build_handoff`·`export_handoff` 하나뿐이다. 저장소 안에 다른 호출부는 없다.
+  - `pipeline.outcome_label`과 `evolution_report`는 상태 원장의 PAPER_PASSED를 집계 라벨 PASS·생존자로 센다. 이것은 보고용 집계이고 증거 문서가 아니다. 상태 원장을 소급 수정하지 않는 한 남는다. 별도 문제로 기록한다(C-5).
