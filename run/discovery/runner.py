@@ -24,19 +24,19 @@ sys.path.insert(0, str(Path(__file__).parent))
 from data_quality import (  # noqa: E402
     Bar,
     DatasetHandle,
-    dataset_for,
     funding_quality,
     staleness,
 )
+from strategy_spec import nondegenerate_sd  # noqa: E402
 from engine_lib import (  # noqa: E402
     CODE_VERSION,
     VALIDATION_CFG_VERSION,
     CandidateState,
     LockRegistryError,
+    LockState,
     LockTestRegistry,
     LockedWindowError,
     ProcessLock,
-    TRANSIENT_ERROR_CODES,
     assert_no_locked_overlap,
     atomic_write_json,
     code_identity,
@@ -71,34 +71,61 @@ from promotion import PromotionQueue, combo_promotion_gate, is_combo, promotion_
 def load_fng_series(data_dir: Path) -> Optional[dict]:
     """Load the Fear&Greed daily series (A-18/A-19).
 
-    Returns {utc_day_index: value} or ``None`` when the dataset is absent.
+    Returns {utc_day_index: value} or ``None`` when the dataset is absent OR
+    fails the quality gate (:func:`load_fng_series_checked`, ADR 0078 A-06):
+    a strategy that needs FNG is then DATA_MISSING, never evaluated on it.
     Day index = epoch_ms // 86_400_000 (UTC day of the value's calendar
     date).  A day's value is only usable for decisions taken on LATER days
     — the publication timing is enforced by the consumers of this map.
     """
+    return load_fng_series_checked(data_dir)[0]
+
+
+def load_fng_series_checked(data_dir: Path) -> tuple[Optional[dict], dict]:
+    """(series or None, report).  Quality gate (ADR 0078, A-06): every value
+    finite and in [0, 100]; a row with a date but an unparsable value, or two
+    files giving DIFFERENT values for one day, blocks the dataset (the old
+    loader skipped the row / let the last file win silently).  Days missing
+    between the first and the last day are reported (``gap_days``); a
+    consumer sees them as no value (no signal), exactly as before."""
     import datetime as dt
+    rep: dict = {"status": "ABSENT", "issues": [], "gap_days": 0, "files": 0}
     fdir = Path(data_dir) / "fng"
     if not fdir.exists():
-        return None
+        return None, rep
     out: dict = {}
     for p in sorted(fdir.glob("*.csv")):
-        for line in p.read_text(encoding="utf-8", errors="replace").splitlines():
+        rep["files"] += 1
+        for ln, line in enumerate(p.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
             parts = [x.strip() for x in line.split(",")]
             if len(parts) < 2:
                 continue
             try:
-                val = float(parts[1])
-            except ValueError:
-                continue
-            try:
                 d = dt.date.fromisoformat(parts[0][:10])
             except ValueError:
-                continue  # header or malformed row — skipped, never guessed
+                continue  # header or a row without a date — skipped, never guessed
+            try:
+                val = float(parts[1])
+            except ValueError:
+                rep["issues"].append(f"{p.name}:{ln}: value {parts[1]!r} not a number")
+                continue
+            if not (math.isfinite(val) and 0.0 <= val <= 100.0):
+                rep["issues"].append(f"{p.name}:{ln}: value {val} outside [0, 100]")
+                continue
             day_idx = int(dt.datetime(d.year, d.month, d.day,
                                       tzinfo=dt.timezone.utc).timestamp()
                           * 1000) // 86_400_000
+            if day_idx in out and out[day_idx] != val:
+                rep["issues"].append(f"{p.name}:{ln}: {d} given as {out[day_idx]} and {val}")
+                continue
             out[day_idx] = val
-    return out or None
+    if out:
+        rep["gap_days"] = (max(out) - min(out) + 1) - len(out)
+    if rep["issues"]:
+        rep["status"] = "BLOCKED"
+        return None, rep
+    rep["status"] = "OK" if out else "ABSENT"
+    return (out or None), rep
 
 
 class PathConfigError(RuntimeError):
@@ -170,27 +197,35 @@ def merged_bars(data_dir: Path, symbol: str, start_iso: str, end_iso: str) -> Da
                              bars=[], sha256="", first_ts=0, last_ts=0,
                              quality=type("Q", (), {"ok": False, "to_json": lambda s: {"missing": True}})(),
                              missing=[f"no kline files for window [{start_iso},{end_iso}]"])
-    # hard date cut (UTC): keep ts in [start 00:00, end_of(end_iso) 23:59:59.999]
-    start_ms = int(dt.datetime(d0.year, d0.month, d0.day,
+    # hard date cut (UTC): keep ts in [start_iso 00:00, end_of(end_iso) 23:59:59.999].
+    # ADR 0078 (A-01): the cut starts at ``start_iso`` itself — ``d0`` (the 1st of
+    # the month) only selects the monthly FILES.  Cutting at ``d0`` made the locked
+    # TEST window (BTC from 2024-03-25) start on 2024-03-01, i.e. inside the
+    # selection / validation data, and the paper replay start inside the locked window.
+    ds = dt.date.fromisoformat(start_iso)
+    start_ms = int(dt.datetime(ds.year, ds.month, ds.day,
                                tzinfo=dt.timezone.utc).timestamp() * 1000)
     end_ms = int((dt.datetime(d1.year, d1.month, d1.day, tzinfo=dt.timezone.utc)
                   + dt.timedelta(days=1)).timestamp() * 1000) - 1
     bars: list[Bar] = []
     sha = hashlib.sha256()
     for p in sorted(files):
-        # A-28 fix: dataset_for returns ONE handle (the draft unpacked two and
-        # crashed every evaluation before any test exercised the full path)
-        h = dataset_for(symbol, p)
-        if h is None or not h.quality.ok:
+        # ADR 0078 (A-03): the bar-level quality gate runs on the CUT window only
+        # (check_bars below).  Gating the whole monthly file first made a bad bar
+        # on a day outside the window (e.g. inside the locked TEST window, same
+        # month as the selection end) reject the selection dataset — one bit of
+        # locked-window information.  Rows that cannot be parsed at all have no
+        # trustworthy timestamp and still block the whole file (fail-closed).
+        from data_quality import load_kline_csv
+        fbars, frep = load_kline_csv(p, symbol)
+        if getattr(frep, "parse_errors", 0) or getattr(frep, "torn_tail", False):
             return DatasetHandle(
                 dataset_id=f"{symbol}-15m-REJECTED", symbol=symbol, bars=[],
-                sha256="", first_ts=0, last_ts=0,
-                quality=h.quality if h else type(
-                    "Q", (), {"ok": False, "to_json": lambda s: {"missing": True}})(),
-                missing=[f"file {p.name} failed the quality gate"])
-        bars.extend(b for b in h.bars if start_ms <= b.ts <= end_ms)
+                sha256="", first_ts=0, last_ts=0, quality=frep,
+                missing=[f"file {p.name} failed the quality gate (unparsable rows)"])
+        bars.extend(b for b in fbars if start_ms <= b.ts <= end_ms)
         sha.update(p.name.encode())
-        sha.update(h.sha256.encode())
+        sha.update(frep.file_sha256.encode())
     from data_quality import check_bars
     rep = check_bars(bars, symbol)
     rep.file_sha256 = sha.hexdigest()
@@ -234,7 +269,27 @@ def load_funding_window_checked(data_dir: Path, symbol: str, start_iso: str,
         cur = (cur.replace(day=28) + dt.timedelta(days=6)).replace(day=1)
     # ADR 0073: the per-file and cross-file checks live in data_quality (shared with
     # paper_forward.FileFeed); the report keys of ADR 0072 are unchanged
-    return load_funding_files_checked(paths)
+    pairs, rep = load_funding_files_checked(paths)
+    # ADR 0078 (A-04): monthly files reach past ``end_iso`` (into the locked TEST
+    # window for a selection read).  The source checks above ran on the whole
+    # files; the series handed on is cut to the window.  The FIRST settlement after
+    # the window end is kept: settlement_check needs a settlement at or after an
+    # exit to prove coverage, and its rate is neither summed ((entry, exit] ends at
+    # the last bar open) nor known to a decision (calc_time < bar close).  The
+    # start is cut at the day too, keeping the last settlement before it (the
+    # coverage proof of the first holding window).
+    s_ms = int(dt.datetime(*dt.date.fromisoformat(start_iso).timetuple()[:3],
+                           tzinfo=dt.timezone.utc).timestamp() * 1000)
+    e_ms = int((dt.datetime(*d1.timetuple()[:3], tzinfo=dt.timezone.utc)
+                + dt.timedelta(days=1)).timestamp() * 1000) - 1
+    lo = max([k for k, (t, _r) in enumerate(pairs) if t <= s_ms], default=0)
+    after = [k for k, (t, _r) in enumerate(pairs) if t > e_ms]
+    hi = after[0] + 1 if after else len(pairs)
+    cut = pairs[lo:hi]
+    keep = {t for t, _ in cut}
+    rep["intervals"] = {t: v for t, v in rep.get("intervals", {}).items() if t in keep}
+    rep["window_cut"] = {"start": start_iso, "end": end_iso, "rows_in": len(pairs), "rows_out": len(cut)}
+    return cut, rep
 
 
 def load_funding_window(data_dir: Path, symbol: str, start_iso: str, end_iso: str) -> list[tuple[int, float]]:
@@ -321,7 +376,7 @@ def _rolling_z(vals: Sequence[Optional[float]], i: int, window: int) -> Optional
     mu = sum(xs) / len(xs)
     var = sum((x - mu) ** 2 for x in xs) / max(1, len(xs) - 1)
     sd = var ** 0.5
-    if sd <= 0:
+    if not nondegenerate_sd(sd, xs):      # ADR 0078 (A-02)
         return None
     cur = vals[i]
     if cur is None or cur != cur:
@@ -394,7 +449,7 @@ def build_signal_fn(defn: Mapping, aux: Mapping) -> Callable:
             roll_max = max(w)
             mu = sum(w) / vw
             sd = (sum((x - mu) ** 2 for x in w) / max(1, vw - 1)) ** 0.5
-            if sd <= 0:
+            if not nondegenerate_sd(sd, w):
                 return 0
             return 1 if closes[i] > roll_max + k * sd else 0
         return sig
@@ -456,14 +511,19 @@ FNG_PUBLICATION_LAG_DAYS = 1
 
 
 def funding_known_series(bars: Sequence[Bar], funding: Sequence[tuple[int, float]]) -> list[int]:
-    """For each bar i: the number of settlements with calc_time <= close of
-    bar i (the settlements a decision at that close may know)."""
+    """For each bar i: the number of settlements with calc_time STRICTLY
+    before the close of bar i (the settlements a decision at that close may
+    know).  ADR 0078 (A-09): a settlement stamped exactly at the close (= the
+    next bar's open, the fill instant) is final only at that instant and is
+    not known to the decision; ``<=`` used it, and calc_time jitter made the
+    inclusion depend on milliseconds.  The registry text already said
+    "strictly before"."""
     horizon_ms = 15 * 60 * 1000
     out: list[int] = []
     j = 0
     for b in bars:
         close_ts = b.ts + horizon_ms
-        while j < len(funding) and funding[j][0] <= close_ts:
+        while j < len(funding) and funding[j][0] < close_ts:
             j += 1
         out.append(j)
     return out
@@ -488,7 +548,7 @@ def funding_settlement_z(funding: Sequence[tuple[int, float]], known: Sequence[i
                 mu = sum(prev) / window
                 var = sum((x - mu) ** 2 for x in prev) / max(1, window - 1)
                 sd = var ** 0.5
-                cache[k] = (rates[k - 1] - mu) / sd if sd > 0 else None
+                cache[k] = (rates[k - 1] - mu) / sd if nondegenerate_sd(sd, prev) else None
         out.append(cache[k])
     return out
 
@@ -574,10 +634,11 @@ READ_END_NO_LOCK = "2026-12-31"
 #: data cleaning / timing rules that change results (P1-7).  Changing any of
 #: these changes the experiment context id.
 DATA_POLICY = {
-    "version": "datapol-v1",
+    "version": "datapol-v2",
     "timezone": "UTC (epoch ms; day boundaries in UTC)",
     "kline_interval_ms": 900_000,
-    "window_cut": "hard truncation to [start 00:00, end 23:59:59.999] UTC before the quality gate",
+    "window_cut": "hard truncation to [start_iso 00:00, end 23:59:59.999] UTC (the start DAY, not "
+                  "the start month — ADR 0078) before the bar quality gate; unparsable rows block the file",
     "missing_candles": "fail-closed, never interpolated (exact 15m grid; only documented exchange exceptions excuse a gap)",
     "quality_policy": "dq-v2 (OK/WARN/BLOCK; BLOCK never reaches a backtest)",
     "embargo": "max(horizon, 96 bars) between dev and validation and before the readable end",
@@ -585,7 +646,10 @@ DATA_POLICY = {
     "funding_z": "z of the latest known settlement vs the previous funding_window settlements",
     "funding_gaps": "holding windows overlapping a settlement gap are dropped (never summed short)",
     "max_abs_logret_15m": 0.20,
-    "funding_known_at": "calc_time <= bar close (no early use)",
+    "funding_known_at": "calc_time < bar close (strict, ADR 0078)",
+    "funding_calc_time": "snapped to the whole UTC hour when within 60 s of it (ADR 0078)",
+    "funding_window_cut": "settlements after the read end dropped except the first one (coverage proof only, "
+                          "its rate is never summed or known to a decision) — ADR 0078",
     "funding_quality": "duplicates/inversions fail-closed; event dropped when holding window not covered",
     "fng_known_at": "values of UTC days strictly before the bar's day",
     "read_start": READ_START,
@@ -696,14 +760,22 @@ class Runner:
         self._cands: list = []
         self._defn_by_sid: dict = {}
         self._ctx: Optional[str] = None
+        self._old_handlers: dict = {}
         for _sig in (signal.SIGINT, signal.SIGTERM):
             try:
-                signal.signal(_sig, self._on_signal)
+                self._old_handlers[_sig] = signal.signal(_sig, self._on_signal)
             except (ValueError, OSError):
                 pass
 
     def _on_signal(self, *a) -> None:  # pragma: no cover
         self._interrupted = True
+
+    def restore_signal_handlers(self) -> None:
+        """Give SIGINT / SIGTERM back to whoever had them before this Runner
+        (ADR 0078, H-01: a finished Runner kept them, so a stop request between
+        two ``ops loop`` cycles only set a flag nobody read any more)."""
+        _restore_handlers(self._old_handlers)
+        self._old_handlers = {}
 
     # -- generation / preregistration (P1-8) ---------------------------------
     def register_all(self) -> dict:
@@ -785,6 +857,8 @@ class Runner:
             entry["fq"] = fq
             if fq["ok"]:
                 entry["funding"] = f
+                # ADR 0078 (C-02): declared settlement intervals for every study
+                entry["funding_intervals"] = dict(frep.get("intervals") or {})
             else:
                 entry["missing"] = [f"{sym}: funding unavailable/quality {fq['issues']}"]
         self._data_cache[sym] = entry
@@ -856,6 +930,11 @@ class Runner:
         except LockedWindowError as e:
             # selection must never read the locked window — hard stop
             rec = {"status": "ERROR", "error_code": "CONFIG_ERROR", "error_message": str(e)}
+        except (KeyError, IndexError) as e:
+            # ADR 0079 (R-1): LookupError subclasses that are programming errors — an
+            # IndexError is also a signal reading a bar outside its PrefixView
+            # (look-ahead).  They were DATA_MISSING (re-verifiable when data arrives)
+            rec = _logic_error(e)
         except (FileNotFoundError, LookupError) as e:
             rec = {"status": "DATA_MISSING", "missing": [str(e)]}
         except Exception as e:  # noqa: BLE001 — classified below
@@ -914,6 +993,8 @@ class Runner:
             rec = self._evaluate(sid, defn)
         except LockedWindowError as e:
             rec = {"status": "ERROR", "error_code": "CONFIG_ERROR", "error_message": str(e)}
+        except (KeyError, IndexError) as e:              # ADR 0079 (R-1)
+            rec = _logic_error(e)
         except (FileNotFoundError, LookupError) as e:
             rec = {"status": "DATA_MISSING", "missing": [str(e)]}
         except Exception as e:  # noqa: BLE001
@@ -927,20 +1008,8 @@ class Runner:
         return {"skipped": False, "status": rec["status"], "record": rec, "prior_pass_reeval": True}
 
     def _maybe_enqueue_reverify(self, sid: str, status: str, error_code: Optional[str] = None) -> None:
-        e = self.store.entry(sid)
-        # A-22: the DATA_MISSING reason is a *check schedule*, not a claim that
-        # data has arrived — the real availability gate is the re-evaluation
-        # itself (data reload + quality gate) under max-attempt control.
-        reason = {
-            "DATA_MISSING": "data_refresh_check",
-            "ERROR": "transient_error_retry",
-        }.get(status)
-        if status == "ERROR" and error_code not in TRANSIENT_ERROR_CODES:
-            return  # permanent — never retried
-        if reason:
-            from engine_lib import backoff_seconds
-            if self.queue.enqueue(sid, reason):
-                self.queue.requeue_with_backoff(sid, backoff_seconds(e.retry.attempt_count + 1))
+        from store import enqueue_reverify
+        enqueue_reverify(self.store, self.queue, sid, status, error_code)
 
     def _evaluate(self, sid: str, defn: Mapping) -> dict:
         fam = defn["family"]
@@ -949,6 +1018,7 @@ class Runner:
         needs = defn_requirements(defn)
         handles: dict[str, DatasetHandle] = {}
         fundings: dict[str, list] = {}
+        fivs: dict[str, dict] = {}
         missing: list[str] = []
         for sym in required:
             e = self._sym_data(sym)
@@ -957,6 +1027,7 @@ class Runner:
                 continue
             handles[sym] = e["handle"]
             fundings[sym] = e["funding"]
+            fivs[sym] = e.get("funding_intervals") or {}
         common = {"primary_symbol": required[0], "primary_dev_p": None,
                   "dataset": {s: handles[s].identity() for s in handles},
                   "cost_model": {"version": self.cost.version,
@@ -988,7 +1059,8 @@ class Runner:
             d0, d1 = win["dev"]
             sub = h.bars[:d1 + 1]
             es = run_event_study(sub, sym, sig_fn, horizon, self.cost,
-                                 self.order_value, fundings.get(sym))
+                                 self.order_value, fundings.get(sym),
+                                 funding_intervals=fivs.get(sym), require_funding=True)
             results_dev[sym] = cell_stats(es.events, sym, f"{fam}|dev")
             cnt = {k: v for k, v in es.to_json().items() if k != "events"}
             v0, v1 = win["validation"]
@@ -997,7 +1069,8 @@ class Runner:
                 auxv = build_aux(subv, defn, fundings.get(sym), fng=fng)
                 sigv = build_signal_fn(defn, auxv)
                 esv = run_event_study(subv, sym, sigv, horizon, self.cost,
-                                      self.order_value, fundings.get(sym))
+                                      self.order_value, fundings.get(sym),
+                                      funding_intervals=fivs.get(sym), require_funding=True)
                 results_val[sym] = cell_stats(esv.events, sym, f"{fam}|val")
                 cnt = {"dev": cnt, "val": {k: v for k, v in esv.to_json().items() if k != "events"}}
             else:
@@ -1047,7 +1120,8 @@ class Runner:
             try:
                 pf = simulate_portfolio(grid_bars, sigs,
                                         {s: fundings.get(s, []) for s in grid_bars},
-                                        self.cost, self._pf_cfg(), context_id=ctx)
+                                        self.cost, self._pf_cfg(), context_id=ctx,
+                                        funding_intervals_by_symbol=fivs)
                 portfolio = pf.to_json()
                 portfolio["passed"], portfolio["pass_failures"] = portfolio_passes(portfolio)
             except ValueError as e:   # e.g. symbols on different grids
@@ -1134,8 +1208,6 @@ class Runner:
         """The locked-TEST entrants of one BH decision form ONE campaign,
         preregistered (members + alpha) before any locked data is read.
         Members whose window is retired are held back (reported)."""
-        if not eligible:
-            return None, {}
         cfg = _locked_campaign_cfg()
         base = decision["input_hash"]
         k = 0
@@ -1144,8 +1216,15 @@ class Runner:
             if found is None:
                 break
             if not found["aborted"]:
-                return found["preregistered"], {}
+                # ADR 0078 (F-01): an open campaign of this decision is resumed even
+                # when no member is eligible any more (its members' windows were
+                # consumed before a crash): it is closed below, never left open
+                if found["result"] is None or eligible:
+                    return found["preregistered"], {}
+                return None, {}
             k += 1
+        if not eligible:
+            return None, {}
         members, retired = {}, {}
         for sid in eligible:
             syms = list(self._defn_by_sid[sid]["symbols"])
@@ -1250,13 +1329,27 @@ class Runner:
                                  "DATA_MISSING", "ERROR") else "FAIL_STAT"
             lock_info["note"] = "independent validation not passed — locked TEST not consumed"
         else:
-            entry = self.lock_entry_status(sid, defn)
+            # ADR 0078 (F-01): a final record already written under this context
+            # (crash before the state write) is re-applied, never re-decided
+            prior = self._final_record(sid, ctx)
+            if prior is not None:
+                self.store.set(sid, CandidateState(prior["status"]), data_version=ctx)
+                return prior["status"]
+            recovered = self._recover_consumed(sid, required, ctx)
+            entry = self.lock_entry_status(sid, defn) if recovered is None else {"reason": "RECOVERED"}
             lock_info["entry"] = entry
-            if entry["reason"] in ("IN_PROGRESS", "COST_NOT_VERIFIED"):
+            if recovered is not None:
+                # ADR 0078 (F-01): THIS candidate's own exposure under this context
+                # completed (results stored) but the final record was lost in a
+                # crash: rebuild it from the stored results — never a fake reuse FAIL
+                final, lock_info = recovered
+            if entry["reason"] == "RECOVERED":
+                lock_info["entry"] = entry
+            elif entry["reason"] in ("IN_PROGRESS", "COST_NOT_VERIFIED"):
                 # another live process holds the window, or the cost model does
                 # not cover this use yet (ADR 0010): wait, window untouched
                 return None
-            if entry["reason"] == "NOT_INDEPENDENT":
+            elif entry["reason"] == "NOT_INDEPENDENT":
                 final = "DATA_MISSING"
                 lock_info["note"] = ("LOCKED_WINDOW_NOT_INDEPENDENT: "
                                      + "; ".join(entry["overlap"])
@@ -1346,7 +1439,7 @@ class Runner:
             if not lfq["ok"]:
                 blocked.append(f"{sym}: locked-window funding {lfq['issues']}")
                 continue
-            loaded[sym] = (lh, lf)
+            loaded[sym] = (lh, lf, dict(lfrep.get("intervals") or {}))
         if blocked:
             for t in tokens.values():
                 self.lock_registry.block(t, "; ".join(blocked))
@@ -1360,11 +1453,12 @@ class Runner:
                 self.lock_registry.start(tokens[sym])
             info["consumed"] = True
             for sym in required:
-                lh, lf = loaded[sym]
+                lh, lf, lfiv = loaded[sym]
                 auxl = build_aux(lh.bars, defn, lf, fng=fng)
                 sigl = build_signal_fn(defn, auxl)
                 esl = run_event_study(lh.bars, sym, sigl, horizon, self.cost,
-                                      self.order_value, lf)
+                                      self.order_value, lf, funding_intervals=lfiv,
+                                      require_funding=True)
                 cl = cell_stats(esl.events, sym, f"{fam}|lock")
                 from campaigns import member_alpha
                 camp = self._campaign
@@ -1386,6 +1480,38 @@ class Runner:
                         pass
             raise
         info["results"] = results
+        return self._locked_verdict(sid, required, info)
+
+    def _final_record(self, sid: str, ctx: str) -> Optional[dict]:
+        """The final ledger record of ``sid`` under context ``ctx`` (ADR 0078)."""
+        found = None
+        for r in self.ledger.records():
+            if r.get("phase") == "final" and r.get("strategy_id") == sid and r.get("context_id") == ctx:
+                found = r
+        return found
+
+    def _recover_consumed(self, sid: str, required: Sequence[str], ctx: str) -> Optional[tuple[str, dict]]:
+        """(final, lock info) rebuilt from the lock registry when EVERY required
+        window was exposed exactly once, by this candidate, under this context,
+        and holds its stored result (ADR 0078, F-01); else None."""
+        results = {}
+        for sym in required:
+            atts = [a for a in self.lock_registry.attempts(sid, sym) if a.get("exposed")]
+            if self.lock_registry.uses(sid, sym) != 1 or len(atts) != 1:
+                return None
+            a = atts[0]
+            if (a.get("state") != LockState.CONSUMED.value or a.get("context_id") != ctx
+                    or not isinstance(a.get("result"), dict)):
+                return None
+            results[sym] = a["result"]
+        info: dict = {"windows": {s: locked_window_for(s) for s in required}, "consumed": True,
+                      "results": results, "recovered_from_registry": True,
+                      "note": "final record rebuilt from the stored locked results after a crash "
+                              "(ADR 0078); the window was read once"}
+        return self._locked_verdict(sid, required, info)
+
+    def _locked_verdict(self, sid: str, required: Sequence[str], info: dict) -> tuple[str, dict]:
+        results = info["results"]
         info["pass"] = {s: r["pass"] for s, r in results.items()}
         info["independent"] = all(self.lock_registry.uses(sid, s) == 1 for s in required)
         sts = [r["status"] for r in results.values()]
@@ -1617,6 +1743,13 @@ class Runner:
         s.finished_at = iso_now()
         atomic_write_json(self.paths.results_dir / "cycle_summary.json", s.to_json())
         return s
+
+
+def _logic_error(e: BaseException) -> dict:
+    """ADR 0079 (R-1): KeyError / IndexError raised by an evaluation."""
+    return {"status": "ERROR", "error_code": "LOGIC_ERROR",
+            "error_message": f"{type(e).__name__}: {e} (a programming error or a read outside the "
+                             "visible history — never DATA_MISSING)"}
 
 
 def win_for(h: DatasetHandle, horizon: int) -> tuple[int, int]:
@@ -1896,11 +2029,20 @@ def main(argv: Sequence[str]) -> int:
         print(f"RUN_MODE {opts['mode']} state_dir={paths.state_dir}", file=sys.stderr)
         if opts["mode"] in ("legacy", "full"):
             r = Runner(paths, cost=cost)
-            s = r.cycle(max_candidates=opts["batch"])
+            try:
+                s = r.cycle(max_candidates=opts["batch"])
+            finally:
+                r.restore_signal_handlers()
             if os.environ.get("REFRESH") == "1":
                 s.notes.append("REFRESH=1 requested but NOT supported — no data was refreshed")
             print(json.dumps(s.to_json(), default=str))
             rc = EXIT_CODES[s.status]
+            if s.status == "INTERRUPTED" or r._interrupted:
+                # ADR 0078 (H-02): a stop request during the legacy part stops the
+                # whole run — never a following evolution cycle (validation, locked)
+                if opts["mode"] == "full":
+                    print("EVOLVE_SKIPPED stop requested during the legacy part", file=sys.stderr)
+                return 1
         if opts["mode"] in ("evolve", "full"):
             from autoloop import CYCLE_EXIT, run_evolution_cycle
             from paper_forward import FileFeed
@@ -1934,7 +2076,9 @@ def main(argv: Sequence[str]) -> int:
                 _restore_handlers(old)
             print(json.dumps(es.to_json(), default=str))
             erc = CYCLE_EXIT[es.status]
-            rc = erc if rc == 0 else (rc if erc == 0 else max(rc, erc))
+            # ADR 0078 (H-03): FAILED (1) outranks every other code; otherwise the
+            # worse of PARTIAL (2) / BLOCKED_DATA (4)
+            rc = 1 if 1 in (rc, erc) else max(rc, erc)
     except CycleInterrupted as e:
         print(json.dumps({"status": "FAILED", "fatal": f"interrupted by {e}"}))
         return 1

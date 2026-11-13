@@ -137,13 +137,18 @@ class SyntheticProvider:
         if not self.locked_present:
             return {"bars": [], "funding": None, "missing": ["synthetic locked absent"], "sha256": ""}
         b = self._sym[sym]["lock"]
-        return {"bars": b, "funding": synth_funding(b), "missing": [], "sha256": "synthetic"}
+        f = synth_funding(b)
+        # ADR 0078: the declared schedule travels with every funding series
+        return {"bars": b, "funding": f, "funding_intervals": {t: 8 * 3_600_000 for t, _ in f},
+                "missing": [], "sha256": "synthetic"}
 
     def paper(self, sym):
         if not self.paper_present:
             return {"bars": [], "funding": None, "missing": ["no post-lock data"]}
         b = self._sym[sym]["paper"]
-        return {"bars": b, "funding": synth_funding(b), "missing": []}
+        f = synth_funding(b)
+        return {"bars": b, "funding": f, "funding_intervals": {t: 8 * 3_600_000 for t, _ in f},
+                "missing": []}
 
     def identity(self, symbols):
         return {s: self.symbol(s)["identity"] for s in sorted(symbols)}

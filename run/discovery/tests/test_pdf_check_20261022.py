@@ -133,8 +133,10 @@ class GKBootstrapTest(unittest.TestCase):
     def test_rectangular_negative_variance_is_refused(self):
         x = [(-1.0) ** i for i in range(60)]
         x = [v + 0.001 * i for i, v in enumerate(x)]
-        with self.assertRaises(ValueError):
-            sm.stepm({"a": x, "b": x[::-1]}, alpha=0.05, B=49, studentize="gk_block",
+        # ADR 0079: B=49 at alpha 0.05 is now refused for resolution (also a
+        # ValueError), which would hide the check under test; B=99 resolves it
+        with self.assertRaisesRegex(ValueError, "non-positive variance"):
+            sm.stepm({"a": x, "b": x[::-1]}, alpha=0.05, B=99, studentize="gk_block",
                      lag_window="rectangular", block_len=8)
 
     def test_unknown_studentize_refused(self):

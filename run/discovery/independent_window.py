@@ -43,7 +43,8 @@ if str(HERE) not in sys.path:
 from engine_lib import (  # noqa: E402
     LOCKED_TEST_PERIODS, append_jsonl, canonical_json, iso_now, iter_jsonl, strategy_id,
 )
-from stats_mc import by_fdr, daily_series, default_q, spending_alpha, stepm  # noqa: E402
+from stats_mc import (InsufficientBootstrapResolution, _require_resolution, by_fdr, daily_series,  # noqa: E402
+                      default_q, spending_alpha, stepm)
 
 DEFAULT_PREREG = HERE / "config" / "independent_window_v1.json"
 DEFAULT_HISTORY = HERE / "validation_window_history.jsonl"
@@ -147,7 +148,11 @@ def load_symbol(data_dir: Path, sym: str, pre: Mapping) -> dict:
     if not fq["ok"]:
         return {"bars": [], "funding": None, "missing": [f"funding quality {fq['issues']}"]}
     hi = _end_ms(per["read_end"])
-    return {"bars": [b for b in h.bars if b.ts <= hi], "funding": [x for x in f if x[0] <= hi],
+    fk = [x for x in f if x[0] <= hi]
+    keep = {t for t, _ in fk}
+    # ADR 0078 (C-02): the declared settlement intervals travel with the series
+    return {"bars": [b for b in h.bars if b.ts <= hi], "funding": fk,
+            "funding_intervals": {t: v for t, v in (rep.get("intervals") or {}).items() if t in keep},
             "missing": [], "kline_sha256": h.sha256,
             "funding_sha256": hashlib.sha256(repr(sorted(f)).encode()).hexdigest()}
 
@@ -253,7 +258,9 @@ def member_events(spec: Mapping, sym: str, e: Mapping, pre: Mapping, cost) -> li
     aux = build_spec_aux(bars, spec, e["funding"], None)
     es = run_event_study(bars, sym, build_spec_signal(spec, aux), spec["exit"]["horizon"], cost,
                          float(pre["cost"]["order_value"]), e["funding"], warmup=max(1, lo),
-                         exit_rule=stop_exit_rule(spec))
+                         exit_rule=stop_exit_rule(spec),
+                         # ADR 0078 (C-02): declared schedule, never the nominal-8h legacy rule
+                         funding_intervals=e.get("funding_intervals"), require_funding=True)
     return [x.to_json() for x in es.events]
 
 
@@ -267,6 +274,20 @@ def open_tranche(pre: Mapping, prereg_sha: str, tranche: str, data_dir: Path, me
                  history_path: Path, out_dir: Path, cost, *, check: Optional[Mapping] = None,
                  gate: Optional[Mapping] = None, registry_path: Optional[Path] = None,
                  resume: bool = False, command: Sequence[str] = ()) -> dict:
+    """:func:`_open_tranche` under the shared window-history lock (ADR 0078,
+    D-03 / F-07: the tranche index is read and the history row appended by one
+    writer at a time — the evolution pipeline takes the same lock)."""
+    from engine_lib import exclusive_file_lock
+    with exclusive_file_lock(Path(history_path)):
+        return _open_tranche(pre, prereg_sha, tranche, data_dir, members, history_path, out_dir, cost,
+                             check=check, gate=gate, registry_path=registry_path, resume=resume,
+                             command=command)
+
+
+def _open_tranche(pre: Mapping, prereg_sha: str, tranche: str, data_dir: Path, members: Mapping,
+                  history_path: Path, out_dir: Path, cost, *, check: Optional[Mapping] = None,
+                  gate: Optional[Mapping] = None, registry_path: Optional[Path] = None,
+                  resume: bool = False, command: Sequence[str] = ()) -> dict:
     """``gate`` is the report of :func:`prereg_gate.require_active` for this
     prereg (the CLI computes it); without an ACTIVE gate nothing is opened.
     ``resume`` completes a run that was STARTED and stopped before its result
@@ -288,6 +309,9 @@ def open_tranche(pre: Mapping, prereg_sha: str, tranche: str, data_dir: Path, me
     code_hash = research_code_identity()["code_hash"]
     state = reg.state(run_id)
     spent = any(key in (r.get("window_keys") or []) for r in history)
+    # ADR 0078 (F-06): the history row of THIS run (written before reg.start)
+    own_row = any(key in (r.get("window_keys") or []) and run_id in (r.get("batch_ids") or [])
+                  for r in history)
     out_dir = Path(out_dir)
     result_path = out_dir / f"{pre['window_id']}-{tranche}_result.json"
     if state in ("COMPLETED", "ABORTED", "INVALIDATED"):
@@ -301,11 +325,23 @@ def open_tranche(pre: Mapping, prereg_sha: str, tranche: str, data_dir: Path, me
         drift = reg.member_drift(run_id, members["members"])
         if drift:
             raise WindowRefused(f"{run_id}: members differ from the registration: {drift}")
+    elif state == "REGISTERED" and own_row:
+        # stopped between this run's history row and reg.start: nothing was read
+        # yet, the alpha slot is this run's own — resumable with the same members
+        if not resume:
+            raise WindowRefused(f"{run_id} was registered and its history row written but it never "
+                                "started: use --resume to run it with the same members and code")
+        if result_path.exists():
+            raise WindowRefused(f"{result_path} exists but the run never started — inspect by hand")
+        drift = reg.member_drift(run_id, members["members"])
+        if drift:
+            raise WindowRefused(f"{run_id}: members differ from the registration: {drift}")
     elif spent:
         raise WindowRefused(f"{key} was already opened — a tranche is single-use")
     elif state == "REGISTERED":
         pass                                  # registered, stopped before the history row: continue
-    issues = overlap_issues(pre, [r for r in history if not (state == "RUNNING" and key in (r.get("window_keys") or []))])
+    issues = overlap_issues(pre, [r for r in history if not ((state == "RUNNING" or own_row)
+                                                             and key in (r.get("window_keys") or []))])
     if issues:
         raise WindowRefused("; ".join(issues))
     check = check or data_check(data_dir, pre)
@@ -314,6 +350,13 @@ def open_tranche(pre: Mapping, prereg_sha: str, tranche: str, data_dir: Path, me
         raise WindowRefused(f"tranche {tranche}: no eligible symbol")
     k = tranche_index(pre, tranche, history)
     alpha = spending_alpha(k, float(pre["test"]["alpha_total_family"]))
+    try:
+        # ADR 0079 (D-01): the frozen B must resolve this tranche's alpha; refused
+        # BEFORE anything is registered or read, so the tranche stays unspent
+        _require_resolution(alpha, int(pre["test"]["bootstrap_B"]))
+    except InsufficientBootstrapResolution as e:
+        raise WindowRefused(f"{key}: tranche index {k}: {e} — the frozen preregistration "
+                            "cannot test this tranche; a new preregistration version is needed") from e
     data = {s: load_symbol(data_dir, s, pre) for s in syms}
     bad = {s: e["missing"] for s, e in data.items() if e["missing"]}
     if bad:
@@ -329,14 +372,15 @@ def open_tranche(pre: Mapping, prereg_sha: str, tranche: str, data_dir: Path, me
     except RegistryRefused as e:
         raise WindowRefused(str(e)) from e
     if state != "RUNNING":
-        # the window counts as used from here on, whatever happens next
-        append_jsonl(history_path, {
-        "run": f"{pre['window_id']}-{tranche}", "batches": 1, "batch_ids": [run_id],
-        "context_id": members["context_id"], "date": dt.date.today().isoformat(),
-        "window_keys": [key], "symbols": syms, "alpha": alpha, "tranche_index": k,
-        "members": len(ids), "prereg_sha256": prereg_sha,
-        "note": "independent window (ADR 0016): written BEFORE evaluation; result in the run's out dir",
-        "source": "run/discovery/independent_window.py open"})
+        if not own_row:
+            # the window counts as used from here on, whatever happens next
+            append_jsonl(history_path, {
+                "run": f"{pre['window_id']}-{tranche}", "batches": 1, "batch_ids": [run_id],
+                "context_id": members["context_id"], "date": dt.date.today().isoformat(),
+                "window_keys": [key], "symbols": syms, "alpha": alpha, "tranche_index": k,
+                "members": len(ids), "prereg_sha256": prereg_sha,
+                "note": "independent window (ADR 0016): written BEFORE evaluation; result in the run's out dir",
+                "source": "run/discovery/independent_window.py open"})
         reg.start(run_id, members_sha256=members["members_sha256"], code_hash=code_hash)
     g0, g1 = _ms(pre["period"]["entry_start"]), _end_ms(pre["period"]["read_end"])
     per_member, series, excluded = {}, {}, {}
@@ -367,8 +411,13 @@ def open_tranche(pre: Mapping, prereg_sha: str, tranche: str, data_dir: Path, me
     if series:
         n = len(next(iter(series.values())))
         q = default_q(n)
-        sm = stepm(series, alpha=alpha, B=int(tc["bootstrap_B"]), q=q, seed=int(tc["bootstrap_seed"]),
-                   studentize=tc.get("studentize", "fixed"))
+        try:
+            sm = stepm(series, alpha=alpha, B=int(tc["bootstrap_B"]), q=q, seed=int(tc["bootstrap_seed"]),
+                       studentize=tc.get("studentize", "fixed"))
+        except InsufficientBootstrapResolution as err:
+            # checked before opening; should it still refuse, nothing is decided (ADR 0079)
+            sm = {"rejected": [], "steps": [], "method": "BLOCKED_STATISTICS"}
+            res["stepm_blocked"] = str(err)
         res.update({"rejected": sorted(sm["rejected"]), "steps": sm["steps"], "q": q, "n_days": n,
                     "stepm_method": sm["method"]})
     hp = {s: v["pooled_hac_p"] for s, v in per_member.items() if v["pooled_hac_p"] is not None}
@@ -379,7 +428,8 @@ def open_tranche(pre: Mapping, prereg_sha: str, tranche: str, data_dir: Path, me
         v = per_member[sid]
         powered = v["n_events"] >= 60 and v["nonzero_days"] >= 30
         rej = sid in res["rejected"]
-        outcome[sid] = ("PASSED_INDEPENDENT_WINDOW" if rej and powered
+        outcome[sid] = ("BLOCKED_STATISTICS" if "stepm_blocked" in res
+                        else "PASSED_INDEPENDENT_WINDOW" if rej and powered
                         else "REJECTED" if powered else "INCONCLUSIVE")
     result = {"schema": RESULT_SCHEMA, "run_id": run_id, "window_key": key, "tranche": tranche,
               "tranche_index": k, "symbols": syms, "prereg_sha256": prereg_sha,

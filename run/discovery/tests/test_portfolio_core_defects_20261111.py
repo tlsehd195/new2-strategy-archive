@@ -296,7 +296,17 @@ class TestFundingSchedule(unittest.TestCase):
         self.assertEqual((c["status"], c["schedule_changes"]), ("OK", 1))
         f2 = series([0, 8, 16, 24])                 # 20:00 of the new 4h schedule missing
         ivs2 = {0: 8 * H, 8 * H: 8 * H, 16 * H: 8 * H, 24 * H: 4 * H}
-        self.assertEqual(settlement_check(f2, ivs2, 1, 24 * H)["status"], "FUNDING_SETTLEMENT_GAP")
+        # ADR 0078 (C-03): the 16:00 -> 24:00 step is contiguous if the 4h value at
+        # 24:00 describes the period STARTING there and a gap if it describes the
+        # period ENDING there; the step is judged under both readings, so it is
+        # never OK (was GAP under the single "ending" reading)
+        c2 = settlement_check(f2, ivs2, 1, 24 * H)
+        self.assertEqual(c2["status"], "FUNDING_SCHEDULE_UNKNOWN")
+        self.assertIn("SCHEDULE_CHANGE_AMBIGUOUS", c2["reason"])
+        # missing under BOTH readings (16:00 -> 32:00 with 8h/4h) stays a GAP
+        f3 = series([0, 8, 16, 32])
+        ivs3 = {0: 8 * H, 8 * H: 8 * H, 16 * H: 8 * H, 32 * H: 4 * H}
+        self.assertEqual(settlement_check(f3, ivs3, 1, 32 * H)["status"], "FUNDING_SETTLEMENT_GAP")
 
     def test_unknown_schedule(self):
         f = series([0, 8, 16])
@@ -612,7 +622,7 @@ class TestPipelineWiring(PipelineCase):
         self.assertTrue(val["per_symbol"]["BTCUSDT"]["signal_diagnostics"]["accounting_ok"])
         rec = p.evaluation("portfolio", ids[0])
         self.assertEqual(rec["portfolio_config_version"], "portfolio-validation-v2")
-        self.assertEqual(rec["model_version"], "portfolio-multi-v3")   # ADR 0072 (was v2, ADR 0071)
+        self.assertEqual(rec["model_version"], "portfolio-multi-v4")   # ADR 0078 (v3 ADR 0072, v2 ADR 0071)
         base = rec["compositions"]["standalone"]["scenarios"]["base"]["result"]
         self.assertEqual(base["signal_accounting"]["status"], "OK")
         self.assertEqual(base["funding_completeness"]["trades_by_status"].keys(), {"OK"})

@@ -1370,3 +1370,30 @@ Stage Summary:
 - 사전등록(데이터 받기 전 커밋) 가설 4개를 바이낸스 USDT-M 897개 종목의 시점별 상위 50개에 적용, DEV만
 - 가정 비용에서 4개 모두 손실(충격항이 대부분). 비용 0에서도 H3 캐리 S1 0.93(베타 뺀 t 1.49), H1 모멘텀 S1 0.59
 - 알트 비용 측정 후 같은 4개를 다시 돌린다
+
+## 2026-11-12 저장소 전체 전수 감사·통합 결함 수정 (ADR 0078)
+
+- 기준 `main` `2d6616a`. 영역별 검토 에이전트 8개(A 데이터 ~ H 운영/CI)와 작성자가 감사, 재현 스크립트는 합성 데이터·임시 디렉터리만
+- Critical 2(A-01 잠금 창 월초 시작, G-01 데이터 구멍으로 PAPER_PASSED), High 6(ME-01, D-01, F-01~F-03, G-02) 및 Medium·Low 다수 수정. 수용 한계: E-01, ME-04, A-05, B-06 일부, C-04, C-07
+- 신규 회귀 테스트 55개(`test_integrated_audit_20261112.py`, 수정 전 52개 실패). 버전 갱신: datapol-v2, funding-schedule-v2, mc-v4, evo-pipeline-v2, fp-v3, evo-gen-v2, power-analysis-v2, portfolio-multi-v4, portfolio-mtm-v4
+- 보호 데이터·잠금/IW1 창·사전등록·기존 원장 손대지 않음. 보고서: `run/audit/FINAL_REPORT_20261112.md`, 현재 상태: `run/audit/STATUS_CURRENT_20261112.md`
+
+## 2026-11-12 ADR 0078 보완 감사 (ADR 0079)
+
+- 기준 PR #79 `757114f`. 사용자 지시(14:00Z): D-01 해상도 불일치 최우선, Paper Forward G-03/G-04, 잠금 밖 쓰기(F-11), runner.py·engine_lib.py 작성자 전수 검토
+- D-01: 검사를 5(`MIN_TAIL_DRAWS`)로 통일, 해상도 부족 구 배치는 BLOCKED_STATISTICS. G-04: FNG 전진 계획 거부. F-11: 4개 경로 잠금. R-1: 미래 봉 읽기 오류를 LOGIC_ERROR로
+- 신규 테스트 33개(`test_audit_followup_20261112.py`, `757114f`에서 22개 실패). 보호 데이터·창·사전등록·기존 기록 변경 없음. 보고서: `run/audit/FINAL_REPORT_ADR0079_20261112.md`
+
+## 2026-11-13 ADR 0079 후속 (FNG 완료 반환, G-03 호출 그래프, F-11 범위)
+
+- 기준 `3d49e41`. 사용자 지시(2026-11-12 23:20Z)
+- 완료된 FNG 계획의 `step()`이 과거 PAPER_PASSED를 그대로 돌려주던 것을 PAPER_BLOCKED_DATA, `recorded_verdict`, `conclusion_verified: False`로 바꿨다(읽기 전용, 기록 변경 없음)
+- G-03: AST Call 노드 기반 호출 그래프(`tests/static_callgraph.py`)로 공유 진입 16개, 평가기 전용·재생 전용 목록을 정확 일치로 고정. 변형 테스트와 런타임 추적으로 교차 확인
+- F-11: 잠금 프로토콜이 있는 파일의 단순 추가 4곳(캠페인 RESULT/ABORT, 배치 RESULT, evaluations, research_feedback)을 잠금 안으로
+- 신규 테스트 15개(`3d49e41`에서 5개 테스트 실패와 문서 하위 28개 실패). 로컬 CI 3.11·3.13 unit 1,119, root 152 통과. 보고서 `run/audit/FINAL_REPORT_ADR0079_FOLLOWUP_20261112.md`
+
+## 2026-11-13 C-4 Handoff FNG 결론 차단 (ADR 0079 §6)
+
+- 기준 `66bf37c`(PR #79). `build_handoff`가 과거 FNG PAPER_PASSED를 그대로 내보내던 것을 HandoffRefused(FNG_NOT_PINNED, UNVERIFIED_PRIOR_CONCLUSION)로 바꿨다. PAPER_PASSED 상태는 그 기록과 증거 ID가 맞아야 하고, 명세가 없으면 거부한다
+- 신규 테스트 4개(`TestC04HandoffFng`, 실제 승격 흐름의 합성 FNG 전략). 수정 전 3개가 실패한다. 기록·기존 handoff 파일이 바이트 단위로 보존됨을 확인했다
+- 보고서 `run/audit/FINAL_REPORT_C04_HANDOFF_20261113.md`

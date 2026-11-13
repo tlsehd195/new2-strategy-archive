@@ -95,7 +95,8 @@ from typing import Callable, Mapping, Optional, Sequence
 from costs_bridge import CostDataMissing, CostRefused
 from data_quality import Bar, check_bars
 from engine_lib import (
-    JsonlCorruption, append_jsonl, atomic_write_json, canonical_json, iso_now, iter_jsonl, nw_tstat, t_sf,
+    JsonlCorruption, append_jsonl, atomic_write_json, canonical_json, exclusive_file_lock, iso_now, iter_jsonl,
+    nw_tstat, t_sf,
 )
 from evaluator import FundingIndex, PrefixView, run_event_study
 from execution_sim import EXECUTION_SIM_VERSION, ExecutionConfig, apply_execution
@@ -124,6 +125,14 @@ FUNDING_TOL_MS = 60_000
 #: sequenced funding / funding-quality logs anchored in the state).  A plan without it
 #: (registered under ADR 0073 only) is never concluded.
 FUNDING_INTEGRITY = "paper-forward-integrity-v1"
+#: ADR 0079 (G-04): a strategy that reads the Fear & Greed index cannot be observed
+#: forward.  Neither feed has an FNG source, so the plan cannot pin (snapshot +
+#: sha256) the FNG values of its observation period; the evaluator and the replay
+#: would read whatever the research provider's archive holds at each step.  New
+#: plans are refused; a plan registered before ADR 0079 never concludes.
+FNG_NOT_PINNED = ("FNG_NOT_PINNED: the strategy reads the Fear & Greed index; the forward feed has no FNG "
+                  "source and the plan pins no FNG snapshot, so its observation would use unpinned FNG "
+                  "data (ADR 0079)")
 #: ADR 0075: positions of a plan.  The sample of a final verdict is every trade ENTERED
 #: in [start, evaluation cutoff]; the cutoff is the last observed bar of the step at which
 #: the preregistered stopping rule (min_days + min_trades, or max_days) first held.  A
@@ -328,12 +337,25 @@ class FileFeed:
         from data_quality import load_kline_csv
         now = self.clock()
         out: dict[int, Bar] = {}
-        info = {"files": 0, "blocked_files": [], "incomplete_skipped": 0, "duplicates_across_files": 0}
+        info = {"files": 0, "blocked_files": [], "incomplete_skipped": 0, "duplicates_across_files": 0,
+                "conflicts": [], "held_back_from_ts": None}
+        # ADR 0078 (G-02 / A-08): delivery stops at the first bar a source problem
+        # could affect.  A blocked file (parse error, torn tail, bad bars) used to be
+        # skipped while LATER files were still delivered: its bars became a permanent
+        # "gap" (re-downloaded bars are older than last_ts and count as duplicates),
+        # and a gap inside a pending position removed it from the sample.  Two files
+        # that disagree on one bar used to keep the first one silently.
+        hold = None
+        prefix = f"{sym}-15m-"
         for p in self._files("klines", f"{sym}-15m-*.csv"):
             bars, rep = load_kline_csv(p, sym)
             info["files"] += 1
             if not rep.ok:
                 info["blocked_files"].append({"file": p.name, "codes": rep.blocking_codes()})
+                span = _month_span(p.name, prefix)
+                h0 = span[0] if span is not None else after_ts + 1     # unknown span: hold everything
+                if span is None or span[1] > after_ts:
+                    hold = h0 if hold is None else min(hold, h0)
                 continue
             for b in bars:
                 if b.ts <= after_ts:
@@ -343,9 +365,14 @@ class FileFeed:
                     continue
                 if b.ts in out:
                     info["duplicates_across_files"] += 1
+                    if _bar_row(out[b.ts]) != _bar_row(b):
+                        info["conflicts"].append({"ts": b.ts, "file": p.name})
+                        hold = b.ts if hold is None else min(hold, b.ts)
                     continue
                 out[b.ts] = b
-        return [out[k] for k in sorted(out)], info
+        if hold is not None:
+            info["held_back_from_ts"] = hold
+        return [out[k] for k in sorted(out) if hold is None or k < hold], info
 
     def funding_checked(self, sym: str, after_ts: int) -> dict:
         """Funding settlements in ``(after_ts, now]`` with their quality (ADR 0073).
@@ -702,11 +729,27 @@ class ForwardPaper:
         raise KeyError(plan_id)
 
     def register_plan(self, sid: str) -> dict:
+        """ADR 0079 (F-11): under the plan ledger's file lock — the "a plan already
+        exists" check and the append are one step, so two callers never register
+        two plans for one strategy and context."""
         ctx = self.p.context_id()
+        with exclusive_file_lock(self.plans_path):
+            return self._register_plan(sid, ctx)
+
+    def _register_plan(self, sid: str, ctx: str) -> dict:
         st = self.p.statuses.status(sid, ctx)
         if st not in ("PAPER_TEST_READY", "PAPER_TESTING"):
             raise ForwardRefused(f"{sid} is {st}: forward paper needs PAPER_TEST_READY/PAPER_TESTING")
+        # ADR 0078 (F-03): a recorded replay that DEGRADED fails the candidate even
+        # when its PAPER_FAILED status was lost in a crash — never a forward plan
+        from paper import paper_runs
+        for r in paper_runs(self.p):
+            if r.get("strategy_id") == sid and r.get("context_id") == ctx and r.get("verdict") == "PAPER_DEGRADED":
+                raise ForwardRefused(f"{sid}: isolated replay PAPER_DEGRADED in this context")
         spec = canonicalize_spec(self.p.specs.get(sid))
+        why_fng = self._fng_refusal(spec)
+        if why_fng:
+            raise ForwardRefused(f"{sid}: {why_fng}")
         ok, why = self.p.cost.verified_for(spec["symbols"], self.p.order_value)
         if not ok:
             raise ForwardRefused(f"cost model not verified for this use: {why}")
@@ -831,9 +874,10 @@ class ForwardPaper:
     def _try_step_lock(self, plan_id: str) -> Optional[int]:
         """Non-blocking exclusive lock of one plan (``step.lock`` in its directory;
         flock: released by the kernel when the process dies, so a killed step
-        never leaves a stale lock).  No higher level holds one: ``step`` is called
-        by library users and tests only (runner.py's ``state/run.lock`` covers
-        the research cycle, which never calls it)."""
+        never leaves a stale lock).  ``step`` is called by the research cycle
+        (autoloop, under runner.py's ``state/run.lock``), by library users and by
+        tests; this per-plan lock serialises every one of them (ADR 0078, G-05:
+        the old text said the cycle never calls it)."""
         d = self.root / plan_id
         d.mkdir(parents=True, exist_ok=True)
         fd = os.open(str(d / "step.lock"), os.O_CREAT | os.O_RDWR, 0o644)
@@ -879,7 +923,7 @@ class ForwardPaper:
         if bad:
             return self._state_unusable(plan, bad)
         if st["concluded"]:
-            return {"plan_id": plan_id, "status": "CONCLUDED", "verdict": st["verdict"]}
+            return self._concluded_result(plan, st)
         d = self.root / plan_id
         now = self.clock()
         prior = self.p.evaluation("paper_forward", plan["strategy_id"], plan["context_id"])
@@ -932,7 +976,13 @@ class ForwardPaper:
             st["incomplete_skipped"] += int(info.get("incomplete_skipped", 0))
             if info.get("blocked_files"):
                 st["errors"].append({"at": now, "symbol": sym, "kind": "SOURCE_FILE_BLOCKED",
-                                     "detail": info["blocked_files"]})
+                                     "detail": info["blocked_files"],
+                                     "held_back_from_ts": info.get("held_back_from_ts")})
+            if info.get("conflicts"):
+                # ADR 0078 (A-08): delivery stops before the first conflicting bar
+                st["errors"].append({"at": now, "symbol": sym, "kind": "SOURCE_CONFLICT",
+                                     "detail": info["conflicts"][:20],
+                                     "held_back_from_ts": info.get("held_back_from_ts")})
             added = 0
             for b in bars:
                 if b.ts + MS15 > now:
@@ -1402,6 +1452,41 @@ class ForwardPaper:
         append_jsonl(d / "steps.jsonl", {"at": iso_now(), "clock_ms": self.clock(), **res})
         return res
 
+    @staticmethod
+    def _fng_refusal(spec: Mapping) -> Optional[str]:
+        """ADR 0079 (G-04): why a plan for ``spec`` cannot be registered, or None."""
+        return FNG_NOT_PINNED if "fng" in (spec.get("data") or ()) else None
+
+    def _plan_fng_problem(self, plan: Mapping) -> Optional[str]:
+        """ADR 0079 (G-04): a plan (registered before ADR 0079) whose strategy reads
+        FNG: it never concludes.  An unreadable spec is a problem as well."""
+        raw = self.p.specs.get(plan["strategy_id"])
+        if raw is None:
+            return "strategy specification missing"
+        return FNG_NOT_PINNED if "fng" in (canonicalize_spec(raw).get("data") or ()) else None
+
+    def _concluded_result(self, plan: Mapping, st: Mapping) -> dict:
+        """What ``step`` returns for a plan whose state says it concluded.
+
+        ADR 0079 follow-up: a plan whose strategy reads FNG (only an older version
+        could register one) concluded on FNG values it never pinned, so its stored
+        verdict is not a verified current result — the same reason
+        :meth:`verify_conclusion` gives (FNG_NOT_PINNED).  The stored conclusion is
+        kept as it is (state.json, the evaluation record and the status ledger are
+        neither rewritten nor re-evaluated); the call returns PAPER_BLOCKED_DATA
+        with the stored verdict under ``recorded_verdict`` and
+        ``conclusion_verified: False``.  Read only: nothing is written.  A plan
+        without FNG returns exactly what it returned before."""
+        pid = plan["plan_id"]
+        fng = self._plan_fng_problem(plan)
+        if fng is None:
+            return {"plan_id": pid, "status": "CONCLUDED", "verdict": st["verdict"]}
+        return {"plan_id": pid, "status": "CONCLUDED", "verdict": "PAPER_BLOCKED_DATA",
+                "recorded_verdict": st["verdict"], "conclusion_verified": False,
+                "reasons": [fng, f"UNVERIFIED_PRIOR_CONCLUSION: the stored verdict {st['verdict']} "
+                            "cannot be verified for the reason above; it is kept as a historical "
+                            "record and is not a current result"]}
+
     def _plan_drift(self, plan: Mapping) -> list[str]:
         """What differs between the registered plan and what a step would run."""
         why = []
@@ -1722,7 +1807,7 @@ class ForwardPaper:
         Returns {"open": [position], "closed": [event_id], "problems": [str],
         "counts": {...}}."""
         n = len(bars)
-        out = {"open": [], "closed": [], "problems": [],
+        out = {"open": [], "closed": [], "problems": [], "unobservable": [],
                "counts": {"signals": 0, "overlapped": 0, "refused": 0, "gap_excluded": 0, "closed": 0, "open": 0}}
         rest = dict(ledger)
         last_exit = -1
@@ -1769,6 +1854,10 @@ class ForwardPaper:
                 x_ts = bars[x_i].ts
                 if e_ts < start_ts or any(a < x_ts and b > e_ts - GAP_EMBARGO_BARS * MS15 for a, b in gaps):
                     out["counts"]["gap_excluded"] += 1
+                    if e_ts >= start_ts:
+                        # ADR 0078 (G-01): a sample trade made unobservable by a data gap
+                        out["unobservable"].append({"event_id": eid, "symbol": sym, "entry_ts": e_ts,
+                                                    "exit_ts": x_ts, "side": side, "reason": "DATA_GAP"})
                     if row is not None:
                         out["problems"].append(f"LEDGER_TRADE_EXCLUDED_BY_RULES: {eid} overlaps a data gap "
                                                "(or the warm-up) but is in the ledger")
@@ -1828,6 +1917,7 @@ class ForwardPaper:
             if canonical_json(o["gaps"]) != canonical_json([list(g) for g in st["gaps"][sym]]):
                 problems.append(f"STATE_GAPS_MISMATCH: {sym}: gaps of the bar log differ from the state's")
         return {"open": [dict(x) for x in rec["open"]], "closed": list(rec["closed"]), "problems": problems,
+                "unobservable": [dict(x) for x in rec.get("unobservable") or []],
                 "counts": dict(rec["counts"])}
 
     def _replay_from_disk(self, plan: Mapping, spec: Mapping) -> dict:
@@ -1836,7 +1926,7 @@ class ForwardPaper:
         horizon = int(spec["exit"]["horizon"])
         exit_rule = stop_exit_rule(spec)
         ledger_all = list(iter_jsonl(d / "events.jsonl"))
-        out = {"open": [], "closed": [], "problems": [], "observed": {}, "counts": {}}
+        out = {"open": [], "closed": [], "problems": [], "unobservable": [], "observed": {}, "counts": {}}
         for sym in plan["symbols"]:
             wj = self._warmup(plan, sym)
             warm = [_row_bar(r) for r in wj["rows"]]
@@ -1875,6 +1965,7 @@ class ForwardPaper:
             rep = self._replay_positions(sym, bars, len(warm), sig, horizon, exit_rule, ledger, refusal,
                                          [(a, b) for a, b, _ in gaps], plan["start_ts"])
             out["open"] += rep["open"]
+            out["unobservable"] += rep["unobservable"]
             out["closed"] += rep["closed"]
             out["problems"] += rep["problems"]
             out["counts"][sym] = rep["counts"]
@@ -1907,6 +1998,21 @@ class ForwardPaper:
             if diff:
                 out.append(f"OPEN_POSITION_MISMATCH: {eid} differs from the replay in {diff}")
         return out
+
+    def _unobservable_in_sample(self, plan: Mapping, st: Mapping, result: Mapping, bound: int) -> list[dict]:
+        """ADR 0078 (G-01): trades of the sample (entered in [start, bound]) that the
+        registered rules took but whose bars were not all observed (a data gap in the
+        holding period or its feature embargo) — from the evaluator AND the
+        independent replay.  Before ADR 0078 they were dropped from the sample, so a
+        bar missing after the cutoff removed a pending losing position and the plan
+        PASSED.  A non-empty list blocks every final verdict: the result of a trade
+        that was taken but not observed is unknown, and leaving it out is selection."""
+        rec = self._reconstruct_positions(plan, st)
+        out = {}
+        for x in list(result.get("unobservable") or []) + list(rec.get("unobservable") or []):
+            if plan["start_ts"] <= int(x["entry_ts"]) <= int(bound):
+                out.setdefault(x["event_id"], dict(x))
+        return [out[k] for k in sorted(out)]
 
     def _pending_all(self, plan: Mapping, st: Mapping, result: Mapping, bound: int) -> list[dict]:
         """Positions of the sample still open: the evaluator's AND the replay's
@@ -1995,6 +2101,9 @@ class ForwardPaper:
         if not self._integrity(plan):
             return {"verdict": "PAPER_BLOCKED_DATA", "final": False,
                     "reasons": ["LEGACY_PLAN_INTEGRITY_UNVERIFIED: plan registered before ADR 0074"]}
+        fng = self._plan_fng_problem(plan)
+        if fng:
+            return {"verdict": "PAPER_BLOCKED_DATA", "final": False, "reasons": [fng]}
         # ADR 0074: the evidence is re-verified against the state right before any verdict
         problems = self._evidence(plan, st, recover=False) + self._plan_drift(plan)
         if problems:
@@ -2054,6 +2163,14 @@ class ForwardPaper:
                                 f"{bound} ({'; '.join(d['reasons'])})"]}
         # ADR 0077: pending = the evaluator's and the independent replay's positions
         # entered by the cutoff (they agree here: any difference was PAPER_ERROR above)
+        unobs = self._unobservable_in_sample(plan, st, result, bound)
+        if unobs:
+            result["unobservable_in_sample"] = unobs
+            return {"verdict": "PAPER_BLOCKED_DATA", "final": False, "evaluation_cutoff": bound,
+                    "reasons": [f"UNOBSERVABLE_SAMPLE_TRADES: {len(unobs)} trade(s) entered by the evaluation "
+                                f"cutoff {bound} overlap a data gap and cannot be observed: "
+                                + ", ".join(f"{x['event_id']} (exit {x['exit_ts']})" for x in unobs[:10])
+                                + " — no verdict without them (ADR 0078)"]}
         pending = self._pending_all(plan, st, result, bound)
         pend_ids = {x.get("event_id") for x in pending}
         result["positions"] = {"policy": POSITION_POLICY, "completeness": COMPLETENESS_POLICY,
@@ -2125,6 +2242,9 @@ class ForwardPaper:
             why.append("plan has no funding policy (registered before ADR 0073)")
         if not self._integrity(plan):
             why.append("plan has no evidence integrity record (registered before ADR 0074)")
+        fng = self._plan_fng_problem(plan)
+        if fng:
+            why.append(fng)
         if result.get("funding_ok") is not True:
             why.append("funding of this step not confirmed")
         if (result.get("excluded") or {}).get("no_funding_coverage") or result.get("funding_dropped"):
@@ -2177,6 +2297,10 @@ class ForwardPaper:
             return why
         if rule_t != cut["ts"]:
             why.append(f"recorded cutoff {cut['ts']} is not the earliest bar at which the rule holds ({rule_t})")
+        unobs = self._unobservable_in_sample(plan, st, result, cut["ts"])
+        if unobs:
+            why.append(f"{len(unobs)} trade(s) of the sample unobservable (data gap): " + ", ".join(
+                str(x.get("event_id")) for x in unobs))
         pend = self._pending_all(plan, st, result, cut["ts"])
         if pend:
             why.append(f"{len(pend)} position(s) of the sample still open: " + ", ".join(
@@ -2267,15 +2391,20 @@ class ForwardPaper:
         """One research-feedback row per concluded plan (a resumed conclusion adds
         it only if the interrupted one did not get that far, ADR 0077)."""
         path = self.p.dir / "research_feedback.jsonl"
-        try:
-            rows = list(iter_jsonl(path)) if path.exists() else []
-        except (JsonlCorruption, OSError, ValueError):
-            rows = []
-        if any(r.get("source") == "paper_forward" and r.get("plan_id") == plan["plan_id"] for r in rows):
-            return
-        append_jsonl(path, {"strategy_id": plan["strategy_id"], "context_id": plan["context_id"],
-                            "plan_id": plan["plan_id"], "source": "paper_forward", "verdict": verdict,
-                            "use": "human review + failure memory only; never search ranking", "at": iso_now()})
+        # ADR 0079 follow-up (F-11): plans of different strategies step concurrently
+        # (one step lock per plan) and all append to this one file: read, decide and
+        # append under its lock
+        with exclusive_file_lock(path):
+            try:
+                rows = list(iter_jsonl(path)) if path.exists() else []
+            except (JsonlCorruption, OSError, ValueError):
+                rows = []
+            if any(r.get("source") == "paper_forward" and r.get("plan_id") == plan["plan_id"] for r in rows):
+                return
+            append_jsonl(path, {"strategy_id": plan["strategy_id"], "context_id": plan["context_id"],
+                                "plan_id": plan["plan_id"], "source": "paper_forward", "verdict": verdict,
+                                "use": "human review + failure memory only; never search ranking",
+                                "at": iso_now()})
 
     # -- conclusion anchors (ADR 0076) ------------------------------------------------
     def _anchors(self, plan: Mapping, st: Mapping) -> dict:
@@ -2308,6 +2437,11 @@ class ForwardPaper:
         if not isinstance(a, Mapping):
             return ["evaluation record has no anchors (concluded before ADR 0076)"]
         out = []
+        fng = self._plan_fng_problem(plan)
+        if fng:
+            # ADR 0079: a conclusion reached on unpinned FNG data is never completed
+            # (resume) nor confirmed (verify_conclusion)
+            out.append(fng)
         plan_id = plan["plan_id"]
         try:
             now = self._anchors(plan, st)

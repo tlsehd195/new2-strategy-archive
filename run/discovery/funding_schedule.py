@@ -45,7 +45,7 @@ import math
 from bisect import bisect_left, bisect_right
 from typing import Mapping, Optional, Sequence
 
-FUNDING_SCHEDULE_VERSION = "funding-schedule-v1"
+FUNDING_SCHEDULE_VERSION = "funding-schedule-v2"   # v2: both interval readings per step (ADR 0078)
 #: timestamp jitter accepted between two settlements (same as data_quality.FUNDING_TOL_MS)
 FUNDING_TOL_MS = 60_000
 
@@ -124,6 +124,7 @@ def settlement_check(pairs: Optional[Sequence], intervals: Optional[Mapping[int,
         return out
     prev_iv = None
     unknown = []
+    ambiguous = []
     for j in range(k0 + 1, k1 + 1):
         iv = intervals.get(times[j])
         if not (isinstance(iv, (int, float)) and iv > 0):
@@ -132,13 +133,27 @@ def settlement_check(pairs: Optional[Sequence], intervals: Optional[Mapping[int,
         if prev_iv is not None and iv != prev_iv:
             out["schedule_changes"] += 1
         prev_iv = iv
-        step = times[j] - times[j - 1]
-        if step > iv + tol_ms:
-            out["gaps"].append([times[j - 1], times[j], int(iv)])
-            out["missing_estimate"] += max(1, int(round(step / iv)) - 1)
+        # ADR 0078 (C-03): the step is judged under BOTH readings of the interval
+        # column (period ending vs starting at the settlement), exactly as the
+        # Paper Forward coverage rule does (_step_status, ADR 0074).  Reading it one
+        # way only let a 4h -> 8h change pass with one settlement uncharged.
+        st, _lo, hi = _step_status(times, intervals, j, tol_ms)
+        if st == "FUNDING_SCHEDULE_UNKNOWN":
+            unknown.append(times[j - 1])
+        elif st == "SCHEDULE_CHANGE_AMBIGUOUS":
+            ambiguous.append([times[j - 1], times[j]])
+        elif st == "FUNDING_SETTLEMENT_GAP":
+            step = times[j] - times[j - 1]
+            out["gaps"].append([times[j - 1], times[j], int(hi)])
+            out["missing_estimate"] += max(1, int(round(step / hi)) - 1)
     if unknown:
         out.update(status="FUNDING_SCHEDULE_UNKNOWN",
                    reason=f"{len(unknown)} settlements without a declared interval (first {unknown[0]})")
+        return out
+    if ambiguous:
+        out.update(status="FUNDING_SCHEDULE_UNKNOWN",
+                   reason=f"SCHEDULE_CHANGE_AMBIGUOUS: {len(ambiguous)} steps contiguous under one "
+                          f"reading of the interval column only (first {ambiguous[0]})")
         return out
     if out["gaps"]:
         out.update(status="FUNDING_SETTLEMENT_GAP",

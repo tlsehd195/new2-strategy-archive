@@ -32,19 +32,22 @@ Rules (each one enforced, each one tested):
 
 from __future__ import annotations
 
+import contextlib
+import functools
 import hashlib
-import json
+import os
 from pathlib import Path
 from typing import Mapping, Optional, Sequence
 
-from engine_lib import append_jsonl, canonical_json, iso_now
+from engine_lib import append_jsonl, canonical_json, iso_now, scan_jsonl
 
 SCHEMA = "validation_registry_v1"
 EVENTS = ("REGISTERED", "STARTED", "COMPLETED", "ABORTED", "INVALIDATED")
 #: replayed state of a run
 STATES = ("REGISTERED", "RUNNING", "COMPLETED", "ABORTED", "INVALIDATED")
 #: outcome vocabulary of one member in one completed run
-MEMBER_OUTCOMES = ("PASSED_INDEPENDENT_WINDOW", "REJECTED", "INCONCLUSIVE")
+MEMBER_OUTCOMES = ("PASSED_INDEPENDENT_WINDOW", "REJECTED", "INCONCLUSIVE",
+                   "BLOCKED_STATISTICS")      # ADR 0079: test refused, nothing decided
 #: the fields a registration must carry (all of them pin what is tested)
 REGISTRATION_FIELDS = ("window_key", "prereg_sha256", "members_sha256", "members",
                        "code_hash", "config", "cost")
@@ -74,28 +77,52 @@ def _rec_sha(rec: Mapping) -> str:
     return hashlib.sha256(canonical_json(body).encode()).hexdigest()
 
 
+def _serialized(fn):
+    """Read-check-append of one writer under an exclusive flock on
+    ``<registry>.lock`` (ADR 0078, F-07): two writers interleaving broke the
+    hash chain and bricked the registry."""
+    @functools.wraps(fn)
+    def wrapper(self, *a, **kw):
+        with self._lock():
+            return fn(self, *a, **kw)
+    return wrapper
+
+
 class ValidationRegistry:
     def __init__(self, path: Path):
         self.path = Path(path)
 
+    @contextlib.contextmanager
+    def _lock(self):
+        import fcntl
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        fd = os.open(self.path.with_name(self.path.name + ".lock"), os.O_CREAT | os.O_RDWR, 0o644)
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX)
+            yield
+        finally:
+            fcntl.flock(fd, fcntl.LOCK_UN)
+            os.close(fd)
+
     # -- reading -------------------------------------------------------------
     def records(self) -> list[dict]:
+        """Hash-chained records.  ADR 0078 (F-07): read with the engine's JSONL
+        scanner — a torn last line (interrupted write, never committed) and a
+        quarantined torn line are not part of the chain; any other unparsable
+        line is corruption (fail closed)."""
         if not self.path.exists():
             return []
+        recs, rep = scan_jsonl(self.path)
+        if rep["corrupt"]:
+            raise RegistryCorrupt(f"{self.path}: not JSON at line(s) {[n for n, _ in rep['corrupt']]}")
         out, prev = [], GENESIS
-        for i, line in enumerate(self.path.read_text(encoding="utf-8").splitlines(), 1):
-            if not line.strip():
-                continue
-            try:
-                r = json.loads(line)
-            except ValueError as e:
-                raise RegistryCorrupt(f"{self.path}:{i}: not JSON ({e})") from e
-            if not isinstance(r, dict) or r.get("schema") != SCHEMA or r.get("event") not in EVENTS:
-                raise RegistryCorrupt(f"{self.path}:{i}: not a {SCHEMA} record")
+        for i, r in enumerate(recs, 1):
+            if r.get("schema") != SCHEMA or r.get("event") not in EVENTS:
+                raise RegistryCorrupt(f"{self.path}: record {i}: not a {SCHEMA} record")
             if r.get("record_sha256") != _rec_sha(r):
-                raise RegistryCorrupt(f"{self.path}:{i}: record hash does not match its content")
+                raise RegistryCorrupt(f"{self.path}: record {i}: record hash does not match its content")
             if r.get("prev_sha256") != prev:
-                raise RegistryCorrupt(f"{self.path}:{i}: hash chain broken")
+                raise RegistryCorrupt(f"{self.path}: record {i}: hash chain broken")
             prev = r["record_sha256"]
             out.append(r)
         return out
@@ -131,6 +158,7 @@ class ValidationRegistry:
         append_jsonl(self.path, rec)
         return rec
 
+    @_serialized
     def register(self, run_id: str, **reg) -> dict:
         missing = [k for k in REGISTRATION_FIELDS if reg.get(k) in (None, "", {}, [])]
         if missing:
@@ -163,12 +191,14 @@ class ValidationRegistry:
         if why:
             raise RegistryRefused(f"{reg['run_id']}: " + "; ".join(why) + " — invalidate and re-register")
 
+    @_serialized
     def start(self, run_id: str, *, members_sha256: str, code_hash: str) -> dict:
         run = self._need(run_id, ("REGISTERED",))
         self._pin_check(run, members_sha256=members_sha256, code_hash=code_hash)
         return self._append(run_id, "STARTED", {"members_sha256": members_sha256,
                                                 "code_hash": code_hash})
 
+    @_serialized
     def complete(self, run_id: str, *, members_sha256: str, code_hash: str, result_sha256: str,
                  outcomes: Mapping[str, str], result_path: str = "") -> dict:
         run = self._need(run_id, ("RUNNING",))
@@ -185,10 +215,12 @@ class ValidationRegistry:
                                                   "result_path": result_path,
                                                   "stage": "independent"})
 
+    @_serialized
     def abort(self, run_id: str, reason: str) -> dict:
         self._need(run_id, ("REGISTERED", "RUNNING"))
         return self._append(run_id, "ABORTED", {"reason": reason})
 
+    @_serialized
     def invalidate(self, run_id: str, reason: str) -> dict:
         """A run whose candidates or code changed: its result (if any) is no
         longer evidence for the current definitions (re-validation needed)."""
@@ -232,5 +264,8 @@ class ValidationRegistry:
         return {"runs": len(runs), "by_state": by_state,
                 "completed_members": sum(outcomes.values()), "outcomes": outcomes,
                 "incomplete_runs": sorted(k for k, r in runs.items() if r["state"] == "RUNNING"),
+                # ADR 0078 (F-06): registered, never started (resumable with --resume
+                # once its history row is written)
+                "registered_not_started": sorted(k for k, r in runs.items() if r["state"] == "REGISTERED"),
                 "independent_passes": sorted(s for s, lst in self.independent_outcomes().items()
                                              if any(x["outcome"] == "PASSED_INDEPENDENT_WINDOW" for x in lst))}

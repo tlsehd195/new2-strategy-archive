@@ -83,9 +83,12 @@ def write_kline_csv(path: Path, bars):
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def write_funding_csv(path: Path, pairs):
+def write_funding_csv(path: Path, pairs, interval_hours="8"):
+    """Binance archive layout (calc_time, funding_interval_hours, rate).  ADR 0078:
+    the interval column is declared (``"8"``) — every confirmatory study requires
+    the declared schedule; pass ``interval_hours="x"`` for an undeclared file."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("".join(f"{t},x,{r}\n" for t, r in pairs), encoding="utf-8")
+    path.write_text("".join(f"{t},{interval_hours},{r}\n" for t, r in pairs), encoding="utf-8")
 
 
 def long_signal(view):
@@ -939,15 +942,20 @@ class TestPromotion(unittest.TestCase):
         chk2 = combo_promotion_gate(**kw, portfolio_passed=True)
         self.assertFalse(chk2.eligible)
         bars = make_bars(n=200, drift=0.001, vol=0.0, seed=21, volume=1e9)
-        pf = simulate_portfolio({"A": bars}, [{"symbol": "A", "decision_index": 40,
-                                               "side": 1, "horizon": 20}],
-                                {"A": make_funding(bars[0].ts, bars[-1].ts, rate=0.0)},
-                                CostContext.futures_default(),
-                                PortfolioConfig(initial_capital=10_000, size_fraction=0.1),
-                                context_id="C2-x").to_json()
+        fund = make_funding(bars[0].ts, bars[-1].ts, rate=0.0)
+        sigs = [{"symbol": "A", "decision_index": 40, "side": 1, "horizon": 20}]
+        pcfg = PortfolioConfig(initial_capital=10_000, size_fraction=0.1)
+        pf = simulate_portfolio({"A": bars}, sigs, {"A": fund}, CostContext.futures_default(), pcfg,
+                                context_id="C2-x",
+                                funding_intervals_by_symbol={"A": {t: 8 * 3_600_000 for t, _ in fund}}).to_json()
         chk3 = combo_promotion_gate(**kw, portfolio_result=pf, context_id="C2-x")
         self.assertTrue(chk3.eligible, chk3.failed_steps)
         self.assertEqual(chk3.kind, "SURVIVOR_COMBO")
+        # ADR 0078 (E-02): without the declared schedule the funding of the book is
+        # unproven — never eligible
+        pf0 = simulate_portfolio({"A": bars}, sigs, {"A": fund}, CostContext.futures_default(), pcfg,
+                                 context_id="C2-x").to_json()
+        self.assertFalse(combo_promotion_gate(**kw, portfolio_result=pf0, context_id="C2-x").eligible)
 
     def test_queue_duplicates_and_not_deployed(self):
         with tempfile.TemporaryDirectory() as td:

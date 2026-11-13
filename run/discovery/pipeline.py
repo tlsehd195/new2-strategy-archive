@@ -35,6 +35,7 @@ REJECTED, INCONCLUSIVE, BLOCKED_DATA, BLOCKED_COST, BLOCKED_STATISTICS.
 
 from __future__ import annotations
 
+import datetime as dt
 import hashlib
 import json
 import math
@@ -45,23 +46,24 @@ from typing import Mapping, Optional, Sequence
 from campaigns import CampaignLedger, WindowRetired, member_alpha
 from costs_bridge import COST_MODEL_SCOPE, CostComputationError, CostConfigError, UNVERIFIED_COST_MODEL
 from engine_lib import (
-    CODE_FILES, LockTestRegistry, append_jsonl, bh_fdr_family, canonical_json,
+    CODE_FILES, LockTestRegistry, append_jsonl, bh_fdr_family, canonical_json, exclusive_file_lock,
     code_identity, experiment_context, iso_now, iter_jsonl, locked_window_for, nw_tstat,
     pbo_cscv, runtime_identity, t_sf,
 )
 from evaluator import cell_stats, run_event_study
-from evolution import EVOLUTION_GENERATOR_VERSION, INTEGER_FEATURES, LineageStore, SpecStore
+from evolution import EVOLUTION_GENERATOR_VERSION, FROZEN_PARAMS, INTEGER_FEATURES, LineageStore, SpecStore
 from search import SearchConfig, dev_feedback
 from stats_mc import (
     MC_METHOD_VERSION, by_fdr, daily_series, default_q, dm_test, mcs, reality_check, spa_test, step_spa,
     spending_alpha, stationary_bootstrap_indices, stepm,
+    InsufficientBootstrapResolution, bootstrap_B_for,
 )
 from strategy_spec import (
     FEATURES, HORIZON_RANGE, build_spec_aux, build_spec_signal, canonicalize_spec,
     registry_identity, stop_exit_rule,
 )
 
-PIPELINE_VERSION = "evo-pipeline-v1"
+PIPELINE_VERSION = "evo-pipeline-v2"  # ADR 0078
 EVO_CODE_FILES = tuple(sorted(set(CODE_FILES) | {"public_cost_estimate.py", "portable_util.py", "strategy_spec.py", "evolution.py", "search.py",
                                                  "pipeline.py", "autoloop.py", "paper.py",
                                                  "paper_forward.py", "execution_sim.py",
@@ -207,12 +209,21 @@ class StatusStore:
     def __init__(self, path: Path):
         self.path = Path(path)
         self._cur: Optional[dict] = None
+        self._size: Optional[int] = None
+
+    def _disk_size(self) -> int:
+        try:
+            return self.path.stat().st_size
+        except FileNotFoundError:
+            return 0
 
     def _load(self) -> dict:
         if self._cur is None:
+            size = self._disk_size()
             self._cur = {}
             for r in iter_jsonl(self.path):
                 self._cur[(r["strategy_id"], r["context_id"])] = r
+            self._size = size
         return self._cur
 
     def get(self, sid: str, ctx: str) -> Optional[dict]:
@@ -228,6 +239,19 @@ class StatusStore:
     def set(self, sid: str, ctx: str, status: str, *, stage: str, reasons: Sequence[str] = (),
             evidence: Optional[Mapping] = None, resume_to: Optional[str] = None,
             labels: Sequence[str] = ()) -> dict:
+        """ADR 0079 (F-11): the transition is decided against the file ON DISK
+        under its lock — a status another writer (process or store instance)
+        appended since this store last read the file is seen, so an illegal
+        transition can no longer be written from a stale cache."""
+        with exclusive_file_lock(self.path):
+            if self._cur is not None and self._disk_size() != self._size:
+                self._cur = None                    # changed by another writer: re-read
+            return self._set_locked(sid, ctx, status, stage=stage, reasons=reasons, evidence=evidence,
+                                    resume_to=resume_to, labels=labels)
+
+    def _set_locked(self, sid: str, ctx: str, status: str, *, stage: str, reasons: Sequence[str],
+                    evidence: Optional[Mapping], resume_to: Optional[str],
+                    labels: Sequence[str]) -> dict:
         if status not in STATUSES:
             raise InvalidStatusTransition(f"unknown status {status}")
         cur = self.get(sid, ctx)
@@ -243,8 +267,10 @@ class StatusStore:
                "labels": list(labels), "at": iso_now()}
         if status in _BLOCKED:
             rec["resume_to"] = resume_to or (cur or {}).get("resume_to") or prev or "RESEARCH_ONLY"
+        cache = self._load()
         append_jsonl(self.path, rec)
-        self._load()[(sid, ctx)] = rec
+        cache[(sid, ctx)] = rec
+        self._size = self._disk_size()
         return rec
 
 
@@ -332,7 +358,10 @@ class RunnerDataProvider:
         fq = checked_funding_quality(f, rep)
         if not fq["ok"]:
             return {"bars": [], "funding": None, "missing": [f"funding {fq['issues']}"], "sha256": ""}
-        return {"bars": h.bars, "funding": f, "missing": [], "sha256": h.sha256}
+        # ADR 0078 (ME-01): the declared settlement intervals travel with the series,
+        # exactly as for the dev/validation read (``symbol``)
+        return {"bars": h.bars, "funding": f, "funding_intervals": dict(rep.get("intervals") or {}),
+                "missing": [], "sha256": h.sha256}
 
     def locked_ready(self, sym: str) -> bool:
         """File-presence check only (no locked content is read): does every
@@ -429,6 +458,8 @@ def neighbours(spec: Mapping, limit: int = 12) -> list[dict]:
         conds = base["entry"]["conditions"] if where == "entry" else base["filters"]
         for i, c in enumerate(conds):
             for pn, v in c["params"].items():
+                if (c["feature"], pn) in FROZEN_PARAMS:
+                    continue                 # ADR 0078 (B-01): no DEV-start-only neighbours
                 ps = FEATURES[c["feature"]].params[pn]
                 for f in (1.4, 1 / 1.4):
                     d = json.loads(json.dumps(base))
@@ -505,8 +536,9 @@ class EvolutionPipeline:
             }
             ctx, norm = experiment_context(comps)
             p = self.dir / "contexts.jsonl"
-            if not any(r.get("context_id") == ctx for r in iter_jsonl(p)):
-                append_jsonl(p, {"context_id": ctx, "components": norm, "at": iso_now()})
+            with exclusive_file_lock(p):         # ADR 0079 (F-11): one row per context
+                if not any(r.get("context_id") == ctx for r in iter_jsonl(p)):
+                    append_jsonl(p, {"context_id": ctx, "components": norm, "at": iso_now()})
             self._ctx = ctx
         return self._ctx
 
@@ -554,7 +586,10 @@ class EvolutionPipeline:
         rec = {**rec, "pipeline": PIPELINE_VERSION}
         rec["record_id"] = record_hash(rec)
         rec["at"] = iso_now()
-        append_jsonl(self.eval_path, rec)
+        # ADR 0079 follow-up (F-11): forward plans of different strategies conclude
+        # concurrently (one step lock per plan) and append here
+        with exclusive_file_lock(self.eval_path):
+            append_jsonl(self.eval_path, rec)
         self._index()[(rec["stage"], rec["strategy_id"], rec["context_id"])] = rec
         return rec
 
@@ -574,14 +609,15 @@ class EvolutionPipeline:
 
     # -- low-level study ------------------------------------------------------------
     def _study(self, spec: Mapping, sym: str, bars, funding, fng, lo: int, hi: int,
-               cost=None) -> list[dict]:
+               cost=None, *, funding_intervals: Optional[dict] = None) -> list[dict]:
         """Events with entry decisions in [lo, hi) and exits <= hi; features
         computed causally on bars[:hi+1] (history before ``lo`` is warm-up).
 
         Interface kept for every existing caller (events only).  The signal
         accounting of the same study (signals, refusals, missing data) is
         returned by :meth:`_study_result` (ADR 0071)."""
-        return self._study_result(spec, sym, bars, funding, fng, lo, hi, cost)[0]
+        return self._study_result(spec, sym, bars, funding, fng, lo, hi, cost,
+                                  funding_intervals=funding_intervals)[0]
 
     def _funding_schedule_of(self, sym: str, funding) -> Optional[dict]:
         """Declared settlement intervals of the provider's funding series for
@@ -596,8 +632,14 @@ class EvolutionPipeline:
         return None
 
     def _study_result(self, spec: Mapping, sym: str, bars, funding, fng, lo: int, hi: int,
-                      cost=None) -> tuple[list[dict], dict]:
-        """(events, signal diagnostics) of one study (ADR 0071)."""
+                      cost=None, *, funding_intervals: Optional[dict] = None) -> tuple[list[dict], dict]:
+        """(events, signal diagnostics) of one study (ADR 0071).
+
+        ADR 0078 (ME-01): ``funding_intervals`` is passed explicitly by callers whose
+        series is not the provider's own list (locked TEST, paper replay); without it
+        the provider's schedule is used only when ``funding`` IS that list.  A study
+        that charges funding always runs under the DECLARED schedule
+        (``require_funding``): the legacy nominal-8h rule hid a missing 4h settlement."""
         sub = bars[:hi + 1]
         # features on the FULL list (causal => identical on every prefix), cached
         # per input identity so strategies sharing a feature compute it once
@@ -609,10 +651,11 @@ class EvolutionPipeline:
         aux = build_spec_aux(bars, spec, funding, fng, cache=self._feat_cache if stable else None,
                              cache_ns=ns)
         ctx = cost or self.cost
+        ivs = funding_intervals if funding_intervals is not None else self._funding_schedule_of(sym, funding)
         es = run_event_study(sub, sym, build_spec_signal(spec, aux), spec["exit"]["horizon"],
                              ctx, self.order_value, funding,
                              warmup=max(1, lo), exit_rule=stop_exit_rule(spec),
-                             funding_intervals=self._funding_schedule_of(sym, funding))
+                             funding_intervals=ivs, require_funding=funding is not None)
         diag = es.diagnostics()
         diag.update(window_ts=[bars[max(0, lo)].ts if bars else None,
                                bars[min(hi, len(bars) - 1)].ts if bars else None],
@@ -627,6 +670,11 @@ class EvolutionPipeline:
             e = self.provider.symbol(sym)
             if e["missing"]:
                 missing += e["missing"]
+            elif e.get("funding") is not None and not e.get("funding_intervals"):
+                # ADR 0078 (ME-01): a funding series without its declared settlement
+                # intervals would be charged under the nominal-8h rule: data missing
+                missing.append(f"{sym}: funding settlement intervals not declared "
+                               "(NOMINAL_8H_LEGACY refused)")
             else:
                 data[sym] = e
         fng = None
@@ -652,6 +700,11 @@ class EvolutionPipeline:
                  operator: str = "seed", detail: Optional[Mapping] = None, round_index: int = 0,
                  seed: int = 0, budget: Optional[Mapping] = None) -> tuple[str, bool]:
         sid, created = self.specs.put(spec, source=source)
+        if not created and any(r.get("child_id") == sid and list(r.get("parents") or []) == list(parents)
+                               and r.get("operator") == operator for r in self.lineage.records()):
+            # ADR 0078 (B-07): a re-seed after a context / config change re-registers
+            # the same edge — one lineage record per (child, parents, operator)
+            return sid, created
         self.lineage.record(child_id=sid, parents=list(parents), operator=operator,
                             detail=dict(detail or {}), generator_version=EVOLUTION_GENERATOR_VERSION,
                             seed=seed, round_index=round_index, context_id=self.context_id(),
@@ -854,7 +907,26 @@ class EvolutionPipeline:
             self.validation_candidates()
         return dict(self._near_skips)
 
+    def _history_guard(self):
+        """Exclusive lock of the shared ``validation_history`` (ADR 0078, D-03):
+        the batch index k of a shared window is read and the new batch appended
+        under one lock (also taken by ``independent_window open``), so two state
+        directories never spend the same alpha twice.  ADR 0079 (F-11): this
+        directory's batch ledger is locked as well (always, history or not), so
+        two writers of one state directory cannot both take the same k.  Lock
+        order: history, then the batch ledger."""
+        import contextlib
+        stack = contextlib.ExitStack()
+        if self.validation_history is not None:
+            stack.enter_context(exclusive_file_lock(self.validation_history))
+        stack.enter_context(exclusive_file_lock(self.batch_path))
+        return stack
+
     def preregister_batch(self, members: Sequence[str]) -> dict:
+        with self._history_guard():
+            return self._preregister_batch(members)
+
+    def _preregister_batch(self, members: Sequence[str]) -> dict:
         ctx = self.context_id()
         vc = self.cfg["validation"]
         prior = [b for b in self._batches() if b["kind"] == "PREREGISTERED"]
@@ -867,6 +939,10 @@ class EvolutionPipeline:
             windows[key] = {"symbol": sym, "batch_index": k, "external_prior_batches": ext,
                             "alpha": spending_alpha(k, window_alpha_total(vc)),
                             "alpha_family": alpha_family(vc),
+                            # ADR 0078 (D-01): B large enough that alpha*(B+1) >= MIN_TAIL_DRAWS,
+                            # so the StepM critical value is never clamped to the sample max
+                            "B": bootstrap_B_for(spending_alpha(k, window_alpha_total(vc)),
+                                                 int(vc["bootstrap_B"])),
                             "members": sorted(m for m in members if sym in self.specs.get(m)["symbols"])}
         body = {"kind": "PREREGISTERED", "context_id": ctx, "members": sorted(members),
                 "windows": windows, "method": vc["method"], "mc_method": MC_METHOD_VERSION,
@@ -875,6 +951,19 @@ class EvolutionPipeline:
                 "dev_records": {m: self.evaluation("dev", m)["record_id"] for m in members}}
         body["batch_id"] = "VB-" + hashlib.sha256(canonical_json(body).encode()).hexdigest()[:16]
         body["created_at"] = iso_now()
+        if self.validation_history is not None:
+            # ADR 0078 (D-03): the batch is written to the SHARED window history
+            # before this directory's ledger, so a crash in between can only
+            # over-count (a phantom batch spends alpha; never a reused index)
+            append_jsonl(self.validation_history, {
+                "run": f"evolve:{self.dir.name}", "batches": 1, "batch_ids": [body["batch_id"]],
+                "context_id": ctx, "date": dt.date.today().isoformat(),
+                "window_keys": sorted(windows), "symbols": syms,
+                "alpha": {k: w["alpha"] for k, w in sorted(windows.items())},
+                "batch_index": {k: w["batch_index"] for k, w in sorted(windows.items())},
+                "members": len(members),
+                "note": "written at preregistration, BEFORE evaluation",
+                "source": "run/discovery/pipeline.py preregister_batch (ADR 0078)"})
         append_jsonl(self.batch_path, body)
         return body
 
@@ -970,17 +1059,31 @@ class EvolutionPipeline:
                     if len(set(len(v) for v in series.values())) != 1:
                         raise RuntimeError("validation series misaligned")
                     q = default_q(len(next(iter(series.values()))))
-                    sm = stepm(series, alpha=w["alpha"], B=vc["bootstrap_B"], q=q, seed=batch["seed"],
-                               studentize=vc.get("studentize", "fixed"))
-                    res.update({"rejected": sm["rejected"], "steps": sm["steps"], "q": q,
+                    B_w = int(w.get("B", batch["B"]))
+                    try:
+                        sm = stepm(series, alpha=w["alpha"], B=B_w, q=q, seed=batch["seed"],
+                                   studentize=vc.get("studentize", "fixed"))
+                    except InsufficientBootstrapResolution as err:
+                        # batch preregistered (by an older version) with too few draws for
+                        # its alpha: the test cannot be run.  Nobody is rejected and nobody
+                        # passes (fail closed); the stored B / alpha are used as they are and
+                        # never raised — that would be a re-run nobody preregistered
+                        # (ADR 0078, ADR 0079: the rule is alpha*(B+1) >= MIN_TAIL_DRAWS)
+                        sm = {"rejected": [], "steps": [], "n": len(next(iter(series.values()))),
+                              "method": "BLOCKED_STATISTICS"}
+                        res["stepm_blocked"] = str(err)
+                    res.update({"rejected": sm["rejected"], "steps": sm["steps"], "q": q, "B": B_w,
                                 "n_days": sm["n"], "stepm_method": sm["method"]})
                     try:
-                        res["spa"] = {k: v for k, v in spa_test(series, B=vc["bootstrap_B"], q=q,
+                        res["spa"] = {k: v for k, v in spa_test(series, B=B_w, q=q,
                                                                  seed=batch["seed"]).items()
                                       if k.startswith("p_") or k == "statistic"}
-                        res["step_spa_rejected"] = step_spa(series, alpha=w["alpha"], B=vc["bootstrap_B"],
-                                                            q=q, seed=batch["seed"])["rejected"]
-                        res["reality_check_p"] = reality_check(series, B=vc["bootstrap_B"], q=q,
+                        try:
+                            res["step_spa_rejected"] = step_spa(series, alpha=w["alpha"], B=B_w,
+                                                                q=q, seed=batch["seed"])["rejected"]
+                        except InsufficientBootstrapResolution as err:
+                            res["step_spa_blocked"] = str(err)       # diagnostic: recorded, not hidden
+                        res["reality_check_p"] = reality_check(series, B=B_w, q=q,
                                                                seed=batch["seed"])["p"]
                     except ValueError as err:
                         res["spa_error"] = str(err)
@@ -990,6 +1093,8 @@ class EvolutionPipeline:
                     try:
                         m_ = mcs(series, alpha=0.10, B=vc["bootstrap_B"], q=q, seed=batch["seed"])
                         res["mcs"] = {"set": m_["set"], "p": m_["p"], "alpha": m_["alpha"]}
+                    except InsufficientBootstrapResolution as err:
+                        res["mcs_blocked"] = str(err)
                     except ValueError as err:
                         res["mcs_error"] = str(err)
                 hp = {m: per_member[m][sym]["hac_p"] for m in w["members"]}
@@ -1003,8 +1108,9 @@ class EvolutionPipeline:
             for m in batch["members"]:
                 self.statuses.set(m, ctx, "BLOCKED_COST", stage="validation", reasons=[str(err)],
                                   resume_to="RESEARCH_ONLY")
-            append_jsonl(self.batch_path, {"kind": "RESULT", "batch_id": batch["batch_id"],
-                                           "blocked": "BLOCKED_COST", "error": str(err), "at": iso_now()})
+            with exclusive_file_lock(self.batch_path):     # ADR 0079 follow-up (F-11)
+                append_jsonl(self.batch_path, {"kind": "RESULT", "batch_id": batch["batch_id"],
+                                               "blocked": "BLOCKED_COST", "error": str(err), "at": iso_now()})
             return {"batch_id": batch["batch_id"], "blocked": "BLOCKED_COST"}
         outcome = {}
         for m in batch["members"]:
@@ -1012,14 +1118,22 @@ class EvolutionPipeline:
             keys = {w["symbol"]: k for k, w in batch["windows"].items()}
             rejected = all(m in tests[keys[s]]["rejected"] for s in syms)
             powered = all((per_member[m][s]["n"] or 0) >= vc["min_events_per_symbol"] for s in syms)
-            fclass = validation_failure_class(per_member[m], syms, rejected=rejected, powered=powered,
-                                              min_events=vc["min_events_per_symbol"])
+            # ADR 0079 (D-01): a window whose StepM could not resolve its alpha decides
+            # nothing for any member on it — not REJECTED, not PASSED
+            blocked = sorted({tests[keys[s]]["stepm_blocked"] for s in syms
+                              if "stepm_blocked" in tests[keys[s]]})
+            fclass = ("BLOCKED_STATISTICS" if blocked else
+                      validation_failure_class(per_member[m], syms, rejected=rejected, powered=powered,
+                                               min_events=vc["min_events_per_symbol"]))
             prev = self.evaluation("validation", m)
             if prev is not None and prev.get("batch_id") == batch["batch_id"]:
                 # resumed batch (the run stopped after this member's record and
                 # before the RESULT row): reuse the record — never a second one —
-                # and require the recomputation to agree with it (ADR 0029)
-                if (prev.get("stepm_rejected"), prev.get("powered")) != (rejected, powered):
+                # and require the recomputation to agree with it (ADR 0029).  A
+                # record written before ADR 0079 has no stepm_blocked field: only
+                # the fields it has are compared
+                if (prev.get("stepm_rejected"), prev.get("powered")) != (rejected, powered) or (
+                        "stepm_blocked" in prev and bool(prev["stepm_blocked"]) != bool(blocked)):
                     raise EvidenceTampered(f"{m}: resumed batch {batch['batch_id']} disagrees with "
                                            f"its stored validation record {prev['record_id']}")
                 rec = prev
@@ -1027,11 +1141,23 @@ class EvolutionPipeline:
                 rec = self._append_eval({"stage": "validation", "strategy_id": m, "context_id": ctx,
                                          "status": "OK", "batch_id": batch["batch_id"],
                                          "per_symbol": per_member[m], "stepm_rejected": rejected,
+                                         "stepm_blocked": blocked or False,
                                          "powered": powered, "failure_class": fclass,
                                          "cost_model": self._cost_block()})
             cur = self.statuses.get(m, ctx) or {}
             done = (cur.get("evidence") or {}).get("validation") == rec["record_id"]
-            if rejected and powered:
+            if blocked:
+                outcome[m] = "BLOCKED_STATISTICS"
+                if not done:
+                    # resume_to stays RESEARCH_ONLY-like but the member is no longer
+                    # RESEARCH_ONLY, so it is never put into another batch on its own:
+                    # re-testing it would be a second look at the validation window
+                    self.statuses.set(m, ctx, "BLOCKED_STATISTICS", stage="validation",
+                                      reasons=["validation StepM refused: bootstrap resolution "
+                                               "alpha*(B+1) < MIN_TAIL_DRAWS (ADR 0079)", *blocked],
+                                      evidence={"validation": rec["record_id"]},
+                                      resume_to="RESEARCH_ONLY")
+            elif rejected and powered:
                 outcome[m] = "PASSED_STEPM"
             elif powered:
                 outcome[m] = "REJECTED"
@@ -1048,7 +1174,10 @@ class EvolutionPipeline:
                                       evidence={"validation": rec["record_id"]})
         result = {"kind": "RESULT", "batch_id": batch["batch_id"], "tests": tests,
                   "outcome": outcome, "at": iso_now()}
-        append_jsonl(self.batch_path, result)
+        # ADR 0079 follow-up (F-11): every writer of the batch ledger takes its lock
+        # (the preregistration appends under it); _evaluate_batch never holds it
+        with exclusive_file_lock(self.batch_path):
+            append_jsonl(self.batch_path, result)
         for m, o in outcome.items():
             if o == "PASSED_STEPM":
                 self.robustness(m)
@@ -1066,7 +1195,12 @@ class EvolutionPipeline:
                 st = self.statuses.get(m, ctx)
                 if o != "PASSED_STEPM" or st is None:
                     continue
-                if (st["status"] == "RESEARCH_ONLY" and self.evaluation("robustness", m) is None) or (
+                rob = self.evaluation("robustness", m)
+                if st["status"] == "RESEARCH_ONLY" and rob is not None:
+                    # ADR 0078 (F-04): record written, status lost in a crash
+                    self._apply_robustness(m, rob)
+                    out.append(m)
+                elif (st["status"] == "RESEARCH_ONLY" and rob is None) or (
                         st["status"] == "BLOCKED_STATISTICS" and st["stage"] == "robustness"
                         and self._blocked_now_computable(m)):
                     self.robustness(m)
@@ -1162,6 +1296,15 @@ class EvolutionPipeline:
             latest = {k: v for k, v in latest.items() if k in pool}
         return latest
 
+    def _trials_searched_all(self) -> int:
+        """Strategies tried by the search of this state directory over EVERY
+        experiment context (ADR 0078, D-02): with ``dsr_trial_set =
+        "search_pool"`` the search pool (lineage records are context-free);
+        otherwise every strategy with a DEV series under any context."""
+        if self.cfg["robustness"].get("dsr_trial_set") == "search_pool":
+            return len(self.search_pool())
+        return len({r["strategy_id"] for r in iter_jsonl(self.series_path)})
+
     def _pbo(self) -> dict:
         latest = self._trial_series()
         if len(latest) < self.cfg["robustness"]["pbo_min_trials"]:
@@ -1178,14 +1321,23 @@ class EvolutionPipeline:
         mat = [[pooled[s].get(d, 0.0) for s in sids] for d in days]
         pbo, n = pbo_cscv(mat, n_partitions=self.cfg["robustness"]["pbo_partitions"])
         return {"computable": math.isfinite(pbo), "pbo": pbo if math.isfinite(pbo) else None,
-                "combinations": n, "trials": len(sids), "days": len(days)}
+                "combinations": n, "trials": len(sids), "days": len(days),
+                # ADR 0078: the CSCV matrix needs series on the current basis, so it
+                # holds the current context only; the full count is recorded
+                "trials_searched_all": self._trials_searched_all()}
 
     def _dsr(self, sid: str) -> dict:
         """Deflated Sharpe Ratio (Bailey & López de Prado 2014) of the strategy's
-        DEV daily series against ALL strategies with a DEV series in this
-        context (the selection set).  Diagnostic only (non-gating): the
-        number of effectively independent trials is unknowable here and the
-        daily series of one search are strongly dependent."""
+        DEV daily series against the trial set (:meth:`_trial_series`).
+
+        Gating under promo-v5 (``dsr_gating``, ADR 0064).  ADR 0078 (D-02/D-06):
+        the gate uses ``dsr_at_trials_searched`` — the DSR at the number of
+        strategies the search tried in THIS state directory over every
+        experiment context (:meth:`_trials_searched_all`), never fewer than the
+        computable ones.  A code / cost / data change starts a new context; the
+        selection that already happened is not undone by it, so the trial count
+        does not restart.  ``var_sr`` still comes from the current context's
+        computable series (the only ones on the current data/cost basis)."""
         from engine_lib import deflated_sharpe
         latest = self._trial_series()
         min_days = int(self.cfg["robustness"].get("dsr_min_days", 30))
@@ -1206,8 +1358,9 @@ class EvolutionPipeline:
             sd = (sum((v - mu) ** 2 for v in x) / (len(x) - 1)) ** 0.5
             if sd > 0:
                 srs[s_] = (mu / sd, x)
+        n_searched = max(len(latest), self._trials_searched_all())
         if sid not in srs or len(srs) < 2:
-            return {"computable": False, "trials": len(srs), "trials_searched": len(latest)}
+            return {"computable": False, "trials": len(srs), "trials_searched": n_searched}
         sr, x = srs[sid]
         n = len(x)
         mu = sum(x) / n
@@ -1218,18 +1371,17 @@ class EvolutionPipeline:
         m_ = sum(all_sr) / len(all_sr)
         var_sr = sum((v - m_) ** 2 for v in all_sr) / (len(all_sr) - 1)
         d = deflated_sharpe(sr, n, skew, kurt, len(srs), var_sr)
-        # ADR 0069 (diagnostic, not a gate): every search-pool strategy with a DEV
-        # series was a trial, also those whose SR is not computable (too few days,
-        # no variation).  ``trials`` counts only computable ones, which can only
-        # lower the expected-maximum benchmark; the DSR at the full count is kept
-        # next to it so the difference is visible.
-        n_searched = len(latest)
-        d_all = deflated_sharpe(sr, n, skew, kurt, max(n_searched, len(srs)), var_sr)
+        # every strategy the search tried was a trial, also those whose SR is not
+        # computable (too few days, no variation) and those evaluated under an
+        # earlier context.  ``trials`` (computable, current context) is kept for
+        # the record; the GATE uses the full count (ADR 0078, D-02/D-06).
+        n_all = max(n_searched, len(srs))
+        d_all = deflated_sharpe(sr, n, skew, kurt, n_all, var_sr)
         # MinBTL (Bailey et al. 2014): raw trial count, 365 d/yr (24/7 market).
         from engine_lib import expected_max_sr, min_backtest_years
         sr_ann = sr * math.sqrt(365.0)
-        floor_ann = expected_max_sr(len(srs)) / math.sqrt(n / 365.0)
-        return {"minbtl_years": min_backtest_years(len(srs), sr_ann),
+        floor_ann = expected_max_sr(n_all) / math.sqrt(n / 365.0)
+        return {"minbtl_years": min_backtest_years(n_all, sr_ann),
                 "sr_annual": sr_ann, "sr_floor_annual": floor_ann,
                 "exceeds_sr_floor": sr_ann > floor_ann,
                 "computable": math.isfinite(d), "dsr": d if math.isfinite(d) else None,
@@ -1246,10 +1398,13 @@ class EvolutionPipeline:
         all_ev: list[dict] = []
         regime_ev: dict[str, list[float]] = {}
         val_halves: list[Optional[float]] = []
+        win_days: list[int] = []
         for sym in spec["symbols"]:
             ev, v0, v1 = self._validation_events(sid, sym)
             all_ev += ev
             bars = self.provider.symbol(sym)["bars"]
+            if v1 > v0:
+                win_days += [bars[v0].ts // DAY_MS, bars[v1].ts // DAY_MS]
             closes = [b.close for b in bars]
             vols = {}
             for x in ev:
@@ -1307,7 +1462,10 @@ class EvolutionPipeline:
             "top5pct_event_share": top_share if math.isfinite(top_share) else None,
             "top_day_share": day_share if math.isfinite(day_share) else None}
         # bootstrap CI of the mean daily validation return (recorded)
-        days = sorted(by_day)
+        # ADR 0078 (D-05): every day of the VALIDATION window counts (no-trade days
+        # are 0), not only the days between the first and the last exit — the
+        # trimmed span left out flat days and overstated the daily mean
+        days = sorted(set(by_day) | set(win_days))
         ser = [by_day.get(d, 0.0) for d in range(days[0], days[-1] + 1)] if days else []
         ci = None
         nb_ci = int(rc.get("ci_bootstrap_B", 500))
@@ -1357,7 +1515,11 @@ class EvolutionPipeline:
         if rc.get("dsr_gating"):
             # promo-v5 (ADR 0064): DSR below min_dsr fails; not computable (too few DEV
             # days or trials) is INSUFFICIENT_DATA, never a pass
-            checks["dsr"] = {**dsr, "pass": bool(dsr["computable"]) and dsr["dsr"] >= rc["min_dsr"],
+            # ADR 0078 (D-06): the gate value is the DSR at every trial searched
+            gate = dsr.get("dsr_at_trials_searched")
+            checks["dsr"] = {**dsr, "computable": gate is not None,
+                             "pass": gate is not None and gate >= rc["min_dsr"],
+                             "gate_value": gate, "gate_trials": dsr.get("trials_searched"),
                              "gating": True, "min_dsr": rc["min_dsr"]}
         else:
             checks["dsr"] = {"pass": True, "gating": False, **dsr}
@@ -1370,6 +1532,19 @@ class EvolutionPipeline:
                                  "not_computable": not_computable,
                                  "config_hash": self.cfg_hash,
                                  "config_version": self.cfg.get("version")})
+        self._apply_robustness(sid, rec)
+        return rec
+
+    def _apply_robustness(self, sid: str, rec: Mapping) -> None:
+        """Status of a robustness record (ADR 0078, F-04: also re-applied when a
+        crash fell between the record and its status)."""
+        ctx = self.context_id()
+        checks, failed = rec["checks"], rec["failed"]
+        not_computable = rec.get("not_computable")
+        if not_computable is None:         # records before ADR 0064
+            not_computable = sorted(k for k in failed if checks[k].get("computable") is False)
+        pbo = checks["pbo"]
+        dev = self.evaluation("dev", sid)
         ev = {"dev": dev["record_id"], "validation": self.evaluation("validation", sid)["record_id"],
               "robustness": rec["record_id"]}
         if not failed:
@@ -1377,7 +1552,7 @@ class EvolutionPipeline:
             # PASS_INDIVIDUAL: the separate portfolio layer runs next (ADR 0068)
             self.portfolio_validation(sid)
         elif failed == not_computable:
-            why = {"pbo": f"PBO not computable ({pbo['trials']} trials)",
+            why = {"pbo": f"PBO not computable ({pbo.get('trials')} trials)",
                    "dsr": f"DSR not computable ({checks['dsr'].get('trials')} trials)",
                    "bootstrap_ci": f"bootstrap CI not computable ({checks['bootstrap_ci'].get('n_days')} days)"}
             self.statuses.set(sid, ctx, "BLOCKED_STATISTICS", stage="robustness",
@@ -1386,7 +1561,6 @@ class EvolutionPipeline:
         else:
             self.statuses.set(sid, ctx, "REJECTED", stage="robustness",
                               reasons=[f"robustness failed: {', '.join(failed)}"], evidence=ev)
-        return rec
 
     # -- stage 3b: portfolio validation (ADR 0068) -------------------------------------------
     #: statuses that take a strategy out of the book
@@ -1669,8 +1843,21 @@ class EvolutionPipeline:
             d = self.provider.locked(sym)
             if d["missing"] or not d["bars"]:
                 missing[sym] = d["missing"] or ["no locked bars"]
-            else:
-                loaded[sym] = d
+                continue
+            # ADR 0078 (ME-01): checked BEFORE exposure — the locked study charges
+            # funding under the declared schedule, so the schedule must exist and the
+            # warm-up and locked sources must agree on every shared settlement
+            pre = self.provider.symbol(sym)
+            if not d.get("funding_intervals"):
+                missing[sym] = ["locked funding has no declared settlement intervals"]
+                continue
+            try:
+                merge_funding(pre.get("funding"), pre.get("funding_intervals"),
+                              d["funding"], d.get("funding_intervals"))
+            except FundingMergeConflict as err:
+                missing[sym] = [f"funding sources disagree: {err}"]
+                continue
+            loaded[sym] = d
         if missing:
             for (sid, sym), tok in tokens.items():
                 self.lock_registry.block(tok, f"locked data missing: {missing}")
@@ -1717,8 +1904,10 @@ class EvolutionPipeline:
                         bars, warm = list(d["bars"]), 1        # no contiguous warm-up history
                     else:
                         warm = len(tail)
-                    fund = sorted({*(pre["funding"] or []), *d["funding"]})
-                    ev = self._study(spec, sym, bars, fund, fng, warm, len(bars) - 1)
+                    fund, ivs = merge_funding(pre.get("funding"), pre.get("funding_intervals"),
+                                              d["funding"], d.get("funding_intervals"))
+                    ev = self._study(spec, sym, bars, fund, fng, warm, len(bars) - 1,
+                                     funding_intervals=ivs)
                     nets = [x["net_bp"] for x in ev]
                     t, p = _hac(nets) if len(nets) >= 3 else (float("nan"), float("nan"))
                     a = member_alpha(camp, sym)
@@ -1745,19 +1934,29 @@ class EvolutionPipeline:
                                   reasons=[f"locked evaluation failed after exposure: {err}"],
                                   resume_to="VALIDATION_SURVIVOR")
                 continue
-            rec = self._append_eval({"stage": "locked", "strategy_id": sid, "context_id": ctx,
-                                     "status": "OK", "campaign_id": camp["campaign_id"],
-                                     "per_symbol": per, "cost_model": self._cost_block()})
+            # ADR 0078 (F-02): a campaign resumed after a crash reuses the locked
+            # record of THIS campaign (never a second copy) and writes each status
+            # only once — a repeated PAPER_TEST_READY -> PAPER_TEST_READY write was an
+            # invalid transition that failed every later cycle
+            prev = self.evaluation("locked", sid)
+            if prev is not None and prev.get("campaign_id") == camp["campaign_id"]:
+                rec = prev
+            else:
+                rec = self._append_eval({"stage": "locked", "strategy_id": sid, "context_id": ctx,
+                                         "status": "OK", "campaign_id": camp["campaign_id"],
+                                         "per_symbol": per, "cost_model": self._cost_block()})
             passed = all(v["pass"] for v in per.values())
             powered = all(v["powered"] for v in per.values())
             results[sid] = {"pass": passed, "powered": powered, "record_id": rec["record_id"]}
+            cur = (self.statuses.get(sid, ctx) or {}).get("status")
             if passed:
                 self.promotion_review(sid)
             elif powered:
-                self.statuses.set(sid, ctx, "REJECTED", stage="locked",
-                                  reasons=["locked TEST not significant at the campaign alpha"],
-                                  evidence={"locked": rec["record_id"]})
-            else:
+                if cur != "REJECTED":
+                    self.statuses.set(sid, ctx, "REJECTED", stage="locked",
+                                      reasons=["locked TEST not significant at the campaign alpha"],
+                                      evidence={"locked": rec["record_id"]})
+            elif cur != "INCONCLUSIVE":
                 self.statuses.set(sid, ctx, "INCONCLUSIVE", stage="locked",
                                   reasons=["locked TEST underpowered (window consumed)"],
                                   evidence={"locked": rec["record_id"]})
@@ -1810,6 +2009,14 @@ class EvolutionPipeline:
                 labels.append(self.cost.status)       # ASSUMED_COST_MODEL / ESTIMATED_FROM_PUBLIC_DATA
         if self.cost.test_only:
             labels.append("TEST_ONLY_COST")
+        # ADR 0078 (F-02): one review per (strategy, context, evidence).  A review
+        # written before a crash is re-applied only while its status is still
+        # missing (VALIDATION_SURVIVOR); a later status is never rewound
+        for old in iter_jsonl(self.review_path):
+            if (old.get("strategy_id"), old.get("context_id"), old.get("evidence")) == (sid, ctx, evidence):
+                if (self.statuses.get(sid, ctx) or {}).get("status") == "VALIDATION_SURVIVOR":
+                    self._apply_review(sid, ctx, old)
+                return old
         review = {"strategy_id": sid, "context_id": ctx, "config_hash": self.cfg_hash,
                   "evidence": evidence, "failures": failures, "labels": labels,
                   "cost_verified": cost_ok, "cost_scope_issues": cost_why,
@@ -1819,17 +2026,47 @@ class EvolutionPipeline:
                   "scope": "paper trading / isolated simulation only — never live orders",
                   "at": iso_now()}
         append_jsonl(self.review_path, review)
+        self._apply_review(sid, ctx, review)
+        return review
+
+    def _apply_review(self, sid: str, ctx: str, review: Mapping) -> None:
+        evidence = review["evidence"]
         if review["decision"] == "PAPER_TEST_READY":
             self.statuses.set(sid, ctx, "PAPER_TEST_READY", stage="promotion", evidence=evidence,
-                              labels=labels)
+                              labels=review["labels"])
         elif review["decision"] == "BLOCKED_COST":
             self.statuses.set(sid, ctx, "BLOCKED_COST", stage="promotion",
                               reasons=[f"{self.cost.status}: research candidate only, not promotable to PAPER_TEST_READY"],
                               evidence=evidence, resume_to="VALIDATION_SURVIVOR")
         else:
-            self.statuses.set(sid, ctx, "BLOCKED_STATISTICS", stage="promotion", reasons=failures,
+            self.statuses.set(sid, ctx, "BLOCKED_STATISTICS", stage="promotion",
+                              reasons=review["failures"],
                               evidence=evidence, resume_to="VALIDATION_SURVIVOR")
-        return review
+
+
+class FundingMergeConflict(ValueError):
+    """Two funding sources disagree on the rate (or declared interval) of one settlement."""
+
+
+def merge_funding(a, a_iv, b, b_iv) -> tuple[list, dict]:
+    """Union of two funding series and their declared intervals (ADR 0078, ME-01).
+
+    The old merge (``sorted({*a, *b})``) dropped the intervals — the locked study
+    then ran under the nominal-8h rule — and kept BOTH rows when the sources gave
+    one settlement two different rates (a duplicate settlement time, i.e. an
+    INVALID series that silently dropped every event).  A conflict now raises."""
+    rates: dict = {}
+    ivs: dict = {}
+    for pairs, iv in ((a or [], a_iv or {}), (b or [], b_iv or {})):
+        for t, r in pairs:
+            if t in rates and rates[t] != r:
+                raise FundingMergeConflict(f"settlement {t}: rate {rates[t]!r} vs {r!r}")
+            rates[t] = r
+            if t in iv:
+                if t in ivs and ivs[t] != iv[t]:
+                    raise FundingMergeConflict(f"settlement {t}: interval {ivs[t]} vs {iv[t]}")
+                ivs[t] = iv[t]
+    return sorted(rates.items()), ivs
 
 
 def cost_attribution(events: Sequence[Mapping]) -> dict:
@@ -1850,7 +2087,7 @@ def cost_attribution(events: Sequence[Mapping]) -> dict:
 
 #: primary reason a validation member did not pass (reporting, never a gate)
 FAILURE_CLASSES = ("PASSED_STEPM", "DATA_MISSING", "INSUFFICIENT_DATA", "NO_EDGE_OUT_OF_SAMPLE",
-                   "FAIL_COST", "FAIL_STAT")
+                   "FAIL_COST", "FAIL_STAT", "BLOCKED_STATISTICS")
 
 
 def validation_failure_class(per_symbol: Mapping, symbols: Sequence[str], *, rejected: bool,
@@ -1917,7 +2154,8 @@ def outcome_label(status: Optional[Mapping], *, dev: Optional[Mapping] = None,
     if fc is not None:
         return {"DATA_MISSING": "DATA_MISSING", "INSUFFICIENT_DATA": "UNDETERMINED_POWER",
                 "NO_EDGE_OUT_OF_SAMPLE": "FAIL_STAT", "FAIL_COST": "FAIL_COST",
-                "FAIL_STAT": "FAIL_STAT", "PASSED_STEPM": "FAIL_STAT"}.get(fc, "FAIL_STAT")
+                "FAIL_STAT": "FAIL_STAT", "PASSED_STEPM": "FAIL_STAT",
+                "BLOCKED_STATISTICS": "UNDETERMINED_POWER"}.get(fc, "FAIL_STAT")
     if st == "INCONCLUSIVE":
         return "UNDETERMINED_POWER"
     # DEV screen rejection: positive before cost, not after -> the cost removed it
