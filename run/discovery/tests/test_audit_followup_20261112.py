@@ -7,6 +7,7 @@ decision or written.
 """
 from __future__ import annotations
 
+import json
 import random
 import shutil
 import sys
@@ -719,6 +720,151 @@ class TestG03SharedSurface(unittest.TestCase):
                 self.assertIn(name, res)
                 self.assertIn(name, rp)
 
+
+
+# ---------------------------------------------------------------------------
+# C-4 — the hand-off must not export an unverifiable FNG forward conclusion
+# ---------------------------------------------------------------------------
+
+class _FngProvider(tp.SyntheticProvider):
+    """The synthetic provider with a Fear & Greed series over every day it serves."""
+
+    def fng(self):
+        return {d: 10.0 for d in range(18_000, 21_000)}
+
+
+class TestC04HandoffFng(FundingCase):
+    """User directive 2026-11-13 04:21Z (C-4).  ``handoff.build_handoff`` copied the
+    paper_forward record's verdict into the hand-off; an FNG strategy concluded
+    PAPER_PASSED by the code before ADR 0079 (FNG never pinned) was exported with
+    ``paper_forward_verdict: PAPER_PASSED`` although ``step()`` and
+    ``verify_conclusion()`` no longer confirm that conclusion."""
+
+    def _promoted(self, spec, provider):
+        """A strategy promoted by the real flow (validation StepM, locked campaign,
+        isolated replay, promotion review) on synthetic data: PAPER_TESTING."""
+        from paper import run_paper
+        from test_completion import SynthFeed, _ms, synth_bars
+        from test_paper_forward_funding_20261111 import DeclaredFeed, declared_settlements
+        p = self.pipe(provider)
+        sid, *_ = self.register_all(p, [spec] + tp.NOISE[:7])
+        p.run_validation()
+        p.run_locked_campaign()
+        run_paper(p, sid)
+        self.assertEqual(p.statuses.status(sid, p.context_id()), "PAPER_TESTING")
+        last = provider.paper("BTCUSDT")["bars"][-1]
+        bars = synth_bars("2024-07-01", "2025-03-31", seed=77, drift_hours=(0, 1, 2), price0=last.close)
+        self.now = [_ms(self.START)]
+        base = SynthFeed(bars, lambda: self.now[0])
+        feed = DeclaredFeed(base.bars, base.clock,
+                            declared_settlements(base.bars[0].ts, base.bars[-1].ts + DAY, 4))
+        return p, sid, feed
+
+    def _old_fng_pass(self):
+        """FNG strategy, forward plan registered and concluded PAPER_PASSED by the
+        code before ADR 0079 (registration refusal and conclusion block patched out:
+        what an older version wrote).  No FNG source or snapshot pin exists."""
+        import paper_forward as pf
+        p, sid, feed = self._promoted(_fng_edge_spec(), _FngProvider())
+        fp = pf.ForwardPaper(p, feed, clock=lambda: self.now[0])
+        with mock.patch.object(pf.ForwardPaper, "_fng_refusal", return_value=None), \
+                mock.patch.object(pf.ForwardPaper, "_plan_fng_problem", return_value=None):
+            plan = fp.register_plan(sid)
+            self.now[0] += 75 * DAY
+            self.assertEqual(fp.step(plan["plan_id"])["verdict"], "PAPER_PASSED")
+        ctx = p.context_id()
+        self.assertEqual(p.statuses.status(sid, ctx), "PAPER_PASSED")
+        self.assertEqual(p.evaluation("paper_forward", sid)["verdict"], "PAPER_PASSED")
+        self.assertIn("fng", p.specs.get(sid)["data"])
+        return p, sid, fp, plan
+
+    def test_old_fng_paper_passed_is_not_handed_off(self):
+        """Test 1 (and 2: byte-for-byte preservation of every record)."""
+        from handoff import HandoffRefused, build_handoff, export_handoff
+        p, sid, fp, plan = self._old_fng_pass()
+        before = TestG04ForwardFng._snapshot(p.dir)
+        self.assertTrue(any(k.endswith("evaluations.jsonl") for k in before))
+        self.assertTrue(any(k.endswith("statuses.jsonl") for k in before))
+        self.assertTrue(any(k.endswith("state.json") for k in before))
+        with self.assertRaises(HandoffRefused) as cm:
+            build_handoff(p, sid)
+        msg = str(cm.exception)
+        self.assertIn("FNG_NOT_PINNED", msg)
+        self.assertIn("UNVERIFIED_PRIOR_CONCLUSION", msg)
+        self.assertIn("PAPER_PASSED", msg)                       # the recorded verdict is named, not exported
+        out = self.td / "handoff_out"
+        with self.assertRaises(HandoffRefused):
+            export_handoff(p, sid, out)
+        self.assertFalse(out.exists() and any(out.iterdir()))    # no document written
+        # nothing was rewritten: state, evaluation record, status ledger, logs, plans
+        self.assertEqual(TestG04ForwardFng._snapshot(p.dir), before)
+        self.assertEqual(p.statuses.status(sid, p.context_id()), "PAPER_PASSED")
+        self.assertEqual(p.evaluation("paper_forward", sid)["verdict"], "PAPER_PASSED")
+        # the forward API says the same thing about the same record
+        self.assertEqual(fp.step(plan["plan_id"])["verdict"], "PAPER_BLOCKED_DATA")
+        self.assertTrue(any("FNG_NOT_PINNED" in x for x in fp.verify_conclusion(plan["plan_id"])))
+
+    def test_existing_handoff_documents_are_kept(self):
+        """Test 2: a hand-off exported before (here: from the same strategy while
+        it was PAPER_TESTING, legitimately: no forward verdict) is not touched."""
+        from handoff import HandoffRefused, export_handoff
+        import paper_forward as pf
+        p, sid, feed = self._promoted(_fng_edge_spec(), _FngProvider())
+        out = self.td / "handoff_out"
+        old = export_handoff(p, sid, out)
+        old_bytes = old.read_bytes()
+        self.assertEqual(json.loads(old_bytes)["paper_forward_verdict"], "NOT_RUN")
+        fp = pf.ForwardPaper(p, feed, clock=lambda: self.now[0])
+        with mock.patch.object(pf.ForwardPaper, "_fng_refusal", return_value=None), \
+                mock.patch.object(pf.ForwardPaper, "_plan_fng_problem", return_value=None):
+            plan = fp.register_plan(sid)
+            self.now[0] += 75 * DAY
+            fp.step(plan["plan_id"])
+        with self.assertRaises(HandoffRefused):
+            export_handoff(p, sid, out)
+        self.assertEqual(sorted(out.iterdir()), [old])
+        self.assertEqual(old.read_bytes(), old_bytes)
+
+    def test_non_fng_strategy_hands_off_as_before(self):
+        """Test 3: the same flow without FNG: PAPER_PASSED is exported as before."""
+        from handoff import build_handoff
+        from paper_forward import ForwardPaper
+        p, sid, feed = self._promoted(tp.EDGE, tp.SyntheticProvider())
+        self.assertNotIn("fng", p.specs.get(sid)["data"])
+        fp = ForwardPaper(p, feed, clock=lambda: self.now[0])
+        plan = fp.register_plan(sid)
+        self.now[0] += 75 * DAY
+        self.assertEqual(fp.step(plan["plan_id"])["verdict"], "PAPER_PASSED")
+        doc = build_handoff(p, sid)
+        rec = p.evaluation("paper_forward", sid)
+        self.assertEqual(doc["paper_forward_verdict"], "PAPER_PASSED")
+        self.assertEqual(doc["paper_forward_record_id"], rec["record_id"])
+        self.assertEqual(doc["status"], "PAPER_PASSED")
+
+    def test_unclear_evidence_is_refused(self):
+        """Test 4: PAPER_PASSED status whose forward record is missing, says another
+        verdict or is another record than the status evidence; a specification
+        that is missing.  Nothing is filled in as a success."""
+        from handoff import HandoffRefused, _forward_or_refuse
+        st = {"status": "PAPER_PASSED", "evidence": {"paper_forward": "EV-1"}}
+        no_fng = {"data": ["klines"]}
+        with self.assertRaisesRegex(HandoffRefused, "DATA_MISSING"):
+            _forward_or_refuse("S", st, no_fng, None)
+        with self.assertRaisesRegex(HandoffRefused, "PAPER_INCONCLUSIVE"):
+            _forward_or_refuse("S", st, no_fng, {"verdict": "PAPER_INCONCLUSIVE", "record_id": "EV-1"})
+        with self.assertRaisesRegex(HandoffRefused, "EV-2"):
+            _forward_or_refuse("S", st, no_fng, {"verdict": "PAPER_PASSED", "record_id": "EV-2"})
+        with self.assertRaisesRegex(HandoffRefused, "FNG_NOT_PINNED"):   # any recorded FNG verdict
+            _forward_or_refuse("S", {"status": "PAPER_TESTING"}, {"data": ["fng", "klines"]},
+                               {"verdict": "PAPER_FAILED", "record_id": "EV-1"})
+        _forward_or_refuse("S", st, no_fng, {"verdict": "PAPER_PASSED", "record_id": "EV-1"})
+        _forward_or_refuse("S", {"status": "PAPER_TESTING"}, {"data": ["fng"]}, None)   # nothing recorded
+        # a missing specification is refused, never treated as "no FNG"
+        from handoff import build_handoff
+        p, sid, fp, plan = self._old_fng_pass()
+        with mock.patch.object(type(p.specs), "get", return_value=None):
+            with self.assertRaisesRegex(HandoffRefused, "specification missing"):
+                build_handoff(p, sid)
 
 
 # ---------------------------------------------------------------------------
