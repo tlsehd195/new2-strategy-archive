@@ -79,10 +79,14 @@
 | Handoff 기존 테스트(`test_pipeline.TestHandoff` 2개, `test_completion`의 forward → handoff 테스트) | PASS |
 | FNG 테스트(`TestG04ForwardFng` 6개, 후속 48개 전체) | PASS |
 | 지정 묶음: `test_pipeline.TestHandoff`, `test_completion`, `test_audit_followup_20261112` | PASS (3.13 로컬, 89개) |
-| 전체 discovery unit | §F 참조 |
-| 루트 테스트 | §F 참조 |
-| Python 3.11 / 3.13 | §F 참조 |
-| 정적 검사(ruff F, E9/F63/F7/F82) | PASS(로컬 3.13). 나머지는 §F 참조 |
+| 전체 discovery unit | PASS: 3.11·3.13 모두 1,123개 OK(이전 1,119개 + 신규 4개) |
+| 루트 테스트 | PASS: 3.11·3.13 모두 152개 OK |
+| Python 3.11 / 3.13 | PASS: 로컬 작업 트리 2개와 GitHub Actions 모두 |
+| 정적 검사 | PASS: compileall, ruff(E9/F63/F7/F82와 F), `bash -n`·shellcheck, configs, independence, 원장(ledger_check), inventory, source audit, provenance, TS, manifests |
+
+- 처음 Actions(#355 push, #356 pull_request, `3e080c8`)는 source audit 단계에서 실패했다. `handoff.py`가 2026-11-10 검토 판과 달라졌는데 `changed_since_review` 표시가 없었기 때문이다.
+  - `source_audit_20261110.py refresh`로 표시를 넣었다(`02306d2`). 감사 표의 해당 행에 바뀐 판의 sha256이 기록된다. 검토 등급은 올리지 않았다.
+  - 이 단계를 처음 수정 전에 로컬에서 돌리지 않아서 놓쳤다.
 
 ## D. 기록 보존 검증
 
@@ -119,6 +123,13 @@
 ## F. GitHub 작업 상태
 
 - 브랜치 `claude/project-thread-vjbdnd`(PR #79). main 직접 커밋, 병합, 강제 푸시는 하지 않았다.
-- 수정 커밋 `3e080c8`. 변경 파일 2개: `handoff.py`, 테스트 파일.
-- 로컬 CI(`3e080c8`, Python 3.11과 3.13 작업 트리에서 실제 실행): 결과는 스레드 보고와 PR 체크에 적는다.
-- GitHub Actions: 최종 HEAD 결과를 스레드 보고에 적는다.
+- 커밋:
+  - `3e080c8`: 코드와 테스트. `handoff.py`, `tests/test_audit_followup_20261112.py`.
+  - `02306d2`: 감사 표, ADR, worklog, 이 보고서. `SOURCE_AUDIT_20261110.jsonl`·`.md`, `docs/adr/0079-…md`, `docs/worklog.md`, `FINAL_REPORT_C04_HANDOFF_20261113.md`.
+  - 이 보고서를 마감한 커밋은 문서만 바꾼다.
+- C-4로 바뀐 파일은 모두 7개다(코드 1, 테스트 1, 감사 표 2, 문서 3).
+- 로컬 전체 CI: `02306d2`에서 3.11·3.13 모두 `OVERALL fail=0`.
+- GitHub Actions `research-ci`:
+  - `3e080c8`: #355, #356 실패(source audit, 위 설명).
+  - `02306d2`: #357(push)과 #358(pull_request) 모두 test (3.11)·test (3.13) success.
+  - 보고서 마감 커밋의 결과는 스레드 최종 보고에 적는다.
