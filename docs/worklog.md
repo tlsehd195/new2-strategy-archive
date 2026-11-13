@@ -1383,3 +1383,11 @@ Stage Summary:
 - 기준 PR #79 `757114f`. 사용자 지시(14:00Z): D-01 해상도 불일치 최우선, Paper Forward G-03/G-04, 잠금 밖 쓰기(F-11), runner.py·engine_lib.py 작성자 전수 검토
 - D-01: 검사를 5(`MIN_TAIL_DRAWS`)로 통일, 해상도 부족 구 배치는 BLOCKED_STATISTICS. G-04: FNG 전진 계획 거부. F-11: 4개 경로 잠금. R-1: 미래 봉 읽기 오류를 LOGIC_ERROR로
 - 신규 테스트 33개(`test_audit_followup_20261112.py`, `757114f`에서 22개 실패). 보호 데이터·창·사전등록·기존 기록 변경 없음. 보고서: `run/audit/FINAL_REPORT_ADR0079_20261112.md`
+
+## 2026-11-13 ADR 0079 후속 (FNG 완료 반환, G-03 호출 그래프, F-11 범위)
+
+- 기준 `3d49e41`. 사용자 지시(2026-11-12 23:20Z)
+- 완료된 FNG 계획의 `step()`이 과거 PAPER_PASSED를 그대로 돌려주던 것을 PAPER_BLOCKED_DATA, `recorded_verdict`, `conclusion_verified: False`로 바꿨다(읽기 전용, 기록 변경 없음)
+- G-03: AST Call 노드 기반 호출 그래프(`tests/static_callgraph.py`)로 공유 진입 16개, 평가기 전용·재생 전용 목록을 정확 일치로 고정. 변형 테스트와 런타임 추적으로 교차 확인
+- F-11: 잠금 프로토콜이 있는 파일의 단순 추가 4곳(캠페인 RESULT/ABORT, 배치 RESULT, evaluations, research_feedback)을 잠금 안으로
+- 신규 테스트 15개(`3d49e41`에서 5개 테스트 실패와 문서 하위 28개 실패). 로컬 CI 3.11·3.13 unit 1,119, root 152 통과. 보고서 `run/audit/FINAL_REPORT_ADR0079_FOLLOWUP_20261112.md`

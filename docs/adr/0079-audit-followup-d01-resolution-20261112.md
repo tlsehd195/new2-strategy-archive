@@ -4,7 +4,7 @@
 - 날짜: 2026-11-12
 - 기준: PR #79 HEAD `757114f` (main `2d6616a`)
 - 지시: 사용자 동동 2026-11-12 14:00Z "ADR 0078 보완 감사 및 D-01 통계 해상도 결함 수정 지시"
-- 보고서: [run/audit/FINAL_REPORT_ADR0079_20261112.md](../../run/audit/FINAL_REPORT_ADR0079_20261112.md)
+- 보고서: [run/audit/FINAL_REPORT_ADR0079_20261112.md](../../run/audit/FINAL_REPORT_ADR0079_20261112.md), 후속 [run/audit/FINAL_REPORT_ADR0079_FOLLOWUP_20261112.md](../../run/audit/FINAL_REPORT_ADR0079_FOLLOWUP_20261112.md)
 - 회귀 테스트: `run/discovery/tests/test_audit_followup_20261112.py` (33개, `757114f`에서 22개 실패, 11개는 대조·문서 고정 테스트). 후속(§5) 15개 추가, 합계 48개. 정적 호출 그래프 도구 `run/discovery/tests/static_callgraph.py`
 
 ## 1. 배경
