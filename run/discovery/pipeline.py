@@ -408,6 +408,20 @@ class DevSeriesError(ValueError):
     """A stored DEV daily series that cannot be used (non-finite value)."""
 
 
+def pooled_dev_day_map(series: Mapping) -> dict[int, float]:
+    """``{day: pooled value}`` on the days at least one symbol OBSERVED (the
+    pooling of :func:`pooled_dev_days`, keyed by day; ADR 0081/0083).
+    Raises :class:`DevSeriesError` on a non-finite value."""
+    acc: dict[int, float] = {}
+    for sym, (d0, vals) in series.items():
+        for i, v in enumerate(vals):
+            v = float(v)
+            if not math.isfinite(v):
+                raise DevSeriesError(f"{sym}: non-finite DEV daily value on day {int(d0) + i}")
+            acc[int(d0) + i] = acc.get(int(d0) + i, 0.0) + v
+    return acc
+
+
 def pooled_dev_days(series: Mapping) -> tuple[list[float], dict]:
     """Pool a strategy's per-symbol DEV daily series ``{symbol: [d0, values]}``
     into one daily series on the days at least one symbol OBSERVED (ADR 0081).
@@ -420,13 +434,7 @@ def pooled_dev_days(series: Mapping) -> tuple[list[float], dict]:
     the observed days are kept in calendar order.  Returns the series and a
     record of the calendar (observed / unobserved days, contiguous segments).
     Raises :class:`DevSeriesError` on a non-finite value."""
-    acc: dict[int, float] = {}
-    for sym, (d0, vals) in series.items():
-        for i, v in enumerate(vals):
-            v = float(v)
-            if not math.isfinite(v):
-                raise DevSeriesError(f"{sym}: non-finite DEV daily value on day {int(d0) + i}")
-            acc[int(d0) + i] = acc.get(int(d0) + i, 0.0) + v
+    acc = pooled_dev_day_map(series)
     days = sorted(acc)
     if not days:
         return [], {"observed_days": 0, "span_days": 0, "unobserved_days": 0, "segments": 0,
@@ -1197,22 +1205,63 @@ class EvolutionPipeline:
         return latest
 
     def _pbo(self) -> dict:
+        """PBO by CSCV (Bailey et al. 2017) over the trial set (:meth:`_trial_series`).
+
+        ADR 0083: CSCV ranks all N trials on the SAME T periods.  Each trial's
+        series is pooled on its OBSERVED DEV days (:func:`pooled_dev_day_map`);
+        a day outside a trial's DEV windows is not a zero return (ADR 0006), so
+        it is never filled.  When the trials' observed days are not one common
+        calendar (strategies with different symbol sets / DEV windows in one
+        context) the T x N matrix does not exist: PBO is NOT COMPUTABLE with
+        ``reason = TRIAL_CALENDARS_DIFFER`` (fail-closed; never narrowed to the
+        common days, which would change what is measured).  One common calendar
+        gives exactly the matrix and value of a441ba7."""
         latest = self._trial_series()
         if len(latest) < self.cfg["robustness"]["pbo_min_trials"]:
-            return {"computable": False, "trials": len(latest)}
+            return {"computable": False, "trials": len(latest), "reason": "TOO_FEW_TRIALS",
+                    "reason_detail": f"{len(latest)} trial(s) < pbo_min_trials "
+                                     f"{self.cfg['robustness']['pbo_min_trials']}"}
         pooled: dict[str, dict[int, float]] = {}
+        invalid: dict[str, str] = {}
         for sid, r in latest.items():
-            acc: dict[int, float] = {}
-            for sym, (d0, vals) in r["series"].items():
-                for i, v in enumerate(vals):
-                    acc[d0 + i] = acc.get(d0 + i, 0.0) + v
-            pooled[sid] = acc
-        days = sorted({d for a in pooled.values() for d in a})
+            try:
+                pooled[sid] = pooled_dev_day_map(r["series"])
+            except DevSeriesError as err:
+                invalid[sid] = str(err)
+        if invalid:
+            first = sorted(invalid)[0]
+            return {"computable": False, "trials": len(latest), "reason": "DEV_SERIES_INVALID",
+                    "reason_detail": f"{len(invalid)} trial(s) with a non-finite DEV value "
+                                     f"(first {first}: {invalid[first]})",
+                    "invalid_trials": sorted(invalid)}
         sids = sorted(pooled)
-        mat = [[pooled[s].get(d, 0.0) for s in sids] for d in days]
+        groups: dict[frozenset, list[str]] = {}
+        for s_ in sids:
+            groups.setdefault(frozenset(pooled[s_]), []).append(s_)
+        if len(groups) != 1:
+            union = frozenset().union(*groups)
+            common = frozenset.intersection(*groups)
+            summary = sorted(({"trials": len(m), "observed_days": len(cal),
+                               "first_day": min(cal) if cal else None,
+                               "last_day": max(cal) if cal else None, "example": m[0]}
+                              for cal, m in groups.items()),
+                             key=lambda g: (-g["trials"], g["example"]))
+            return {"computable": False, "trials": len(sids), "reason": "TRIAL_CALENDARS_DIFFER",
+                    "reason_detail": f"{len(groups)} different observed DEV calendars among "
+                                     f"{len(sids)} trials ({len(common)} common of "
+                                     f"{len(union)} days); unobserved days are not zero returns",
+                    "calendars": len(groups), "days_union": len(union),
+                    "days_common": len(common), "calendar_groups": summary[:10]}
+        days = sorted(next(iter(groups)))
+        mat = [[pooled[s_][d] for s_ in sids] for d in days]
         pbo, n = pbo_cscv(mat, n_partitions=self.cfg["robustness"]["pbo_partitions"])
-        return {"computable": math.isfinite(pbo), "pbo": pbo if math.isfinite(pbo) else None,
-                "combinations": n, "trials": len(sids), "days": len(days)}
+        out = {"computable": math.isfinite(pbo), "pbo": pbo if math.isfinite(pbo) else None,
+               "combinations": n, "trials": len(sids), "days": len(days)}
+        if not math.isfinite(pbo):
+            out.update(reason="CSCV_NOT_COMPUTABLE",
+                       reason_detail=f"{len(days)} common days < pbo_partitions "
+                                     f"{self.cfg['robustness']['pbo_partitions']} or < 2 trials")
+        return out
 
     def _dsr(self, sid: str) -> dict:
         """Deflated Sharpe Ratio (Bailey & López de Prado 2014) of the strategy's
@@ -1430,6 +1479,8 @@ class EvolutionPipeline:
             why = {"pbo": f"PBO not computable ({pbo['trials']} trials)",
                    "dsr": f"DSR not computable ({checks['dsr'].get('trials')} trials)",
                    "bootstrap_ci": f"bootstrap CI not computable ({checks['bootstrap_ci'].get('n_days')} days)"}
+            if pbo.get("reason"):                 # ADR 0083: why PBO is not computable
+                why["pbo"] += f" [{pbo['reason']}]"
             self.statuses.set(sid, ctx, "BLOCKED_STATISTICS", stage="robustness",
                               reasons=["INSUFFICIENT_DATA: " + why.get(k, k) for k in not_computable],
                               evidence=ev, resume_to="VALIDATION_SURVIVOR")
