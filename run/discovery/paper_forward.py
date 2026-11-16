@@ -159,6 +159,13 @@ CUTOFF_POLICY = "paper-forward-cutoff-v1"
 #: the state it loaded) and re-read before the record is appended; a state changed on disk
 #: during the step refuses the conclusion and is not overwritten.
 COMPLETENESS_POLICY = "paper-forward-completeness-v1"
+#: ADR 0080 (audit r2 F-3): every evidence log of a concluded plan (bar log, funding log,
+#: funding quality log, per symbol) must hold EXACTLY the rows the verdict was computed
+#: from, with the anchored head at the last one.  Rows appended after the conclusion are
+#: reported like rows removed (``verify_conclusion`` / the resume path; read only, never
+#: repaired).  An anchored head without a row count (no concluded plan has one) falls
+#: back to comparing its hash with the last row of the log.
+EVIDENCE_LOG_POLICY = "evidence-log-final-state-v1"
 #: fields of an open position compared with the independent replay
 _OPEN_KEYS = ("event_id", "symbol", "side", "entry_ts", "decision_ts", "planned_exit_ts", "status")
 #: state fields a conclusion is anchored to (equal in memory and on disk at the last gate)
@@ -2454,14 +2461,7 @@ class ForwardPaper:
         for k in keys:
             if canonical_json(now.get(k)) != canonical_json(a.get(k)):
                 out.append(f"{k} differs from the evaluation record")
-        for sym, b in (a.get("bar_logs") or {}).items():
-            got = now["bar_logs"].get(sym) or {}
-            if got.get("rows", 0) < b.get("rows", 0):
-                out.append(f"bars_{sym}.jsonl is shorter than when the verdict was computed")
-                continue
-            rows = read_bar_log(self.root / plan_id / f"bars_{sym}.jsonl")
-            if b.get("rows") and rows[b["rows"] - 1]["hash"] != b.get("head"):
-                out.append(f"bars_{sym}.jsonl was rewritten after the verdict")
+        out += self._log_final_problems(plan, a, now)
         ledger = list(iter_jsonl(self.root / plan_id / "events.jsonl"))
         try:
             rule_t = self._rule_cutoff(plan, st, ledger)
@@ -2484,6 +2484,58 @@ class ForwardPaper:
             pend = [x["event_id"] for x in rp["open"] if x["entry_ts"] <= rule_t]
             if pend:
                 out.append(f"position(s) of the sample open under the registered rules: {pend}")
+        return out
+
+    def _log_final_problems(self, plan: Mapping, a: Mapping, now: Mapping) -> list[str]:
+        """ADR 0080 (EVIDENCE_LOG_POLICY): each evidence log on disk against the
+        anchors ``a`` of the record — row count EXACTLY equal (appended and removed
+        rows alike), then the anchored head hash at the last row.  ``now`` = the
+        anchors recomputed from disk (bar logs).  Read only."""
+        out: list[str] = []
+        d = self.root / plan["plan_id"]
+
+        def compare(name: str, rows: Optional[int], head: Optional[str], disk: Sequence[Mapping]) -> None:
+            if isinstance(rows, bool) or not isinstance(rows, int):
+                # legacy anchor without a row count: the head hash against the last row
+                if (disk[-1]["hash"] if disk else "") != (head or ""):
+                    out.append(f"{name} was rewritten or extended after the verdict "
+                               "(anchored head is not its last row; no row count anchored)")
+                return
+            if len(disk) != rows:
+                out.append(f"{name} has {len(disk)} rows, the verdict was computed from {rows} "
+                           "(rows appended to or removed from a concluded plan)")
+                return
+            if rows and disk[rows - 1].get("hash") != head:
+                out.append(f"{name} was rewritten after the verdict")
+
+        for sym, b in (a.get("bar_logs") or {}).items():
+            name = f"bars_{sym}.jsonl"
+            got = (now.get("bar_logs") or {}).get(sym)
+            if not isinstance(b, Mapping) or not isinstance(got, Mapping):
+                out.append(f"{name}: no bar log anchor for this symbol")
+                continue
+            try:
+                disk = read_bar_log(d / name)
+            except (CausalityViolation, JsonlCorruption, OSError, ValueError) as e:
+                out.append(f"{name} unreadable: {type(e).__name__}: {e}")
+                continue
+            compare(name, b.get("rows"), b.get("head"), disk)
+        for key, what, fname in (("funding_head", "FUNDING_LOG", "funding_{}.jsonl"),
+                                 ("quality_head", "QUALITY_LOG", "funding_quality_{}.jsonl")):
+            heads = a.get(key)
+            if not isinstance(heads, Mapping):
+                continue                      # compared with the state above
+            for sym, h in heads.items():
+                name = fname.format(sym)
+                if not isinstance(h, Mapping):
+                    out.append(f"{name}: anchored {key} is not a head")
+                    continue
+                try:
+                    disk = read_seq_chain(d / name, what) if (d / name).exists() else []
+                except (EvidenceIntegrityError, OSError, ValueError) as e:
+                    out.append(f"{name} unreadable: {type(e).__name__}: {e}")
+                    continue
+                compare(name, h.get("seq"), h.get("hash"), disk)
         return out
 
     def _resume_conclusion(self, plan: Mapping, st: dict, base_sha: str, prior: Mapping, now: int) -> dict:
@@ -2526,8 +2578,10 @@ class ForwardPaper:
         (ADR 0076).  Returns the problems found ([] = the files on disk are the ones
         the verdict was computed from, and they still give the same cutoff, metrics
         and verdict).  ADR 0077: also the anchored state fields and the independent
-        position replay (no position of the sample open).  Read only: nothing is
-        repaired or written."""
+        position replay (no position of the sample open).  ADR 0080: every
+        evidence log (bars, funding, funding quality) holds exactly the anchored
+        number of rows — rows appended after the conclusion are reported like rows
+        removed.  Read only: nothing is repaired or written."""
         plan = self.plan(plan_id)
         rec = self.p.evaluation("paper_forward", plan["strategy_id"], plan["context_id"])
         if rec is None or rec.get("plan_id") != plan_id:

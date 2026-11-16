@@ -433,6 +433,40 @@ def _folds(events: Sequence[Mapping], t0: int, t1: int, k: int) -> list[Optional
     return [sum(a) / len(a) if a else None for a in acc]
 
 
+class DevSeriesError(ValueError):
+    """A stored DEV daily series that cannot be used (non-finite value)."""
+
+
+def pooled_dev_days(series: Mapping) -> tuple[list[float], dict]:
+    """Pool a strategy's per-symbol DEV daily series ``{symbol: [d0, values]}``
+    into one daily series on the days at least one symbol OBSERVED (ADR 0081).
+
+    Each symbol's series covers its own DEV window day by day (a day without an
+    exit inside the window is an observed 0, see ``stats_mc.daily_series``).  A
+    day inside no symbol's window was not observed: it is left out, never
+    filled with 0 (ADR 0006 DM alignment) — symbols whose DEV windows do not
+    touch (separate locked TEST windows) give a series with calendar gaps, and
+    the observed days are kept in calendar order.  Returns the series and a
+    record of the calendar (observed / unobserved days, contiguous segments).
+    Raises :class:`DevSeriesError` on a non-finite value."""
+    acc: dict[int, float] = {}
+    for sym, (d0, vals) in series.items():
+        for i, v in enumerate(vals):
+            v = float(v)
+            if not math.isfinite(v):
+                raise DevSeriesError(f"{sym}: non-finite DEV daily value on day {int(d0) + i}")
+            acc[int(d0) + i] = acc.get(int(d0) + i, 0.0) + v
+    days = sorted(acc)
+    if not days:
+        return [], {"observed_days": 0, "span_days": 0, "unobserved_days": 0, "segments": 0,
+                    "first_day": None, "last_day": None}
+    span = days[-1] - days[0] + 1
+    segments = 1 + sum(1 for a, b in zip(days, days[1:]) if b - a > 1)
+    return [acc[d] for d in days], {"observed_days": len(days), "span_days": span,
+                                    "unobserved_days": span - len(days), "segments": segments,
+                                    "first_day": days[0], "last_day": days[-1]}
+
+
 def complexity(spec: Mapping) -> int:
     s = canonicalize_spec(spec)
     return (len(s["entry"]["conditions"]) + len(s["filters"])
@@ -1337,30 +1371,44 @@ class EvolutionPipeline:
         computable ones.  A code / cost / data change starts a new context; the
         selection that already happened is not undone by it, so the trial count
         does not restart.  ``var_sr`` still comes from the current context's
-        computable series (the only ones on the current data/cost basis)."""
+        computable series (the only ones on the current data/cost basis).
+
+        ADR 0081: the daily series is the pooled series on the OBSERVED DEV days
+        (:func:`pooled_dev_days`).  Symbols whose DEV windows do not touch give
+        calendar gaps; gap days are not returns and are left out, so ``n_days``
+        is the number of observed days.  Not computable carries ``reason``."""
         from engine_lib import deflated_sharpe
         latest = self._trial_series()
         min_days = int(self.cfg["robustness"].get("dsr_min_days", 30))
 
-        def pooled(r):
-            acc: dict[int, float] = {}
-            for _sym, (d0, vals) in r["series"].items():
-                for i, v in enumerate(vals):
-                    acc[d0 + i] = acc.get(d0 + i, 0.0) + v
-            days = sorted(acc)
-            return [acc[d] for d in range(days[0], days[-1] + 1)] if days else []
-        srs = {}
+        # ADR 0081: observed DEV days only (a day outside every symbol's DEV window
+        # is not a zero return); a trial whose SR cannot be computed is left out of
+        # the computable set with its reason, the target strategy's reason is recorded
+        srs, why, cal = {}, {}, {}
         for s_, r in latest.items():
-            x = pooled(r)
+            try:
+                x, cal[s_] = pooled_dev_days(r["series"])
+            except DevSeriesError as err:
+                why[s_] = ("DEV_SERIES_INVALID", str(err), None)
+                continue
             if len(x) < min_days:
+                why[s_] = ("DEV_SERIES_TOO_SHORT", f"{len(x)} observed DEV days < {min_days}", len(x))
                 continue
             mu = sum(x) / len(x)
             sd = (sum((v - mu) ** 2 for v in x) / (len(x) - 1)) ** 0.5
             if sd > 0:
                 srs[s_] = (mu / sd, x)
+            else:
+                why[s_] = ("DEV_SERIES_NO_VARIATION", "standard deviation 0", len(x))
         n_searched = max(len(latest), self._trials_searched_all())
         if sid not in srs or len(srs) < 2:
-            return {"computable": False, "trials": len(srs), "trials_searched": n_searched}
+            code, detail, n_obs = why.get(sid, ("NO_DEV_SERIES", "no DEV series in this context", None))
+            if sid in srs:
+                code, detail, n_obs = ("TOO_FEW_COMPUTABLE_TRIALS",
+                                       f"{len(srs)} computable trial(s) < 2", len(srs[sid][1]))
+            return {"computable": False, "trials": len(srs), "trials_searched": n_searched,
+                    "reason": code, "reason_detail": detail, "n_days": n_obs,
+                    "dev_calendar": cal.get(sid)}
         sr, x = srs[sid]
         n = len(x)
         mu = sum(x) / n
@@ -1388,7 +1436,9 @@ class EvolutionPipeline:
                 "sr_daily": sr, "n_days": n, "trials": len(srs), "var_sr": var_sr,
                 "trials_searched": n_searched,
                 "dsr_at_trials_searched": d_all if math.isfinite(d_all) else None,
-                "skew": skew, "kurtosis": kurt}
+                "skew": skew, "kurtosis": kurt,
+                # ADR 0081: n_days = observed DEV days; calendar gaps recorded
+                "dev_calendar": cal[sid]}
 
     def robustness(self, sid: str) -> dict:
         ctx = self.context_id()

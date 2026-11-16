@@ -430,3 +430,17 @@ Power of these gates (`power_analysis.py`, `config/power_analysis_v1.json`,
 synthetic only, fixed seed; result in
 `run/audit/evidence_power_20261110/power_v1.json`) is summarised in ADR 0064.
 
+DEV days of the DSR (ADR 0081).  The DSR series of a strategy is the sum of
+its per-symbol DEV daily series on the days **observed** by at least one
+symbol (`pooled_dev_days`).  A day inside a symbol's DEV window without an exit
+is an observed 0; a day inside no symbol's window is not observed and is left
+out, never filled with 0 (as in the DM alignment, ADR 0006).  Symbols whose DEV
+windows do not touch (BTCUSDT and ETHUSDT have separate locked TEST windows)
+therefore give a series with calendar gaps: `n_days` is the number of observed
+days and `dev_calendar` records span, unobserved days and segments.  Until
+ADR 0081 such a series raised `KeyError` and stopped the validation batch.
+Not computable cases carry `reason`: `DEV_SERIES_TOO_SHORT` (observed days <
+`dsr_min_days`), `DEV_SERIES_NO_VARIATION`, `DEV_SERIES_INVALID` (non-finite
+value), `NO_DEV_SERIES`, `TOO_FEW_COMPUTABLE_TRIALS`.  Contiguous series give
+exactly the same values as before.
+
