@@ -444,3 +444,18 @@ Not computable cases carry `reason`: `DEV_SERIES_TOO_SHORT` (observed days <
 value), `NO_DEV_SERIES`, `TOO_FEW_COMPUTABLE_TRIALS`.  Contiguous series give
 exactly the same values as before.
 
+PBO trial calendar (ADR 0083).  CSCV ranks all N trials on the same T
+periods, so `_pbo` pools each trial on its observed DEV days
+(`pooled_dev_day_map`, the pooling of ADR 0081) and builds the T x N matrix
+only when every trial has the **same** observed days.  A day outside a trial's
+DEV windows is never filled with 0 (ADR 0006).  When the trials' calendars
+differ (strategies with different symbol sets / DEV windows in one context)
+PBO is not computable with `reason = TRIAL_CALENDARS_DIFFER` (`calendars`,
+`days_union`, `days_common`, `calendar_groups` recorded): the PBO check fails
+and the strategy is `BLOCKED_STATISTICS`, never a pass.  It is not narrowed to
+the common days (that would change what is measured).  Other reasons:
+`TOO_FEW_TRIALS` (< `pbo_min_trials`), `DEV_SERIES_INVALID` (non-finite value;
+until ADR 0083 a NaN gave a finite PBO), `CSCV_NOT_COMPUTABLE` (days <
+`pbo_partitions`).  One common calendar gives exactly the pre-ADR 0083 value.
+Until ADR 0083 the matrix used the union of days with unobserved days as 0.
+
