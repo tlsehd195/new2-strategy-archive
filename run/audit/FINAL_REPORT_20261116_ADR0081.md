@@ -47,6 +47,9 @@
 | ruff F(제외 2개)·E9/F63/F7/F82 | 통과 (로컬 ruff 0.16.9, CI 고정 0.16.8) |
 | source audit / provenance / research inventory / ledger_check / compileall | 통과 |
 
+PR #80 병합(`de1fee4`) 반영 후 병합 커밋 `5207c64`에서 다시 실행: 3.13 1050 tests OK(1868 s), 3.11 1050 tests OK(skipped=1, 1912 s).
+GitHub Actions: 병합 전 head `b52d6e4`는 3.11·3.13 모두 성공. `5207c64`는 3.11 한 번 성공, 3.13은 작업 제한 30분(`timeout-minutes: 30`)에 걸려 취소됐다. main `de1fee4`의 push 실행도 같은 이유로 취소돼 있어 이 PR 때문은 아니다(스위트 실행 시간이 30분 근처).
+
 단언 완화 없음. 기존 테스트 수정은 `SyntheticProvider` 인자 확장 1곳뿐.
 
 ## 6. 남은 한계·발견
