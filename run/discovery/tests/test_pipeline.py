@@ -85,7 +85,9 @@ class SyntheticProvider:
             from engine_lib import locked_window_for
             lo, hi = locked_window_for(sym)
             read_end = (dt.date.fromisoformat(lo) - dt.timedelta(days=1)).isoformat()
-            pre = synth_bars(dev_start, read_end, seed=seed + k, drift_hours=drift_hours)
+            # ``dev_start``: one date for every symbol, or {symbol: date} (ADR 0081)
+            start = dev_start[sym] if isinstance(dev_start, dict) else dev_start
+            pre = synth_bars(start, read_end, seed=seed + k, drift_hours=drift_hours)
             if val_drift_hours is not None:      # different validation world, same dev world
                 vstart = _ms(lo) - 180 * DAY_MS
                 tail = synth_bars(dt.datetime.fromtimestamp(vstart / 1000, dt.timezone.utc).date().isoformat(),
