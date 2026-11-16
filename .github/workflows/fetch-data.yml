@@ -22,16 +22,27 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      # ADR 0078 (H-09): the inputs reach the shell only as environment values and
+      # must be YYYY-MM (no expression is expanded into the script text)
       - name: Download and quality-check
         env:
           NEW2_DATA_DIR: ${{ github.workspace }}/data
+          START: ${{ inputs.start }}
+          END: ${{ inputs.end }}
         run: |
+          [[ "$START" =~ ^[0-9]{4}-[0-9]{2}$ ]] || { echo "start must be YYYY-MM"; exit 1; }
+          [[ "$END" =~ ^[0-9]{4}-[0-9]{2}$ ]] || { echo "end must be YYYY-MM"; exit 1; }
           mkdir -p "$NEW2_DATA_DIR"
           python3 run/discovery/data_fetch.py --allow-network \
-            --symbols BTCUSDT ETHUSDT --start "${{ inputs.start }}" --end "${{ inputs.end }}"
+            --symbols BTCUSDT ETHUSDT --start "$START" --end "$END"
+      # only the public files this job fetched — never the repository's own ledgers
+      # (fill_ledger.jsonl, fng_ledger.jsonl, liquidations.db, ...) under data/
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: market-data
-          path: data
+          path: |
+            data/klines
+            data/funding
+            data/_provenance.jsonl
           retention-days: 14

@@ -525,15 +525,21 @@ def convert_fees(fills: Sequence[dict], *, policy: Mapping, fee_prices: Optional
 # ---------------------------------------------------------------------------
 
 def load_decisions(path: Path) -> dict:
-    """The user's own decision log: one row per order (also unfilled ones)."""
+    """The user's own decision log: one row per order (also unfilled ones),
+    keyed by (SYMBOL, order_id) — ADR 0078 (C-05): exchanges number orders per
+    symbol, so an ETH rejection sharing an id with a BTC fill was lost and the
+    BTC fill took the ETH decision's reference price.  A row without a symbol
+    is keyed ("", order_id) and matches that order id on any symbol only when
+    no symbol-scoped row exists."""
     out = {}
     for r in iter_jsonl(Path(path)):
         oid = str(r.get("order_id") or "").strip()
         if not oid:
             raise FillImportError("decision row without order_id")
-        if oid in out:
-            raise FillImportError(f"decision log lists order {oid} twice")
-        out[oid] = r
+        key = (str(r.get("symbol") or "").strip().upper(), oid)
+        if key in out:
+            raise FillImportError(f"decision log lists order {key[0] or '?'}/{oid} twice")
+        out[key] = r
     return out
 
 
@@ -572,11 +578,28 @@ def _reference(quotes: Optional[Mapping], sym: str, ts_ms: int, max_age: int):
     return {"ts_ms": ts[i], "bid": bid, "ask": ask}
 
 
+def _decision_keys(decisions: Optional[Mapping]) -> dict:
+    """Decision rows keyed by (SYMBOL, order_id) (ADR 0078, C-05).  A mapping
+    keyed by the bare order id (the pre-0078 form) is re-keyed from each row's
+    own ``symbol``; two rows landing on one key are refused, never merged."""
+    out: dict = {}
+    for k, d in (decisions or {}).items():
+        if isinstance(k, tuple) and len(k) == 2:
+            key = (str(k[0] or "").strip().upper(), str(k[1]))
+        else:
+            key = (str(d.get("symbol") or "").strip().upper(), str(k))
+        if key in out:
+            raise FillImportError(f"decision log lists order {key[0] or '?'}/{key[1]} twice")
+        out[key] = d
+    return out
+
+
 def orders_to_observations(fills: Sequence[dict], *, policy: Mapping, decisions: Optional[Mapping] = None,
                            quotes: Optional[Mapping] = None, klines: Optional[Mapping] = None
                            ) -> tuple[list, dict]:
     """Groups fills by order and builds ``cost_calibration.Observation`` rows."""
     from cost_calibration import CalibrationError, Observation
+    decisions = _decision_keys(decisions)
     groups: dict = defaultdict(list)
     for f in fills:
         groups[(f["symbol"], f["order_id"])].append(f)
@@ -597,7 +620,9 @@ def orders_to_observations(fills: Sequence[dict], *, policy: Mapping, decisions:
         first = min(f["ts_ms"] for f in fs)
         liq = "taker" if any(f["liquidity"] == "TAKER" for f in fs) else (
             "maker" if all(f["liquidity"] == "MAKER" for f in fs) else None)
-        d = (decisions or {}).get(oid)
+        d = (decisions or {}).get((sym, oid))
+        if d is None:
+            d = (decisions or {}).get(("", oid))
         ref, bid, ask, notional, dts = None, None, None, filled, first
         status = "FILLED"
         if d is not None:
@@ -635,9 +660,11 @@ def orders_to_observations(fills: Sequence[dict], *, policy: Mapping, decisions:
         obs.append(o)
     # unfilled orders are visible only in the decision log
     if decisions:
+        filled_keys = set(groups)
         filled_ids = {oid for (_, oid) in groups}
-        for oid, d in sorted(decisions.items()):
-            if oid in filled_ids or str(d.get("status", "")).upper() not in ("REJECTED", "EXPIRED"):
+        for (dsym, oid), d in sorted(decisions.items()):
+            done = (dsym, oid) in filled_keys if dsym else oid in filled_ids
+            if done or str(d.get("status", "")).upper() not in ("REJECTED", "EXPIRED"):
                 continue
             ref = d.get("ref_price") or (0.5 * (float(d["bid"]) + float(d["ask"]))
                                          if d.get("bid") is not None and d.get("ask") is not None else None)

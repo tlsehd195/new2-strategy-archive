@@ -83,11 +83,13 @@ None of them changes a default: every frozen procedure keeps ``default_q``.
 from __future__ import annotations
 
 import math
+import numbers
 import random
+from fractions import Fraction
 from typing import Mapping, Optional, Sequence
 
 #: version tag recorded in every decision (changing any rule => new tag)
-MC_METHOD_VERSION = "mc-v3(stationary-bootstrap,RC,SPA,StepM-studentized,StepSPA-diagnostic,MCS-Tmax,BY,alpha-spending-1/k^2)"
+MC_METHOD_VERSION = "mc-v5(stationary-bootstrap,RC,SPA,StepM-studentized,StepSPA-diagnostic,MCS-Tmax,BY,alpha-spending-1/k^2,refuse-alpha(B+1)<5)"
 
 
 # ---------------------------------------------------------------------------
@@ -367,6 +369,84 @@ def spa_test(series: Mapping[str, Sequence[float]], *, B: int = 1000,
             "seed": seed}
 
 
+class InsufficientBootstrapResolution(ValueError):
+    """ADR 0078 / 0079 (D-01): a bootstrap test at level ``alpha`` with ``B``
+    draws is refused when alpha * (B + 1) < MIN_TAIL_DRAWS — fewer than
+    MIN_TAIL_DRAWS draws would lie beyond the (1 - alpha) critical value, so the
+    critical value is (nearly) the sample maximum and the real level is set by
+    B, not by alpha (at alpha * (B + 1) < 1 it is clamped to the largest draw
+    outright).  Alpha spending (6/pi^2/k^2) drives alpha down with every batch
+    on a window; the test is refused (fail closed) instead of silently running
+    at another level.  ADR 0078 shipped the check at ``< 1``; ADR 0079 aligns
+    it with the rule ADR 0078 states and :func:`bootstrap_B_for` enforces."""
+
+
+#: draws in the tail beyond the critical value; the single source of the rule
+#: used by :func:`_require_resolution` and :func:`bootstrap_B_for`
+MIN_TAIL_DRAWS = 5
+
+
+def _check_alpha(alpha) -> float:
+    if isinstance(alpha, bool) or not isinstance(alpha, numbers.Real):
+        raise ValueError(f"alpha must be a real number, got {alpha!r}")
+    a = float(alpha)
+    if not (math.isfinite(a) and 0.0 < a < 1.0):
+        raise ValueError(f"alpha must be in (0, 1), got {alpha!r}")
+    return a
+
+
+def _check_B(B, name: str = "B") -> int:
+    if isinstance(B, bool) or not isinstance(B, numbers.Integral):
+        raise ValueError(f"{name} must be an integer, got {B!r}")
+    if int(B) < 1:
+        raise ValueError(f"{name} must be >= 1, got {B!r}")
+    return int(B)
+
+
+def _resolved(alpha: float, B: int) -> bool:
+    """alpha * (B + 1) >= MIN_TAIL_DRAWS, exactly (rational arithmetic on the
+    binary value of alpha: no rounding decides a boundary case)."""
+    return Fraction(alpha) * (B + 1) >= MIN_TAIL_DRAWS
+
+
+def bootstrap_B_for(alpha: float, base_B: int) -> int:
+    """B for a test at level ``alpha``: the configured B, raised to the
+    ceil(MIN_TAIL_DRAWS / alpha) + 1 when it is below that
+    (ADR 0078).  ADR 0079: validates its input like :func:`_require_resolution`
+    and never returns a B that :func:`_require_resolution` would refuse."""
+    a = _check_alpha(alpha)
+    B = _check_B(base_B, "base_B")
+    if _resolved(a, B):
+        return B
+    # the ADR 0078 formula, unchanged (B values of new batches stay what they were):
+    # it gives alpha*(B+1) >= MIN_TAIL_DRAWS + 2*alpha; the loop only guards rounding
+    need = int(math.ceil(MIN_TAIL_DRAWS / a)) + 1
+    while not _resolved(a, need):
+        need += 1
+    return max(B, need)
+
+
+def _min_resolving_B(alpha: float) -> int:
+    """Smallest B with alpha * (B + 1) >= MIN_TAIL_DRAWS (for messages)."""
+    b = max(1, int(math.ceil(Fraction(MIN_TAIL_DRAWS) / Fraction(alpha))) - 1)
+    while b > 1 and _resolved(alpha, b - 1):
+        b -= 1
+    while not _resolved(alpha, b):
+        b += 1
+    return b
+
+
+def _require_resolution(alpha: float, B: int) -> None:
+    """Refuse a test that cannot resolve ``alpha`` with ``B`` draws (ADR 0079)."""
+    a = _check_alpha(alpha)
+    b = _check_B(B)
+    if not _resolved(a, b):
+        raise InsufficientBootstrapResolution(
+            f"alpha*(B+1) = {a * (b + 1):.6g} < {MIN_TAIL_DRAWS} (MIN_TAIL_DRAWS): alpha {a:.6g} "
+            f"needs B >= {_min_resolving_B(a)} bootstrap draws, got {b} — fewer than "
+            f"{MIN_TAIL_DRAWS} draws would lie beyond the critical value")
+
+
 def stepm(series: Mapping[str, Sequence[float]], *, alpha: float, B: int = 1000,
           q: Optional[float] = None, seed: int = 0, studentize: str = "fixed",
           block_len: Optional[int] = None, lag_window: str = "parzen",
@@ -402,8 +482,7 @@ def stepm(series: Mapping[str, Sequence[float]], *, alpha: float, B: int = 1000,
         raise ValueError("studentize must be 'fixed', 'bootstrap_t' or 'gk_block'")
     keys, n = _check_matrix(series)
     q = q or default_q(n)
-    if not 0.0 < alpha < 1.0:
-        raise ValueError("alpha must be in (0, 1)")
+    _require_resolution(alpha, B)          # validates alpha and B (ADR 0079)
     rng = random.Random(seed)
     dbar = {k: _mean(series[k]) for k in keys}
     sig = {}
@@ -481,8 +560,7 @@ def step_spa(series: Mapping[str, Sequence[float]], *, alpha: float, B: int = 10
     Diagnostic only — see module docstring."""
     keys, n = _check_matrix(series)
     q = q or default_q(n)
-    if not 0.0 < alpha < 1.0:
-        raise ValueError("alpha must be in (0, 1)")
+    _require_resolution(alpha, B)          # validates alpha and B (ADR 0079)
     rng = random.Random(seed)
     dbar = {k: _mean(series[k]) for k in keys}
     w = {}
@@ -548,8 +626,7 @@ def mcs(series: Mapping[str, Sequence[float]], *, alpha: float = 0.10, B: int = 
     the set — callers must not rank inside it."""
     keys, n = _check_matrix(series)
     q = q or default_q(n)
-    if not 0.0 < alpha < 1.0:
-        raise ValueError("alpha must be in (0, 1)")
+    _require_resolution(alpha, B)          # validates alpha and B (ADR 0079)
     if len(keys) < 2:
         return {"method": "hln2011_mcs_tmax", "alpha": alpha, "p": {keys[0]: 1.0},
                 "set": list(keys), "eliminated": [], "B": B, "q": q, "n": n, "seed": seed}

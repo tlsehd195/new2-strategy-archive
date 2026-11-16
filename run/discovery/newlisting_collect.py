@@ -119,8 +119,12 @@ def save_state(out: Path, state: dict) -> None:
 
 
 def discover(out: Path, state: dict, now_ms: int, *, opener=None, sleep=time.sleep,
-             track_recent_days: float = 0.0) -> list:
-    """Read exchangeInfo, update ``state`` in place, return the list of newly tracked symbols."""
+             track_recent_days: float = 0.0, report: Optional[dict] = None) -> list:
+    """Read exchangeInfo, update ``state`` in place, return the list of newly tracked
+    symbols.  ``report["ok"]`` says whether exchangeInfo was read (ADR 0078, H-05:
+    a failed read also returned [] and the run counted it as a quiet success)."""
+    if report is not None:
+        report["ok"] = False
     try:
         info = _get_json(public_url("/fapi/v1/exchangeInfo"), opener, sleep)
         syms = [s for s in info["symbols"] if is_new_perp(s)]
@@ -128,6 +132,8 @@ def discover(out: Path, state: dict, now_ms: int, *, opener=None, sleep=time.sle
         append_line(out / "listing_events.jsonl", {"schema": SCHEMA, "event": "DISCOVER_FAILED",
                                                     "at_ms": now_ms, "detail": f"{type(e).__name__}: {e}"[:300]})
         return []
+    if report is not None:
+        report["ok"] = True
     first_run = "known" not in state
     state.setdefault("known", [])
     state.setdefault("tracked", {})
@@ -261,6 +267,7 @@ def collect(out: Path, *, hours: float, discover_sec: float = 60.0, allow_networ
     end = clock() + hours * 3600
     next_discover = 0.0
     fails, stop, samples, new_total = 0, "DURATION_REACHED", 0, 0
+    disc_fails, disc_ok = 0, False
     try:
         while clock() < end:
             t0 = clock()
@@ -269,9 +276,15 @@ def collect(out: Path, *, hours: float, discover_sec: float = 60.0, allow_networ
                 stop = "DISK_LOW"
                 break
             if t0 >= next_discover:
+                drep: dict = {}
                 new_total += len(discover(out, state, now_ms, opener=opener, sleep=sleep,
-                                          track_recent_days=track_recent_days))
+                                          track_recent_days=track_recent_days, report=drep))
                 next_discover = t0 + discover_sec
+                disc_ok = disc_ok or drep["ok"]
+                disc_fails = 0 if drep["ok"] else disc_fails + 1
+                if disc_fails >= max_failures_in_row:
+                    stop = "DISCOVER_FAILING"
+                    break
             for sym, st in state.get("tracked", {}).items():
                 if st["done"]:
                     continue
@@ -294,6 +307,8 @@ def collect(out: Path, *, hours: float, discover_sec: float = 60.0, allow_networ
             sleep(max(0.0, 5.0 - (clock() - t0)))
     except KeyboardInterrupt:
         stop = "INTERRUPTED"
+    if stop == "DURATION_REACHED" and not disc_ok:
+        stop = "NO_SUCCESSFUL_DISCOVER"          # ADR 0078 (H-05): never a quiet exit 0
     save_state(out, state)
     man = write_manifest(out)
     active = [s for s, v in state.get("tracked", {}).items() if not v["done"]]

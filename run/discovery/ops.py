@@ -26,6 +26,7 @@ import io
 import json
 import os
 import shutil
+import signal
 import sys
 import time
 from pathlib import Path
@@ -60,15 +61,8 @@ def health(state_dir: Path, *, data_dir: Optional[Path] = None,
     config_dir = Path(config_dir or Path(__file__).resolve().parent / "config")
     checks: dict[str, dict] = {}
     # lock
-    lk = state_dir / "run.lock"
-    if not lk.exists():
-        checks["lock"] = {"status": "FREE"}
-    else:
-        try:
-            pid = int(lk.read_text().strip())
-            checks["lock"] = {"status": "HELD" if _pid_alive(pid) else "STALE", "pid": pid}
-        except (ValueError, OSError) as e:
-            checks["lock"] = {"status": "STALE", "error": str(e)}
+    from engine_lib import process_lock_status
+    checks["lock"] = process_lock_status(state_dir / "run.lock")
     # ledgers
     bad, n = [], 0
     if state_dir.exists():
@@ -151,8 +145,33 @@ def run_loop(main: Callable[[Sequence[str]], int], runner_args: Sequence[str], *
     if max_cycles < 1:
         raise ValueError("max_cycles must be >= 1 (no endless mode)")
     log = Path(state_dir) / "ops_loop.jsonl"
+    # ADR 0078 (H-01): the loop owns SIGTERM / SIGINT between cycles (a cycle
+    # installs its own handlers and gives them back when it ends)
+    stop_req: list = []
+    old = {}
+    for sig in (signal.SIGTERM, signal.SIGINT):
+        try:
+            old[sig] = signal.signal(sig, lambda signum, _f: stop_req.append(signum))
+        except (ValueError, OSError):      # not the main thread
+            pass
+    try:
+        return _run_loop(main, runner_args, log=log, max_cycles=max_cycles, interval=interval,
+                         max_no_progress=max_no_progress, sleep=sleep, stop_req=stop_req)
+    finally:
+        for sig, h in old.items():
+            try:
+                signal.signal(sig, h)
+            except (ValueError, OSError):
+                pass
+
+
+def _run_loop(main, runner_args, *, log: Path, max_cycles: int, interval: float,
+              max_no_progress: int, sleep, stop_req: list) -> dict:
     no_prog, cycles, stop = 0, [], "MAX_CYCLES"
     for k in range(max_cycles):
+        if stop_req:
+            stop = "INTERRUPTED"
+            break
         out = io.StringIO()
         t0 = time.time()
         try:
@@ -183,13 +202,16 @@ def run_loop(main: Callable[[Sequence[str]], int], runner_args: Sequence[str], *
         if no_prog >= max_no_progress:
             stop = "NO_PROGRESS"
             break
+        if stop_req:
+            stop = "INTERRUPTED"
+            break
         if k + 1 < max_cycles and interval > 0:
             sleep(interval)
     partial = sum(1 for c in cycles if c["exit"] == 2)
     # a loop that ran to its limit is still not a success if a cycle only partly
     # succeeded (runner exit 2): the loop exit says so instead of 0
     exit_code = (0 if partial == 0 else 2) if stop in ("MAX_CYCLES", "NO_PROGRESS") \
-        else (cycles[-1]["exit"] if cycles else 1) or 1
+        else 1 if stop == "INTERRUPTED" else (cycles[-1]["exit"] if cycles else 1) or 1
     res = {"stopped": stop, "cycles": len(cycles), "last_exit": cycles[-1]["exit"] if cycles else None,
            "partial_cycles": partial, "exit": exit_code, "at": iso_now()}
     append_jsonl(log, {"loop_end": res})

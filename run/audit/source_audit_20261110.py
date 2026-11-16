@@ -6,16 +6,22 @@ Input : raw reviewer rows (one JSON object per file, any of the two shapes the
 
     python3 run/audit/source_audit_20261110.py build RAW1.jsonl [RAW2 ...]
     python3 run/audit/source_audit_20261110.py check      # CI: table vs inventory
+    python3 run/audit/source_audit_20261110.py pin COMMIT # record the reviewed file versions
+    python3 run/audit/source_audit_20261110.py refresh    # mark files changed since the review
 
 The check fails when any script in RESEARCH_SCRIPTS_20261110.json is still only
 INVENTORIED, when a row names a file that does not exist, when a row claims a level that is not allowed, or when lines_read is
-less than lines_total for a FULL_SOURCE_REVIEW / LOGIC_TRACED / TESTED row.
+less than lines_total for a FULL_SOURCE_REVIEW / LOGIC_TRACED / TESTED row,
+and (ADR 0078) when a file differs from the reviewed version (sha256 at the
+table commit) without a ``changed_since_review`` mark.
 """
 
 from __future__ import annotations
 
 import collections
+import hashlib
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -93,7 +99,10 @@ def render_md(rows: list[dict]) -> str:
          f"- 대상: {len(rows)}개 파일 (INVENTORIED였던 run/*.py 112개 + 핵심 모듈 12개)",
          "- 검토자: 읽기 전용 독립 검토 에이전트. 각 행은 검토자의 주장이다.",
          "  `spot_checked`가 참인 행만 작성자가 직접 다시 읽어 확인했다.",
-         "- 모든 행에서 lines_read = lines_total(파일 전체를 읽음).", "",
+         "- 모든 행에서 lines_read = lines_total(파일 전체를 읽음).",
+         "- ADR 0078: 각 행은 검토한 파일 판본(`reviewed_against`: 표 작성 커밋의 sha256)에 묶인다.",
+         "  그 뒤 바뀐 파일은 `검토 후 변경`에 표시되며, 그 행의 수준은 검토한 판본에만 해당한다"
+         f" (현재 {sum(1 for r in rows if r.get('changed_since_review'))}개).", "",
          "## 감사 수준별 개수", "", "| 수준 | 개수 |", "|---|---|"]
     L += [f"| {k} | {lv.get(k, 0)} |" for k in LEVELS]
     L += ["", "## 위험 판정 개수", "", "| 항목 | NONE_FOUND | POSSIBLE | CONFIRMED | UNKNOWN |", "|---|---|---|---|---|"]
@@ -113,10 +122,14 @@ def render_md(rows: list[dict]) -> str:
             if r[k]["level"] == "POSSIBLE":
                 fix = f" [수정: {r['fixed_in']}]" if r["fixed_in"] else ""
                 L.append(f"- `{r['file']}` {k}{fix}: {r[k]['detail'][:400]}")
-    L += ["", "## 파일별 수준", "", "| 파일 | 수준 | 줄 | 누수 | 비용 | 백테스트 | 작성자 확인 |", "|---|---|---|---|---|---|---|"]
+    L += ["", "## 파일별 수준", "",
+          "| 파일 | 수준 | 줄 | 누수 | 비용 | 백테스트 | 작성자 확인 | 검토 후 변경 |",
+          "|---|---|---|---|---|---|---|---|"]
     for r in rows:
+        ch = r.get("changed_since_review")
         L.append(f"| `{r['file']}` | {r['audit_level']} | {r['lines_total']} | {r['leakage_risk']['level']} | "
-                 f"{r['cost_risk']['level']} | {r['backtest_error_risk']['level']} | {'예' if r['spot_checked'] else ''} |")
+                 f"{r['cost_risk']['level']} | {r['backtest_error_risk']['level']} | {'예' if r['spot_checked'] else ''} | "
+                 f"{('예 (현재 ' + str(ch['lines_now']) + '줄)') if ch else ''} |")
     return "\n".join(L) + "\n"
 
 
@@ -128,9 +141,79 @@ def build(paths: list[str]) -> None:
     print(f"wrote {len(rows)} rows")
 
 
+def _path(f: str) -> Path:
+    return REPO / f if "/" in f else REPO / "run" / f
+
+
+def _sha(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def pin(commit: str) -> None:
+    """ADR 0078 (H-06): record, per row, the file content the review describes
+    (sha256 + line count of the file at ``commit``, the commit that wrote the
+    table).  Rows whose file differs NOW get ``changed_since_review`` (the level
+    then applies to the reviewed version only — a downgrade marker, never an
+    upgrade).  Existing review fields are not touched."""
+    rows = [json.loads(line) for line in OUT_JSONL.read_text(encoding="utf-8").splitlines() if line.strip()]
+    for r in rows:
+        rel = str(_path(r["file"]).relative_to(REPO))
+        old = subprocess.run(["git", "-C", str(REPO), "show", f"{commit}:{rel}"],
+                             capture_output=True, check=False).stdout
+        r["reviewed_against"] = {"commit": commit, "sha256": _sha(old) if old else None,
+                                 "lines": old.decode("utf-8", "replace").count("\n") if old else None}
+        _mark(r)
+    OUT_JSONL.write_text("".join(json.dumps(r, ensure_ascii=False, sort_keys=True) + "\n" for r in rows),
+                         encoding="utf-8")
+    OUT_MD.write_text(render_md(rows), encoding="utf-8")
+    print(f"pinned {len(rows)} rows to {commit}; changed since review: "
+          f"{sum(1 for r in rows if r.get('changed_since_review'))}")
+
+
+def _mark(r: dict) -> None:
+    ra = r.get("reviewed_against") or {}
+    p = _path(r["file"])
+    now = p.read_bytes() if p.exists() else b""
+    if ra.get("sha256") and _sha(now) != ra["sha256"]:
+        r["changed_since_review"] = {"sha256_now": _sha(now),
+                                     "lines_now": now.decode("utf-8", "replace").count("\n"),
+                                     "meaning": "file changed after the review: the audit level "
+                                                "describes the reviewed version only"}
+    else:
+        r.pop("changed_since_review", None)
+
+
+def refresh() -> None:
+    """Re-mark ``changed_since_review`` against the current files (after a code
+    change).  Levels and review fields are never changed."""
+    rows = [json.loads(line) for line in OUT_JSONL.read_text(encoding="utf-8").splitlines() if line.strip()]
+    for r in rows:
+        _mark(r)
+    OUT_JSONL.write_text("".join(json.dumps(r, ensure_ascii=False, sort_keys=True) + "\n" for r in rows),
+                         encoding="utf-8")
+    OUT_MD.write_text(render_md(rows), encoding="utf-8")
+    print(f"changed since review: {sum(1 for r in rows if r.get('changed_since_review'))} of {len(rows)}")
+
+
 def check() -> list[str]:
     rows = [json.loads(line) for line in OUT_JSONL.read_text(encoding="utf-8").splitlines() if line.strip()]
     errs = []
+    # ADR 0078 (H-06): the table must say, for every reviewed file, whether the
+    # file still is the reviewed version (the old check compared the stored
+    # lines_read with the stored lines_total only, so changed files kept their
+    # level silently)
+    for r in rows:
+        ra = r.get("reviewed_against") or {}
+        if not ra.get("sha256"):
+            errs.append(f"{r['file']}: no reviewed_against.sha256 (run: pin <commit>)")
+            continue
+        p = _path(r["file"])
+        cur = _sha(p.read_bytes()) if p.exists() else None
+        flagged = (r.get("changed_since_review") or {}).get("sha256_now")
+        if cur != ra["sha256"] and flagged != cur:
+            errs.append(f"{r['file']}: changed since the review and not marked (run: refresh)")
+        if cur == ra["sha256"] and r.get("changed_since_review"):
+            errs.append(f"{r['file']}: marked changed but equals the reviewed version (run: refresh)")
     files = [r["file"] for r in rows]
     if len(files) != len(set(files)):
         errs.append("duplicate rows")
@@ -159,6 +242,10 @@ def check() -> list[str]:
 if __name__ == "__main__":
     if len(sys.argv) >= 2 and sys.argv[1] == "build":
         build(sys.argv[2:])
+    elif len(sys.argv) == 3 and sys.argv[1] == "pin":
+        pin(sys.argv[2])
+    elif len(sys.argv) == 2 and sys.argv[1] == "refresh":
+        refresh()
     elif len(sys.argv) == 2 and sys.argv[1] == "check":
         e = check()
         print("\n".join(e) if e else "source audit table OK")

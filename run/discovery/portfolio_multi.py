@@ -55,7 +55,7 @@ from typing import Mapping, Optional, Sequence
 from costs_bridge import CostContext, CostDataMissing, CostError, CostRefused
 from data_quality import Bar
 
-PORTFOLIO_MULTI_VERSION = "portfolio-multi-v3"
+PORTFOLIO_MULTI_VERSION = "portfolio-multi-v4"  # ADR 0078 (E-04/E-05/E-06)
 DAY_MS = 86_400_000
 
 #: result statuses (ADR 0068).  PASS_INDIVIDUAL is the individual pipeline's
@@ -68,7 +68,8 @@ PORTFOLIO_STATUSES = ("PASS_PORTFOLIO", "FAIL_PORTFOLIO", "INSUFFICIENT_PORTFOLI
 #: previously counted only per strategy)
 SKIP_REASONS = ("capacity", "margin", "gross_exposure", "same_symbol", "cost_refused",
                 "cost_data_missing", "cost_error", "inactive", "halted", "zero_allocation",
-                "latency_beyond_data", "duplicate_signal", "account_valuation_incomplete")
+                "latency_beyond_data", "duplicate_signal", "account_valuation_incomplete",
+                "primary_not_entered")
 #: classification of every exclusion (ADR 0071).  Strategy-rule exclusions and
 #: the window end are not rejections and are outside the rejection denominator.
 SKIP_CLASS = {"duplicate_signal": "strategy_rule", "inactive": "strategy_rule",
@@ -80,7 +81,10 @@ SKIP_CLASS = {"duplicate_signal": "strategy_rule", "inactive": "strategy_rule",
               # ADR 0072: cross margin, an open position's symbol has no bar at the entry
               # timestamp, so the account (equity, margin, liquidation) cannot be valued
               # on prices of one moment: a data fact, the signal's outcome is unknown
-              "account_valuation_incomplete": "data_missing"}
+              "account_valuation_incomplete": "data_missing",
+              # ADR 0078 (E-05): the rest of a refused order — the refusal is counted
+              # once, on the primary leg
+              "primary_not_entered": "strategy_rule"}
 
 
 class PortfolioInputError(ValueError):
@@ -328,6 +332,7 @@ def simulate_multi(bars_by_symbol: Mapping[str, Sequence[Bar]],
     # per leg: a primary leg is one evaluator event (= one signal that reached
     # the account); a remainder leg is the partial-fill stress's second fill
     skips_leg = {"primary": {k: 0 for k in SKIP_REASONS}, "remainder": {k: 0 for k in SKIP_REASONS}}
+    primary_entered: set = set()
     skips_leg["primary"]["latency_beyond_data"] = n_latency_skip
     legs = {"primary_scheduled": sum(1 for v in sched.values() for t in v if t.get("leg") != "remainder"),
             "remainder_scheduled": sum(1 for v in sched.values() for t in v if t.get("leg") == "remainder"),
@@ -537,6 +542,10 @@ def simulate_multi(bars_by_symbol: Mapping[str, Sequence[Bar]],
             if halted:
                 _skip("halted", t)
                 continue
+            if t.get("leg") == "remainder" and t["uid"] not in primary_entered:
+                # ADR 0078 (E-05): the rest of an order the account refused never fills
+                _skip("primary_not_entered", t)
+                continue
             if m in inactive_from and t["decision_ts"] >= inactive_from[m]:
                 _skip("inactive", t)
                 continue
@@ -612,6 +621,8 @@ def simulate_multi(bars_by_symbol: Mapping[str, Sequence[Bar]],
                               hold_to_end=bool(t.get("hold_to_end")), leg=leg))
             per[m]["entries"] += 1
             legs[leg + "_entered"] += 1
+            if leg == "primary":
+                primary_entered.add(t["uid"])
             if leg == "primary" and t["size_mult"] < 1:
                 legs["partial_primary"] += 1
             if t.get("remainder_cancelled"):
@@ -663,9 +674,19 @@ def simulate_multi(bars_by_symbol: Mapping[str, Sequence[Bar]],
                         # only when the stop is the fill that is booked
                         stop_loss = -(p.side * (p.exit_price - p.entry_price) * p.qty)
                         if stop_loss >= liq_loss:
+                            # ADR 0078 (E-04): the stop lies beyond the liquidation
+                            # price, so the price crossed the liquidation level first:
+                            # the larger (stop) loss is booked AND it counts as a
+                            # liquidation (``liquidation_events_eq: 0`` must see it)
                             f, s_ = _exit_cost(p, p.exit_price, bi)
+                            liq_events += 1
                             _book(p, p.side * (p.exit_price - p.entry_price) * p.qty, f, s_, ts,
-                                  p.exit_reason)
+                                  p.exit_reason, liquidated=True,
+                                  liq={"condition": "stop price beyond the liquidation price in one bar",
+                                       "reference_price": p.exit_price,
+                                       "price_loss_at_reference": stop_loss,
+                                       "uncapped_excess_loss": max(0.0, stop_loss - liq_loss),
+                                       "loss_rule": "larger loss booked (stop), counted as liquidation"})
                             continue
                     adv = b.low if p.side == 1 else b.high
                     tot["liq_loss"] += liq_loss
@@ -1226,6 +1247,10 @@ def judge(res: Mapping, criteria: Mapping, *, data_issues: Sequence[str] = ()) -
             continue
         r = acc.get(rate_key)
         if r is None:
+            # ADR 0078 (E-06): without signal accounting the refusal share is unknown;
+            # a limit (also "no refusal allowed" = null) can then not be checked
+            undefined.append(f"{label} refusal share unknown (no signal accounting) — "
+                             "criterion cannot be checked")
             continue
         if criteria[key] is None:
             if r > 0:

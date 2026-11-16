@@ -21,6 +21,7 @@ import hashlib
 import io
 import json
 import os
+import re
 import sys
 import tempfile
 import time
@@ -210,6 +211,12 @@ def fetch_missing(data_dir: Path, symbols: Sequence[str], start: str, end: str, 
                   sleep: Callable[[float], None] = time.sleep, base: str = BASE) -> dict:
     """Fetch every missing COMPLETE month in [start, end] (the running month is
     never fetched: monthly archives exist only for finished months)."""
+    # ADR 0078 (H-09): a symbol / month becomes a path and a URL — only plain
+    # exchange symbols and YYYY-MM are accepted (no "../", no separators)
+    bad = [x for x in symbols if not re.fullmatch(r"[A-Z0-9]{2,30}", str(x))]
+    bad += [x for x in (start, end) if not re.fullmatch(r"\d{4}-\d{2}", str(x))]
+    if bad:
+        raise ValueError(f"invalid symbol / month {bad}")
     if not allow:
         return {"status": "DISABLED", "note": "network fetch not allowed (opt-in)", "results": []}
     today = today or dt.datetime.now(dt.timezone.utc).date()

@@ -49,7 +49,7 @@ from strategy_spec import (
     SpecError, canonicalize_spec,
 )
 
-EVOLUTION_GENERATOR_VERSION = "evo-gen-v1"
+EVOLUTION_GENERATOR_VERSION = "evo-gen-v2"  # ADR 0078: FROZEN_PARAMS
 HORIZON_GRID = [4, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256, 384, 768]
 
 OPERATORS = ("tweak_param", "resample_param", "tweak_threshold", "change_horizon",
@@ -156,7 +156,8 @@ def _get(s: dict, where: tuple[str, int]) -> dict:
 
 
 def op_tweak_param(s, rng, ctx):
-    slots = [(w, pn) for w in _all_conds(s) for pn in FEATURES[_get(s, w)["feature"]].params]
+    slots = [(w, pn) for w in _all_conds(s) for pn in FEATURES[_get(s, w)["feature"]].params
+             if (_get(s, w)["feature"], pn) not in FROZEN_PARAMS]
     if not slots:
         return None
     w, pn = rng.choice(slots)
@@ -176,7 +177,8 @@ def op_tweak_param(s, rng, ctx):
 
 
 def op_resample_param(s, rng, ctx):
-    slots = [(w, pn) for w in _all_conds(s) for pn in FEATURES[_get(s, w)["feature"]].params]
+    slots = [(w, pn) for w in _all_conds(s) for pn in FEATURES[_get(s, w)["feature"]].params
+             if (_get(s, w)["feature"], pn) not in FROZEN_PARAMS]
     if not slots:
         return None
     w, pn = rng.choice(slots)
@@ -342,7 +344,7 @@ OPS = {
 
 
 #: version of the strategy fingerprints below; recorded with every lineage edge
-FINGERPRINT_VERSION = "fp-v2"
+FINGERPRINT_VERSION = "fp-v3"  # ADR 0078: effective computation (B-01/B-02)
 #: features whose value is an integer by construction (UTC hour of the bar), so
 #: thresholds between two integers select the same bars
 INTEGER_FEATURES = frozenset({"hour_utc", "dow_utc"})
@@ -394,6 +396,28 @@ def _integer_bounds(b: list) -> list:
     return [lo, True, hi, True]
 
 
+def _effective_computation(feature: str, params: Mapping) -> tuple[str, dict]:
+    """(feature, params) of the series a condition actually reads, with exact
+    equivalences folded (ADR 0078):
+
+    * B-01 ``ret_z.min_history <= window`` blanks nothing: ``_rolling_z``
+      already returns None for the first ``window`` bars, so the value is 0;
+    * B-02 ``fng_min`` and ``fng_max`` over ``days = 1`` are both the day's
+      value: written as ``fng_max``."""
+    ps = dict(params)
+    if feature == "ret_z" and ps.get("min_history", 0) <= ps.get("window", 0):
+        ps["min_history"] = 0
+    if feature == "fng_min" and ps.get("days") == 1:
+        feature = "fng_max"
+    return feature, ps
+
+
+#: parameters the search never mutates (ADR 0078, B-01): ``ret_z.min_history``
+#: only moves the start of the DEV sample (never the validation or locked
+#: windows) — a DEV-only knob that produced twin hypotheses
+FROZEN_PARAMS = {("ret_z", "min_history")}
+
+
 def _normal_conditions(conds: Sequence[Mapping], *, conjunction: bool) -> list[str]:
     """Normal form of a set of conditions.  Under a conjunction, every group
     of conditions on the same feature WITH the same computation parameters is
@@ -403,7 +427,8 @@ def _normal_conditions(conds: Sequence[Mapping], *, conjunction: bool) -> list[s
     (``>`` vs ``>=`` on a continuous feature) stay different."""
     groups: dict = {}
     for c in conds:
-        key = canonical_json({"feature": c["feature"], "params": c["params"]})
+        f, ps = _effective_computation(c["feature"], c["params"])
+        key = canonical_json({"feature": f, "params": ps})
         b = _bounds(c)
         if conjunction and key in groups:
             groups[key] = [_intersect(groups[key][0], b)]

@@ -30,7 +30,7 @@ import math
 from pathlib import Path
 from typing import Mapping, Optional, Sequence
 
-from engine_lib import append_jsonl, canonical_json, iso_now, iter_jsonl, locked_window_for
+from engine_lib import append_jsonl, canonical_json, exclusive_file_lock, iso_now, iter_jsonl, locked_window_for
 from stats_mc import spending_alpha
 
 CAMPAIGN_SCHEMA = "locked_campaign_v1"
@@ -110,7 +110,19 @@ class CampaignLedger:
                     max_campaigns: int, method: str, config_hash: str) -> dict:
         """Write the campaign BEFORE any locked data is touched.  ``members``
         maps strategy id -> symbols.  Raises WindowRetired if a window is
-        exhausted (the caller must exclude those members first)."""
+        exhausted (the caller must exclude those members first).
+
+        ADR 0079 (F-11): the window counts are read and the campaign appended
+        under the ledger's file lock (the legacy runner and the evolution
+        pipeline share this file), so two writers never take one campaign index."""
+        with exclusive_file_lock(self.path):
+            return self._preregister(source=source, source_ref=source_ref, context_id=context_id,
+                                     members=members, alpha_total=alpha_total,
+                                     max_campaigns=max_campaigns, method=method, config_hash=config_hash)
+
+    def _preregister(self, *, source: str, source_ref: str, context_id: str,
+                     members: Mapping[str, Sequence[str]], alpha_total: float,
+                     max_campaigns: int, method: str, config_hash: str) -> dict:
         have = self.find(source, source_ref)
         if have is not None:
             return have["preregistered"]
@@ -141,15 +153,20 @@ class CampaignLedger:
 
     def abort_no_exposure(self, campaign: Mapping, reason: str,
                           windows: Optional[Sequence[str]] = None) -> None:
-        append_jsonl(self.path, {"schema": CAMPAIGN_SCHEMA, "kind": "ABORTED_NO_EXPOSURE",
-                                 "campaign_id": campaign["campaign_id"],
-                                 "windows": list(windows or campaign["windows"]),
-                                 "reason": reason, "at": iso_now()})
+        # ADR 0079 follow-up (F-11): every writer of this ledger takes its lock, so
+        # this append never lands between another writer's tail check and its
+        # write (a writer that died mid-line would be glued to this record)
+        with exclusive_file_lock(self.path):
+            append_jsonl(self.path, {"schema": CAMPAIGN_SCHEMA, "kind": "ABORTED_NO_EXPOSURE",
+                                     "campaign_id": campaign["campaign_id"],
+                                     "windows": list(windows or campaign["windows"]),
+                                     "reason": reason, "at": iso_now()})
 
     def record_result(self, campaign: Mapping, results: Mapping) -> None:
-        append_jsonl(self.path, {"schema": CAMPAIGN_SCHEMA, "kind": "RESULT",
-                                 "campaign_id": campaign["campaign_id"],
-                                 "results": dict(results), "at": iso_now()})
+        with exclusive_file_lock(self.path):           # ADR 0079 follow-up (F-11), as above
+            append_jsonl(self.path, {"schema": CAMPAIGN_SCHEMA, "kind": "RESULT",
+                                     "campaign_id": campaign["campaign_id"],
+                                     "results": dict(results), "at": iso_now()})
 
 
 def member_alpha(campaign: Mapping, symbol: str) -> float:

@@ -176,7 +176,11 @@ class TestCapitalMarginLiquidation(unittest.TestCase):
         b = {"A": bars([100, 100, 95, 95], lows=lows)}
         r = run(b, [tr("s1", "A", 1, 0, 1, 1, px=79.0, reason="stop")], ["s1"],
                 cfg=MultiConfig(leverage=5.0, max_gross_exposure=5.0), cost=fee_cost(0.0))
-        self.assertEqual(r["liquidation_events"], 0)
+        # ADR 0078 (E-04): the stop lies beyond the liquidation price (80.5), so the
+        # price crossed the liquidation level first: the larger (stop) loss is still
+        # booked, and it now also counts as a liquidation (was 0: invisible to the
+        # ``liquidation_events_eq: 0`` gate)
+        self.assertEqual(r["liquidation_events"], 1)
         self.assertAlmostEqual(r["final_equity"], 10_000 - 500 * 21, 6)
         # stop at 85 loses less than the margin -> the liquidation is booked
         lows = [None, 80.0, None, None]
@@ -194,7 +198,10 @@ class TestCapitalMarginLiquidation(unittest.TestCase):
 class TestCostsFundingFills(unittest.TestCase):
     def test_funding_paid_by_long_received_by_short(self):
         b = {"A": bars([100] * 6)}
-        fund = {"A": [(T0, 0.0), (T0 + 2 * M15, 0.001), (T0 + 10 * M15, 0.0)]}
+        # ADR 0078 (C-03): a regular 30-minute schedule (the old fixture changed
+        # 30m -> 2h, which is contiguous under one reading of the interval column
+        # only and is now SCHEDULE_UNKNOWN); the held settlements are the same
+        fund = {"A": [(T0 + k * 2 * M15, 0.001 if k == 1 else 0.0) for k in range(6)]}
         long_ = run(b, [tr("s1", "A", 1, 0, 1, 4)], ["s1"], cost=fee_cost(0.0), funding=fund)
         short = run(b, [tr("s1", "A", -1, 0, 1, 4)], ["s1"], cost=fee_cost(0.0), funding=fund)
         self.assertAlmostEqual(long_["totals"]["funding"], 10.0, 6)

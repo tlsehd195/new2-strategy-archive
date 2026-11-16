@@ -1,0 +1,1241 @@
+"""ADR 0079: follow-up audit of ADR 0078 (user directive 2026-11-12 14:00Z).
+
+D-01 bootstrap resolution, G-03/G-04 Paper Forward, F-11 writers outside the
+lock, runner.py / engine_lib.py author review.  SYNTHETIC data, mocks and temp
+directories only: no real window, no network, no real record is read for a
+decision or written.
+"""
+from __future__ import annotations
+
+import json
+import random
+import shutil
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+from typing import Optional
+from unittest import mock
+
+HERE = Path(__file__).resolve().parent
+DISC = HERE.parent
+for _p in (str(DISC), str(HERE)):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
+import stats_mc  # noqa: E402
+import test_pipeline as tp  # noqa: E402
+from engine_lib import append_jsonl, iter_jsonl  # noqa: E402
+from stats_mc import InsufficientBootstrapResolution  # noqa: E402
+
+
+def _series(m=2, n=60, seed=3, edge=0.4):
+    rng = random.Random(seed)
+    return {f"k{j}": [rng.gauss(edge if j == 0 else 0.0, 1.0) for _ in range(n)] for j in range(m)}
+
+
+def _call(fn, alpha, B):
+    return fn(_series(), alpha=alpha, B=B, seed=1)
+
+
+# ---------------------------------------------------------------------------
+# D-01 — bootstrap resolution alpha * (B + 1) >= MIN_TAIL_DRAWS
+# ---------------------------------------------------------------------------
+
+#: (alpha, B, alpha*(B+1)) — every product is exact in binary floating point
+#: or lies on the stated side of the boundary
+BLOCKED = [
+    (0.01, 50, 0.51),        # < 1
+    (0.01, 99, 1.0),         # == 1
+    (0.05, 19, 1.0),         # == 1
+    (0.01, 299, 3.0),        # 1 < x < 5
+    (0.05, 49, 2.5),         # 1 < x < 5
+    (0.05, 98, 4.95),        # 1 < x < 5, just below
+    (0.10, 48, 4.9),         # 1 < x < 5, just below
+]
+ALLOWED = [
+    (0.01, 499, 5.0),        # == 5
+    (0.05, 99, 5.0),         # == 5
+    (0.10, 49, 5.0),         # == 5
+    (0.05, 199, 10.0),       # > 5
+    (0.10, 150, 15.1),       # > 5
+]
+FUNCS = ("stepm", "step_spa", "mcs")
+
+
+class TestD01Boundary(unittest.TestCase):
+    """Each test function is called directly at every boundary class."""
+
+    def test_products_are_on_the_stated_side(self):
+        for a, B, x in BLOCKED:
+            self.assertLess(a * (B + 1), stats_mc.MIN_TAIL_DRAWS, (a, B))
+            self.assertAlmostEqual(a * (B + 1), x)
+        for a, B, x in ALLOWED:
+            self.assertGreaterEqual(a * (B + 1), stats_mc.MIN_TAIL_DRAWS, (a, B))
+            self.assertAlmostEqual(a * (B + 1), x)
+
+    def test_blocked_below_min_tail_draws(self):
+        for name in FUNCS:
+            fn = getattr(stats_mc, name)
+            for a, B, x in BLOCKED:
+                with self.subTest(fn=name, alpha=a, B=B, product=x):
+                    with self.assertRaises(InsufficientBootstrapResolution):
+                        _call(fn, a, B)
+
+    def test_one_to_five_band_is_blocked(self):
+        """The band the ADR 0078 code let through (it checked < 1 only)."""
+        for name in FUNCS:
+            fn = getattr(stats_mc, name)
+            for a, B in ((0.01, 100), (0.01, 250), (0.01, 498), (0.05, 20), (0.05, 60), (0.025, 150)):
+                with self.subTest(fn=name, alpha=a, B=B):
+                    self.assertTrue(1.0 <= a * (B + 1) < 5.0)
+                    with self.assertRaises(InsufficientBootstrapResolution):
+                        _call(fn, a, B)
+
+    def test_allowed_at_and_above_min_tail_draws(self):
+        for name in FUNCS:
+            fn = getattr(stats_mc, name)
+            for a, B, x in ALLOWED:
+                with self.subTest(fn=name, alpha=a, B=B, product=x):
+                    out = _call(fn, a, B)
+                    self.assertEqual(out["B"], B)
+                    self.assertEqual(out["alpha"], a)
+
+    def test_stepm_studentize_modes_share_the_check(self):
+        for mode in ("fixed", "bootstrap_t", "gk_block"):
+            with self.subTest(mode=mode):
+                with self.assertRaises(InsufficientBootstrapResolution):
+                    stats_mc.stepm(_series(), alpha=0.05, B=49, seed=1, studentize=mode)
+                stats_mc.stepm(_series(), alpha=0.05, B=99, seed=1, studentize=mode)
+
+    def test_mcs_single_model_is_checked_too(self):
+        with self.assertRaises(InsufficientBootstrapResolution):
+            stats_mc.mcs({"a": [0.1, -0.2, 0.3] * 10}, alpha=0.10, B=10)
+
+    def test_threshold_has_a_single_source(self):
+        """_require_resolution reads MIN_TAIL_DRAWS (not a literal)."""
+        with mock.patch.object(stats_mc, "MIN_TAIL_DRAWS", 7):
+            with self.assertRaises(InsufficientBootstrapResolution):
+                _call(stats_mc.stepm, 0.05, 119)            # 6.0 < 7
+            self.assertGreaterEqual(0.05 * (stats_mc.bootstrap_B_for(0.05, 10) + 1), 7)
+            _call(stats_mc.stepm, 0.05, stats_mc.bootstrap_B_for(0.05, 10))
+        src = Path(stats_mc.__file__).read_text()
+        body = src[src.index("def _require_resolution"):src.index("def stepm(")]
+        self.assertIn("MIN_TAIL_DRAWS", body)
+        self.assertNotIn("< 1.0", body)
+
+    def test_message_names_the_rule(self):
+        with self.assertRaises(InsufficientBootstrapResolution) as cm:
+            _call(stats_mc.stepm, 0.01, 299)
+        msg = str(cm.exception)
+        self.assertIn("alpha*(B+1)", msg)
+        self.assertIn("499", msg)                           # the B that would resolve it
+
+    def test_invalid_alpha_refused(self):
+        for bad in (0.0, 1.0, -0.1, 1.5, float("nan"), float("inf"), -float("inf"), True, False,
+                    "0.05", None, [0.05]):
+            for name in FUNCS:
+                with self.subTest(fn=name, alpha=bad):
+                    with self.assertRaises(ValueError):
+                        _call(getattr(stats_mc, name), bad, 1000)
+
+    def test_invalid_B_refused(self):
+        for bad in (0, -1, -1000, True, False, 1000.0, 99.5, float("nan"), float("inf"), "1000", None):
+            for name in FUNCS:
+                with self.subTest(fn=name, B=bad):
+                    with self.assertRaises(ValueError):
+                        _call(getattr(stats_mc, name), 0.05, bad)
+
+    def test_bootstrap_B_for_always_resolves(self):
+        alphas = [stats_mc.spending_alpha(k, tot) for tot in (0.1, 0.05, 0.025, 0.0213)
+                  for k in range(1, 60)] + [0.5, 0.1, 0.05, 1e-3, 1e-5]
+        for a in alphas:
+            for base in (1, 49, 1000, 10_000):
+                B = stats_mc.bootstrap_B_for(a, base)
+                with self.subTest(alpha=a, base=base):
+                    self.assertIsInstance(B, int)
+                    self.assertGreaterEqual(B, base)
+                    self.assertGreaterEqual(a * (B + 1), stats_mc.MIN_TAIL_DRAWS)
+                    stats_mc._require_resolution(a, B)        # must not raise
+
+    def test_bootstrap_B_for_refuses_bad_input(self):
+        for a, base in ((0.0, 1000), (1.0, 1000), (float("nan"), 1000), (True, 1000),
+                        (0.05, 0), (0.05, True), (0.05, 99.5), (0.05, -5)):
+            with self.subTest(alpha=a, base=base):
+                with self.assertRaises(ValueError):
+                    stats_mc.bootstrap_B_for(a, base)
+
+    def test_no_test_without_alpha_is_affected(self):
+        """reality_check / spa_test return p-values (no alpha): unchanged."""
+        s = _series()
+        self.assertIn("p", stats_mc.reality_check(s, B=49, seed=1))
+        self.assertIn("p_consistent", stats_mc.spa_test(s, B=49, seed=1))
+
+
+class TestD01Pipeline(tp.PipelineCase):
+    """A batch PREREGISTERED by an older version with too few draws for its
+    alpha: nobody is rejected, nobody passes, the block is recorded, the
+    stored B / alpha / batch index and the alpha history are left as they are."""
+
+    def _legacy_batch(self, hist=None):
+        from pipeline import EvolutionPipeline
+        p = EvolutionPipeline(self.td / "state", tp.SyntheticProvider(), tp.verified_fee_cost(),
+                              symbols=["BTCUSDT"], validation_history=hist)
+        sids = self.register_all(p, [tp.EDGE] + tp.NOISE)
+
+        def legacy_B(alpha, base):               # 1 <= alpha*(B+1) < 5, as old code allowed
+            return max(1, int(2.5 / alpha))
+        cands = p.validation_candidates()
+        with mock.patch("pipeline.bootstrap_B_for", legacy_B):
+            batch = p.preregister_batch(cands)
+        return p, sids, batch
+
+    def test_legacy_small_B_batch_is_blocked_not_rejected(self):
+        hist = self.td / "history.jsonl"
+        p, sids, batch = self._legacy_batch(hist)
+        pre_rows = [dict(r) for r in iter_jsonl(p.batch_path)]
+        hist_rows = list(iter_jsonl(hist))
+        for w in batch["windows"].values():
+            self.assertTrue(1.0 <= w["alpha"] * (w["B"] + 1) < stats_mc.MIN_TAIL_DRAWS)
+        res = p.run_validation()                  # resumes the open (legacy) batch
+        self.assertEqual(res["batch_id"], batch["batch_id"])
+        ctx = p.context_id()
+        for m in batch["members"]:
+            with self.subTest(member=m):
+                self.assertEqual(res["outcome"][m], "BLOCKED_STATISTICS")
+                st = p.statuses.get(m, ctx)
+                self.assertEqual(st["status"], "BLOCKED_STATISTICS")
+                self.assertEqual(st["stage"], "validation")
+                rec = p.evaluation("validation", m)
+                self.assertFalse(rec["stepm_rejected"])
+                self.assertTrue(rec["stepm_blocked"])
+                self.assertEqual(rec["failure_class"], "BLOCKED_STATISTICS")
+                self.assertIsNone(p.evaluation("robustness", m))
+        for key, w in batch["windows"].items():
+            t = res["tests"][key]
+            self.assertIn("stepm_blocked", t)
+            self.assertEqual(t["rejected"], [])
+            self.assertEqual(t["B"], w["B"])                       # stored B, not raised
+            self.assertEqual(t["alpha"], w["alpha"])
+            self.assertEqual(t["stepm_method"], "BLOCKED_STATISTICS")
+            self.assertIn("step_spa_blocked", t)                   # not hidden as spa_error
+            self.assertNotIn("step_spa_rejected", t)
+        # the ledger before the RESULT row is byte-for-byte what it was
+        rows = list(iter_jsonl(p.batch_path))
+        self.assertEqual(rows[:len(pre_rows)], pre_rows)
+        self.assertEqual(rows[-1]["kind"], "RESULT")
+        # alpha spending kept: the history row stays, the batch still counts
+        self.assertEqual(list(iter_jsonl(hist)), hist_rows)
+        # no member is offered to a new batch (no second look at the window)
+        self.assertEqual([c for c in p.validation_candidates() if c in batch["members"]], [])
+        from pipeline import outcome_label
+        for m in batch["members"]:
+            self.assertEqual(outcome_label(p.statuses.get(m, ctx),
+                                           validation=p.evaluation("validation", m),
+                                           dev=p.evaluation("dev", m)), "UNDETERMINED_POWER")
+
+    def test_resumed_blocked_batch_is_idempotent(self):
+        p, sids, batch = self._legacy_batch()
+        r1 = p.run_validation()
+        n_eval = len(list(iter_jsonl(p.dir / "evaluations.jsonl")))
+        self.assertIsNone(p.run_validation())
+        self.assertEqual(len(list(iter_jsonl(p.dir / "evaluations.jsonl"))), n_eval)
+        self.assertEqual(r1["outcome"][sids[0]], "BLOCKED_STATISTICS")
+
+    def test_current_batch_is_not_blocked(self):
+        """Control: a batch preregistered by the current code resolves its alpha."""
+        p = self.pipe(tp.SyntheticProvider())
+        self.register_all(p, [tp.EDGE] + tp.NOISE)
+        res = p.run_validation()
+        for t in res["tests"].values():
+            self.assertNotIn("stepm_blocked", t)
+        self.assertIn("PASSED_STEPM", res["outcome"].values())
+
+
+class TestD01IndependentWindow(unittest.TestCase):
+    """The independent window refuses to open (nothing registered, no history
+    row) when its frozen B cannot resolve the tranche alpha."""
+
+    def setUp(self):
+        import test_independent_window as tiw
+        self.tiw = tiw
+        self.td = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.td, True)
+        self.data = self.td / "data"
+        months = ["2020-01", "2020-02", "2020-03"]
+        tiw.write_symbol(self.data, "BTCUSDT", months, seed=1)
+        tiw.write_symbol(self.data, "BBBUSDT", months, seed=40)
+        self.hist = self.td / "history.jsonl"
+        for r in iter_jsonl(tiw.REAL_HISTORY):        # read-only copy, as test_independent_window
+            append_jsonl(self.hist, r)
+        self.hist_before = list(iter_jsonl(self.hist))
+        self.pre = tiw.small_prereg()
+        self.sha = "f" * 64
+        self.members = tiw.members_of(self.pre, self.sha,
+                                      [tp.hour_spec(0, 2)] + [tp.hour_spec(h, h + 2) for h in (6, 12)])
+
+    def _open(self, out="out"):
+        import independent_window as iw
+        return iw.open_tranche(self.pre, self.sha, "A", self.data, self.members, self.hist,
+                               self.td / out, tp.verified_fee_cost(),
+                               gate={"lifecycle": "ACTIVE", "prereg_sha256": self.sha},
+                               registry_path=self.td / "registry.jsonl")
+
+    def test_unresolvable_B_refuses_before_opening(self):
+        import independent_window as iw
+        self.pre["test"]["bootstrap_B"] = 100      # alpha_1 = 0.0304: 0.0304*101 = 3.07 < 5
+        with self.assertRaises(iw.WindowRefused) as cm:
+            self._open()
+        self.assertIn("alpha*(B+1)", str(cm.exception))
+        self.assertEqual(list(iter_jsonl(self.hist)), self.hist_before)
+        self.assertFalse((self.td / "registry.jsonl").exists()
+                         and list(iter_jsonl(self.td / "registry.jsonl")))
+        self.assertFalse((self.td / "out").exists())
+
+    def test_blocked_stepm_inside_a_run_is_recorded_not_rejected(self):
+        """Defence in depth: should StepM refuse inside an opened run, every member
+        is BLOCKED_STATISTICS (never REJECTED, never PASSED)."""
+        import independent_window as iw
+
+        def refuse(*a, **k):
+            raise InsufficientBootstrapResolution("synthetic refusal")
+        with mock.patch.object(iw, "stepm", refuse):
+            r = self._open()
+        self.assertEqual(set(r["outcome"].values()), {"BLOCKED_STATISTICS"})
+        self.assertEqual(r["test"]["rejected"], [])
+        self.assertIn("stepm_blocked", r["test"])
+
+
+class TestD01PowerAnalysis(unittest.TestCase):
+    def test_power_analysis_uses_a_resolving_B(self):
+        src = (DISC / "power_analysis.py").read_text()
+        self.assertIn("bootstrap_B_for(a_w", src)
+
+
+
+# ---------------------------------------------------------------------------
+# G-04 — Fear & Greed data of a forward plan
+# ---------------------------------------------------------------------------
+
+def _fng_edge_spec():
+    """EDGE (hour 0-2) gated by an FNG filter that is true whenever a value
+    exists (fng_max over 1 day <= 100): it trades like EDGE where FNG is known
+    and not at all where it is not."""
+    sp = tp.hour_spec(0, 2)
+    sp["filters"] = [{"feature": "fng_max", "params": {"days": 1}, "op": "le", "value": 100.0}]
+    return sp
+
+
+def _fng_map(lo_ms, hi_ms, value=10.0):
+    return {d: value for d in range(lo_ms // 86_400_000 - 30, hi_ms // 86_400_000 + 1)}
+
+
+from test_paper_forward_funding_20261111 import DAY, FundingCase  # noqa: E402
+
+
+class TestG04ForwardFng(FundingCase):
+    def _fng_ready(self):
+        """A PAPER_TEST_READY strategy that needs FNG; the provider's FNG series
+        ends at the registration time (what the archive holds then)."""
+        p, edge, feed = self.setup_feed(iv_h=4)
+        self.fng = _fng_map(feed.bars[0].ts, self.now[0])
+        p.provider.fng = lambda: self.fng
+        sid, _ = p.register(_fng_edge_spec(), source="test")
+        ctx = p.context_id()
+        for s in ("RESEARCH_ONLY", "VALIDATION_SURVIVOR", "PAPER_TEST_READY"):
+            p.statuses.set(sid, ctx, s, stage="test", reasons=["synthetic G-04 fixture"])
+        return p, sid, feed
+
+    def test_fng_strategy_plan_is_refused(self):
+        """HEAD 757114f registered the plan: FNG is read from the live provider at
+        every evaluation, nothing about it is in the plan (no hash, no snapshot)."""
+        from paper_forward import ForwardPaper, ForwardRefused
+        p, sid, feed = self._fng_ready()
+        fp = ForwardPaper(p, feed, clock=lambda: self.now[0])
+        with self.assertRaises(ForwardRefused) as cm:
+            fp.register_plan(sid)
+        self.assertIn("FNG", str(cm.exception))
+        self.assertEqual(fp.plans(), [])
+        self.assertEqual(p.statuses.status(sid, p.context_id()), "PAPER_TEST_READY")
+
+    def test_fng_changed_mid_plan_never_passes(self):
+        """A plan for an FNG strategy registered by an older version (the refusal
+        bypassed): the FNG source is extended / revised after registration.  The
+        plan must never conclude on FNG values it did not pin (HEAD: PAPER_PASSED
+        on the new FNG values, unnoticed — the synthetic provider's identity, like
+        any provider that omits FNG from it, does not change the context)."""
+        import paper_forward as pf
+        p, sid, feed = self._fng_ready()
+        fp = pf.ForwardPaper(p, feed, clock=lambda: self.now[0])
+        with mock.patch.object(pf.ForwardPaper, "_fng_refusal", return_value=None, create=True):
+            plan = fp.register_plan(sid)
+        self.now[0] += 20 * DAY
+        fp.step(plan["plan_id"])
+        self.fng = _fng_map(feed.bars[0].ts, feed.bars[-1].ts)       # source revised / extended
+        self.now[0] += 55 * DAY
+        r = fp.step(plan["plan_id"])
+        self.assertNotEqual(r["verdict"], "PAPER_PASSED", r.get("reasons"))
+        self.assertEqual(r["verdict"], "PAPER_BLOCKED_DATA", r.get("reasons"))
+        self.assertTrue(any("FNG" in x for x in r.get("reasons", [])), r.get("reasons"))
+        self.assertNotEqual(p.statuses.status(sid, p.context_id()), "PAPER_PASSED")
+        self.assertIsNone(p.evaluation("paper_forward", sid))
+
+    def test_non_fng_plan_unaffected(self):
+        """Control: the FNG rule does not touch a strategy without FNG."""
+        from paper_forward import ForwardPaper
+        p, edge, feed = self.setup_feed(iv_h=4)
+        fp = ForwardPaper(p, feed, clock=lambda: self.now[0])
+        plan = fp.register_plan(edge)
+        self.now[0] += 75 * DAY
+        self.assertEqual(fp.step(plan["plan_id"])["verdict"], "PAPER_PASSED")
+
+    def test_old_fng_conclusion_is_not_confirmed(self):
+        """A conclusion an older version recorded for an FNG plan is left as it is
+        (no record rewritten) but verify_conclusion no longer confirms it."""
+        import paper_forward as pf
+        p, sid, feed = self._fng_ready()
+        self.fng = _fng_map(feed.bars[0].ts, feed.bars[-1].ts)
+        fp = pf.ForwardPaper(p, feed, clock=lambda: self.now[0])
+        with mock.patch.object(pf.ForwardPaper, "_fng_refusal", return_value=None), \
+                mock.patch.object(pf.ForwardPaper, "_plan_fng_problem", return_value=None):
+            plan = fp.register_plan(sid)
+            self.now[0] += 75 * DAY
+            r = fp.step(plan["plan_id"])
+            self.assertEqual(r["verdict"], "PAPER_PASSED")              # what old code did
+            self.assertEqual(fp.verify_conclusion(plan["plan_id"]), [])
+        evals = (p.dir / "evaluations.jsonl").read_bytes()
+        probs = fp.verify_conclusion(plan["plan_id"])
+        self.assertTrue(any("FNG_NOT_PINNED" in x for x in probs), probs)
+        self.assertEqual((p.dir / "evaluations.jsonl").read_bytes(), evals)   # nothing rewritten
+
+    # -- ADR 0079 follow-up: step() on a concluded FNG plan -------------------------
+    @staticmethod
+    def _snapshot(root: Path) -> dict:
+        """Bytes of every record file under ``root`` (lock files carry no record)."""
+        return {str(f.relative_to(root)): f.read_bytes() for f in sorted(root.rglob("*"))
+                if f.is_file() and not f.name.endswith(".lock")}
+
+    def _old_concluded_fng_plan(self):
+        """A plan for an FNG strategy registered and concluded PAPER_PASSED by the
+        code before ADR 0079 (registration refusal and conclusion block patched out)."""
+        import paper_forward as pf
+        p, sid, feed = self._fng_ready()
+        self.fng = _fng_map(feed.bars[0].ts, feed.bars[-1].ts)
+        fp = pf.ForwardPaper(p, feed, clock=lambda: self.now[0])
+        with mock.patch.object(pf.ForwardPaper, "_fng_refusal", return_value=None), \
+                mock.patch.object(pf.ForwardPaper, "_plan_fng_problem", return_value=None):
+            plan = fp.register_plan(sid)
+            self.now[0] += 75 * DAY
+            r = fp.step(plan["plan_id"])
+            self.assertEqual(r["verdict"], "PAPER_PASSED")              # what old code did
+            self.assertEqual(fp.step(plan["plan_id"])["verdict"], "PAPER_PASSED")   # and returned again
+        self.assertTrue(fp.state(plan["plan_id"])["concluded"])
+        return p, sid, fp, plan
+
+    def test_concluded_fng_plan_step_does_not_return_old_pass(self):
+        """HEAD 3d49e41: ``step`` returned the stored PAPER_PASSED of a concluded FNG
+        plan before any FNG check, while verify_conclusion said FNG_NOT_PINNED."""
+        p, sid, fp, plan = self._old_concluded_fng_plan()
+        pid, ctx = plan["plan_id"], p.context_id()
+        before = self._snapshot(p.dir)
+        r = fp.step(pid)
+        self.assertNotEqual(r["verdict"], "PAPER_PASSED", r)
+        self.assertEqual(r["verdict"], "PAPER_BLOCKED_DATA", r)
+        self.assertEqual(r["status"], "CONCLUDED")
+        self.assertEqual(r["recorded_verdict"], "PAPER_PASSED")       # the past record, labelled
+        self.assertIs(r["conclusion_verified"], False)
+        self.assertTrue(any("FNG_NOT_PINNED" in x for x in r["reasons"]), r)
+        self.assertTrue(any("UNVERIFIED_PRIOR_CONCLUSION" in x for x in r["reasons"]), r)
+        # the two APIs agree: neither confirms the stored conclusion, for the same reason
+        probs = fp.verify_conclusion(pid)
+        self.assertTrue(any("FNG_NOT_PINNED" in x for x in probs), probs)
+        # nothing written, rewritten or re-evaluated (state, evaluation record, statuses, logs)
+        self.assertEqual(self._snapshot(p.dir), before)
+        self.assertEqual(fp.state(pid)["verdict"], "PAPER_PASSED")
+        self.assertEqual(p.statuses.status(sid, ctx), "PAPER_PASSED")
+        self.assertEqual(p.evaluation("paper_forward", sid, ctx)["verdict"], "PAPER_PASSED")
+        self.assertEqual(fp.step(pid), r)                               # stable on repeat
+
+    def test_concluded_non_fng_plan_step_unchanged(self):
+        """Control: a concluded plan without FNG returns exactly what it returned
+        before (same keys, same verdict) and verify_conclusion still confirms it."""
+        from paper_forward import ForwardPaper
+        p, edge, feed = self.setup_feed(iv_h=4)
+        fp = ForwardPaper(p, feed, clock=lambda: self.now[0])
+        plan = fp.register_plan(edge)
+        self.now[0] += 75 * DAY
+        self.assertEqual(fp.step(plan["plan_id"])["verdict"], "PAPER_PASSED")
+        before = self._snapshot(p.dir)
+        self.assertEqual(fp.step(plan["plan_id"]),
+                         {"plan_id": plan["plan_id"], "status": "CONCLUDED", "verdict": "PAPER_PASSED"})
+        self.assertEqual(fp.verify_conclusion(plan["plan_id"]), [])
+        self.assertEqual(self._snapshot(p.dir), before)
+
+
+# ---------------------------------------------------------------------------
+# F-11 — read-decide-write of shared records under one lock
+# ---------------------------------------------------------------------------
+
+import threading  # noqa: E402
+
+
+class TestF11Locks(unittest.TestCase):
+    def setUp(self):
+        self.td = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.td, True)
+
+    def test_status_transition_decided_on_the_file_not_a_stale_cache(self):
+        """HEAD: a second store instance (another process) with a stale cache
+        wrote RESEARCH_ONLY -> VALIDATION_SURVIVOR over a REJECTED (terminal)."""
+        from pipeline import InvalidStatusTransition, StatusStore
+        path = self.td / "statuses.jsonl"
+        a, b = StatusStore(path), StatusStore(path)
+        a.set("S1", "C", "RESEARCH_ONLY", stage="dev")
+        self.assertEqual(b.status("S1", "C"), "RESEARCH_ONLY")          # b caches the file now
+        a.set("S1", "C", "REJECTED", stage="validation")
+        with self.assertRaises(InvalidStatusTransition):
+            b.set("S1", "C", "VALIDATION_SURVIVOR", stage="validation")
+        rows = list(iter_jsonl(path))
+        self.assertEqual([r["status"] for r in rows], ["RESEARCH_ONLY", "REJECTED"])
+        self.assertEqual(b.status("S1", "C"), "REJECTED")
+        self.assertTrue(path.with_name(path.name + ".lock").exists())
+
+    def test_campaign_index_is_taken_once(self):
+        """HEAD: two writers read the window count before either appended and both
+        preregistered campaign 1 (alpha spent twice) on the same locked window."""
+        import campaigns as cmod
+        from engine_lib import LOCKED_TEST_PERIODS
+        sym = sorted(LOCKED_TEST_PERIODS)[0]
+        path = self.td / "locked_window_campaigns.jsonl"
+        read_done, release = threading.Event(), threading.Event()
+        orig = cmod.CampaignLedger.window_status
+
+        def slow_status(self_, symbol, *, max_campaigns):
+            st = orig(self_, symbol, max_campaigns=max_campaigns)
+            if threading.current_thread().name == "A":
+                read_done.set()
+                release.wait(1.0)          # B runs here (or waits on the lock)
+            return st
+        out = {}
+
+        def run(name, ref):
+            out[name] = cmod.CampaignLedger(path).preregister(
+                source="test", source_ref=ref, context_id="C", members={"S" + name: [sym]},
+                alpha_total=0.05, max_campaigns=5, method="m", config_hash="h")
+        with mock.patch.object(cmod.CampaignLedger, "window_status", slow_status):
+            ta = threading.Thread(target=run, args=("A", "ref-A"), name="A")
+            ta.start()
+            self.assertTrue(read_done.wait(5))
+            tb = threading.Thread(target=run, args=("B", "ref-B"), name="B")
+            tb.start()
+            tb.join(0.5)
+            release.set()
+            ta.join(10)
+            tb.join(10)
+        idx = sorted(w["campaign_index"] for r in out.values() for w in r["windows"].values())
+        self.assertEqual(idx, [1, 2])
+        rows = [r for r in iter_jsonl(path) if r["kind"] == "PREREGISTERED"]
+        self.assertEqual(sorted(w["campaign_index"] for r in rows for w in r["windows"].values()), [1, 2])
+
+    def test_lock_file_helper_serialises_threads(self):
+        """exclusive_file_lock (flock on a fresh descriptor) excludes a second
+        holder in the same process — what the tests above rely on."""
+        from engine_lib import exclusive_file_lock
+        p = self.td / "x.jsonl"
+        got = []
+        with exclusive_file_lock(p):
+            t = threading.Thread(target=lambda: (exclusive_file_lock(p).__enter__(), got.append(1)))
+            t.daemon = True
+            t.start()
+            t.join(0.3)
+            self.assertEqual(got, [])
+        t.join(5)
+        self.assertEqual(got, [1])
+
+
+class TestF11ForwardPlan(FundingCase):
+    def test_one_plan_per_strategy_under_concurrent_registration(self):
+        """HEAD: two ForwardPaper instances both passed the "plan exists" check and
+        appended two plans for one strategy (two observations of one hypothesis)."""
+        import paper_forward as pf
+        p, edge, feed = self.setup_feed(iv_h=4)
+        read_done, release = threading.Event(), threading.Event()
+        orig = pf.ForwardPaper._fetch_funding
+
+        def slow_fetch(self_, sym, after_ts):
+            r = orig(self_, sym, after_ts)
+            if threading.current_thread().name == "A":
+                read_done.set()
+                release.wait(2.0)
+            return r
+        errs, plans = [], []
+
+        def run():
+            try:
+                plans.append(pf.ForwardPaper(p, feed, clock=lambda: self.now[0]).register_plan(edge))
+            except pf.ForwardRefused as e:
+                errs.append(str(e))
+        with mock.patch.object(pf.ForwardPaper, "_fetch_funding", slow_fetch):
+            ta = threading.Thread(target=run, name="A")
+            ta.start()
+            self.assertTrue(read_done.wait(30))
+            tb = threading.Thread(target=run, name="B")
+            tb.start()
+            tb.join(1.0)
+            release.set()
+            ta.join(60)
+            tb.join(60)
+        fp = pf.ForwardPaper(p, feed, clock=lambda: self.now[0])
+        self.assertEqual(len([x for x in fp.plans() if x["strategy_id"] == edge]), 1)
+        self.assertEqual((len(plans), len(errs)), (1, 1), errs)
+        self.assertIn("already exists", errs[0])
+
+
+# ---------------------------------------------------------------------------
+# runner.py / engine_lib.py author review (R-1)
+# ---------------------------------------------------------------------------
+
+class TestR01RunnerErrorClass(unittest.TestCase):
+    """R-1: run_one / reevaluate_prior_pass caught LookupError as DATA_MISSING —
+    KeyError / IndexError (a programming error, or a signal reading a bar
+    outside the PrefixView = look-ahead) became DATA_MISSING, which is
+    re-verifiable when data arrives, instead of a permanent LOGIC_ERROR."""
+
+    def setUp(self):
+        self.td = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.td, True)
+
+    def _runner(self, sub="a"):
+        import test_engine
+        from costs_bridge import FUTURES_COST_DEFAULTS, CostContext
+        from engine_lib import normalize_strategy, strategy_id
+        from runner import PathConfig, Runner
+        T = test_engine.TestPromotion
+        defn = dict(T.TOD_DEFN, symbols=["ETHUSDT"], primary_cell={"symbol": "ETHUSDT", "horizon": 16})
+        td = self.td / sub
+        (td / "data" / "klines").mkdir(parents=True, exist_ok=True)
+        paths = PathConfig(root=td / "disc", data_dir=td / "data", state_dir=td / "state",
+                           results_dir=td / "results", audit_dir=td / "audit")
+        cost = CostContext.from_params(FUTURES_COST_DEFAULTS, version="T", verified=True, test_only=True)
+        sid = strategy_id(defn)
+        r = Runner(paths, cost=cost, allow_test_cost=True,
+                   candidates_fn=lambda: ([(sid, normalize_strategy(defn))], []))
+        self.addCleanup(r.restore_signal_handlers)
+        r.register_all()
+        return r, sid
+
+    def _run(self, exc, sub="a"):
+        r, sid = self._runner(sub)
+        with mock.patch.object(r, "_evaluate", side_effect=exc):
+            out = r.run_one(sid, r._defn_by_sid[sid])
+        return r, sid, out
+
+    def test_lookahead_index_error_is_a_logic_error(self):
+        from engine_lib import CandidateState
+        r, sid, out = self._run(IndexError("index outside the visible (closed) history"))
+        self.assertEqual(out["status"], "ERROR")
+        self.assertEqual(out["record"]["error_code"], "LOGIC_ERROR")
+        self.assertEqual(r.store.entry(sid).state, CandidateState.ERROR.value)
+
+    def test_key_error_is_a_logic_error(self):
+        r, sid, out = self._run(KeyError("funding_z"))
+        self.assertEqual((out["status"], out["record"]["error_code"]), ("ERROR", "LOGIC_ERROR"))
+
+    def test_declared_missing_data_stays_data_missing(self):
+        """Control: the deliberate LookupError of a missing dataset."""
+        for exc in (LookupError("FNG dataset absent"), FileNotFoundError("klines")):
+            with self.subTest(exc=type(exc).__name__):
+                r, sid, out = self._run(exc, sub=type(exc).__name__)
+                self.assertEqual(out["status"], "DATA_MISSING")
+
+    def test_prior_pass_reevaluation_same_rule(self):
+        r, sid = self._runner()
+        r._current_context()
+        with mock.patch.object(r, "_evaluate", side_effect=IndexError("future bar")):
+            out = r.reevaluate_prior_pass(sid, r._defn_by_sid[sid])
+        self.assertEqual(out["status"], "ERROR")
+
+
+# ---------------------------------------------------------------------------
+# G-03 — what the independent replay shares with the evaluator (ADR 0079 §G-03)
+# ---------------------------------------------------------------------------
+
+class TestG03SharedSurface(unittest.TestCase):
+    """The replay (ADR 0077) is independent in its position walk only.  The
+    functions below are called on BOTH sides, so a defect in any of them is
+    reproduced by the replay and cannot be detected by it.  This test pins
+    the list documented in ADR 0079: a new shared call (or a removed one) must
+    update the documentation, never silently widen the shared surface."""
+
+    SHARED = ("build_spec_aux", "build_spec_signal", "stop_exit_rule", "_funding_series",
+              "_warmup", "read_bar_log", "_row_bar", "provider.fng", "GAP_EMBARGO_BARS",
+              "_funding_policy")
+    # used by the evaluator only (through run_event_study / directly)
+    EVALUATOR_ONLY = ("run_event_study", "apply_execution", "_open_positions", "_reconcile_trades")
+
+    @staticmethod
+    def _names(fn) -> set:
+        """Identifiers a function's CODE uses (names and attribute names; the
+        docstring and comments are not code)."""
+        import ast
+        import inspect
+        import textwrap
+        tree = ast.parse(textwrap.dedent(inspect.getsource(fn)))
+        out = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Name):
+                out.add(node.id)
+            elif isinstance(node, ast.Attribute):
+                out.add(node.attr)
+                if isinstance(node.value, ast.Attribute):
+                    out.add(f"{node.value.attr}.{node.attr}")
+        return out
+
+    def _sides(self):
+        import paper_forward as pf
+        F = pf.ForwardPaper
+        ev = self._names(F._evaluate) | self._names(F._series)
+        rp = self._names(F._replay_from_disk) | self._names(F._replay_positions)
+        return ev, rp
+
+    def test_shared_calls_are_the_documented_ones(self):
+        ev, rp = self._sides()
+        for name in self.SHARED:
+            with self.subTest(name=name):
+                self.assertIn(name, ev)
+                self.assertIn(name, rp)
+        for name in self.EVALUATOR_ONLY:
+            with self.subTest(name=name):
+                self.assertIn(name, ev)
+                self.assertNotIn(name, rp)
+
+    def test_run_event_study_shares_funding_cost_and_causality_primitives(self):
+        """The evaluator reaches FundingIndex / PrefixView / round_trip_bp through
+        run_event_study; the replay calls them directly: same code, both sides."""
+        import evaluator
+        res = self._names(evaluator.run_event_study)
+        _ev, rp = self._sides()
+        for name in ("FundingIndex", "PrefixView", "round_trip_bp"):
+            with self.subTest(name=name):
+                self.assertIn(name, res)
+                self.assertIn(name, rp)
+
+
+
+# ---------------------------------------------------------------------------
+# C-4 — the hand-off must not export an unverifiable FNG forward conclusion
+# ---------------------------------------------------------------------------
+
+class _FngProvider(tp.SyntheticProvider):
+    """The synthetic provider with a Fear & Greed series over every day it serves."""
+
+    def fng(self):
+        return {d: 10.0 for d in range(18_000, 21_000)}
+
+
+class TestC04HandoffFng(FundingCase):
+    """User directive 2026-11-13 04:21Z (C-4).  ``handoff.build_handoff`` copied the
+    paper_forward record's verdict into the hand-off; an FNG strategy concluded
+    PAPER_PASSED by the code before ADR 0079 (FNG never pinned) was exported with
+    ``paper_forward_verdict: PAPER_PASSED`` although ``step()`` and
+    ``verify_conclusion()`` no longer confirm that conclusion."""
+
+    def _promoted(self, spec, provider):
+        """A strategy promoted by the real flow (validation StepM, locked campaign,
+        isolated replay, promotion review) on synthetic data: PAPER_TESTING."""
+        from paper import run_paper
+        from test_completion import SynthFeed, _ms, synth_bars
+        from test_paper_forward_funding_20261111 import DeclaredFeed, declared_settlements
+        p = self.pipe(provider)
+        sid, *_ = self.register_all(p, [spec] + tp.NOISE[:7])
+        p.run_validation()
+        p.run_locked_campaign()
+        run_paper(p, sid)
+        self.assertEqual(p.statuses.status(sid, p.context_id()), "PAPER_TESTING")
+        last = provider.paper("BTCUSDT")["bars"][-1]
+        bars = synth_bars("2024-07-01", "2025-03-31", seed=77, drift_hours=(0, 1, 2), price0=last.close)
+        self.now = [_ms(self.START)]
+        base = SynthFeed(bars, lambda: self.now[0])
+        feed = DeclaredFeed(base.bars, base.clock,
+                            declared_settlements(base.bars[0].ts, base.bars[-1].ts + DAY, 4))
+        return p, sid, feed
+
+    def _old_fng_pass(self):
+        """FNG strategy, forward plan registered and concluded PAPER_PASSED by the
+        code before ADR 0079 (registration refusal and conclusion block patched out:
+        what an older version wrote).  No FNG source or snapshot pin exists."""
+        import paper_forward as pf
+        p, sid, feed = self._promoted(_fng_edge_spec(), _FngProvider())
+        fp = pf.ForwardPaper(p, feed, clock=lambda: self.now[0])
+        with mock.patch.object(pf.ForwardPaper, "_fng_refusal", return_value=None), \
+                mock.patch.object(pf.ForwardPaper, "_plan_fng_problem", return_value=None):
+            plan = fp.register_plan(sid)
+            self.now[0] += 75 * DAY
+            self.assertEqual(fp.step(plan["plan_id"])["verdict"], "PAPER_PASSED")
+        ctx = p.context_id()
+        self.assertEqual(p.statuses.status(sid, ctx), "PAPER_PASSED")
+        self.assertEqual(p.evaluation("paper_forward", sid)["verdict"], "PAPER_PASSED")
+        self.assertIn("fng", p.specs.get(sid)["data"])
+        return p, sid, fp, plan
+
+    def test_old_fng_paper_passed_is_not_handed_off(self):
+        """Test 1 (and 2: byte-for-byte preservation of every record)."""
+        from handoff import HandoffRefused, build_handoff, export_handoff
+        p, sid, fp, plan = self._old_fng_pass()
+        before = TestG04ForwardFng._snapshot(p.dir)
+        self.assertTrue(any(k.endswith("evaluations.jsonl") for k in before))
+        self.assertTrue(any(k.endswith("statuses.jsonl") for k in before))
+        self.assertTrue(any(k.endswith("state.json") for k in before))
+        with self.assertRaises(HandoffRefused) as cm:
+            build_handoff(p, sid)
+        msg = str(cm.exception)
+        self.assertIn("FNG_NOT_PINNED", msg)
+        self.assertIn("UNVERIFIED_PRIOR_CONCLUSION", msg)
+        self.assertIn("PAPER_PASSED", msg)                       # the recorded verdict is named, not exported
+        out = self.td / "handoff_out"
+        with self.assertRaises(HandoffRefused):
+            export_handoff(p, sid, out)
+        self.assertFalse(out.exists() and any(out.iterdir()))    # no document written
+        # nothing was rewritten: state, evaluation record, status ledger, logs, plans
+        self.assertEqual(TestG04ForwardFng._snapshot(p.dir), before)
+        self.assertEqual(p.statuses.status(sid, p.context_id()), "PAPER_PASSED")
+        self.assertEqual(p.evaluation("paper_forward", sid)["verdict"], "PAPER_PASSED")
+        # the forward API says the same thing about the same record
+        self.assertEqual(fp.step(plan["plan_id"])["verdict"], "PAPER_BLOCKED_DATA")
+        self.assertTrue(any("FNG_NOT_PINNED" in x for x in fp.verify_conclusion(plan["plan_id"])))
+
+    def test_existing_handoff_documents_are_kept(self):
+        """Test 2: a hand-off exported before (here: from the same strategy while
+        it was PAPER_TESTING, legitimately: no forward verdict) is not touched."""
+        from handoff import HandoffRefused, export_handoff
+        import paper_forward as pf
+        p, sid, feed = self._promoted(_fng_edge_spec(), _FngProvider())
+        out = self.td / "handoff_out"
+        old = export_handoff(p, sid, out)
+        old_bytes = old.read_bytes()
+        self.assertEqual(json.loads(old_bytes)["paper_forward_verdict"], "NOT_RUN")
+        fp = pf.ForwardPaper(p, feed, clock=lambda: self.now[0])
+        with mock.patch.object(pf.ForwardPaper, "_fng_refusal", return_value=None), \
+                mock.patch.object(pf.ForwardPaper, "_plan_fng_problem", return_value=None):
+            plan = fp.register_plan(sid)
+            self.now[0] += 75 * DAY
+            fp.step(plan["plan_id"])
+        with self.assertRaises(HandoffRefused):
+            export_handoff(p, sid, out)
+        self.assertEqual(sorted(out.iterdir()), [old])
+        self.assertEqual(old.read_bytes(), old_bytes)
+
+    def test_non_fng_strategy_hands_off_as_before(self):
+        """Test 3: the same flow without FNG: PAPER_PASSED is exported as before."""
+        from handoff import build_handoff
+        from paper_forward import ForwardPaper
+        p, sid, feed = self._promoted(tp.EDGE, tp.SyntheticProvider())
+        self.assertNotIn("fng", p.specs.get(sid)["data"])
+        fp = ForwardPaper(p, feed, clock=lambda: self.now[0])
+        plan = fp.register_plan(sid)
+        self.now[0] += 75 * DAY
+        self.assertEqual(fp.step(plan["plan_id"])["verdict"], "PAPER_PASSED")
+        doc = build_handoff(p, sid)
+        rec = p.evaluation("paper_forward", sid)
+        self.assertEqual(doc["paper_forward_verdict"], "PAPER_PASSED")
+        self.assertEqual(doc["paper_forward_record_id"], rec["record_id"])
+        self.assertEqual(doc["status"], "PAPER_PASSED")
+
+    def test_unclear_evidence_is_refused(self):
+        """Test 4: PAPER_PASSED status whose forward record is missing, says another
+        verdict or is another record than the status evidence; a specification
+        that is missing.  Nothing is filled in as a success."""
+        from handoff import HandoffRefused, _forward_or_refuse
+        st = {"status": "PAPER_PASSED", "evidence": {"paper_forward": "EV-1"}}
+        no_fng = {"data": ["klines"]}
+        with self.assertRaisesRegex(HandoffRefused, "DATA_MISSING"):
+            _forward_or_refuse("S", st, no_fng, None)
+        with self.assertRaisesRegex(HandoffRefused, "PAPER_INCONCLUSIVE"):
+            _forward_or_refuse("S", st, no_fng, {"verdict": "PAPER_INCONCLUSIVE", "record_id": "EV-1"})
+        with self.assertRaisesRegex(HandoffRefused, "EV-2"):
+            _forward_or_refuse("S", st, no_fng, {"verdict": "PAPER_PASSED", "record_id": "EV-2"})
+        with self.assertRaisesRegex(HandoffRefused, "FNG_NOT_PINNED"):   # any recorded FNG verdict
+            _forward_or_refuse("S", {"status": "PAPER_TESTING"}, {"data": ["fng", "klines"]},
+                               {"verdict": "PAPER_FAILED", "record_id": "EV-1"})
+        _forward_or_refuse("S", st, no_fng, {"verdict": "PAPER_PASSED", "record_id": "EV-1"})
+        _forward_or_refuse("S", {"status": "PAPER_TESTING"}, {"data": ["fng"]}, None)   # nothing recorded
+        # a missing specification is refused, never treated as "no FNG"
+        from handoff import build_handoff
+        p, sid, fp, plan = self._old_fng_pass()
+        with mock.patch.object(type(p.specs), "get", return_value=None):
+            with self.assertRaisesRegex(HandoffRefused, "specification missing"):
+                build_handoff(p, sid)
+
+
+# ---------------------------------------------------------------------------
+# F-11 (follow-up) — plain appends to a file that has a lock protocol
+# ---------------------------------------------------------------------------
+
+def _interleaving_writer(target: Path):
+    """Patch ``engine_lib.repair_jsonl_tail`` so that right after an appender has
+    checked the tail of ``target`` (and before it writes), ANOTHER writer that
+    follows the lock protocol of the file tries to append and dies mid-line
+    (a killed process: partial bytes, its flock released by the kernel).
+
+    If the appender holds the file lock the other writer cannot get in
+    ("blocked").  If it does not, the partial line lands first and the
+    appender's record is glued to it ("wrote"): one interior corrupt line,
+    every strict read of the ledger fails and the record is lost."""
+    import fcntl
+    import os
+
+    import engine_lib
+    orig = engine_lib.repair_jsonl_tail
+    hits: list = []
+
+    def repair(path):
+        r = orig(path)
+        if Path(path) == Path(target):
+            fd = os.open(str(Path(target).with_name(Path(target).name + ".lock")), os.O_CREAT | os.O_RDWR, 0o644)
+            try:
+                try:
+                    fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                except OSError:
+                    hits.append("blocked")
+                    return r
+                with open(target, "ab") as f:
+                    f.write(b'{"kind": "PREREGISTERED", "note": "writer killed mid-li')
+                hits.append("wrote")
+                fcntl.flock(fd, fcntl.LOCK_UN)
+            finally:
+                os.close(fd)
+        return r
+    return mock.patch("engine_lib.repair_jsonl_tail", repair), hits
+
+
+class TestF11AppendUnderLock(unittest.TestCase):
+    """ADR 0079 follow-up (user directive 2026-11-12 23:20Z, F-11 range).  On
+    3d49e41 these appends did not take the file lock that the read-decide-write
+    writers of the same file take; with a writer that dies mid-line between the
+    tail check and the write, the record was glued to the torn line."""
+
+    def setUp(self):
+        self.td = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.td, True)
+
+    def _assert_clean(self, path: Path, hits: list, last_kind: Optional[str] = None):
+        self.assertNotIn("wrote", hits, "an append ran without the file lock")
+        self.assertIn("blocked", hits)
+        rows = list(iter_jsonl(path))                       # strict read: no interior corruption
+        if last_kind:
+            self.assertEqual(rows[-1]["kind"], last_kind)
+
+    def _campaign(self):
+        import campaigns as cmod
+        from engine_lib import LOCKED_TEST_PERIODS
+        sym = sorted(LOCKED_TEST_PERIODS)[0]
+        led = cmod.CampaignLedger(self.td / "locked_window_campaigns.jsonl")
+        camp = led.preregister(source="test", source_ref="r", context_id="C", members={"S1": [sym]},
+                               alpha_total=0.05, max_campaigns=5, method="m", config_hash="h")
+        return led, camp
+
+    def test_campaign_result_appends_under_the_ledger_lock(self):
+        led, camp = self._campaign()
+        patch, hits = _interleaving_writer(led.path)
+        with patch:
+            led.record_result(camp, {"S1": "FAIL_STAT"})
+        self._assert_clean(led.path, hits, "RESULT")
+        self.assertIsNotNone(led.find("test", "r")["result"])
+
+    def test_campaign_abort_appends_under_the_ledger_lock(self):
+        led, camp = self._campaign()
+        patch, hits = _interleaving_writer(led.path)
+        with patch:
+            led.abort_no_exposure(camp, "synthetic: no exposure")
+        self._assert_clean(led.path, hits, "ABORTED_NO_EXPOSURE")
+        self.assertEqual(led.counted_campaigns(next(iter(camp["windows"]))), 0)
+
+
+class TestF11BatchAndEvaluations(tp.PipelineCase):
+    def test_batch_result_and_evaluations_append_under_lock(self):
+        p = self.pipe(tp.SyntheticProvider())
+        self.register_all(p, [tp.EDGE] + tp.NOISE)
+        batch = p.preregister_batch(p.validation_candidates())
+        pb, hb = _interleaving_writer(p.batch_path)
+        with pb:
+            res = p.run_validation()
+        self.assertEqual(res["batch_id"], batch["batch_id"])
+        self.assertNotIn("wrote", hb)
+        self.assertIn("blocked", hb)
+        self.assertEqual(list(iter_jsonl(p.batch_path))[-1]["kind"], "RESULT")
+        pe, he = _interleaving_writer(p.eval_path)
+        with pe:
+            p._append_eval({"stage": "synthetic", "strategy_id": "S-test", "context_id": p.context_id(),
+                            "status": "OK"})
+        self.assertNotIn("wrote", he)
+        self.assertIn("blocked", he)
+        self.assertEqual(list(iter_jsonl(p.eval_path))[-1]["stage"], "synthetic")
+
+
+class TestF11ForwardFeedback(FundingCase):
+    def test_research_feedback_decided_and_appended_under_lock(self):
+        from paper_forward import ForwardPaper
+        p, edge, feed = self.setup_feed(iv_h=4)
+        fp = ForwardPaper(p, feed, clock=lambda: self.now[0])
+        plan = fp.register_plan(edge)
+        path = p.dir / "research_feedback.jsonl"
+        patch, hits = _interleaving_writer(path)
+        with patch:
+            fp._feedback_once(plan, "PAPER_INCONCLUSIVE")
+            fp._feedback_once(plan, "PAPER_INCONCLUSIVE")        # once per plan
+        self.assertNotIn("wrote", hits)
+        self.assertIn("blocked", hits)
+        rows = [r for r in iter_jsonl(path) if r.get("plan_id") == plan["plan_id"]]
+        self.assertEqual(len(rows), 1)
+
+# ---------------------------------------------------------------------------
+# G-03 (follow-up) — the shared surface computed from CALL nodes, not names
+# ---------------------------------------------------------------------------
+
+from static_callgraph import CallGraph, shared_surface  # noqa: E402
+
+EV_ROOT = "paper_forward.ForwardPaper._evaluate"
+RP_ROOT = "paper_forward.ForwardPaper._reconstruct_positions"
+#: receivers whose type the source does not state (``Pipeline.__init__`` takes
+#: them untyped); declared here, each one checked against the run-time trace
+RECEIVERS = {"self.p.cost": "costs_bridge.CostContext", "self.p.specs": "pipeline.SpecStore",
+             "self.p.provider": None}       # provider: several implementations -> dynamic node
+
+
+def _graph(root: Path = DISC) -> CallGraph:
+    return CallGraph(root, RECEIVERS)
+
+
+class TestG03CallGraph(unittest.TestCase):
+    """ADR 0079 follow-up (user directive 2026-11-12 23:20Z): the shared surface
+    of the evaluator (``_evaluate``) and the independent replay
+    (``_reconstruct_positions``) is computed from the call graph and must equal
+    the list in ADR 0079 EXACTLY — a new shared function fails this test until
+    the ADR says so.  Static analysis: see ``static_callgraph`` for what it does
+    not see; ``TestG03RuntimeTrace`` checks it against an executed run."""
+
+    #: functions both sides enter directly (below them everything is shared)
+    SHARED_ENTRY = {
+        "strategy_spec.canonicalize_spec", "evolution.SpecStore.get",        # spec read
+        "strategy_spec.build_spec_aux", "strategy_spec.build_spec_signal",   # features / signal
+        "strategy_spec.stop_exit_rule",                                     # exit rule
+        "dyn:self.p.provider.fng",                                          # FNG
+        "evaluator.PrefixView",                                             # causality
+        "evaluator.FundingIndex", "evaluator.FundingIndex.paid_bp",         # funding amount / coverage
+        "paper_forward.ForwardPaper._funding_series", "paper_forward.ForwardPaper._funding_policy",
+        "costs_bridge.CostContext.round_trip_bp",                           # cost / participation refusal
+        "paper_forward.ForwardPaper._warmup", "paper_forward.read_bar_log",  # inputs
+        "paper_forward._row_bar", "engine_lib.iter_jsonl",
+    }
+    EVALUATOR_ONLY = {
+        "evaluator.run_event_study", "execution_sim.ExecutionConfig", "execution_sim.apply_execution",
+        "paper_forward.ForwardPaper._series", "paper_forward.ForwardPaper._open_positions",
+        "paper_forward.ForwardPaper._reconcile_trades", "engine_lib.append_jsonl", "engine_lib.iso_now",
+        "evaluator.EventRecord.to_json",
+    }
+    REPLAY_ONLY = {
+        "paper_forward.ForwardPaper._replay_from_disk", "paper_forward.ForwardPaper._replay_positions",
+        "costs_bridge.CostContext.identity",
+    }
+    SHARED_CONSTANTS = {"paper_forward.GAP_EMBARGO_BARS", "paper_forward.MS15"}
+
+    def setUp(self):
+        self.s = shared_surface(_graph(), EV_ROOT, RP_ROOT, "paper_forward")
+
+    def test_shared_entry_is_exactly_the_documented_set(self):
+        self.assertEqual(self.s["shared_entry"], self.SHARED_ENTRY)
+
+    def test_evaluator_only_and_replay_only_are_exact(self):
+        self.assertEqual(self.s["evaluator_only"], self.EVALUATOR_ONLY)
+        self.assertEqual(self.s["replay_only"], self.REPLAY_ONLY)
+        self.assertFalse(self.EVALUATOR_ONLY & self.s["replay"])
+        self.assertFalse(self.REPLAY_ONLY & self.s["evaluator"])
+
+    def test_shared_rule_constants_are_exact(self):
+        self.assertEqual(self.s["shared_constants"], self.SHARED_CONSTANTS)
+
+    def test_entries_reach_the_whole_shared_closure(self):
+        """Every shared node lies below a documented entry (nothing shared is
+        reachable on both sides without passing one of them)."""
+        g = _graph()
+        below = g.reach(*self.SHARED_ENTRY)
+        self.assertLessEqual(self.s["shared"], below)
+
+    def test_documentation_lists_the_entries(self):
+        doc = (DISC.parent.parent / "docs/adr/0079-audit-followup-d01-resolution-20261112.md").read_text()
+        for n in sorted(self.SHARED_ENTRY | self.EVALUATOR_ONLY | self.REPLAY_ONLY):
+            with self.subTest(node=n):
+                self.assertIn(f"`{n}`", doc)
+
+    def test_a_new_shared_call_in_the_real_source_fails(self):
+        """Mutation: a copy of the source where the replay also calls
+        ``apply_execution`` (the evaluator-only fill model) — the computed set
+        changes, so the exact-equality test above would fail."""
+        td = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, td, True)
+        for f in DISC.glob("*.py"):
+            shutil.copy(f, td / f.name)
+        src = (td / "paper_forward.py").read_text()
+        hook = "        exit_rule = stop_exit_rule(spec)\n        ledger_all ="
+        self.assertEqual(src.count(hook), 1)
+        (td / "paper_forward.py").write_text(src.replace(
+            hook, "        exit_rule = stop_exit_rule(spec)\n        _x = apply_execution\n"
+                  "        _x({}, [], None)\n        apply_execution({}, [], None)\n        ledger_all ="))
+        got = shared_surface(_graph(td), EV_ROOT, RP_ROOT, "paper_forward")
+        self.assertIn("execution_sim.apply_execution", got["shared_entry"])
+        self.assertNotEqual(got["shared_entry"], self.SHARED_ENTRY)
+        self.assertNotIn("execution_sim.apply_execution", got["evaluator_only"])
+
+
+class TestG03Resolver(unittest.TestCase):
+    """The resolver on synthetic modules: aliases, attribute calls, imported
+    functions and wrappers are followed; a name that only APPEARS (docstring,
+    an unrelated attribute, an assignment) is not a call."""
+
+    def setUp(self):
+        self.td = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.td, True)
+        files = {
+            "lib.py": '''
+LIMIT = 3
+def leaf(): return 1
+def wrapped(): return leaf()                 # a wrapper: leaf is reached through it
+def mentioned(): return 2
+def passed(): return 3
+def closure_maker():
+    def inner(): return leaf()
+    return inner
+class Model:
+    def __init__(self): self.k = 1
+    def price(self): return helper_m()
+def helper_m(): return 0
+''',
+            "other.py": '''
+from lib import leaf as renamed
+def via_alias(): return renamed()
+''',
+            "ev.py": '''
+import lib as L
+from other import via_alias
+from lib import Model, LIMIT
+class E:
+    def run(self, m: Model):
+        """calls mentioned() -- only in a docstring"""
+        x = L.wrapped()
+        y = via_alias()
+        m.price()
+        f = L.mentioned            # a reference, never called
+        obj.mentioned()            # unknown receiver: untracked, not an edge
+        sorted([], key=L.passed)   # attribute reference as an argument: not followed
+        return self._own() + LIMIT
+    def _own(self):
+        from lib import closure_maker
+        return closure_maker()
+''',
+            "rp.py": '''
+from lib import Model, wrapped, passed, LIMIT
+def replay():
+    mdl = Model() if True else None
+    mdl.price()
+    sorted([], key=passed)     # a repository function handed to a callee
+    return wrapped() + LIMIT
+''',
+        }
+        import textwrap
+        for name, body in files.items():
+            (self.td / name).write_text(textwrap.dedent(body))
+
+    def test_edges(self):
+        g = CallGraph(self.td)
+        ev = g.reach("ev.E.run")
+        rp = g.reach("rp.replay")
+        for n in ("lib.wrapped", "lib.leaf", "other.via_alias", "lib.Model.price", "lib.helper_m",
+                  "ev.E._own", "lib.closure_maker"):
+            with self.subTest(evaluator=n):
+                self.assertIn(n, ev)
+        for n in ("lib.Model", "lib.Model.__init__", "lib.Model.price", "lib.wrapped", "lib.leaf", "lib.passed"):
+            with self.subTest(replay=n):
+                self.assertIn(n, rp)
+        self.assertNotIn("lib.mentioned", ev)          # docstring, reference, unknown receiver
+        self.assertIn("obj.mentioned", g.untracked["ev.E.run"])
+        self.assertEqual(g.kinds[("rp.replay", "lib.passed")], "ref")
+        self.assertEqual(g.consts["rp.replay"], {"lib.LIMIT"})
+
+    def test_shared_entry_and_a_new_shared_call(self):
+        s = shared_surface(CallGraph(self.td), "ev.E.run", "rp.replay", "ev")
+        self.assertEqual(s["shared_entry"], {"lib.wrapped", "lib.Model.price"})
+        self.assertIn("lib.leaf", s["shared"])            # below an entry
+        # the replay starts calling a function only the evaluator called
+        (self.td / "rp.py").write_text((self.td / "rp.py").read_text().replace(
+            "    return wrapped()", "    from other import via_alias\n    via_alias()\n    return wrapped()"))
+        s2 = shared_surface(CallGraph(self.td), "ev.E.run", "rp.replay", "ev")
+        self.assertEqual(s2["shared_entry"], {"lib.wrapped", "lib.Model.price", "other.via_alias"})
+
+
+class TestG03RuntimeTrace(FundingCase):
+    """Cross-check of the static graph against one executed synthetic plan
+    (``sys.setprofile`` while ``_evaluate`` / ``_reconstruct_positions`` run):
+    every repository function executed on a side is in that side's static
+    reach, except the dynamic-dispatch kinds the analysis declares it cannot
+    see.  One run covers the branches this input takes, not every branch."""
+
+    @staticmethod
+    def _dynamic_kind(node: str) -> Optional[str]:
+        name = node.rsplit(".", 1)[-1]
+        if name.startswith("__") and name.endswith("__") and name not in ("__init__", "__post_init__"):
+            return "dunder (len(), iteration ...)"
+        if node.startswith("strategy_spec._f_"):
+            return "feature table FEATURES[name].fn"
+        if node.startswith("cost_model."):
+            return "CostContext.model (untyped attribute)"
+        return None
+
+    def test_executed_calls_are_in_the_static_reach(self):
+        import paper_forward as pf
+        seen: dict = {"ev": set(), "rp": set()}
+        disc = str(DISC)
+
+        def wrap(name, key):
+            orig = getattr(pf.ForwardPaper, name)
+
+            def w(self_, *a, **k):
+                def prof(frame, event, arg):
+                    c = frame.f_code
+                    if event == "call" and c.co_filename.startswith(disc) and "/tests/" not in c.co_filename:
+                        q = c.co_qualname.split(".<locals>")[0]
+                        seen[key].add(f"{Path(c.co_filename).stem}.{q}")
+                old = sys.getprofile()
+                sys.setprofile(prof)
+                try:
+                    return orig(self_, *a, **k)
+                finally:
+                    sys.setprofile(old)
+            return w
+
+        with mock.patch.object(pf.ForwardPaper, "_evaluate", wrap("_evaluate", "ev")), \
+                mock.patch.object(pf.ForwardPaper, "_reconstruct_positions",
+                                  wrap("_reconstruct_positions", "rp")):
+            p, edge, feed = self.setup_feed(iv_h=4)
+            fp = pf.ForwardPaper(p, feed, clock=lambda: self.now[0])
+            plan = fp.register_plan(edge)
+            self.now[0] += 75 * DAY
+            self.assertEqual(fp.step(plan["plan_id"])["verdict"], "PAPER_PASSED")
+        s = shared_surface(_graph(), EV_ROOT, RP_ROOT, "paper_forward")
+        for key, static in (("ev", s["evaluator"]), ("rp", s["replay"])):
+            self.assertTrue(seen[key])
+            for n in sorted(seen[key] - static):
+                with self.subTest(side=key, node=n):
+                    self.assertIsNotNone(self._dynamic_kind(n), f"{n} executed, not in the static reach")
+        # what both sides executed is shared statically (up to the declared dynamic kinds)
+        for n in sorted((seen["ev"] & seen["rp"]) - s["shared"]):
+            with self.subTest(shared=n):
+                self.assertIsNotNone(self._dynamic_kind(n), n)
+        # the trace saw the documented entries this input reaches
+        for n in ("strategy_spec.build_spec_signal", "evaluator.FundingIndex.paid_bp",
+                  "costs_bridge.CostContext.round_trip_bp", "paper_forward.ForwardPaper._warmup"):
+            with self.subTest(executed=n):
+                self.assertIn(n, seen["ev"] & seen["rp"])
+
+
+if __name__ == "__main__":
+    unittest.main()

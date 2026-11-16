@@ -4,6 +4,8 @@
 - 검토자: 읽기 전용 독립 검토 에이전트. 각 행은 검토자의 주장이다.
   `spot_checked`가 참인 행만 작성자가 직접 다시 읽어 확인했다.
 - 모든 행에서 lines_read = lines_total(파일 전체를 읽음).
+- ADR 0078: 각 행은 검토한 파일 판본(`reviewed_against`: 표 작성 커밋의 sha256)에 묶인다.
+  그 뒤 바뀐 파일은 `검토 후 변경`에 표시되며, 그 행의 수준은 검토한 판본에만 해당한다 (현재 9개).
 
 ## 감사 수준별 개수
 
@@ -205,129 +207,129 @@
 
 ## 파일별 수준
 
-| 파일 | 수준 | 줄 | 누수 | 비용 | 백테스트 | 작성자 확인 |
-|---|---|---|---|---|---|---|
-| `a1_engine_crosscheck.py` | LOGIC_TRACED | 185 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `a1_family_precheck.py` | LOGIC_TRACED | 129 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `alt_download.py` | FULL_SOURCE_REVIEW | 62 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `alt_download_r2.py` | FULL_SOURCE_REVIEW | 61 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `alt_funding_diag.py` | LOGIC_TRACED | 271 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `alt_funding_engine_crosscheck.py` | LOGIC_TRACED | 185 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `alt_funding_r2_diag.py` | LOGIC_TRACED | 295 | POSSIBLE | NONE_FOUND | CONFIRMED | 예 |
-| `alt_funding_r2_engine_crosscheck.py` | LOGIC_TRACED | 173 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `alt_funding_r2_precheck.py` | LOGIC_TRACED | 78 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `broad_universe_fetch.py` | FULL_SOURCE_REVIEW | 204 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `c1_basis_momentum_diag.py` | LOGIC_TRACED | 310 | POSSIBLE | POSSIBLE | POSSIBLE |  |
-| `c1_engine_crosscheck.py` | LOGIC_TRACED | 189 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `c3_coinbase_premium_diag.py` | LOGIC_TRACED | 366 | POSSIBLE | POSSIBLE | POSSIBLE |  |
-| `c3_download_binance.py` | FULL_SOURCE_REVIEW | 104 | POSSIBLE | NONE_FOUND | POSSIBLE |  |
-| `c3_download_coinbase.py` | FULL_SOURCE_REVIEW | 79 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `c3_engine_crosscheck.py` | LOGIC_TRACED | 199 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `c4_engine_crosscheck.py` | LOGIC_TRACED | 185 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `c4_premium_spike_diag.py` | LOGIC_TRACED | 314 | CONFIRMED | POSSIBLE | POSSIBLE |  |
-| `c5_download_archive.py` | FULL_SOURCE_REVIEW | 81 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `c5_download_data.py` | FULL_SOURCE_REVIEW | 134 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `c5_download_spot_parallel.py` | FULL_SOURCE_REVIEW | 56 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `c5_engine_crosscheck.py` | LOGIC_TRACED | 247 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `c5_quarterly_curve_diag.py` | LOGIC_TRACED | 398 | NONE_FOUND | POSSIBLE | CONFIRMED |  |
-| `c7_cross_venue_spread_diag.py` | LOGIC_TRACED | 388 | POSSIBLE | POSSIBLE | POSSIBLE |  |
-| `c7_download_venues.py` | FULL_SOURCE_REVIEW | 152 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `c7_engine_crosscheck.py` | LOGIC_TRACED | 200 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `c7_probe_data.py` | FULL_SOURCE_REVIEW | 127 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `c9_download_dvol.py` | FULL_SOURCE_REVIEW | 91 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `c9_dvol_diag.py` | LOGIC_TRACED | 365 | CONFIRMED | CONFIRMED | POSSIBLE |  |
-| `c9_engine_crosscheck.py` | FULL_SOURCE_REVIEW | 203 | POSSIBLE | POSSIBLE | POSSIBLE |  |
-| `c9_inspect.py` | FULL_SOURCE_REVIEW | 37 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `compare_selection_dev.py` | FULL_SOURCE_REVIEW | 107 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `download_missing_data.py` | FULL_SOURCE_REVIEW | 486 | POSSIBLE | NONE_FOUND | POSSIBLE |  |
-| `evalue_v3_block.py` | FULL_SOURCE_REVIEW | 233 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `f1_cme_gap_diag.py` | FULL_SOURCE_REVIEW | 264 | POSSIBLE | POSSIBLE | CONFIRMED |  |
-| `f1_engine_crosscheck.py` | LOGIC_TRACED | 182 | POSSIBLE | POSSIBLE | POSSIBLE |  |
-| `f2x6_engine_crosscheck.py` | LOGIC_TRACED | 176 | NONE_FOUND | POSSIBLE | CONFIRMED |  |
-| `f2x6_fng_diag.py` | LOGIC_TRACED | 270 | CONFIRMED | CONFIRMED | POSSIBLE |  |
-| `f2x6_fng_extreme_diag.py` | LOGIC_TRACED | 322 | POSSIBLE | POSSIBLE | CONFIRMED |  |
-| `fng_refresh_check.py` | FULL_SOURCE_REVIEW | 36 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `fr_crosscheck_engine_cost.py` | LOGIC_TRACED | 198 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `fr_extreme_diag.py` | LOGIC_TRACED | 213 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `fr_supplementary.py` | LOGIC_TRACED | 47 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `iw1_statistic_dev.py` | LOGIC_TRACED | 78 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `kp_diag.py` | FULL_SOURCE_REVIEW | 218 | POSSIBLE | POSSIBLE | CONFIRMED |  |
-| `kp_download.py` | FULL_SOURCE_REVIEW | 98 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `kp_download_binance.py` | FULL_SOURCE_REVIEW | 57 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `kp_engine_crosscheck.py` | LOGIC_TRACED | 176 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `l1_engine_crosscheck.py` | FULL_SOURCE_REVIEW | 139 | NONE_FOUND | POSSIBLE | CONFIRMED |  |
-| `l1_expiry_diag.py` | LOGIC_TRACED | 312 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `l3_engine_crosscheck.py` | LOGIC_TRACED | 185 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `liquid_search_dev.py` | FULL_SOURCE_REVIEW | 927 | POSSIBLE | POSSIBLE | CONFIRMED | 예 |
-| `lowliq_cost_calibration.py` | TESTED | 113 | NONE_FOUND | POSSIBLE | NONE_FOUND |  |
-| `maker_entry_reeval.py` | FULL_SOURCE_REVIEW | 194 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `n2_engine_crosscheck.py` | LOGIC_TRACED | 240 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `n2_maker_exec_diag.py` | LOGIC_TRACED | 389 | NONE_FOUND | POSSIBLE | CONFIRMED |  |
-| `null_power_report.py` | FULL_SOURCE_REVIEW | 106 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `okx_real_cost.py` | FULL_SOURCE_REVIEW | 55 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `p3_probe2.py` | FULL_SOURCE_REVIEW | 58 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `p3_probe_liquidation.py` | FULL_SOURCE_REVIEW | 78 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `power_audit_ledger.py` | LOGIC_TRACED | 193 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `power_audit_synthetic.py` | TESTED | 339 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `run/discovery/data_fetch.py` | TESTED | 258 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `run/discovery/execution_sim.py` | TESTED | 131 | NONE_FOUND | POSSIBLE | NONE_FOUND |  |
-| `run/discovery/funding_cost.py` | LOGIC_TRACED | 326 | NONE_FOUND | CONFIRMED | POSSIBLE |  |
-| `run/discovery/generation.py` | TESTED | 478 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `run/discovery/handoff.py` | TESTED | 103 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `run/discovery/newlisting_collect.py` | TESTED | 323 | POSSIBLE | NONE_FOUND | POSSIBLE | 예 |
-| `run/discovery/ops.py` | TESTED | 235 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `run/discovery/paper.py` | TESTED | 106 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `run/discovery/portfolio_sim.py` | FULL_SOURCE_REVIEW | 162 | NONE_FOUND | CONFIRMED | CONFIRMED |  |
-| `run/discovery/public_market_collect.py` | TESTED | 164 | NONE_FOUND | POSSIBLE | NONE_FOUND |  |
-| `run/discovery/repro_bundle.py` | TESTED | 207 | NONE_FOUND | NONE_FOUND | POSSIBLE | 예 |
-| `run/discovery/store.py` | TESTED | 323 | NONE_FOUND | NONE_FOUND | POSSIBLE | 예 |
-| `strong_search_dev.py` | TESTED | 919 | POSSIBLE | POSSIBLE | POSSIBLE |  |
-| `test_alpha101.py` | TESTED | 115 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_broad_universe.py` | TESTED | 79 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_bundle_regime.py` | TESTED | 43 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_candidate_regime.py` | TESTED | 48 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_cross_section_v2.py` | TESTED | 111 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_dev_window_guard.py` | TESTED | 50 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_evalue_v3.py` | TESTED | 30 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_evalue_walkforward.py` | TESTED | 115 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_fast_short.py` | TESTED | 132 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_forward_v2_entry_bar.py` | TESTED | 36 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_hilo_intraday.py` | TESTED | 129 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_hilo_volume.py` | TESTED | 108 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_independent_check.py` | TESTED | 61 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_independent_samples.py` | TESTED | 33 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_maker_entry.py` | TESTED | 96 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_maker_rescore.py` | TESTED | 43 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_null_power.py` | TESTED | 91 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_okx_tendency.py` | TESTED | 141 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_pdf_check.py` | TESTED | 127 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_power_audit.py` | TESTED | 47 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_residual_signals.py` | TESTED | 96 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_stepm_block_sim.py` | TESTED | 37 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_structural_search.py` | TESTED | 83 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_unsup_regime.py` | TESTED | 55 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `test_wide_universe.py` | TESTED | 152 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |
-| `x10_calendar_diag.py` | LOGIC_TRACED | 283 | NONE_FOUND | POSSIBLE | CONFIRMED |  |
-| `x10_engine_crosscheck.py` | LOGIC_TRACED | 162 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `x12_engine_crosscheck.py` | LOGIC_TRACED | 179 | NONE_FOUND | POSSIBLE | CONFIRMED |  |
-| `x12_family_precheck.py` | FULL_SOURCE_REVIEW | 124 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `x1_engine_crosscheck.py` | LOGIC_TRACED | 191 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `x1_external_momentum_diag.py` | LOGIC_TRACED | 294 | CONFIRMED | POSSIBLE | POSSIBLE |  |
-| `x1r_engine_crosscheck.py` | LOGIC_TRACED | 210 | POSSIBLE | POSSIBLE | POSSIBLE |  |
-| `x1r_reverify_diag.py` | LOGIC_TRACED | 382 | NONE_FOUND | POSSIBLE | CONFIRMED |  |
-| `x2_engine_crosscheck.py` | FULL_SOURCE_REVIEW | 89 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `x2_macro_events_diag.py` | LOGIC_TRACED | 281 | POSSIBLE | POSSIBLE | POSSIBLE |  |
-| `x2_prep_events.py` | FULL_SOURCE_REVIEW | 73 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `x3_basis_collapse_diag.py` | LOGIC_TRACED | 303 | POSSIBLE | POSSIBLE | POSSIBLE |  |
-| `x3_engine_crosscheck.py` | LOGIC_TRACED | 184 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `x4f3_engine_crosscheck.py` | FULL_SOURCE_REVIEW | 72 | NONE_FOUND | POSSIBLE | CONFIRMED |  |
-| `x4f3_pair_spread_diag.py` | LOGIC_TRACED | 344 | POSSIBLE | POSSIBLE | CONFIRMED |  |
-| `x5_engine_crosscheck.py` | LOGIC_TRACED | 159 | POSSIBLE | CONFIRMED | POSSIBLE |  |
-| `x5_stable_supply_diag.py` | LOGIC_TRACED | 307 | CONFIRMED | CONFIRMED | POSSIBLE |  |
-| `x7_download_announcements.py` | FULL_SOURCE_REVIEW | 91 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |
-| `x7_engine_crosscheck.py` | LOGIC_TRACED | 113 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `x7_listing_events_diag.py` | LOGIC_TRACED | 310 | POSSIBLE | POSSIBLE | CONFIRMED |  |
-| `x8_engine_crosscheck.py` | LOGIC_TRACED | 178 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `x8_taker_flow_diag.py` | LOGIC_TRACED | 307 | NONE_FOUND | POSSIBLE | CONFIRMED |  |
-| `x9_engine_crosscheck.py` | LOGIC_TRACED | 178 | NONE_FOUND | POSSIBLE | POSSIBLE |  |
-| `x9_ticket_size_diag.py` | LOGIC_TRACED | 316 | POSSIBLE | POSSIBLE | CONFIRMED |  |
+| 파일 | 수준 | 줄 | 누수 | 비용 | 백테스트 | 작성자 확인 | 검토 후 변경 |
+|---|---|---|---|---|---|---|---|
+| `a1_engine_crosscheck.py` | LOGIC_TRACED | 185 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `a1_family_precheck.py` | LOGIC_TRACED | 129 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `alt_download.py` | FULL_SOURCE_REVIEW | 62 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
+| `alt_download_r2.py` | FULL_SOURCE_REVIEW | 61 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `alt_funding_diag.py` | LOGIC_TRACED | 271 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
+| `alt_funding_engine_crosscheck.py` | LOGIC_TRACED | 185 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `alt_funding_r2_diag.py` | LOGIC_TRACED | 295 | POSSIBLE | NONE_FOUND | CONFIRMED | 예 |  |
+| `alt_funding_r2_engine_crosscheck.py` | LOGIC_TRACED | 173 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `alt_funding_r2_precheck.py` | LOGIC_TRACED | 78 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `broad_universe_fetch.py` | FULL_SOURCE_REVIEW | 204 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
+| `c1_basis_momentum_diag.py` | LOGIC_TRACED | 310 | POSSIBLE | POSSIBLE | POSSIBLE |  |  |
+| `c1_engine_crosscheck.py` | LOGIC_TRACED | 189 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `c3_coinbase_premium_diag.py` | LOGIC_TRACED | 366 | POSSIBLE | POSSIBLE | POSSIBLE |  |  |
+| `c3_download_binance.py` | FULL_SOURCE_REVIEW | 104 | POSSIBLE | NONE_FOUND | POSSIBLE |  |  |
+| `c3_download_coinbase.py` | FULL_SOURCE_REVIEW | 79 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
+| `c3_engine_crosscheck.py` | LOGIC_TRACED | 199 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `c4_engine_crosscheck.py` | LOGIC_TRACED | 185 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `c4_premium_spike_diag.py` | LOGIC_TRACED | 314 | CONFIRMED | POSSIBLE | POSSIBLE |  |  |
+| `c5_download_archive.py` | FULL_SOURCE_REVIEW | 81 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
+| `c5_download_data.py` | FULL_SOURCE_REVIEW | 134 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
+| `c5_download_spot_parallel.py` | FULL_SOURCE_REVIEW | 56 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
+| `c5_engine_crosscheck.py` | LOGIC_TRACED | 247 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `c5_quarterly_curve_diag.py` | LOGIC_TRACED | 398 | NONE_FOUND | POSSIBLE | CONFIRMED |  |  |
+| `c7_cross_venue_spread_diag.py` | LOGIC_TRACED | 388 | POSSIBLE | POSSIBLE | POSSIBLE |  |  |
+| `c7_download_venues.py` | FULL_SOURCE_REVIEW | 152 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
+| `c7_engine_crosscheck.py` | LOGIC_TRACED | 200 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `c7_probe_data.py` | FULL_SOURCE_REVIEW | 127 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `c9_download_dvol.py` | FULL_SOURCE_REVIEW | 91 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `c9_dvol_diag.py` | LOGIC_TRACED | 365 | CONFIRMED | CONFIRMED | POSSIBLE |  |  |
+| `c9_engine_crosscheck.py` | FULL_SOURCE_REVIEW | 203 | POSSIBLE | POSSIBLE | POSSIBLE |  |  |
+| `c9_inspect.py` | FULL_SOURCE_REVIEW | 37 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
+| `compare_selection_dev.py` | FULL_SOURCE_REVIEW | 107 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
+| `download_missing_data.py` | FULL_SOURCE_REVIEW | 486 | POSSIBLE | NONE_FOUND | POSSIBLE |  |  |
+| `evalue_v3_block.py` | FULL_SOURCE_REVIEW | 233 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
+| `f1_cme_gap_diag.py` | FULL_SOURCE_REVIEW | 264 | POSSIBLE | POSSIBLE | CONFIRMED |  |  |
+| `f1_engine_crosscheck.py` | LOGIC_TRACED | 182 | POSSIBLE | POSSIBLE | POSSIBLE |  |  |
+| `f2x6_engine_crosscheck.py` | LOGIC_TRACED | 176 | NONE_FOUND | POSSIBLE | CONFIRMED |  |  |
+| `f2x6_fng_diag.py` | LOGIC_TRACED | 270 | CONFIRMED | CONFIRMED | POSSIBLE |  |  |
+| `f2x6_fng_extreme_diag.py` | LOGIC_TRACED | 322 | POSSIBLE | POSSIBLE | CONFIRMED |  |  |
+| `fng_refresh_check.py` | FULL_SOURCE_REVIEW | 36 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `fr_crosscheck_engine_cost.py` | LOGIC_TRACED | 198 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `fr_extreme_diag.py` | LOGIC_TRACED | 213 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `fr_supplementary.py` | LOGIC_TRACED | 47 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `iw1_statistic_dev.py` | LOGIC_TRACED | 78 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
+| `kp_diag.py` | FULL_SOURCE_REVIEW | 218 | POSSIBLE | POSSIBLE | CONFIRMED |  |  |
+| `kp_download.py` | FULL_SOURCE_REVIEW | 98 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
+| `kp_download_binance.py` | FULL_SOURCE_REVIEW | 57 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
+| `kp_engine_crosscheck.py` | LOGIC_TRACED | 176 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `l1_engine_crosscheck.py` | FULL_SOURCE_REVIEW | 139 | NONE_FOUND | POSSIBLE | CONFIRMED |  |  |
+| `l1_expiry_diag.py` | LOGIC_TRACED | 312 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `l3_engine_crosscheck.py` | LOGIC_TRACED | 185 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `liquid_search_dev.py` | FULL_SOURCE_REVIEW | 927 | POSSIBLE | POSSIBLE | CONFIRMED | 예 |  |
+| `lowliq_cost_calibration.py` | TESTED | 113 | NONE_FOUND | POSSIBLE | NONE_FOUND |  |  |
+| `maker_entry_reeval.py` | FULL_SOURCE_REVIEW | 194 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `n2_engine_crosscheck.py` | LOGIC_TRACED | 240 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `n2_maker_exec_diag.py` | LOGIC_TRACED | 389 | NONE_FOUND | POSSIBLE | CONFIRMED |  |  |
+| `null_power_report.py` | FULL_SOURCE_REVIEW | 106 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
+| `okx_real_cost.py` | FULL_SOURCE_REVIEW | 55 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `p3_probe2.py` | FULL_SOURCE_REVIEW | 58 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `p3_probe_liquidation.py` | FULL_SOURCE_REVIEW | 78 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `power_audit_ledger.py` | LOGIC_TRACED | 193 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `power_audit_synthetic.py` | TESTED | 339 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
+| `run/discovery/data_fetch.py` | TESTED | 258 | NONE_FOUND | NONE_FOUND | POSSIBLE |  | 예 (현재 266줄) |
+| `run/discovery/execution_sim.py` | TESTED | 131 | NONE_FOUND | POSSIBLE | NONE_FOUND |  |  |
+| `run/discovery/funding_cost.py` | LOGIC_TRACED | 326 | NONE_FOUND | CONFIRMED | POSSIBLE |  | 예 (현재 327줄) |
+| `run/discovery/generation.py` | TESTED | 478 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
+| `run/discovery/handoff.py` | TESTED | 103 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  | 예 (현재 148줄) |
+| `run/discovery/newlisting_collect.py` | TESTED | 323 | POSSIBLE | NONE_FOUND | POSSIBLE | 예 | 예 (현재 349줄) |
+| `run/discovery/ops.py` | TESTED | 235 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  | 예 (현재 257줄) |
+| `run/discovery/paper.py` | TESTED | 106 | NONE_FOUND | NONE_FOUND | POSSIBLE |  | 예 (현재 126줄) |
+| `run/discovery/portfolio_sim.py` | FULL_SOURCE_REVIEW | 162 | NONE_FOUND | CONFIRMED | CONFIRMED |  | 예 (현재 169줄) |
+| `run/discovery/public_market_collect.py` | TESTED | 164 | NONE_FOUND | POSSIBLE | NONE_FOUND |  |  |
+| `run/discovery/repro_bundle.py` | TESTED | 207 | NONE_FOUND | NONE_FOUND | POSSIBLE | 예 | 예 (현재 215줄) |
+| `run/discovery/store.py` | TESTED | 323 | NONE_FOUND | NONE_FOUND | POSSIBLE | 예 | 예 (현재 364줄) |
+| `strong_search_dev.py` | TESTED | 919 | POSSIBLE | POSSIBLE | POSSIBLE |  |  |
+| `test_alpha101.py` | TESTED | 115 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_broad_universe.py` | TESTED | 79 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_bundle_regime.py` | TESTED | 43 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_candidate_regime.py` | TESTED | 48 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_cross_section_v2.py` | TESTED | 111 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_dev_window_guard.py` | TESTED | 50 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_evalue_v3.py` | TESTED | 30 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_evalue_walkforward.py` | TESTED | 115 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_fast_short.py` | TESTED | 132 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_forward_v2_entry_bar.py` | TESTED | 36 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_hilo_intraday.py` | TESTED | 129 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_hilo_volume.py` | TESTED | 108 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_independent_check.py` | TESTED | 61 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_independent_samples.py` | TESTED | 33 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_maker_entry.py` | TESTED | 96 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_maker_rescore.py` | TESTED | 43 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_null_power.py` | TESTED | 91 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_okx_tendency.py` | TESTED | 141 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_pdf_check.py` | TESTED | 127 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_power_audit.py` | TESTED | 47 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_residual_signals.py` | TESTED | 96 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_stepm_block_sim.py` | TESTED | 37 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_structural_search.py` | TESTED | 83 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_unsup_regime.py` | TESTED | 55 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_wide_universe.py` | TESTED | 152 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `x10_calendar_diag.py` | LOGIC_TRACED | 283 | NONE_FOUND | POSSIBLE | CONFIRMED |  |  |
+| `x10_engine_crosscheck.py` | LOGIC_TRACED | 162 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `x12_engine_crosscheck.py` | LOGIC_TRACED | 179 | NONE_FOUND | POSSIBLE | CONFIRMED |  |  |
+| `x12_family_precheck.py` | FULL_SOURCE_REVIEW | 124 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
+| `x1_engine_crosscheck.py` | LOGIC_TRACED | 191 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `x1_external_momentum_diag.py` | LOGIC_TRACED | 294 | CONFIRMED | POSSIBLE | POSSIBLE |  |  |
+| `x1r_engine_crosscheck.py` | LOGIC_TRACED | 210 | POSSIBLE | POSSIBLE | POSSIBLE |  |  |
+| `x1r_reverify_diag.py` | LOGIC_TRACED | 382 | NONE_FOUND | POSSIBLE | CONFIRMED |  |  |
+| `x2_engine_crosscheck.py` | FULL_SOURCE_REVIEW | 89 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `x2_macro_events_diag.py` | LOGIC_TRACED | 281 | POSSIBLE | POSSIBLE | POSSIBLE |  |  |
+| `x2_prep_events.py` | FULL_SOURCE_REVIEW | 73 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
+| `x3_basis_collapse_diag.py` | LOGIC_TRACED | 303 | POSSIBLE | POSSIBLE | POSSIBLE |  |  |
+| `x3_engine_crosscheck.py` | LOGIC_TRACED | 184 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `x4f3_engine_crosscheck.py` | FULL_SOURCE_REVIEW | 72 | NONE_FOUND | POSSIBLE | CONFIRMED |  |  |
+| `x4f3_pair_spread_diag.py` | LOGIC_TRACED | 344 | POSSIBLE | POSSIBLE | CONFIRMED |  |  |
+| `x5_engine_crosscheck.py` | LOGIC_TRACED | 159 | POSSIBLE | CONFIRMED | POSSIBLE |  |  |
+| `x5_stable_supply_diag.py` | LOGIC_TRACED | 307 | CONFIRMED | CONFIRMED | POSSIBLE |  |  |
+| `x7_download_announcements.py` | FULL_SOURCE_REVIEW | 91 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
+| `x7_engine_crosscheck.py` | LOGIC_TRACED | 113 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `x7_listing_events_diag.py` | LOGIC_TRACED | 310 | POSSIBLE | POSSIBLE | CONFIRMED |  |  |
+| `x8_engine_crosscheck.py` | LOGIC_TRACED | 178 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `x8_taker_flow_diag.py` | LOGIC_TRACED | 307 | NONE_FOUND | POSSIBLE | CONFIRMED |  |  |
+| `x9_engine_crosscheck.py` | LOGIC_TRACED | 178 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
+| `x9_ticket_size_diag.py` | LOGIC_TRACED | 316 | POSSIBLE | POSSIBLE | CONFIRMED |  |  |

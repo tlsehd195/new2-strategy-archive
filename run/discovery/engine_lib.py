@@ -19,6 +19,7 @@ Design rules enforced here (directive §3-§14):
 
 from __future__ import annotations
 
+import contextlib
 import fcntl
 import hashlib
 import json
@@ -426,7 +427,7 @@ def _round_floats(obj: object, sig: int = 10) -> object:
     if isinstance(obj, float):
         if obj != obj or obj in (float("inf"), float("-inf")):
             raise ValueError("non-finite float in strategy definition")
-        return float(f"{obj:.{sig}g}")
+        return float(f"{obj:.{sig}g}") + 0.0      # ADR 0078 (B-06): -0.0 -> 0.0
     if isinstance(obj, bool) or obj is None or isinstance(obj, (int, str)):
         return obj
     if isinstance(obj, Mapping):
@@ -891,8 +892,9 @@ def pbo_cscv(returns_matrix: Sequence[Sequence[float]], n_partitions: int = 16,
     idx = list(range(T))
     block = T // n_partitions
     blocks = [idx[i * block:(i + 1) * block] for i in range(n_partitions)]
-    if len(blocks[-1]) < block:
-        blocks[-2].extend(blocks.pop())
+    # ADR 0078 (D-04): the T mod S tail rows belong to the last block (they were
+    # silently dropped: the old "short last block" branch could never trigger)
+    blocks[-1].extend(idx[n_partitions * block:])
     combos = list(__import__("itertools").combinations(range(len(blocks)), len(blocks) // 2))
     if len(combos) > max_combos:
         rng = random.Random(seed)
@@ -1254,6 +1256,10 @@ class LockTestRegistry:
         self.path = Path(path)
         self.guard = self.path.with_name(self.path.name + ".lock")
         self.owner = {"pid": owner_pid or os.getpid(), "host": socket.gethostname()}
+        # ADR 0078 (F-09): the kernel start time tells a reused PID from its owner
+        st = _proc_start(self.owner["pid"])
+        if st is not None:
+            self.owner["start"] = st
 
     # -- storage -----------------------------------------------------------
     def _load(self) -> dict:
@@ -1308,7 +1314,9 @@ class LockTestRegistry:
             own = a.get("owner") or {}
             if own.get("host") != self.owner["host"]:
                 continue  # cannot verify a foreign host's process — leave it
-            if own.get("pid") == self.owner["pid"] or _pid_alive(own.get("pid")):
+            if own.get("start") is not None and _proc_start(own.get("pid")) not in (None, own["start"]):
+                pass        # ADR 0078 (F-09): the PID now belongs to another process (reused)
+            elif own.get("pid") == self.owner["pid"] or _pid_alive(own.get("pid")):
                 continue
             if a["state"] == LockState.RESERVED.value:
                 a["state"] = LockState.FAILED.value
@@ -1475,35 +1483,116 @@ class LockTestRegistry:
 # ---------------------------------------------------------------------------
 
 
+@contextlib.contextmanager
+def exclusive_file_lock(path: Path):
+    """Exclusive flock on ``<path>.lock`` for a read-decide-append of a shared
+    append-only file (ADR 0078: validation window history, D-03 / F-07)."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd = os.open(str(path.with_name(path.name + ".lock")), os.O_CREAT | os.O_RDWR, 0o644)
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX)
+        yield
+    finally:
+        fcntl.flock(fd, fcntl.LOCK_UN)
+        os.close(fd)
+
+
+def _proc_start(pid: int) -> Optional[str]:
+    """Kernel start time of ``pid`` (Linux /proc, field 22), None elsewhere."""
+    try:
+        stat = Path(f"/proc/{int(pid)}/stat").read_text()
+        return stat[stat.rindex(")") + 2:].split()[19]
+    except (OSError, ValueError, IndexError):
+        return None
+
+
+def process_lock_status(path: Path) -> dict:
+    """FREE / HELD / STALE of a :class:`ProcessLock` file without taking it
+    (ADR 0078: the flock decides; the PID file only for older owners)."""
+    path = Path(path)
+    held = path.with_name(path.name + ".held")
+    if held.exists():
+        fd = os.open(str(held), os.O_RDWR)
+        try:
+            fcntl.flock(fd, fcntl.LOCK_SH | fcntl.LOCK_NB)
+            fcntl.flock(fd, fcntl.LOCK_UN)
+        except OSError:
+            pid = None
+            try:
+                pid = int(path.read_text().split()[0])
+            except (OSError, ValueError, IndexError):
+                pass
+            return {"status": "HELD", "pid": pid}
+        finally:
+            os.close(fd)
+    if not path.exists():
+        return {"status": "FREE"}
+    try:
+        parts = path.read_text().split()
+        pid = int(parts[0])
+    except (OSError, ValueError, IndexError) as e:
+        return {"status": "STALE", "error": str(e)}
+    started = parts[1] if len(parts) > 1 else None
+    if started is not None:
+        return {"status": "STALE", "pid": pid}       # this version always holds the flock
+    return {"status": "HELD" if (pid != os.getpid() and _pid_alive(pid)) else "STALE", "pid": pid}
+
+
 class ProcessLock:
-    """PID-file lock with stale detection (dead PID → reclaimable).
+    """Single-run lock: a kernel flock held for the life of the process on
+    ``<path>.held`` plus a PID file for humans and older lock files.
+
+    ADR 0078 (F-09): the PID file alone blocked forever when a killed run's PID
+    came back — in a container the runner often gets the SAME PID, and a PID
+    reused by an unrelated process looked alive.  Now the flock decides for
+    every owner of this version (the kernel drops it when the owner dies); the
+    PID file (``<pid> <start time>``) is consulted only for an owner that holds
+    no flock: its own PID, a dead PID or a PID whose start time differs is
+    stale.  A file without a start time (older version) whose PID is alive and
+    not ours is still treated as live (conservative).
 
     The check-and-write runs under an exclusive flock on ``<path>.guard`` so
-    two starters can never both conclude the lock is free (the previous
-    exists()/write_text() sequence was racy)."""
+    two starters can never both conclude the lock is free."""
 
     def __init__(self, path: Path):
         self.path = Path(path)
         self.guard = self.path.with_name(self.path.name + ".guard")
+        self.held_path = self.path.with_name(self.path.name + ".held")
         self._held = False
+        self._held_fd: Optional[int] = None
 
     def acquire(self) -> bool:
+        if self._held:
+            return False
         self.path.parent.mkdir(parents=True, exist_ok=True)
         fd = os.open(str(self.guard), os.O_CREAT | os.O_RDWR, 0o644)
         try:
             fcntl.flock(fd, fcntl.LOCK_EX)
+            hfd = os.open(str(self.held_path), os.O_CREAT | os.O_RDWR, 0o644)
+            try:
+                fcntl.flock(hfd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except OSError:
+                os.close(hfd)
+                return False                      # live owner (holds the flock)
             if self.path.exists():
+                parts = self.path.read_text().split()
                 try:
-                    pid = int(self.path.read_text().strip())
+                    pid = int(parts[0]) if parts else None
                 except ValueError:
                     pid = None
-                if pid is not None and _pid_alive(pid):
-                    return False  # live owner
-                # stale (dead / unreadable pid) — reclaim
+                started = parts[1] if len(parts) > 1 else None
+                live = (pid is not None and pid != os.getpid() and _pid_alive(pid)
+                        and (started is None or _proc_start(pid) in (None, started)))
+                if live:
+                    fcntl.flock(hfd, fcntl.LOCK_UN)
+                    os.close(hfd)
+                    return False                  # owner without a flock (older version)
+                # stale: dead PID, our own PID, a reused PID or unreadable — reclaim
             tmp = self.path.with_name(self.path.name + f".{os.getpid()}.tmp")
-            tmp.write_text(str(os.getpid()))
+            tmp.write_text(f"{os.getpid()} {_proc_start(os.getpid()) or ''}".strip())
             os.replace(tmp, self.path)
-            self._held = True
+            self._held, self._held_fd = True, hfd
             return True
         finally:
             fcntl.flock(fd, fcntl.LOCK_UN)
@@ -1512,11 +1601,21 @@ class ProcessLock:
     def release(self) -> None:
         if self._held:
             try:
-                if self.path.read_text().strip() == str(os.getpid()):
+                if self.path.read_text().split()[:1] == [str(os.getpid())]:
                     self.path.unlink()
-            except FileNotFoundError:
+            except (FileNotFoundError, IndexError):
                 pass
+            if self._held_fd is not None:
+                fcntl.flock(self._held_fd, fcntl.LOCK_UN)
+                os.close(self._held_fd)
+                self._held_fd = None
             self._held = False
+
+    def __del__(self) -> None:          # a dropped lock object never keeps the flock
+        try:
+            self.release()
+        except Exception:  # noqa: BLE001 — interpreter shutdown: the kernel drops the flock anyway
+            pass
 
     def __enter__(self) -> "ProcessLock":
         if not self.acquire():

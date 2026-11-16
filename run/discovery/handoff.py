@@ -17,6 +17,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+from typing import Mapping, Optional
 
 from engine_lib import canonical_json, iso_now, iter_jsonl
 from strategy_spec import canonicalize_spec
@@ -50,7 +51,8 @@ def build_handoff(pipeline, sid: str) -> dict:
     forward = pipeline.evaluation("paper_forward", sid)
     comps = next((r["components"] for r in iter_jsonl(pipeline.dir / "contexts.jsonl")
                   if r["context_id"] == ctx), {})
-    spec = canonicalize_spec(pipeline.specs.get(sid))
+    spec = _spec_or_refuse(pipeline, sid)
+    _forward_or_refuse(sid, st, spec, forward)
     cost = pipeline._cost_block()
     body = {
         "schema": HANDOFF_SCHEMA,
@@ -81,6 +83,49 @@ def build_handoff(pipeline, sid: str) -> dict:
     body["sha256"] = hashlib.sha256(canonical_json(
         {k: v for k, v in body.items() if k != "created_at"}).encode()).hexdigest()
     return body
+
+
+def _spec_or_refuse(pipeline, sid: str) -> dict:
+    """The canonical specification, or HandoffRefused (never a guess)."""
+    from strategy_spec import SpecError
+    raw = pipeline.specs.get(sid)
+    if raw is None:
+        raise HandoffRefused(f"{sid}: DATA_MISSING: strategy specification missing")
+    try:
+        return canonicalize_spec(raw)
+    except (SpecError, KeyError, TypeError, ValueError) as e:
+        raise HandoffRefused(f"{sid}: strategy specification unreadable: {type(e).__name__}: {e}") from None
+
+
+def _forward_or_refuse(sid: str, st: Mapping, spec: Mapping, forward: Optional[Mapping]) -> None:
+    """ADR 0079 follow-up (C-4): the forward-paper evidence a hand-off carries.
+
+    - A strategy that reads FNG has no forward conclusion that can be verified:
+      no plan pins its FNG values (the forward feed has no FNG source), so a
+      recorded verdict — PAPER_PASSED included — is refused with the same reason
+      ``ForwardPaper`` gives (``_fng_refusal``: FNG_NOT_PINNED) plus
+      UNVERIFIED_PRIOR_CONCLUSION.  The record itself is left as it is.
+    - A PAPER_PASSED status is only exported with the forward record it came
+      from (the status line is not trusted on its own): missing, another
+      verdict or another record id than the status evidence is refused.
+    Nothing is read from a feed and nothing is written."""
+    from paper_forward import ForwardPaper
+    fng = ForwardPaper._fng_refusal(spec)
+    if fng and forward is not None:
+        raise HandoffRefused(
+            f"{sid}: {fng}; UNVERIFIED_PRIOR_CONCLUSION: recorded paper_forward verdict "
+            f"{forward.get('verdict')} ({forward.get('record_id')}) cannot be verified and is not "
+            "exported as evidence")
+    if st["status"] == "PAPER_PASSED":
+        if forward is None:
+            raise HandoffRefused(f"{sid}: DATA_MISSING: status PAPER_PASSED without its paper_forward record")
+        if forward.get("verdict") != "PAPER_PASSED":
+            raise HandoffRefused(f"{sid}: status PAPER_PASSED but the paper_forward record says "
+                                 f"{forward.get('verdict')}")
+        ev = (st.get("evidence") or {}).get("paper_forward")
+        if ev != forward.get("record_id"):
+            raise HandoffRefused(f"{sid}: status PAPER_PASSED points to paper_forward record {ev}, the "
+                                 f"ledger holds {forward.get('record_id')}")
 
 
 def export_handoff(pipeline, sid: str, out_dir: Path) -> Path:

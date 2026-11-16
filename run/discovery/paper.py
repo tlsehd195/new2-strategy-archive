@@ -46,7 +46,12 @@ def run_paper(pipeline, sid: str, *, mode: str = PAPER_MODE) -> dict:
     # PAPER_TESTING without a recorded run = a replay that was interrupted: resumable
     if st not in ("PAPER_TEST_READY", "PAPER_TESTING"):
         raise PaperRefused(f"{sid} is {st}, not PAPER_TEST_READY")
-    if any(r["strategy_id"] == sid and r["context_id"] == ctx for r in paper_runs(pipeline)):
+    done = [r for r in paper_runs(pipeline) if r["strategy_id"] == sid and r["context_id"] == ctx]
+    if done:
+        # ADR 0078 (F-03): a run recorded before a crash has its evaluation record
+        # and its PAPER_FAILED status applied now (idempotent) — a degraded replay
+        # can never be left at PAPER_TESTING without evidence
+        _apply_run(pipeline, sid, ctx, done[0])
         raise PaperRefused(f"{sid}: paper window already used in this context")
     cfg = pipeline.cfg["paper"]
     spec = canonicalize_spec(pipeline.specs.get(sid))
@@ -57,7 +62,12 @@ def run_paper(pipeline, sid: str, *, mode: str = PAPER_MODE) -> dict:
         if d.get("missing") or not d.get("bars"):
             missing += [f"{sym}: {m}" for m in (d.get("missing") or ["no bars"])]
             continue
-        ev = pipeline._study(spec, sym, d["bars"], d["funding"], fng, 1, len(d["bars"]) - 1)
+        if d.get("funding") is not None and not d.get("funding_intervals"):
+            # ADR 0078 (ME-01): no replay under the nominal-8h legacy funding rule
+            missing.append(f"{sym}: paper funding has no declared settlement intervals")
+            continue
+        ev = pipeline._study(spec, sym, d["bars"], d["funding"], fng, 1, len(d["bars"]) - 1,
+                             funding_intervals=d.get("funding_intervals"))
         nets = [x["net_bp"] for x in ev]
         per[sym] = {"n": len(nets), "mean_bp": sum(nets) / len(nets) if nets else None,
                     "sum_bp": sum(nets), "first_ts": d["bars"][0].ts, "last_ts": d["bars"][-1].ts}
@@ -86,21 +96,31 @@ def run_paper(pipeline, sid: str, *, mode: str = PAPER_MODE) -> dict:
     run.update({"status": "OK", "per_symbol": per, "n": n, "mean_bp": mean, "verdict": verdict,
                 "locked_mean_bp": (sum(lmeans) / len(lmeans)) if lmeans else None})
     append_jsonl(pipeline.dir / "paper_runs.jsonl", run)
-    pipeline._append_eval({"stage": "paper", "strategy_id": sid, "context_id": ctx, "status": "OK",
-                           "verdict": verdict, "n": n,
-                           "mean_bp": mean if mean is None or math.isfinite(mean) else None,
-                           "is_simulation": True})
+    _apply_run(pipeline, sid, ctx, run)
+    return run
+
+
+def _apply_run(pipeline, sid: str, ctx: str, run: dict) -> None:
+    """Evaluation record, status and feedback of a recorded replay run, each
+    written once (ADR 0078, F-03: also re-applied after a crash)."""
+    verdict, n, mean = run["verdict"], run["n"], run["mean_bp"]
+    if pipeline.evaluation("paper", sid) is None:
+        pipeline._append_eval({"stage": "paper", "strategy_id": sid, "context_id": ctx, "status": "OK",
+                               "verdict": verdict, "n": n,
+                               "mean_bp": mean if mean is None or math.isfinite(mean) else None,
+                               "is_simulation": True})
     # A replay on stored history is never enough for PAPER_PASSED (a positive mean is
     # not a preregistered paper criterion): PAPER_CONSISTENT keeps PAPER_TESTING and
     # the strategy waits for the forward observation (paper_forward.py).  A degraded
     # replay fails closed.
-    if verdict == "PAPER_DEGRADED":
+    if verdict == "PAPER_DEGRADED" and pipeline.statuses.status(sid, ctx) != "PAPER_FAILED":
         pipeline.statuses.set(sid, ctx, "PAPER_FAILED", stage="paper",
                               reasons=["replay mean <= 0 after costs"])
     # PAPER_INCONCLUSIVE (too few events): stays PAPER_TESTING, the window is consumed
-    append_jsonl(pipeline.dir / "research_feedback.jsonl",
-                 {"strategy_id": sid, "context_id": ctx, "source": "paper_replay",
-                  "verdict": verdict, "mean_bp": mean, "n": n,
-                  "use": "human review + failure memory only; never search ranking",
-                  "at": iso_now()})
-    return run
+    fb = pipeline.dir / "research_feedback.jsonl"
+    if not any(r.get("strategy_id") == sid and r.get("context_id") == ctx
+               and r.get("source") == "paper_replay" for r in iter_jsonl(fb)):
+        append_jsonl(fb, {"strategy_id": sid, "context_id": ctx, "source": "paper_replay",
+                          "verdict": verdict, "mean_bp": mean, "n": n,
+                          "use": "human review + failure memory only; never search ranking",
+                          "at": iso_now()})

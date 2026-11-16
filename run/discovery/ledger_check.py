@@ -68,15 +68,8 @@ V1_SURVIVOR_VERDICTS = ("SURVIVOR", "SURVIVOR_COMBO", "PASS")
 
 
 def _lock_alive(state_dir: Path) -> bool:
-    lk = Path(state_dir) / "run.lock"
-    if not lk.exists():
-        return False
-    try:
-        pid = int(lk.read_text().strip())
-    except (ValueError, OSError):
-        return False
-    from ops import _pid_alive
-    return _pid_alive(pid)
+    from engine_lib import process_lock_status
+    return process_lock_status(Path(state_dir) / "run.lock")["status"] == "HELD"
 
 
 def check_evolution(state_dir: Path) -> list[dict]:
@@ -189,8 +182,10 @@ def check_legacy(state_dir: Path) -> list[dict]:
     except StoreCorruption as e:
         return [{"kind": "STATE_UNREADABLE", "detail": str(e)}]
     latest: dict = {}
-    for r in iter_jsonl(sd / "discovery_ledger.jsonl"):
-        latest[r["strategy_id"]] = r
+    # ADR 0078 (F-10): the same "latest outcome" rule as the engine (a
+    # prior_pass_reeval re-check is not an outcome)
+    from store import Ledger
+    latest.update(Ledger(sd / "discovery_ledger.jsonl").latest_by_strategy())
     final = {s.value for s in (CandidateState.PASS, CandidateState.FAIL_COST, CandidateState.FAIL_STAT,
                                CandidateState.UNDETERMINED_POWER, CandidateState.DATA_MISSING,
                                CandidateState.ERROR, CandidateState.AWAITING_FDR)}

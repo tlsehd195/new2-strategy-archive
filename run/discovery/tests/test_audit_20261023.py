@@ -102,7 +102,9 @@ class TestVolScaledSpread(unittest.TestCase):
         ev = [{"symbol": "X", "entry_ts": t, "gross_bp": 10.0, "cost_bp": 12.0, "funding_bp": 0.0,
                "net_bp": -2.0} for t in (1, 2, 3)]
         ratio = {("X", 1): 0.5, ("X", 2): 1.0, ("X", 3): 3.0}
-        row = cs.vol_scaled_spread_row(ev, ratio, 0.0005, 0, {1: "low_vol", 2: "low_vol", 3: "high_vol"})
+        # ADR 0078 (C-09): the volatility label is keyed by (symbol, entry time), like ``ratio``
+        row = cs.vol_scaled_spread_row(ev, ratio, 0.0005, 0,
+                                       {("X", 1): "low_vol", ("X", 2): "low_vol", ("X", 3): "high_vol"})
         self.assertEqual(row["n"], 3)
         self.assertAlmostEqual(row["cost_bp"], 12.0 + (2 * 5.0 * 2.0) / 3)    # only the 3x event pays more
         self.assertAlmostEqual(row["net_bp_low_vol"], -2.0)

@@ -454,6 +454,7 @@ def load_funding_csv_checked(path: Path) -> tuple[list[tuple[int, float]], dict]
     errors: list[int] = []
     order_errors: list[dict] = []
     interval_missing: list[int] = []
+    snapped: list[list[int]] = []
     torn = False
     prev_ts: Optional[int] = None
     first_src: Optional[list] = None
@@ -478,6 +479,16 @@ def load_funding_csv_checked(path: Path) -> tuple[list[tuple[int, float]], dict]
             else:
                 errors.append(i + 1)
             continue
+        # ADR 0078 (C-01): calc_time carries a few ms of jitter after the nominal
+        # settlement instant.  The (entry, exit] rule compares it with bar opens,
+        # so +3 ms moved a settlement into / out of a holding window.  A time within
+        # FUNDING_TOL_MS of a whole UTC hour is snapped to that hour (every Binance
+        # schedule settles on whole hours); the raw value is kept in the report.
+        t_raw = t
+        t_hr = int(round(t / 3_600_000)) * 3_600_000
+        if t != t_hr and abs(t - t_hr) <= FUNDING_TOL_MS:
+            t = t_hr
+            snapped.append([i + 1, t_raw, t])
         if prev_ts is not None and t <= prev_ts:
             order_errors.append(source_order_error(
                 "SOURCE_TIME_INVERSION" if t < prev_ts else "SOURCE_DUPLICATE_TS",
@@ -501,6 +512,9 @@ def load_funding_csv_checked(path: Path) -> tuple[list[tuple[int, float]], dict]
                  "sha256": hashlib.sha256(raw).hexdigest(),
                  "source_order_errors": order_errors,
                  "interval_missing_rows": interval_missing,
+                 "calc_time_snapped": {"n": len(snapped), "examples": snapped[:5],
+                                       "rule": "calc_time within FUNDING_TOL_MS of a whole "
+                                               "UTC hour -> that hour (ADR 0078)"},
                  "rows": n_source,
                  # first / last parsed row in SOURCE order ([line, ts]): the cross-file check
                  "first_source_row": first_src,

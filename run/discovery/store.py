@@ -197,9 +197,16 @@ class Ledger:
         return iter_jsonl(self.path)
 
     def latest_by_strategy(self) -> dict[str, dict]:
+        """Latest OUTCOME record per strategy (later lines win).  ADR 0078 (F-10):
+        a ``prior_pass_reeval`` dev record (``Runner.reevaluate_prior_pass``) is
+        a re-check of an earlier PASS, not a new outcome — it is the latest only
+        for a strategy that has no other record."""
         out: dict[str, dict] = {}
+        reeval: dict[str, dict] = {}
         for rec in self.records():
-            out[rec["strategy_id"]] = rec  # later lines win
+            (reeval if rec.get("prior_pass_reeval") else out)[rec["strategy_id"]] = rec
+        for sid, rec in reeval.items():
+            out.setdefault(sid, rec)
         return out
 
     def evaluation_count(self) -> int:
@@ -232,6 +239,25 @@ LEDGER_TO_STATE = {
     "ERROR": CandidateState.ERROR,
     "AWAITING_FDR": CandidateState.AWAITING_FDR,
 }
+
+
+def enqueue_reverify(store: CandidateStore, queue: ReverifyQueue, sid: str, status: str,
+                     error_code: Optional[str] = None) -> None:
+    """Post-outcome re-verification policy, shared by ``Runner.run_one`` and
+    :func:`reconcile` (ADR 0078, F-05: an outcome recovered from the ledger was
+    never re-queued).
+
+    A-22: the DATA_MISSING reason is a *check schedule*, not a claim that data
+    has arrived — the real availability gate is the re-evaluation itself (data
+    reload + quality gate) under max-attempt control."""
+    from engine_lib import TRANSIENT_ERROR_CODES, backoff_seconds
+    reason = {"DATA_MISSING": "data_refresh_check", "ERROR": "transient_error_retry"}.get(status)
+    if status == "ERROR" and error_code not in TRANSIENT_ERROR_CODES:
+        return  # permanent — never retried
+    if reason:
+        e = store.entry(sid)
+        if queue.enqueue(sid, reason):
+            queue.requeue_with_backoff(sid, backoff_seconds(e.retry.attempt_count + 1))
 
 
 def reconcile(store: CandidateStore, queue: ReverifyQueue, ledger: Ledger,
@@ -286,6 +312,8 @@ def reconcile(store: CandidateStore, queue: ReverifyQueue, ledger: Ledger,
             store.set(sid, LEDGER_TO_STATE[done["status"]], data_version=done.get("context_id"),
                       error_code=done.get("error_code"), pending_evaluation_id=None)
             report["recovered_from_ledger"].append(sid)
+            # ADR 0078 (F-05): the same post-outcome policy as run_one
+            enqueue_reverify(store, queue, sid, done["status"], done.get("error_code"))
             continue
         if e.state == CandidateState.RUNNING.value and sid not in running_in_ledger:
             # interrupted before any ledger record — transient retry

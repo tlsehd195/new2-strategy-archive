@@ -45,7 +45,7 @@ from typing import Mapping, Optional, Sequence
 
 HERE = Path(__file__).resolve().parent
 DEFAULT_CONFIG = HERE / "config" / "power_analysis_v1.json"
-POWER_VERSION = "power-analysis-v1"
+POWER_VERSION = "power-analysis-v2"  # ADR 0078: StepM B scaled to alpha
 
 
 def _series(rng: random.Random, n: int, sr_annual: float, phi: float, df: float) -> list[float]:
@@ -119,7 +119,7 @@ def wilson(k: int, n: int, z: float = 1.959963984540054) -> Optional[list]:
 
 
 def simulate(cfg: Mapping, promo: Mapping, *, progress=None) -> dict:
-    from stats_mc import default_q, spending_alpha, stepm
+    from stats_mc import bootstrap_B_for, default_q, spending_alpha, stepm
     from strategy_spec import SUPPORTED_SYMBOLS
     rob, val = promo["robustness"], promo["validation"]
     alpha_total = float(val.get("alpha_total_per_search", val.get("alpha_total_per_window", 0.05)))
@@ -140,7 +140,7 @@ def simulate(cfg: Mapping, promo: Mapping, *, progress=None) -> dict:
                 series = {"true": _series(rng, n_val, sr, phi, df)}
                 for j in range(m - 1):
                     series[f"null{j}"] = _series(rng, n_val, 0.0, phi, df)
-                res = stepm(series, alpha=a_w, B=int(cfg["stepm_B"]), q=default_q(n_val),
+                res = stepm(series, alpha=a_w, B=bootstrap_B_for(a_w, int(cfg["stepm_B"])), q=default_q(n_val),
                             seed=seed + i, studentize=val.get("studentize", "fixed"))
                 rej = set(res["rejected"])
                 v_ok = "true" in rej and sr > 0
@@ -200,7 +200,7 @@ def simulate(cfg: Mapping, promo: Mapping, *, progress=None) -> dict:
             "gates_not_simulated": ["cost_stress", "regimes", "drawdown", "concentration",
                                     "parameter_neighbourhood", "walk_forward", "pbo", "locked",
                                     "portfolio_validation"],
-            "bootstrap_B_used": {"stepm": int(cfg["stepm_B"]), "ci": int(cfg["ci_B"]),
+            "bootstrap_B_used": {"stepm": bootstrap_B_for(a_w, int(cfg["stepm_B"])), "ci": int(cfg["ci_B"]),
                                  "pipeline_stepm": int(val["bootstrap_B"]),
                                  "pipeline_ci": int(rob.get("ci_bootstrap_B", 500))}})
     return out
