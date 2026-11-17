@@ -1261,7 +1261,7 @@ class EvolutionPipeline:
             return False
         ok = True
         if "pbo" in nc:
-            ok &= bool(self._pbo()["computable"])
+            ok &= bool(self._pbo(sid)["computable"])
         if "dsr" in nc:
             ok &= bool(self._dsr(sid)["computable"])
         return ok
@@ -1347,8 +1347,25 @@ class EvolutionPipeline:
             return len(self.search_pool())
         return len({r["strategy_id"] for r in iter_jsonl(self.series_path)})
 
-    def _pbo(self) -> dict:
+    @staticmethod
+    def _symbol_set(row: Mapping) -> tuple:
+        """Symbol set of a DEV series row: its series keys, which are exactly the
+        spec's symbols (``dev_evaluate`` records an OK series only when every
+        symbol of the spec has data).  Sorted: a set, not an order."""
+        return tuple(sorted(row["series"]))
+
+    def _pbo(self, sid: Optional[str] = None) -> dict:
         """PBO by CSCV (Bailey et al. 2017) over the trial set (:meth:`_trial_series`).
+
+        ADR 0087: with ``sid`` the trial set is the strategy's SEARCH CONTEXT —
+        the trials of this experiment context with the same symbol set.  When
+        the experiment context holds one symbol set this is the whole trial
+        set and the result is exactly ``_pbo()``; otherwise the result also
+        carries ``search_context`` (symbol set, trials and symbol sets of the
+        experiment context).  Thresholds and minimum trial count are unchanged
+        and apply to the group.  ``trials_searched_all`` (the multiple-testing
+        count of the DSR gate) is never split.  Without ``sid`` the whole
+        trial set is used (ADR 0083 behaviour, diagnostics).
 
         ADR 0083: CSCV ranks all N trials on the SAME T periods.  Each trial's
         series is pooled on its OBSERVED DEV days (:func:`pooled_dev_day_map`);
@@ -1360,6 +1377,24 @@ class EvolutionPipeline:
         common days, which would change what is measured).  One common calendar
         gives exactly the matrix and value of a441ba7."""
         latest = self._trial_series()
+        extra: dict = {}
+        if sid is not None:
+            sets = {s_: self._symbol_set(r) for s_, r in latest.items()}
+            mine = sets.get(sid)
+            if mine is None:
+                mine = tuple(sorted(canonicalize_spec(self.specs.get(sid))["symbols"]))
+            if len(set(sets.values()) | {mine}) > 1:
+                extra = {"search_context": {
+                    "basis": "symbol_set (ADR 0087)", "symbol_set": list(mine),
+                    "trials_in_experiment_context": len(latest),
+                    "symbol_sets_in_experiment_context": len(set(sets.values()) | {mine})}}
+                latest = {s_: r for s_, r in latest.items() if sets[s_] == mine}
+        out = self._pbo_of(latest)
+        out.update(extra)
+        return out
+
+    def _pbo_of(self, latest: Mapping) -> dict:
+        """PBO of one trial set (the body of ADR 0083 ``_pbo``, unchanged)."""
         if len(latest) < self.cfg["robustness"]["pbo_min_trials"]:
             return {"computable": False, "trials": len(latest), "reason": "TOO_FEW_TRIALS",
                     "reason_detail": f"{len(latest)} trial(s) < pbo_min_trials "
@@ -1608,7 +1643,7 @@ class EvolutionPipeline:
             sum(1 for x in all_ev if x["symbol"] == s) >= self.cfg["validation"]["min_events_per_symbol"]
             for s in spec["symbols"]), "n": len(nets)}
         # overfitting probability of the whole search (CSCV on DEV series)
-        pbo = self._pbo()
+        pbo = self._pbo(sid)       # ADR 0087: the search context of sid
         checks["pbo"] = {"pass": bool(pbo["computable"]) and pbo["pbo"] <= rc["max_pbo"], **pbo}
         dsr = self._dsr(sid)
         if rc.get("dsr_gating"):
@@ -1656,6 +1691,8 @@ class EvolutionPipeline:
                    "bootstrap_ci": f"bootstrap CI not computable ({checks['bootstrap_ci'].get('n_days')} days)"}
             if pbo.get("reason"):                 # ADR 0083: why PBO is not computable
                 why["pbo"] += f" [{pbo['reason']}]"
+            if pbo.get("search_context"):         # ADR 0087: trials of this symbol set only
+                why["pbo"] += f" [symbol set {'+'.join(pbo['search_context']['symbol_set'])}]"
             self.statuses.set(sid, ctx, "BLOCKED_STATISTICS", stage="robustness",
                               reasons=["INSUFFICIENT_DATA: " + why.get(k, k) for k in not_computable],
                               evidence=ev, resume_to="VALIDATION_SURVIVOR")

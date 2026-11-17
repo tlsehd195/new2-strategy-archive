@@ -209,15 +209,20 @@ class TestMixedSymbolSetsFullPath(PipelineCase):
         pbo = rob["checks"]["pbo"]
         self.assertFalse(pbo["pass"])
         self.assertFalse(pbo["computable"])
-        self.assertEqual(pbo["reason"], "TRIAL_CALENDARS_DIFFER")
+        # ADR 0087: the PBO trial set is the strategy's symbol-set group; the
+        # BTC+ETH edge is the only BTC+ETH trial -> still not computable
+        # (fail-closed), now because the group is below pbo_min_trials
+        self.assertEqual(pbo["reason"], "TOO_FEW_TRIALS")
+        self.assertEqual(pbo["trials"], 1)
+        self.assertEqual(pbo["search_context"]["symbol_set"], list(SYMS))
         self.assertIn("pbo", rob["not_computable"])
         self.assertIn("pbo", rob["failed"])
         st = p.statuses.get(sids[0], p.context_id())
         self.assertNotIn(st["status"], ("VALIDATION_SURVIVOR", "PASS_INDIVIDUAL"))
         if rob["failed"] == rob["not_computable"]:
             self.assertEqual(st["status"], "BLOCKED_STATISTICS")
-            self.assertTrue(any("TRIAL_CALENDARS_DIFFER" in x for x in st["reasons"]))
-        # still not computable on a resume: the calendars do not change
+            self.assertTrue(any("TOO_FEW_TRIALS" in x for x in st["reasons"]))
+        # still not computable on a resume: no BTC+ETH trial was added
         self.assertFalse(p._blocked_now_computable(sids[0]))
 
 
