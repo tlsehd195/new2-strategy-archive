@@ -107,10 +107,10 @@ AUTHOR_2026_11_12B = {
                                 "locks/exit codes/look-ahead; findings R-1 (fixed), R-2..R-5 (recorded)",
                                 True, True, "ADR 0079", "run/discovery/tests/test_audit_followup_20261112.py",
                                 "b4d71b172e569cf2b8d8b86e9fa38ebb8826757a95d56978d4a665281950d6a9"),
-    "run/discovery/engine_lib.py": ("FULL", "all 1,626 lines: state machine, JSONL, ids, statistics, "
-                                    "verdicts, locked registry, locks; findings E-1..E-4 recorded, no fix",
-                                    True, False, None, "run/discovery/tests/test_audit_followup_20261112.py",
-                                    "81ca101ee2a798cd5d2b866f1df7a958cd34c885fe947d2a5e84bdde32070a21"),
+    "run/discovery/engine_lib.py": ("PARTIAL", "ADR 0085 (L-1): shared_lock_dir, LockTestRegistry shared exposure record "
+                                    "(reserve/start/uses/entry_status/state, sync_shared); the ADR 0079 FULL read no "
+                                    "longer covers the edited file (downgraded, not re-read)",
+                                    True, True, "ADR 0085", "run/discovery/tests/test_shared_lock_state_20261117.py", None),
     "run/discovery/stats_mc.py": ("PARTIAL", "D-01 _require_resolution / bootstrap_B_for / alpha-B checks, "
                                   "stepm, step_spa, mcs", True, True, "ADR 0079", "run/discovery/tests/test_audit_followup_20261112.py", None),
     "run/discovery/pipeline.py": ("PARTIAL", "D-01 _evaluate_batch blocked windows, F-11 StatusStore.set, "
@@ -121,8 +121,8 @@ AUTHOR_2026_11_12B = {
                                              "ADR 0079", "run/discovery/tests/test_audit_followup_20261112.py", None),
     "run/discovery/paper_forward.py": ("PARTIAL", "G-03 evaluator/replay shared calls, G-04 FNG refusal/block, "
                                        "F-11 register_plan lock", True, True, "ADR 0079", "run/discovery/tests/test_audit_followup_20261112.py", None),
-    "run/discovery/campaigns.py": ("PARTIAL", "F-11 preregister under the ledger lock", True, True, "ADR 0079",
-                                   "run/discovery/tests/test_audit_followup_20261112.py", None),
+    "run/discovery/campaigns.py": ("PARTIAL", "F-11 preregister under the ledger lock; ADR 0085 shared campaign ledger", True, True, "ADR 0079/0085",
+                                   "run/discovery/tests/test_shared_lock_state_20261117.py", None),
 }
 #: claims the 2026-11-10 author re-read (ADR 0070, unchanged)
 SPOT_2026_11_10 = "SPOT (2026-11-10 author, named claims only)"
