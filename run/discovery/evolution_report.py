@@ -88,7 +88,7 @@ def build_report(state_dir: Path, context_id: Optional[str] = None,
                                            for s, x in (v.get("per_symbol") or {}).items()}})
     st_counts = Counter(r["status"] for r in statuses.values())
     # directive vocabulary (pipeline.outcome_label), per strategy, from the same ledgers
-    from pipeline import forward_conclusion_verifiable, outcome_label
+    from pipeline import outcome_label
     spec_by = {r["strategy_id"]: r.get("definition") for r in specs}
     dev_by = {r["strategy_id"]: r for r in dev}
     reverify = _reverify_ids(evo, ctx, statuses)
