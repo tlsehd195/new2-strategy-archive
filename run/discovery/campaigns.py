@@ -30,7 +30,8 @@ import math
 from pathlib import Path
 from typing import Mapping, Optional, Sequence
 
-from engine_lib import append_jsonl, canonical_json, exclusive_file_lock, iso_now, iter_jsonl, locked_window_for
+from engine_lib import (append_jsonl, canonical_json, exclusive_file_lock, iso_now, iter_jsonl,
+                        locked_window_for, shared_lock_dir)
 from stats_mc import spending_alpha
 
 CAMPAIGN_SCHEMA = "locked_campaign_v1"
@@ -49,24 +50,62 @@ class CampaignLedger:
     """Append-only ``locked_window_campaigns.jsonl`` (one file per state dir,
     shared by every path that touches a locked window)."""
 
-    def __init__(self, path: Path):
+    def __init__(self, path: Path, *, shared_path: Optional[Path] = None):
         self.path = Path(path)
+        # ADR 0085 (L-1): the campaign COUNT of a locked window is repository-level, not
+        # per state directory.  Every record this ledger writes is mirrored here, and
+        # counts are taken over local + shared so the stricter (larger) one always wins.
+        self.shared_path = Path(shared_path) if shared_path else shared_lock_dir() / "locked_window_campaigns.jsonl"
 
     def records(self) -> list[dict]:
+        """This state directory's own records (resume / open-campaign logic stays local)."""
         return list(iter_jsonl(self.path))
 
-    def _by_id(self) -> dict:
+    def _shared_records(self) -> list[dict]:
+        return list(iter_jsonl(self.shared_path)) if self.shared_path.exists() else []
+
+    def _count_records(self) -> list[dict]:
+        """Local + shared records, a record present in both counted once."""
+        seen, out = set(), []
+        for r in self.records() + self._shared_records():
+            k = canonical_json(r)
+            if k not in seen:
+                seen.add(k)
+                out.append(r)
+        return out
+
+    def _by_id(self, *, shared: bool = False) -> dict:
         out: dict = {}
-        for r in self.records():
+        for r in (self._count_records() if shared else self.records()):
             out.setdefault(r["campaign_id"], []).append(r)
         return out
+
+    def _append_both(self, record: Mapping) -> None:
+        """Append to the shared ledger first (a crash in between leaves an extra,
+        stricter count, never a missing one), then to the local ledger.  Callers
+        hold the local and the shared lock."""
+        append_jsonl(self.shared_path, record)
+        append_jsonl(self.path, record)
+
+    def _mirror_local(self) -> None:
+        known = {canonical_json(r) for r in self._shared_records()}
+        for r in self.records():
+            if canonical_json(r) not in known:
+                append_jsonl(self.shared_path, r)
+                known.add(canonical_json(r))
+
+    def sync_shared(self) -> None:
+        """Publish this directory's existing campaign records (written before ADR 0085)
+        to the shared ledger.  Idempotent; nothing is rewritten or removed."""
+        with exclusive_file_lock(self.path), exclusive_file_lock(self.shared_path):
+            self._mirror_local()
 
     def counted_campaigns(self, wkey: str) -> int:
         """Accessed (or possibly accessed) campaigns on a window: every
         preregistered campaign except those explicitly aborted before
         exposure."""
         n = 0
-        for cid, recs in self._by_id().items():
+        for cid, recs in self._by_id(shared=True).items():
             pre = [r for r in recs if r["kind"] == "PREREGISTERED"]
             if not pre or wkey not in pre[0]["windows"]:
                 continue
@@ -115,7 +154,8 @@ class CampaignLedger:
         ADR 0079 (F-11): the window counts are read and the campaign appended
         under the ledger's file lock (the legacy runner and the evolution
         pipeline share this file), so two writers never take one campaign index."""
-        with exclusive_file_lock(self.path):
+        with exclusive_file_lock(self.path), exclusive_file_lock(self.shared_path):
+            self._mirror_local()
             return self._preregister(source=source, source_ref=source_ref, context_id=context_id,
                                      members=members, alpha_total=alpha_total,
                                      max_campaigns=max_campaigns, method=method, config_hash=config_hash)
@@ -148,7 +188,7 @@ class CampaignLedger:
                 "config_hash": config_hash}
         body["campaign_id"] = "LC-" + hashlib.sha256(canonical_json(body).encode()).hexdigest()[:16]
         body["created_at"] = iso_now()
-        append_jsonl(self.path, body)
+        self._append_both(body)
         return body
 
     def abort_no_exposure(self, campaign: Mapping, reason: str,
@@ -156,17 +196,17 @@ class CampaignLedger:
         # ADR 0079 follow-up (F-11): every writer of this ledger takes its lock, so
         # this append never lands between another writer's tail check and its
         # write (a writer that died mid-line would be glued to this record)
-        with exclusive_file_lock(self.path):
-            append_jsonl(self.path, {"schema": CAMPAIGN_SCHEMA, "kind": "ABORTED_NO_EXPOSURE",
-                                     "campaign_id": campaign["campaign_id"],
-                                     "windows": list(windows or campaign["windows"]),
-                                     "reason": reason, "at": iso_now()})
+        with exclusive_file_lock(self.path), exclusive_file_lock(self.shared_path):
+            self._append_both({"schema": CAMPAIGN_SCHEMA, "kind": "ABORTED_NO_EXPOSURE",
+                               "campaign_id": campaign["campaign_id"],
+                               "windows": list(windows or campaign["windows"]),
+                               "reason": reason, "at": iso_now()})
 
     def record_result(self, campaign: Mapping, results: Mapping) -> None:
-        with exclusive_file_lock(self.path):           # ADR 0079 follow-up (F-11), as above
-            append_jsonl(self.path, {"schema": CAMPAIGN_SCHEMA, "kind": "RESULT",
-                                     "campaign_id": campaign["campaign_id"],
-                                     "results": dict(results), "at": iso_now()})
+        with exclusive_file_lock(self.path), exclusive_file_lock(self.shared_path):   # ADR 0079 F-11 / 0085
+            self._append_both({"schema": CAMPAIGN_SCHEMA, "kind": "RESULT",
+                               "campaign_id": campaign["campaign_id"],
+                               "results": dict(results), "at": iso_now()})
 
 
 def member_alpha(campaign: Mapping, symbol: str) -> float:

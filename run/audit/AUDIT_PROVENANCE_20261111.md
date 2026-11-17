@@ -58,8 +58,8 @@
 
 | 파일 | 작성자 재검토 | 범위 | 실행 | 결함 재현 | 수정 | 회귀 테스트 |
 |---|---|---|---|---|---|---|
-| `run/discovery/campaigns.py` | PARTIAL | F-11 preregister under the ledger lock | 예 | 예 | ADR 0079 | run/discovery/tests/test_audit_followup_20261112.py |
-| `run/discovery/engine_lib.py` | FULL | all 1,626 lines: state machine, JSONL, ids, statistics, verdicts, locked registry, locks; findings E-1..E-4 recorded, no fix | 예 | 아니오 | - | run/discovery/tests/test_audit_followup_20261112.py |
+| `run/discovery/campaigns.py` | PARTIAL | F-11 preregister under the ledger lock; ADR 0085 shared campaign ledger | 예 | 예 | ADR 0079/0085 | run/discovery/tests/test_shared_lock_state_20261117.py |
+| `run/discovery/engine_lib.py` | PARTIAL | ADR 0085 (L-1): shared_lock_dir, LockTestRegistry shared exposure record (reserve/start/uses/entry_status/state, sync_shared); the ADR 0079 FULL read no longer covers the edited file (downgraded, not re-read) | 예 | 예 | ADR 0085 | run/discovery/tests/test_shared_lock_state_20261117.py |
 | `run/discovery/independent_window.py` | PARTIAL | D-01 resolution refused before opening, in-run block | 예 | 예 | ADR 0079 | run/discovery/tests/test_audit_followup_20261112.py |
 | `run/discovery/paper_forward.py` | PARTIAL | G-03 evaluator/replay shared calls, G-04 FNG refusal/block, F-11 register_plan lock | 예 | 예 | ADR 0079 | run/discovery/tests/test_audit_followup_20261112.py |
 | `run/discovery/pipeline.py` | PARTIAL | D-01 _evaluate_batch blocked windows, F-11 StatusStore.set, context_id, _history_guard | 예 | 예 | ADR 0079 | run/discovery/tests/test_audit_followup_20261112.py |

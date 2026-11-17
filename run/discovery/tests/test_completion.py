@@ -357,6 +357,12 @@ class SynthFeed:
 class ForwardCase(PipelineCase):
     def ready(self, *, drift=(0, 1, 2), start="2024-08-25"):
         from paper import run_paper
+        # ADR 0085 (L-1): every ready() is its own universe (fresh state dir AND a fresh
+        # shared locked-TEST record); tests that loop over cases call it repeatedly
+        import os
+        from unittest import mock
+        self.enterContext(mock.patch.dict(os.environ, {"NEW2_LOCK_SHARED_DIR": tempfile.mkdtemp(
+            prefix="new2_shared_ready_")}))
         prov = SyntheticProvider()
         p = self.pipe(prov)
         edge, *_ = self.register_all(p, [EDGE] + NOISE[:7])
