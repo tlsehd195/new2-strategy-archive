@@ -1241,6 +1241,20 @@ def _pid_alive(pid: int) -> bool:
         return False
 
 
+_SHARED_LOCK_ENV = "NEW2_LOCK_SHARED_DIR"
+
+
+def shared_lock_dir() -> Path:
+    """Directory of the locked-TEST records shared by EVERY state directory
+    (ADR 0085, L-1).  Locked windows are repository-level data: a fresh state
+    directory must not restart at campaign 1 or get a second exposure of a
+    strategy.  ``NEW2_LOCK_SHARED_DIR`` overrides the default (tests, relocated
+    checkouts); the default is committed with the repository like
+    ``validation_window_history.jsonl``."""
+    env = os.environ.get(_SHARED_LOCK_ENV)
+    return Path(env) if env else Path(__file__).resolve().parent / "locked_shared"
+
+
 class LockTestRegistry:
     """Single-use registry for final locked tests, with explicit attempt
     state transitions and cross-process concurrency control.
@@ -1252,9 +1266,12 @@ class LockTestRegistry:
     consumption is never forgotten or deleted.
     """
 
-    def __init__(self, path: Path, *, owner_pid: Optional[int] = None):
+    def __init__(self, path: Path, *, owner_pid: Optional[int] = None,
+                 shared_path: Optional[Path] = None):
         self.path = Path(path)
         self.guard = self.path.with_name(self.path.name + ".lock")
+        # ADR 0085 (L-1): append-only exposure record shared by every state directory
+        self.shared_path = Path(shared_path) if shared_path else shared_lock_dir() / "lock_test_exposures.jsonl"
         self.owner = {"pid": owner_pid or os.getpid(), "host": socket.gethostname()}
         # ADR 0078 (F-09): the kernel start time tells a reused PID from its owner
         st = _proc_start(self.owner["pid"])
@@ -1328,19 +1345,65 @@ class LockTestRegistry:
             changed.append(a["attempt_id"])
         return changed
 
+    # -- shared exposure record (ADR 0085, L-1) ----------------------------------
+    def _shared_records(self) -> list[dict]:
+        return list(iter_jsonl(self.shared_path)) if self.shared_path.exists() else []
+
+    def _shared_other_uses(self, strategy_id: str, symbol: str, data: dict) -> int:
+        """Exposures of (strategy, symbol) recorded by ANY state directory that this
+        directory's own registry does not already count (matched by attempt id)."""
+        own = {a["attempt_id"] for a in data["attempts"].get(strategy_id, {}).get(symbol, [])}
+        return sum(1 for r in self._shared_records()
+                   if r.get("strategy_id") == strategy_id and r.get("symbol") == symbol
+                   and r.get("attempt_id") not in own
+                   and r.get("origin") != str(self.path.resolve()))      # own legacy uses are in _legacy_uses
+
+    def _mirror_local(self, data: dict, known: set) -> None:
+        """Append local exposures (and v1 legacy uses) missing from the shared record.
+        Caller holds the shared lock.  Nothing is ever rewritten or removed."""
+        for sid, syms in (data.get("legacy_v1") or {}).items():
+            for sym, uses in (syms or {}).items():
+                for i, u in enumerate(uses or []):
+                    aid = f"legacy:{sid}:{sym}:{i}"
+                    if aid not in known:
+                        append_jsonl(self.shared_path, {"strategy_id": sid, "symbol": sym,
+                                                        "attempt_id": aid, "kind": "LEGACY_V1",
+                                                        "origin": str(self.path.resolve()),
+                                                        "context_id": (u or {}).get("context_id")
+                                                        if isinstance(u, dict) else None,
+                                                        "at": iso_now()})
+                        known.add(aid)
+        for sid, syms in data["attempts"].items():
+            for sym, atts in syms.items():
+                for a in atts:
+                    if a.get("exposed") and a["attempt_id"] not in known:
+                        append_jsonl(self.shared_path, {"strategy_id": sid, "symbol": sym,
+                                                        "attempt_id": a["attempt_id"], "kind": "EXPOSED",
+                                                        "context_id": a.get("context_id"),
+                                                        "at": iso_now()})
+                        known.add(a["attempt_id"])
+
+    def sync_shared(self) -> None:
+        """Publish this directory's exposed attempts and legacy uses to the shared
+        record (idempotent; writers call it before they decide)."""
+        with exclusive_file_lock(self.shared_path):
+            known = {r.get("attempt_id") for r in self._shared_records()}
+            self._mirror_local(self._load(), known)
+
     # -- queries -------------------------------------------------------------
     def uses(self, strategy_id: str, symbol: str) -> int:
         """Exposed uses: legacy records + attempts that reached evaluation."""
         data = self._load()
         atts = data["attempts"].get(strategy_id, {}).get(symbol, [])
-        return self._legacy_uses(data, strategy_id, symbol) + sum(
-            1 for a in atts if a.get("exposed"))
+        return (self._legacy_uses(data, strategy_id, symbol) + sum(1 for a in atts if a.get("exposed"))
+                + self._shared_other_uses(strategy_id, symbol, data))
 
     def state(self, strategy_id: str, symbol: str) -> LockState:
         data = self._load()
         atts = data["attempts"].get(strategy_id, {}).get(symbol, [])
         if any(a["state"] == LockState.CONSUMED.value for a in atts) or \
-                self._legacy_uses(data, strategy_id, symbol):
+                self._legacy_uses(data, strategy_id, symbol) or \
+                self._shared_other_uses(strategy_id, symbol, data):
             return LockState.CONSUMED
         if not atts:
             return LockState.AVAILABLE
@@ -1355,7 +1418,8 @@ class LockTestRegistry:
         attempts do not consume the window.  Mutates nothing."""
         data = self._load()
         atts = data["attempts"].get(strategy_id, {}).get(symbol, [])
-        uses = self._legacy_uses(data, strategy_id, symbol) + sum(1 for a in atts if a.get("exposed"))
+        uses = (self._legacy_uses(data, strategy_id, symbol) + sum(1 for a in atts if a.get("exposed"))
+                + self._shared_other_uses(strategy_id, symbol, data))
         active = any(a["state"] in _LOCK_ACTIVE for a in atts)
         if uses:
             reason = "ALREADY_CONSUMED"
@@ -1378,13 +1442,15 @@ class LockTestRegistry:
     # -- transitions ----------------------------------------------------------
     def reserve(self, strategy_id: str, symbol: str, context_id: str) -> dict:
         """AVAILABLE → RESERVED.  Refused when another live process holds an
-        active attempt or when the window was already exposed once."""
+        active attempt or when the window was already exposed once — in this
+        state directory or in any other (ADR 0085, L-1)."""
+        self.sync_shared()          # before the local lock: lock order is always shared -> local
         with self._txn() as t:
             atts = self._attempts(t.data, strategy_id, symbol)
             if self._recover_list(atts):
                 t.dirty = True
-            uses = self._legacy_uses(t.data, strategy_id, symbol) + sum(
-                1 for a in atts if a.get("exposed"))
+            uses = (self._legacy_uses(t.data, strategy_id, symbol) + sum(
+                1 for a in atts if a.get("exposed")) + self._shared_other_uses(strategy_id, symbol, t.data))
             if uses:
                 return {"ok": False, "reason": "ALREADY_USED", "uses": uses}
             if any(a["state"] in _LOCK_ACTIVE for a in atts):
@@ -1422,10 +1488,27 @@ class LockTestRegistry:
 
     def start(self, token: Mapping) -> dict:
         """RESERVED → EVALUATION_STARTED: called only after the locked data
-        loaded and passed every quality check, right before exposure."""
-        return self._transition(token, (LockState.RESERVED.value,),
-                                LockState.EVALUATION_STARTED,
-                                started_at=iso_now(), exposed=True)
+        loaded and passed every quality check, right before exposure.
+
+        ADR 0085 (L-1): the exposure is the single-use event, so it is decided under
+        the shared lock — a reservation another directory made earlier cannot also
+        expose the same (strategy, symbol)."""
+        with exclusive_file_lock(self.shared_path):
+            known = {r.get("attempt_id") for r in self._shared_records()}
+            data = self._load()
+            self._mirror_local(data, known)
+            if self._shared_other_uses(token["strategy_id"], token["symbol"], data):
+                raise LockRegistryError(
+                    f"{token['strategy_id']}/{token['symbol']}: already exposed in another state "
+                    "directory (ADR 0085) — not an independent test")
+            att = self._transition(token, (LockState.RESERVED.value,),
+                                   LockState.EVALUATION_STARTED,
+                                   started_at=iso_now(), exposed=True)
+            append_jsonl(self.shared_path, {"strategy_id": token["strategy_id"],
+                                            "symbol": token["symbol"],
+                                            "attempt_id": token["attempt_id"], "kind": "EXPOSED",
+                                            "context_id": att.get("context_id"), "at": iso_now()})
+            return att
 
     def complete(self, token: Mapping, result: Mapping) -> dict:
         """EVALUATION_STARTED → CONSUMED with an immutable result."""
