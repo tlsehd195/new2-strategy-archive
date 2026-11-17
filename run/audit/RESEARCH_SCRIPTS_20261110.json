@@ -592,6 +592,37 @@
   }
  },
  {
+  "file": "dca_extreme_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 418,
+  "doc": "Daily prior-extreme scale-in (DCA / \"물타기\") strategy, DEV only (ADR 0088).",
+  "adr": [
+   "072",
+   "088"
+  ],
+  "flags": {
+   "neg_shift": 1
+  }
+ },
+ {
+  "file": "dca_extreme_prepare.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "LOGIC_TRACED",
+  "traced": null,
+  "legacy": false,
+  "lines": 85,
+  "doc": "Build the daily / funding / bar2345 inputs of run/dca_extreme_dev.py from the project's",
+  "adr": [
+   "088"
+  ],
+  "flags": {}
+ },
+ {
   "file": "download_missing_data.py",
   "class": "RETIRED_OR_ON_HOLD",
   "reason": "v1 data pipeline; replaced by run/discovery/data_fetch.py; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
@@ -1358,6 +1389,20 @@
   "doc": "Tests for the cross-section v2 DEV check (ADR 0040). Needs numpy and pandas.",
   "adr": [
    "040"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_dca_extreme.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 128,
+  "doc": "Tests for the daily scale-in (DCA) engine (ADR 0088). Needs numpy and pandas.",
+  "adr": [
+   "088"
   ],
   "flags": {}
  },
