@@ -8,14 +8,14 @@ Read status: INVENTORIED = header, imports, paths and risk patterns scanned (not
 |---|---|---|
 | INTEGRATED_CORE | hypothesis built into the core engine (feature / legacy family) | 13 |
 | STANDARD_INTERFACE | DEV tool that evaluates through the engine's spec / cost / evaluator interface | 11 |
-| KEPT_INDEPENDENT | independent DEV research or simulation tool; strategy type the engine does not model, result recorded in its ADR | 23 |
+| KEPT_INDEPENDENT | independent DEV research or simulation tool; strategy type the engine does not model, result recorded in its ADR | 24 |
 | DUPLICATE_RESEARCH | superseded by a later tool for the same hypothesis | 1 |
 | RETIRED_OR_ON_HOLD | retired v1 execution path (LEGACY_SCRIPTS.md) or on hold | 43 |
 | NEEDS_MORE_DATA | hypothesis needs a dataset the repository does not have | 21 |
-| TEST | test file of a run/ tool | 25 |
+| TEST | test file of a run/ tool | 26 |
 | NOT_SURVEYED | not surveyed | 0 |
 
-Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 56, TESTED 48
+Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 56, TESTED 50
 
 | file | lines | class | read status | reason | flags |
 |---|---|---|---|---|---|
@@ -72,6 +72,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 56, TESTED 48
 | `fr_crosscheck_engine_cost.py` | 198 | INTEGRATED_CORE | LOGIC_TRACED | funding extremes = legacy family fund_z and feature funding_z; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=2, cointrader=1 |
 | `fr_extreme_diag.py` | 213 | INTEGRATED_CORE | LOGIC_TRACED | funding extremes = legacy family fund_z and feature funding_z; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=2 |
 | `fr_supplementary.py` | 47 | INTEGRATED_CORE | LOGIC_TRACED | funding extremes = legacy family fund_z and feature funding_z; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=1 |
+| `gold_dev.py` | 340 | KEPT_INDEPENDENT | TESTED | gold XAUUSD single-asset DEV feasibility, third-party spot bid/ask feed (ADR 0086); NOT_PROMISING |  |
 | `hilo_intraday_dev.py` | 343 | KEPT_INDEPENDENT | TESTED | high/low line + volume spike, 15m/1h panel (ADR 0046); variant of hilo_volume_dev — traced: swing_lines: future-looking pivot test shifted by k (known at j+k) — causal | neg_shift=3 |
 | `hilo_volume_dev.py` | 288 | KEPT_INDEPENDENT | TESTED | high/low line + volume spike, daily panel (ADR 0043); NOT_PROMISING — traced: shift(-1) realised return, as above | neg_shift=1 |
 | `iw1_statistic_dev.py` | 78 | STANDARD_INTERFACE | LOGIC_TRACED | IW1 statistic re-score via evaluator.run_event_study (ADR 0019/0036) |  |
@@ -114,6 +115,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 56, TESTED 48
 | `test_evalue_walkforward.py` | 115 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_fast_short.py` | 132 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_forward_v2_entry_bar.py` | 36 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_gold_dev.py` | 65 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_hilo_intraday.py` | 129 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_hilo_volume.py` | 108 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_independent_check.py` | 61 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |

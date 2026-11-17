@@ -2223,13 +2223,34 @@ def validation_failure_class(per_symbol: Mapping, symbols: Sequence[str], *, rej
 #: RUNNING exists only for a cycle (``CYCLE_RUNNING`` in the summary file): a
 #: single evaluation is one append and is never left half-written.
 OUTCOME_LABELS = ("PENDING", "RUNNING", "PASS", "FAIL_COST", "FAIL_STAT", "UNDETERMINED_POWER",
-                  "DATA_MISSING", "ERROR", "REVERIFY_PENDING")
+                  "DATA_MISSING", "ERROR", "REVERIFY_PENDING", "UNVERIFIED")
+
+
+def forward_conclusion_verifiable(spec: Optional[Mapping]) -> bool:
+    """ADR 0084 (C-5): can a recorded paper-forward conclusion of this strategy
+    be verified?  Not when it reads FNG (no plan pins FNG values: ADR 0079
+    FNG_NOT_PINNED; same test as ``ForwardPaper._fng_refusal``) nor when its
+    specification is missing / unreadable (fail-closed: unknown is not a pass).
+    Reporting only; it decides nothing about the stored status."""
+    if not isinstance(spec, Mapping):
+        return False
+    data = spec.get("data")
+    if data is None:
+        return True
+    if isinstance(data, (str, bytes)) or not isinstance(data, (list, tuple, set, frozenset)):
+        return False
+    return "fng" not in data
 
 
 def outcome_label(status: Optional[Mapping], *, dev: Optional[Mapping] = None,
-                  validation: Optional[Mapping] = None, reverify: bool = False) -> str:
+                  validation: Optional[Mapping] = None, reverify: bool = False,
+                  spec: Optional[Mapping] = None) -> str:
     """Map one strategy's latest status record (and its DEV / validation
-    evaluation records) to :data:`OUTCOME_LABELS`."""
+    evaluation records) to :data:`OUTCOME_LABELS`.
+
+    ``spec``: the strategy specification, read only for PAPER_PASSED (ADR 0084):
+    a forward conclusion that cannot be verified (FNG strategy, missing or
+    unreadable spec) is ``UNVERIFIED``, never ``PASS``."""
     if reverify:
         return "REVERIFY_PENDING"
     st = (status or {}).get("status")
@@ -2237,6 +2258,8 @@ def outcome_label(status: Optional[Mapping], *, dev: Optional[Mapping] = None,
         if dev is not None and dev.get("status") not in (None, "OK"):
             return {"BLOCKED_DATA": "DATA_MISSING", "BLOCKED_COST": "ERROR"}.get(dev["status"], "ERROR")
         return "PENDING"
+    if st == "PAPER_PASSED" and not forward_conclusion_verifiable(spec):
+        return "UNVERIFIED"
     if st in ("VALIDATION_SURVIVOR", "PAPER_TEST_READY", "PAPER_TESTING", "PAPER_PASSED"):
         return "PASS"
     if st == "RESEARCH_ONLY":
