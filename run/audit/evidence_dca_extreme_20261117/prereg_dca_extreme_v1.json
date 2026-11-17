@@ -1,0 +1,48 @@
+{
+  "version": "dca-extreme-prereg-v1",
+  "status": "DRAFT_FOR_DEV_ONLY",
+  "date": "2026-11-17",
+  "requested_by": "동동 (2026-11-17): 일봉으로 길게 보고 전저점에 가까워지면 롱, 전저점을 뚫고 내려가면 조금씩 물타기로 평단 낮춤. 숏은 전고점에서 같은 방식",
+  "reading": "Daily bars. Reference line = prior N-day extreme (event day excluded). First tranche when close is within a=3% of the line or beyond it; each further tranche when a later daily close is below (long) the line by s*k, k=1..K. Short is the exact mirror at the prior N-day high.",
+  "data": {
+    "source": "project upload data/alts_2021_2026_binance_um_15m_funding.zip (17 USDT-M alts: ADA AVAX BCH BNB DOGE HYPE LINK LTC NEAR SOL SUI TRX UNI XLM XMR XRP ZEC); daily bars aggregated from 15m UTC; data.binance.vision blocked in this environment so the top-50 point-in-time universe of ADR 0035 is NOT used",
+    "segments": {"S1": ["2021-01-01", "2023-09-18"], "S2": ["2024-06-19", "2025-10-20"]},
+    "never_read": ["<=2020-12-31", "2023-09-19..2024-06-18", ">=2025-10-21"],
+    "btc_eth": "not in the upload; not used"
+  },
+  "grid": {
+    "N_days": [30, 90],
+    "step_s": [0.04, 0.08],
+    "max_adds_K": [0, 2, 4],
+    "exit_mode": ["stop_target", "target_time_only"],
+    "fixed": {
+      "entry_band_a": 0.03,
+      "tranche_size": "W/(K+1), W=0.05 of constant capital 1 per symbol (same max exposure for every K)",
+      "fills": "signal on daily close, fill at next day open",
+      "stop_target": "exit signal when close <= L0*(1-s*(K+1)) (short mirror) OR close >= avg_price*1.10 (short: <= avg*0.90) OR 60 days held; fill next open",
+      "target_time_only": "no stop: exit signal only on close >= avg*1.10 (short mirror) or 60 days held; fill next open",
+      "cooldown_days_after_exit": 5,
+      "max_open_symbols": 20,
+      "leverage_isolated": 5,
+      "mmr": 0.005,
+      "liquidation": "if the day's low (short: high) reaches avg*(1-1/5+mmr) the cycle is liquidated that day and loses its full posted margin (notional/5); gap beyond liquidation also loses the margin only (isolated, no negative balance)",
+      "funding": "actually settled funding rates, charged on held notional per day",
+      "cost": "measured alt cost PE-ed757f47 (estimate_v3_alts.json) per tranche fill and per exit; volume-scaled calibration (ADR 0041), x2, assumed public v1 and cost0 reported; 26.6bp round trip reference"
+    },
+    "n_configs": 24,
+    "n_trials_counted": 24,
+    "note": "Long-only and short-only decompositions are reported, not extra trials. Any later change of a, W, tp, timeout, leverage, universe is a new prereg and new trials."
+  },
+  "judgement_dev_only": {
+    "a": "S1 annualised Sharpe (measured cost, constant capital 1) > expected max under N=24 (and cumulative N)",
+    "b": "market-beta-removed alpha t >= 2",
+    "c": "both S1 halves positive",
+    "d": "S2 Sharpe > 0.5",
+    "e": "S1 Sharpe > 0 under volume-scaled cost",
+    "f": ">= 100 S1 cycles",
+    "g_tail": "S1 and S2 intraday-envelope max drawdown <= 0.20 of capital AND liquidated cycles <= 5% of cycles",
+    "h_scale_in_control": "report (not gate): S1 and S2 Sharpe of K>0 vs K=0 with same N, s, exit_mode"
+  },
+  "tail_report": ["close-based max drawdown", "intraday envelope max drawdown (adverse extreme of every open position the same day)", "worst day", "worst 20-day sum", "longest underwater run", "liquidated cycles and share", "worst cycle net return on cycle notional", "max simultaneous gross notional", "long vs short split"],
+  "not_opened": ["prereg activation", "validation", "locked TEST", "IW1", "paper window"]
+}
