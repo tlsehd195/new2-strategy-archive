@@ -1357,7 +1357,7 @@ class EvolutionPipeline:
     def _pbo(self, sid: Optional[str] = None) -> dict:
         """PBO by CSCV (Bailey et al. 2017) over the trial set (:meth:`_trial_series`).
 
-        ADR 0084: with ``sid`` the trial set is the strategy's SEARCH CONTEXT —
+        ADR 0087: with ``sid`` the trial set is the strategy's SEARCH CONTEXT —
         the trials of this experiment context with the same symbol set.  When
         the experiment context holds one symbol set this is the whole trial
         set and the result is exactly ``_pbo()``; otherwise the result also
@@ -1385,7 +1385,7 @@ class EvolutionPipeline:
                 mine = tuple(sorted(canonicalize_spec(self.specs.get(sid))["symbols"]))
             if len(set(sets.values()) | {mine}) > 1:
                 extra = {"search_context": {
-                    "basis": "symbol_set (ADR 0084)", "symbol_set": list(mine),
+                    "basis": "symbol_set (ADR 0087)", "symbol_set": list(mine),
                     "trials_in_experiment_context": len(latest),
                     "symbol_sets_in_experiment_context": len(set(sets.values()) | {mine})}}
                 latest = {s_: r for s_, r in latest.items() if sets[s_] == mine}
@@ -1643,7 +1643,7 @@ class EvolutionPipeline:
             sum(1 for x in all_ev if x["symbol"] == s) >= self.cfg["validation"]["min_events_per_symbol"]
             for s in spec["symbols"]), "n": len(nets)}
         # overfitting probability of the whole search (CSCV on DEV series)
-        pbo = self._pbo(sid)       # ADR 0084: the search context of sid
+        pbo = self._pbo(sid)       # ADR 0087: the search context of sid
         checks["pbo"] = {"pass": bool(pbo["computable"]) and pbo["pbo"] <= rc["max_pbo"], **pbo}
         dsr = self._dsr(sid)
         if rc.get("dsr_gating"):
@@ -1691,7 +1691,7 @@ class EvolutionPipeline:
                    "bootstrap_ci": f"bootstrap CI not computable ({checks['bootstrap_ci'].get('n_days')} days)"}
             if pbo.get("reason"):                 # ADR 0083: why PBO is not computable
                 why["pbo"] += f" [{pbo['reason']}]"
-            if pbo.get("search_context"):         # ADR 0084: trials of this symbol set only
+            if pbo.get("search_context"):         # ADR 0087: trials of this symbol set only
                 why["pbo"] += f" [symbol set {'+'.join(pbo['search_context']['symbol_set'])}]"
             self.statuses.set(sid, ctx, "BLOCKED_STATISTICS", stage="robustness",
                               reasons=["INSUFFICIENT_DATA: " + why.get(k, k) for k in not_computable],
@@ -2260,13 +2260,34 @@ def validation_failure_class(per_symbol: Mapping, symbols: Sequence[str], *, rej
 #: RUNNING exists only for a cycle (``CYCLE_RUNNING`` in the summary file): a
 #: single evaluation is one append and is never left half-written.
 OUTCOME_LABELS = ("PENDING", "RUNNING", "PASS", "FAIL_COST", "FAIL_STAT", "UNDETERMINED_POWER",
-                  "DATA_MISSING", "ERROR", "REVERIFY_PENDING")
+                  "DATA_MISSING", "ERROR", "REVERIFY_PENDING", "UNVERIFIED")
+
+
+def forward_conclusion_verifiable(spec: Optional[Mapping]) -> bool:
+    """ADR 0084 (C-5): can a recorded paper-forward conclusion of this strategy
+    be verified?  Not when it reads FNG (no plan pins FNG values: ADR 0079
+    FNG_NOT_PINNED; same test as ``ForwardPaper._fng_refusal``) nor when its
+    specification is missing / unreadable (fail-closed: unknown is not a pass).
+    Reporting only; it decides nothing about the stored status."""
+    if not isinstance(spec, Mapping):
+        return False
+    data = spec.get("data")
+    if data is None:
+        return True
+    if isinstance(data, (str, bytes)) or not isinstance(data, (list, tuple, set, frozenset)):
+        return False
+    return "fng" not in data
 
 
 def outcome_label(status: Optional[Mapping], *, dev: Optional[Mapping] = None,
-                  validation: Optional[Mapping] = None, reverify: bool = False) -> str:
+                  validation: Optional[Mapping] = None, reverify: bool = False,
+                  spec: Optional[Mapping] = None) -> str:
     """Map one strategy's latest status record (and its DEV / validation
-    evaluation records) to :data:`OUTCOME_LABELS`."""
+    evaluation records) to :data:`OUTCOME_LABELS`.
+
+    ``spec``: the strategy specification, read only for PAPER_PASSED (ADR 0084):
+    a forward conclusion that cannot be verified (FNG strategy, missing or
+    unreadable spec) is ``UNVERIFIED``, never ``PASS``."""
     if reverify:
         return "REVERIFY_PENDING"
     st = (status or {}).get("status")
@@ -2274,6 +2295,8 @@ def outcome_label(status: Optional[Mapping], *, dev: Optional[Mapping] = None,
         if dev is not None and dev.get("status") not in (None, "OK"):
             return {"BLOCKED_DATA": "DATA_MISSING", "BLOCKED_COST": "ERROR"}.get(dev["status"], "ERROR")
         return "PENDING"
+    if st == "PAPER_PASSED" and not forward_conclusion_verifiable(spec):
+        return "UNVERIFIED"
     if st in ("VALIDATION_SURVIVOR", "PAPER_TEST_READY", "PAPER_TESTING", "PAPER_PASSED"):
         return "PASS"
     if st == "RESEARCH_ONLY":

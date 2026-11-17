@@ -1,4 +1,4 @@
-"""ADR 0084: PBO search contexts separated by symbol set.
+"""ADR 0087: PBO search contexts separated by symbol set.
 
 Problem (ADR 0083 consequence): ``_pbo`` refuses a trial set whose observed
 DEV calendars differ (``TRIAL_CALENDARS_DIFFER``).  With the real locked
@@ -47,7 +47,7 @@ class TestPboSymbolSetGroups(PipelineCase):
         return p, mock.patch.object(type(p), "_trial_series", lambda self_: rows)
 
     def test_mixed_context_gives_the_pbo_of_the_symbol_set_group(self):
-        # 9 trials on symbol A, 4 on B (another DEV window): before ADR 0084 every
+        # 9 trials on symbol A, 4 on B (another DEV window): before ADR 0087 every
         # strategy of the context got TRIAL_CALENDARS_DIFFER
         a = {f"a{k}": {"A": [0, wave(160, k, d=0.002 * k)]} for k in range(9)}
         b = {f"b{k}": {"B": [300, wave(160, 30 + k)]} for k in range(4)}

@@ -101,7 +101,7 @@ do not prove equal p-values, so it is handled as a conflict/hold and left untouc
 ## 3. Candidate states
 
 `PENDING → RUNNING → {AWAITING_FDR, PASS, FAIL_COST, FAIL_STAT,
-UNDETERMINED_POWER, DATA_MISSING, ERROR, REVERIFY_PENDING}`;
+UNDETERMINED_POWER, DATA_MISSING, ERROR, REVERIFY_PENDING, UNVERIFIED}`;
 `AWAITING_FDR → {final states, REVERIFY_PENDING}`; non-final states →
 `REVERIFY_PENDING → PENDING`; `PASS` is terminal.
 
@@ -113,6 +113,7 @@ UNDETERMINED_POWER, DATA_MISSING, ERROR, REVERIFY_PENDING}`;
 | FAIL_COST | cost model refused the trade / result | priced with a cheaper fallback |
 | UNDETERMINED_POWER | too few events (n < 30) or degenerate variance | fail or pass |
 | DATA_MISSING | required data absent / quality-rejected / no locked window | statistical failure |
+| UNVERIFIED | reporting label only (ADR 0084): stored status PAPER_PASSED whose forward conclusion cannot be verified — the strategy reads FNG (FNG_NOT_PINNED) or its spec is missing/unreadable | a pass; counted as survivor |
 | ERROR | computation error (NaN/inf, p outside [0,1], cost model numeric error, crash) | p = 0 or p = 1 |
 
 Non-overlap check (one cause → one label): `FAIL_STAT` = data and cost model were

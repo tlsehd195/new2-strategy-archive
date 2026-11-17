@@ -89,10 +89,11 @@ def build_report(state_dir: Path, context_id: Optional[str] = None,
     st_counts = Counter(r["status"] for r in statuses.values())
     # directive vocabulary (pipeline.outcome_label), per strategy, from the same ledgers
     from pipeline import outcome_label
+    spec_by = {r["strategy_id"]: r.get("definition") for r in specs}
     dev_by = {r["strategy_id"]: r for r in dev}
     reverify = _reverify_ids(evo, ctx, statuses)
     labels = {sid: outcome_label(statuses.get(sid), dev=dev_by.get(sid), validation=val.get(sid),
-                                 reverify=sid in reverify)
+                                 reverify=sid in reverify, spec=spec_by.get(sid))
               for sid in sorted(set(statuses) | set(dev_by) | reverify)}
     by_stage = {"dev_screen": Counter(), "validation": Counter()}
     for sid, lab in labels.items():
@@ -145,7 +146,11 @@ def build_report(state_dir: Path, context_id: Optional[str] = None,
         "outcomes": {"total": dict(Counter(labels.values())),
                      "by_stage": {k: dict(v) for k, v in by_stage.items()}},
         "dedup": dedup,
-        "survivors": sorted(s for s, r in statuses.items() if r["status"] in SURVIVOR_STATUSES),
+        # ADR 0084: a PAPER_PASSED whose forward conclusion cannot be verified (FNG, no
+        # readable spec) is not a survivor; the stored status is untouched
+        "survivors": sorted(s for s, r in statuses.items() if r["status"] in SURVIVOR_STATUSES
+                            and labels.get(s) == "PASS"),
+        "unverified_prior_conclusions": sorted(s for s, lab in labels.items() if lab == "UNVERIFIED"),
         "locked": {"registry_present": lp.exists(), "attempts": attempts, "exposed_uses": exposed},
     }
 
@@ -221,6 +226,8 @@ def to_markdown(rep: dict) -> str:
              f"| outcomes by stage | {rep['outcomes']['by_stage']} |",
              f"| dedup decisions (distinct definitions) | {rep['dedup']['counts']} ({rep['dedup']['unique_proposed']}) |",
              f"| in-state validation survivors (spent BTC/ETH windows) | {len(rep['survivors'])} |",
+             f"| PAPER_PASSED with unverifiable forward conclusion (UNVERIFIED, not survivors) | "
+             f"{len(rep['unverified_prior_conclusions'])} |",
              f"| INDEPENDENT runs completed / incomplete | {rep['independent']['by_state'].get('COMPLETED', 0)} / "
              f"{len(rep['independent']['incomplete_runs'])} |",
              f"| INDEPENDENT members evaluated / passes | {rep['independent']['completed_members']} / "

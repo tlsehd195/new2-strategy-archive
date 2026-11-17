@@ -209,7 +209,7 @@ class TestMixedSymbolSetsFullPath(PipelineCase):
         pbo = rob["checks"]["pbo"]
         self.assertFalse(pbo["pass"])
         self.assertFalse(pbo["computable"])
-        # ADR 0084: the PBO trial set is the strategy's symbol-set group; the
+        # ADR 0087: the PBO trial set is the strategy's symbol-set group; the
         # BTC+ETH edge is the only BTC+ETH trial -> still not computable
         # (fail-closed), now because the group is below pbo_min_trials
         self.assertEqual(pbo["reason"], "TOO_FEW_TRIALS")
