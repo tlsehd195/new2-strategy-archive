@@ -1,0 +1,47 @@
+{
+ "schema": "gold_dev_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "2026-11-17T08:45Z",
+ "written_before_any_result": true,
+ "data_state_when_written": "5 yearly M1 bid/ask files (2016-09-01..2021-09-01) were downloaded; only the header and the first 2 rows of the first file were looked at (to learn the column layout). No return, bar or volume statistic has been computed.",
+ "requested_by": "동동, 2026-11-17: 'how about changing the structure to gold futures? gold market is far bigger than BTC so whales cannot manipulate it, and lines drawn on the chart are more accurate'. Coordinator asked for a neutral feasibility check incl. a small DEV test.",
+ "question": "On spot gold (XAUUSD) 15m/daily bars, do the user's high/low line + volume-spike rule (ADR 0043 idea, intraday version) or a few simple trend/session rules earn more than a realistic gold perpetual/futures cost, on DEV data only?",
+ "what_the_author_had_already_seen": "No gold intraday result. General public knowledge: gold had a long uptrend 2018-2025 (so buy-and-hold is reported but is not a trial).",
+ "scope": "DEV only. No validation, locked, paper or IW1 window of the BTC/ETH/alt studies is touched (gold is a different asset). Gold data after 2021-08-31 is NOT downloaded and NOT read: it is kept unseen as a possible future gold validation window, which is NOT opened and needs the user's explicit go.",
+ "data": {
+  "source": "github.com/Dypoi/XAUUSD_Dataset (third party, provenance not stated; layout timestamp,open_bid,high_bid,low_bid,close_bid,open_ask,...,volume_bid,volume_ask; looks like a Dukascopy-style ECN quote feed). Status: UNVERIFIED_THIRD_PARTY. It is a spot OTC quote feed, NOT exchange futures prints; 'volume' is that venue's quote volume, not market volume.",
+  "files": "XAUUSD_M1_20160901_20170901.csv .. XAUUSD_M1_20200901_20210901.csv (5 files), sha256 recorded in the result file",
+  "timezone": "assumed UTC (checked only from the weekly gap position, reported)",
+  "price": "mid = (bid+ask)/2 for signals; trades fill at ask (buy) / bid (sell) of the entry/exit M1 bar open"
+ },
+ "segments": {
+  "S1": {"read": ["2016-09-01", "2019-08-31"], "use": "the only segment that decides anything"},
+  "S2": {"read": ["2019-09-01", "2021-08-31"], "use": "reported, and used only in the fixed S2 > 0.5 condition"}
+ },
+ "never_read": [["2021-09-01", "2099-12-31", "gold reserve (possible future gold validation; not downloaded)"]],
+ "bars": "15m bars built from M1 (UTC, left-closed). daily bars = UTC calendar date of bars with data. A 15m bar exists only if it has >= 1 M1 row.",
+ "trials": {
+  "A_hilo_reversal": {"rule": "event bar t (15m, closed). H = max high, L = min low (mid) of the N bars t-N..t-1; p = (close_t-L)/(H-L); v = volume_t / mean volume of bars t-96..t-1; spike if v >= m; near high p >= 0.9 -> SHORT, near low p <= 0.1 -> LONG. Entry at open of bar t+1, exit at open of bar t+1+Hb.", "grid": {"N": [96, 480], "m": [2.0, 3.0], "Hb": [4, 16]}, "configs": 8},
+  "A_hilo_breakout": {"rule": "exact mirror of A at N=96, m=2.0, Hb=16 (near high -> LONG, near low -> SHORT)", "configs": 1},
+  "B_tsmom": {"rule": "daily: position on day d+1 = sign(close_d / close_{d-L} - 1), held open-to-open, re-evaluated every day; cost only when the position changes", "L": [20, 60], "configs": 2},
+  "C_donchian": {"rule": "daily stop-and-reverse: go LONG at next open if close_d > max high of d-20..d-1, SHORT if close_d < min low of d-20..d-1, otherwise keep", "configs": 1},
+  "D_asia_range_breakout": {"rule": "Asia range = high/low of 15m bars 00:00-06:59 UTC. First 15m close in 07:00-11:59 above the high -> LONG at next bar open, below the low -> SHORT; exit at the 20:00 UTC bar open. At most one trade a day.", "configs": 1},
+  "total": 13,
+  "note": "exactly these 13, each run once; recorded as 13 DEV evaluations in run/audit/dev_search_trials.jsonl with a new search context (gold, different asset). Any change is a NEW trial."
+ },
+ "trade_rules": {
+  "size": "one position at a time, notional = capital (leverage 1). Signals while in a position are ignored (A, D).",
+  "gaps": "A: no entry if the 15m calendar between entry and exit has a gap > 30 minutes (weekend/holiday close); the schedule is known in advance. B/C: positions are held through weekends and gaps (gap risk is real) and the gap return is counted.",
+  "window_end": "no entry whose exit falls after the segment end; B/C are closed at the segment end."
+ },
+ "cost": {
+  "decides": "perp_taker: fee 5bp per side (Binance USDT-M standard taker) + the feed's own bid/ask at fill + carry for every day held: LONG pays 3%/yr, SHORT receives 3%/yr (stand-in for perp funding / futures basis, which tracks USD rates)",
+  "rows_reported_only": ["perp_taker_x2 (fees and spread doubled; must stay > 0 in S1: condition e)", "futures_1bp (1bp per side + bid/ask + same carry: a CME GC-like route)", "cost0 (mid to mid, no carry)"]
+ },
+ "statistics": {
+  "unit": "daily return on capital 1 (days with data; flat days count 0); annualised with the observed number of data days per year",
+  "report": "trades, long/short split, hit rate, mean gross/net per trade (bp), annual Sharpe, annual return, max drawdown, t, S1 halves, correlation with gold buy-and-hold daily return, every cost row; also the feed's median and mean spread (bp) by hour, and buy-and-hold for reference (not a trial)",
+  "dev_flag_not_a_verdict": "DEV_PROMISING only if under perp_taker: (a) S1 annual Sharpe > expected max of 13 unskilled trials over S1 length (engine_lib.expected_max_sr(13)/sqrt(years) ~= 0.98), (b) S1 t >= 2, (c) both S1 halves positive, (d) S2 annual Sharpe > 0.5, (e) S1 Sharpe under perp_taker_x2 > 0, (f) >= 100 S1 trades (B/C: position changes). Anything else NOT_PROMISING. The flag never opens a window.",
+  "power_note": "S1 is 3 years of one asset. A true annual SR of 1 will most likely be flagged NOT_PROMISING. Accepted in advance."
+ }
+}

@@ -1,0 +1,2294 @@
+{
+ "version": "gold-dev-v1",
+ "prereg": "run/audit/evidence_gold_dev_20261117/prereg_gold_dev_v1.json",
+ "prereg_sha256": "ae78faea23f223c7fbeb0e69781e0a9e285d897aef7c7924eb9da5e613e4bcd3",
+ "script_sha256": "ce85d2cf021ea76a020e0f72bfb11dce91813047bbc1a766e16d0b0836de92e7",
+ "data_files_sha256": {
+  "XAUUSD_M1_20160901_20170901.csv": "92d23f3cc96054ccaaa3992e2035937f6a37b2ef19697c43249b00ebc9fb6845",
+  "XAUUSD_M1_20170901_20180901.csv": "dbc06cc5899515d297bb73db359a2d46fa90df916cfc70dd1223ca700267ac61",
+  "XAUUSD_M1_20180901_20190901.csv": "e55306dc3092f8a707e3566e06d40ac4c5d4341e84121215bf4d3f7e1d2401b2",
+  "XAUUSD_M1_20190901_20200901.csv": "afa2a696e144ccf9cc5b3f0e1df4770dc630682066d7c2fa0053f604d4b35870",
+  "XAUUSD_M1_20200901_20210901.csv": "ff26f5f5e3220297169cf4f957d81d5e36c9de8b3cc8be5bf4c7be7142871a8b"
+ },
+ "data_status": "UNVERIFIED_THIRD_PARTY spot XAUUSD bid/ask feed",
+ "never_read_from": "2021-09-01",
+ "emax_S1_sharpe_13_trials": 0.984,
+ "feed": {
+  "m1_rows": 1768390,
+  "bars_15m": 118044,
+  "spread_bp_median": 2.021,
+  "spread_bp_mean": 2.21,
+  "spread_bp_p90": 2.595,
+  "spread_bp_median_by_utc_hour": {
+   "0": 2.09,
+   "1": 2.07,
+   "2": 2.03,
+   "3": 2.02,
+   "4": 2.04,
+   "5": 2.03,
+   "6": 2.0,
+   "7": 1.97,
+   "8": 1.95,
+   "9": 1.94,
+   "10": 1.94,
+   "11": 1.95,
+   "12": 1.96,
+   "13": 1.97,
+   "14": 1.96,
+   "15": 1.95,
+   "16": 1.95,
+   "17": 1.99,
+   "18": 2.01,
+   "19": 2.0,
+   "20": 2.16,
+   "21": 2.33,
+   "22": 2.44,
+   "23": 2.3
+  },
+  "weekly_gap_last_bar_before (weekday hour UTC, most common)": {
+   "Fri 20:45": 164,
+   "Fri 21:45": 84,
+   "Thu 20:45": 5
+  },
+  "weekly_gap_first_bar_after (most common)": {
+   "Sun 22:00": 169,
+   "Sun 23:00": 88,
+   "Mon 23:00": 4
+  }
+ },
+ "buy_and_hold": {
+  "S1": {
+   "days": 931,
+   "years": 2.992,
+   "sharpe": 0.5,
+   "t": 0.865,
+   "annual_return": 0.0546,
+   "mdd": -0.1638,
+   "halves_sharpe": [
+    0.093,
+    0.907
+   ],
+   "corr_buyhold": 1.0
+  },
+  "S2": {
+   "days": 623,
+   "years": 1.999,
+   "sharpe": 0.598,
+   "t": 0.845,
+   "annual_return": 0.1036,
+   "mdd": -0.1858,
+   "halves_sharpe": [
+    1.422,
+    -0.458
+   ],
+   "corr_buyhold": 1.0
+  }
+ },
+ "trials": {
+  "A_R_N96_m2.0_H4": {
+   "S1": {
+    "perp_taker": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -6.314,
+     "t": -10.922,
+     "annual_return": -0.298,
+     "mdd": -0.592,
+     "halves_sharpe": [
+      -5.061,
+      -7.503
+     ],
+     "corr_buyhold": -0.024,
+     "trades": 687,
+     "long": 319,
+     "short": 368,
+     "hit_rate": 0.234,
+     "mean_gross_bp": -0.96,
+     "mean_net_bp": -12.98
+    },
+    "perp_taker_x2": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -9.14,
+     "t": -15.811,
+     "annual_return": -0.574,
+     "mdd": -0.8218,
+     "halves_sharpe": [
+      -7.987,
+      -10.26
+     ],
+     "corr_buyhold": -0.037,
+     "trades": 687,
+     "long": 319,
+     "short": 368,
+     "hit_rate": 0.089,
+     "mean_gross_bp": -0.96,
+     "mean_net_bp": -25.0
+    },
+    "futures_1bp": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -2.858,
+     "t": -4.944,
+     "annual_return": -0.1143,
+     "mdd": -0.2941,
+     "halves_sharpe": [
+      -1.877,
+      -3.839
+     ],
+     "corr_buyhold": -0.008,
+     "trades": 687,
+     "long": 319,
+     "short": 368,
+     "hit_rate": 0.424,
+     "mean_gross_bp": -0.96,
+     "mean_net_bp": -4.98
+    },
+    "cost0": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -0.584,
+     "t": -1.009,
+     "annual_return": -0.0221,
+     "mdd": -0.1015,
+     "halves_sharpe": [
+      0.001,
+      -1.19
+     ],
+     "corr_buyhold": 0.001,
+     "trades": 687,
+     "long": 319,
+     "short": 368,
+     "hit_rate": 0.527,
+     "mean_gross_bp": -0.96,
+     "mean_net_bp": -0.96
+    }
+   },
+   "S2": {
+    "perp_taker": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -5.711,
+     "t": -8.074,
+     "annual_return": -0.4095,
+     "mdd": -0.5626,
+     "halves_sharpe": [
+      -6.833,
+      -4.525
+     ],
+     "corr_buyhold": 0.086,
+     "trades": 579,
+     "long": 252,
+     "short": 327,
+     "hit_rate": 0.283,
+     "mean_gross_bp": -1.77,
+     "mean_net_bp": -14.13
+    },
+    "perp_taker_x2": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -8.841,
+     "t": -12.499,
+     "annual_return": -0.7677,
+     "mdd": -0.7868,
+     "halves_sharpe": [
+      -10.017,
+      -7.624
+     ],
+     "corr_buyhold": 0.066,
+     "trades": 579,
+     "long": 252,
+     "short": 327,
+     "hit_rate": 0.147,
+     "mean_gross_bp": -1.77,
+     "mean_net_bp": -26.5
+    },
+    "futures_1bp": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -2.729,
+     "t": -3.858,
+     "annual_return": -0.1777,
+     "mdd": -0.3175,
+     "halves_sharpe": [
+      -3.691,
+      -1.711
+     ],
+     "corr_buyhold": 0.096,
+     "trades": 579,
+     "long": 252,
+     "short": 327,
+     "hit_rate": 0.435,
+     "mean_gross_bp": -1.77,
+     "mean_net_bp": -6.13
+    },
+    "cost0": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -0.82,
+     "t": -1.16,
+     "annual_return": -0.0514,
+     "mdd": -0.1626,
+     "halves_sharpe": [
+      -1.52,
+      -0.089
+     ],
+     "corr_buyhold": 0.104,
+     "trades": 579,
+     "long": 252,
+     "short": 327,
+     "hit_rate": 0.511,
+     "mean_gross_bp": -1.77,
+     "mean_net_bp": -1.77
+    }
+   },
+   "conditions": {
+    "a_S1_sharpe_gt_emax": false,
+    "b_S1_t_ge_2": false,
+    "c_S1_halves_pos": false,
+    "d_S2_sharpe_gt_0.5": false,
+    "e_S1_x2_cost_pos": false,
+    "f_S1_trades_ge_100": true
+   },
+   "flag": "NOT_PROMISING"
+  },
+  "A_R_N96_m2.0_H16": {
+   "S1": {
+    "perp_taker": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -3.348,
+     "t": -5.791,
+     "annual_return": -0.1671,
+     "mdd": -0.4012,
+     "halves_sharpe": [
+      -2.901,
+      -3.829
+     ],
+     "corr_buyhold": 0.033,
+     "trades": 438,
+     "long": 213,
+     "short": 225,
+     "hit_rate": 0.354,
+     "mean_gross_bp": 0.63,
+     "mean_net_bp": -11.42
+    },
+    "perp_taker_x2": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -6.263,
+     "t": -10.834,
+     "annual_return": -0.3434,
+     "mdd": -0.6461,
+     "halves_sharpe": [
+      -5.433,
+      -7.137
+     ],
+     "corr_buyhold": 0.035,
+     "trades": 438,
+     "long": 213,
+     "short": 225,
+     "hit_rate": 0.224,
+     "mean_gross_bp": 0.63,
+     "mean_net_bp": -23.46
+    },
+    "futures_1bp": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -1.034,
+     "t": -1.789,
+     "annual_return": -0.05,
+     "mdd": -0.1652,
+     "halves_sharpe": [
+      -0.94,
+      -1.137
+     ],
+     "corr_buyhold": 0.031,
+     "trades": 438,
+     "long": 213,
+     "short": 225,
+     "hit_rate": 0.461,
+     "mean_gross_bp": 0.63,
+     "mean_net_bp": -3.42
+    },
+    "cost0": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": 0.19,
+     "t": 0.329,
+     "annual_return": 0.0092,
+     "mdd": -0.0504,
+     "halves_sharpe": [
+      0.091,
+      0.298
+     ],
+     "corr_buyhold": 0.027,
+     "trades": 438,
+     "long": 213,
+     "short": 225,
+     "hit_rate": 0.525,
+     "mean_gross_bp": 0.63,
+     "mean_net_bp": 0.63
+    }
+   },
+   "S2": {
+    "perp_taker": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -3.147,
+     "t": -4.45,
+     "annual_return": -0.2606,
+     "mdd": -0.4134,
+     "halves_sharpe": [
+      -3.523,
+      -2.749
+     ],
+     "corr_buyhold": 0.104,
+     "trades": 384,
+     "long": 172,
+     "short": 212,
+     "hit_rate": 0.378,
+     "mean_gross_bp": -1.35,
+     "mean_net_bp": -13.56
+    },
+    "perp_taker_x2": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -5.667,
+     "t": -8.012,
+     "annual_return": -0.4956,
+     "mdd": -0.6333,
+     "halves_sharpe": [
+      -6.075,
+      -5.235
+     ],
+     "corr_buyhold": 0.096,
+     "trades": 384,
+     "long": 172,
+     "short": 212,
+     "hit_rate": 0.276,
+     "mean_gross_bp": -1.35,
+     "mean_net_bp": -25.8
+    },
+    "futures_1bp": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -1.318,
+     "t": -1.864,
+     "annual_return": -0.1069,
+     "mdd": -0.2466,
+     "halves_sharpe": [
+      -1.666,
+      -0.952
+     ],
+     "corr_buyhold": 0.107,
+     "trades": 384,
+     "long": 172,
+     "short": 212,
+     "hit_rate": 0.451,
+     "mean_gross_bp": -1.35,
+     "mean_net_bp": -5.56
+    },
+    "cost0": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -0.321,
+     "t": -0.454,
+     "annual_return": -0.0259,
+     "mdd": -0.1586,
+     "halves_sharpe": [
+      -0.609,
+      -0.02
+     ],
+     "corr_buyhold": 0.108,
+     "trades": 384,
+     "long": 172,
+     "short": 212,
+     "hit_rate": 0.505,
+     "mean_gross_bp": -1.35,
+     "mean_net_bp": -1.35
+    }
+   },
+   "conditions": {
+    "a_S1_sharpe_gt_emax": false,
+    "b_S1_t_ge_2": false,
+    "c_S1_halves_pos": false,
+    "d_S2_sharpe_gt_0.5": false,
+    "e_S1_x2_cost_pos": false,
+    "f_S1_trades_ge_100": true
+   },
+   "flag": "NOT_PROMISING"
+  },
+  "A_R_N96_m3.0_H4": {
+   "S1": {
+    "perp_taker": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -3.729,
+     "t": -6.451,
+     "annual_return": -0.09,
+     "mdd": -0.2367,
+     "halves_sharpe": [
+      -3.49,
+      -4.078
+     ],
+     "corr_buyhold": -0.116,
+     "trades": 172,
+     "long": 70,
+     "short": 102,
+     "hit_rate": 0.221,
+     "mean_gross_bp": -3.6,
+     "mean_net_bp": -15.65
+    },
+    "perp_taker_x2": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -5.099,
+     "t": -8.821,
+     "annual_return": -0.1593,
+     "mdd": -0.3801,
+     "halves_sharpe": [
+      -4.194,
+      -5.962
+     ],
+     "corr_buyhold": -0.131,
+     "trades": 172,
+     "long": 70,
+     "short": 102,
+     "hit_rate": 0.099,
+     "mean_gross_bp": -3.6,
+     "mean_net_bp": -27.71
+    },
+    "futures_1bp": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -2.106,
+     "t": -3.644,
+     "annual_return": -0.044,
+     "mdd": -0.1321,
+     "halves_sharpe": [
+      -2.616,
+      -1.927
+     ],
+     "corr_buyhold": -0.093,
+     "trades": 172,
+     "long": 70,
+     "short": 102,
+     "hit_rate": 0.343,
+     "mean_gross_bp": -3.6,
+     "mean_net_bp": -7.65
+    },
+    "cost0": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -1.038,
+     "t": -1.796,
+     "annual_return": -0.0207,
+     "mdd": -0.0752,
+     "halves_sharpe": [
+      -2.032,
+      -0.536
+     ],
+     "corr_buyhold": -0.076,
+     "trades": 172,
+     "long": 70,
+     "short": 102,
+     "hit_rate": 0.436,
+     "mean_gross_bp": -3.6,
+     "mean_net_bp": -3.6
+    }
+   },
+   "S2": {
+    "perp_taker": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -2.805,
+     "t": -3.966,
+     "annual_return": -0.1092,
+     "mdd": -0.1997,
+     "halves_sharpe": [
+      -2.586,
+      -3.016
+     ],
+     "corr_buyhold": 0.14,
+     "trades": 182,
+     "long": 80,
+     "short": 102,
+     "hit_rate": 0.308,
+     "mean_gross_bp": 0.16,
+     "mean_net_bp": -12.0
+    },
+    "perp_taker_x2": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -4.824,
+     "t": -6.82,
+     "annual_return": -0.22,
+     "mdd": -0.3583,
+     "halves_sharpe": [
+      -4.926,
+      -4.713
+     ],
+     "corr_buyhold": 0.118,
+     "trades": 182,
+     "long": 80,
+     "short": 102,
+     "hit_rate": 0.181,
+     "mean_gross_bp": 0.16,
+     "mean_net_bp": -24.16
+    },
+    "futures_1bp": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -0.998,
+     "t": -1.411,
+     "annual_return": -0.0364,
+     "mdd": -0.084,
+     "halves_sharpe": [
+      -0.418,
+      -1.554
+     ],
+     "corr_buyhold": 0.15,
+     "trades": 182,
+     "long": 80,
+     "short": 102,
+     "hit_rate": 0.467,
+     "mean_gross_bp": 0.16,
+     "mean_net_bp": -4.0
+    },
+    "cost0": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": 0.042,
+     "t": 0.059,
+     "annual_return": 0.0015,
+     "mdd": -0.0678,
+     "halves_sharpe": [
+      0.836,
+      -0.727
+     ],
+     "corr_buyhold": 0.152,
+     "trades": 182,
+     "long": 80,
+     "short": 102,
+     "hit_rate": 0.511,
+     "mean_gross_bp": 0.16,
+     "mean_net_bp": 0.16
+    }
+   },
+   "conditions": {
+    "a_S1_sharpe_gt_emax": false,
+    "b_S1_t_ge_2": false,
+    "c_S1_halves_pos": false,
+    "d_S2_sharpe_gt_0.5": false,
+    "e_S1_x2_cost_pos": false,
+    "f_S1_trades_ge_100": true
+   },
+   "flag": "NOT_PROMISING"
+  },
+  "A_R_N96_m3.0_H16": {
+   "S1": {
+    "perp_taker": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -2.625,
+     "t": -4.54,
+     "annual_return": -0.073,
+     "mdd": -0.1975,
+     "halves_sharpe": [
+      -2.121,
+      -3.049
+     ],
+     "corr_buyhold": -0.013,
+     "trades": 125,
+     "long": 55,
+     "short": 70,
+     "hit_rate": 0.328,
+     "mean_gross_bp": -5.44,
+     "mean_net_bp": -17.47
+    },
+    "perp_taker_x2": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -3.929,
+     "t": -6.797,
+     "annual_return": -0.1233,
+     "mdd": -0.3096,
+     "halves_sharpe": [
+      -2.834,
+      -4.821
+     ],
+     "corr_buyhold": -0.026,
+     "trades": 125,
+     "long": 55,
+     "short": 70,
+     "hit_rate": 0.184,
+     "mean_gross_bp": -5.44,
+     "mean_net_bp": -29.51
+    },
+    "futures_1bp": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -1.499,
+     "t": -2.593,
+     "annual_return": -0.0395,
+     "mdd": -0.1143,
+     "halves_sharpe": [
+      -1.492,
+      -1.548
+     ],
+     "corr_buyhold": -0.001,
+     "trades": 125,
+     "long": 55,
+     "short": 70,
+     "hit_rate": 0.432,
+     "mean_gross_bp": -5.44,
+     "mean_net_bp": -9.47
+    },
+    "cost0": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -0.873,
+     "t": -1.511,
+     "annual_return": -0.0227,
+     "mdd": -0.0692,
+     "halves_sharpe": [
+      -1.151,
+      -0.715
+     ],
+     "corr_buyhold": 0.004,
+     "trades": 125,
+     "long": 55,
+     "short": 70,
+     "hit_rate": 0.456,
+     "mean_gross_bp": -5.44,
+     "mean_net_bp": -5.44
+    }
+   },
+   "S2": {
+    "perp_taker": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -1.259,
+     "t": -1.78,
+     "annual_return": -0.071,
+     "mdd": -0.1485,
+     "halves_sharpe": [
+      -1.179,
+      -1.337
+     ],
+     "corr_buyhold": 0.11,
+     "trades": 140,
+     "long": 60,
+     "short": 80,
+     "hit_rate": 0.357,
+     "mean_gross_bp": 1.98,
+     "mean_net_bp": -10.13
+    },
+    "perp_taker_x2": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -2.651,
+     "t": -3.747,
+     "annual_return": -0.156,
+     "mdd": -0.2737,
+     "halves_sharpe": [
+      -2.932,
+      -2.448
+     ],
+     "corr_buyhold": 0.099,
+     "trades": 140,
+     "long": 60,
+     "short": 80,
+     "hit_rate": 0.25,
+     "mean_gross_bp": 1.98,
+     "mean_net_bp": -22.27
+    },
+    "futures_1bp": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -0.268,
+     "t": -0.379,
+     "annual_return": -0.0149,
+     "mdd": -0.0917,
+     "halves_sharpe": [
+      0.1,
+      -0.555
+     ],
+     "corr_buyhold": 0.115,
+     "trades": 140,
+     "long": 60,
+     "short": 80,
+     "hit_rate": 0.493,
+     "mean_gross_bp": 1.98,
+     "mean_net_bp": -2.13
+    },
+    "cost0": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": 0.25,
+     "t": 0.354,
+     "annual_return": 0.0139,
+     "mdd": -0.0854,
+     "halves_sharpe": [
+      0.781,
+      -0.155
+     ],
+     "corr_buyhold": 0.118,
+     "trades": 140,
+     "long": 60,
+     "short": 80,
+     "hit_rate": 0.564,
+     "mean_gross_bp": 1.98,
+     "mean_net_bp": 1.98
+    }
+   },
+   "conditions": {
+    "a_S1_sharpe_gt_emax": false,
+    "b_S1_t_ge_2": false,
+    "c_S1_halves_pos": false,
+    "d_S2_sharpe_gt_0.5": false,
+    "e_S1_x2_cost_pos": false,
+    "f_S1_trades_ge_100": true
+   },
+   "flag": "NOT_PROMISING"
+  },
+  "A_R_N480_m2.0_H4": {
+   "S1": {
+    "perp_taker": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -5.487,
+     "t": -9.492,
+     "annual_return": -0.2416,
+     "mdd": -0.5198,
+     "halves_sharpe": [
+      -4.665,
+      -6.245
+     ],
+     "corr_buyhold": 0.031,
+     "trades": 498,
+     "long": 221,
+     "short": 277,
+     "hit_rate": 0.223,
+     "mean_gross_bp": -2.49,
+     "mean_net_bp": -14.52
+    },
+    "perp_taker_x2": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -7.285,
+     "t": -12.602,
+     "annual_return": -0.4418,
+     "mdd": -0.7359,
+     "halves_sharpe": [
+      -6.701,
+      -7.874
+     ],
+     "corr_buyhold": 0.007,
+     "trades": 498,
+     "long": 221,
+     "short": 277,
+     "hit_rate": 0.088,
+     "mean_gross_bp": -2.49,
+     "mean_net_bp": -26.55
+    },
+    "futures_1bp": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -3.05,
+     "t": -5.277,
+     "annual_return": -0.1085,
+     "mdd": -0.2894,
+     "halves_sharpe": [
+      -2.326,
+      -3.781
+     ],
+     "corr_buyhold": 0.056,
+     "trades": 498,
+     "long": 221,
+     "short": 277,
+     "hit_rate": 0.382,
+     "mean_gross_bp": -2.49,
+     "mean_net_bp": -6.52
+    },
+    "cost0": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -1.271,
+     "t": -2.199,
+     "annual_return": -0.0415,
+     "mdd": -0.1383,
+     "halves_sharpe": [
+      -0.866,
+      -1.713
+     ],
+     "corr_buyhold": 0.07,
+     "trades": 498,
+     "long": 221,
+     "short": 277,
+     "hit_rate": 0.492,
+     "mean_gross_bp": -2.49,
+     "mean_net_bp": -2.49
+    }
+   },
+   "S2": {
+    "perp_taker": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -4.21,
+     "t": -5.952,
+     "annual_return": -0.2435,
+     "mdd": -0.3889,
+     "halves_sharpe": [
+      -4.537,
+      -3.864
+     ],
+     "corr_buyhold": -0.01,
+     "trades": 409,
+     "long": 144,
+     "short": 265,
+     "hit_rate": 0.308,
+     "mean_gross_bp": 0.59,
+     "mean_net_bp": -11.9
+    },
+    "perp_taker_x2": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -6.573,
+     "t": -9.293,
+     "annual_return": -0.4991,
+     "mdd": -0.6337,
+     "halves_sharpe": [
+      -6.825,
+      -6.397
+     ],
+     "corr_buyhold": -0.037,
+     "trades": 409,
+     "long": 144,
+     "short": 265,
+     "hit_rate": 0.188,
+     "mean_gross_bp": 0.59,
+     "mean_net_bp": -24.39
+    },
+    "futures_1bp": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -1.578,
+     "t": -2.231,
+     "annual_return": -0.0797,
+     "mdd": -0.175,
+     "halves_sharpe": [
+      -1.944,
+      -1.148
+     ],
+     "corr_buyhold": 0.003,
+     "trades": 409,
+     "long": 144,
+     "short": 265,
+     "hit_rate": 0.447,
+     "mean_gross_bp": 0.59,
+     "mean_net_bp": -3.9
+    },
+    "cost0": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": 0.254,
+     "t": 0.359,
+     "annual_return": 0.012,
+     "mdd": -0.0792,
+     "halves_sharpe": [
+      0.04,
+      0.504
+     ],
+     "corr_buyhold": 0.033,
+     "trades": 409,
+     "long": 144,
+     "short": 265,
+     "hit_rate": 0.509,
+     "mean_gross_bp": 0.59,
+     "mean_net_bp": 0.59
+    }
+   },
+   "conditions": {
+    "a_S1_sharpe_gt_emax": false,
+    "b_S1_t_ge_2": false,
+    "c_S1_halves_pos": false,
+    "d_S2_sharpe_gt_0.5": false,
+    "e_S1_x2_cost_pos": false,
+    "f_S1_trades_ge_100": true
+   },
+   "flag": "NOT_PROMISING"
+  },
+  "A_R_N480_m2.0_H16": {
+   "S1": {
+    "perp_taker": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -2.853,
+     "t": -4.936,
+     "annual_return": -0.1193,
+     "mdd": -0.3095,
+     "halves_sharpe": [
+      -2.651,
+      -3.054
+     ],
+     "corr_buyhold": 0.071,
+     "trades": 305,
+     "long": 144,
+     "short": 161,
+     "hit_rate": 0.364,
+     "mean_gross_bp": 0.35,
+     "mean_net_bp": -11.7
+    },
+    "perp_taker_x2": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -5.135,
+     "t": -8.882,
+     "annual_return": -0.2423,
+     "mdd": -0.5206,
+     "halves_sharpe": [
+      -4.712,
+      -5.54
+     ],
+     "corr_buyhold": 0.064,
+     "trades": 305,
+     "long": 144,
+     "short": 161,
+     "hit_rate": 0.239,
+     "mean_gross_bp": 0.35,
+     "mean_net_bp": -23.77
+    },
+    "futures_1bp": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -0.945,
+     "t": -1.635,
+     "annual_return": -0.0378,
+     "mdd": -0.1212,
+     "halves_sharpe": [
+      -1.0,
+      -0.887
+     ],
+     "corr_buyhold": 0.075,
+     "trades": 305,
+     "long": 144,
+     "short": 161,
+     "hit_rate": 0.462,
+     "mean_gross_bp": 0.35,
+     "mean_net_bp": -3.7
+    },
+    "cost0": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": 0.091,
+     "t": 0.158,
+     "annual_return": 0.0036,
+     "mdd": -0.0476,
+     "halves_sharpe": [
+      -0.122,
+      0.312
+     ],
+     "corr_buyhold": 0.074,
+     "trades": 305,
+     "long": 144,
+     "short": 161,
+     "hit_rate": 0.508,
+     "mean_gross_bp": 0.35,
+     "mean_net_bp": 0.35
+    }
+   },
+   "S2": {
+    "perp_taker": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -1.925,
+     "t": -2.722,
+     "annual_return": -0.1186,
+     "mdd": -0.2214,
+     "halves_sharpe": [
+      -2.226,
+      -1.578
+     ],
+     "corr_buyhold": 0.016,
+     "trades": 245,
+     "long": 91,
+     "short": 154,
+     "hit_rate": 0.388,
+     "mean_gross_bp": 2.63,
+     "mean_net_bp": -9.68
+    },
+    "perp_taker_x2": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -4.057,
+     "t": -5.735,
+     "annual_return": -0.2699,
+     "mdd": -0.4211,
+     "halves_sharpe": [
+      -4.258,
+      -3.858
+     ],
+     "corr_buyhold": 0.007,
+     "trades": 245,
+     "long": 91,
+     "short": 154,
+     "hit_rate": 0.298,
+     "mean_gross_bp": 2.63,
+     "mean_net_bp": -22.02
+    },
+    "futures_1bp": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -0.341,
+     "t": -0.482,
+     "annual_return": -0.0205,
+     "mdd": -0.1283,
+     "halves_sharpe": [
+      -0.722,
+      0.113
+     ],
+     "corr_buyhold": 0.017,
+     "trades": 245,
+     "long": 91,
+     "short": 154,
+     "hit_rate": 0.449,
+     "mean_gross_bp": 2.63,
+     "mean_net_bp": -1.68
+    },
+    "cost0": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": 0.541,
+     "t": 0.765,
+     "annual_return": 0.0323,
+     "mdd": -0.1088,
+     "halves_sharpe": [
+      0.179,
+      0.974
+     ],
+     "corr_buyhold": 0.024,
+     "trades": 245,
+     "long": 91,
+     "short": 154,
+     "hit_rate": 0.514,
+     "mean_gross_bp": 2.63,
+     "mean_net_bp": 2.63
+    }
+   },
+   "conditions": {
+    "a_S1_sharpe_gt_emax": false,
+    "b_S1_t_ge_2": false,
+    "c_S1_halves_pos": false,
+    "d_S2_sharpe_gt_0.5": false,
+    "e_S1_x2_cost_pos": false,
+    "f_S1_trades_ge_100": true
+   },
+   "flag": "NOT_PROMISING"
+  },
+  "A_R_N480_m3.0_H4": {
+   "S1": {
+    "perp_taker": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -3.664,
+     "t": -6.338,
+     "annual_return": -0.0672,
+     "mdd": -0.1826,
+     "halves_sharpe": [
+      -3.056,
+      -4.229
+     ],
+     "corr_buyhold": -0.028,
+     "trades": 109,
+     "long": 45,
+     "short": 64,
+     "hit_rate": 0.174,
+     "mean_gross_bp": -6.37,
+     "mean_net_bp": -18.45
+    },
+    "perp_taker_x2": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -4.535,
+     "t": -7.844,
+     "annual_return": -0.1112,
+     "mdd": -0.2838,
+     "halves_sharpe": [
+      -3.566,
+      -5.384
+     ],
+     "corr_buyhold": -0.04,
+     "trades": 109,
+     "long": 45,
+     "short": 64,
+     "hit_rate": 0.064,
+     "mean_gross_bp": -6.37,
+     "mean_net_bp": -30.53
+    },
+    "futures_1bp": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -2.505,
+     "t": -4.333,
+     "annual_return": -0.0381,
+     "mdd": -0.1094,
+     "halves_sharpe": [
+      -2.346,
+      -2.739
+     ],
+     "corr_buyhold": -0.013,
+     "trades": 109,
+     "long": 45,
+     "short": 64,
+     "hit_rate": 0.312,
+     "mean_gross_bp": -6.37,
+     "mean_net_bp": -10.45
+    },
+    "cost0": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -1.644,
+     "t": -2.844,
+     "annual_return": -0.0232,
+     "mdd": -0.07,
+     "halves_sharpe": [
+      -1.821,
+      -1.642
+     ],
+     "corr_buyhold": -0.003,
+     "trades": 109,
+     "long": 45,
+     "short": 64,
+     "hit_rate": 0.459,
+     "mean_gross_bp": -6.37,
+     "mean_net_bp": -6.37
+    }
+   },
+   "S2": {
+    "perp_taker": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -2.003,
+     "t": -2.831,
+     "annual_return": -0.0665,
+     "mdd": -0.1327,
+     "halves_sharpe": [
+      -1.165,
+      -2.964
+     ],
+     "corr_buyhold": 0.05,
+     "trades": 120,
+     "long": 43,
+     "short": 77,
+     "hit_rate": 0.325,
+     "mean_gross_bp": 1.0,
+     "mean_net_bp": -11.08
+    },
+    "perp_taker_x2": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -3.56,
+     "t": -5.032,
+     "annual_return": -0.1391,
+     "mdd": -0.2466,
+     "halves_sharpe": [
+      -3.065,
+      -4.114
+     ],
+     "corr_buyhold": 0.032,
+     "trades": 120,
+     "long": 43,
+     "short": 77,
+     "hit_rate": 0.217,
+     "mean_gross_bp": 1.0,
+     "mean_net_bp": -23.17
+    },
+    "futures_1bp": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -0.598,
+     "t": -0.845,
+     "annual_return": -0.0185,
+     "mdd": -0.0548,
+     "halves_sharpe": [
+      0.449,
+      -1.843
+     ],
+     "corr_buyhold": 0.063,
+     "trades": 120,
+     "long": 43,
+     "short": 77,
+     "hit_rate": 0.483,
+     "mean_gross_bp": 1.0,
+     "mean_net_bp": -3.08
+    },
+    "cost0": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": 0.197,
+     "t": 0.279,
+     "annual_return": 0.006,
+     "mdd": -0.0435,
+     "halves_sharpe": [
+      1.313,
+      -1.165
+     ],
+     "corr_buyhold": 0.067,
+     "trades": 120,
+     "long": 43,
+     "short": 77,
+     "hit_rate": 0.525,
+     "mean_gross_bp": 1.0,
+     "mean_net_bp": 1.0
+    }
+   },
+   "conditions": {
+    "a_S1_sharpe_gt_emax": false,
+    "b_S1_t_ge_2": false,
+    "c_S1_halves_pos": false,
+    "d_S2_sharpe_gt_0.5": false,
+    "e_S1_x2_cost_pos": false,
+    "f_S1_trades_ge_100": true
+   },
+   "flag": "NOT_PROMISING"
+  },
+  "A_R_N480_m3.0_H16": {
+   "S1": {
+    "perp_taker": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -2.36,
+     "t": -4.082,
+     "annual_return": -0.0511,
+     "mdd": -0.1442,
+     "halves_sharpe": [
+      -1.527,
+      -3.064
+     ],
+     "corr_buyhold": 0.076,
+     "trades": 83,
+     "long": 38,
+     "short": 45,
+     "hit_rate": 0.337,
+     "mean_gross_bp": -6.35,
+     "mean_net_bp": -18.42
+    },
+    "perp_taker_x2": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -3.395,
+     "t": -5.873,
+     "annual_return": -0.0846,
+     "mdd": -0.2251,
+     "halves_sharpe": [
+      -2.192,
+      -4.39
+     ],
+     "corr_buyhold": 0.065,
+     "trades": 83,
+     "long": 38,
+     "short": 45,
+     "hit_rate": 0.169,
+     "mean_gross_bp": -6.35,
+     "mean_net_bp": -30.5
+    },
+    "futures_1bp": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -1.428,
+     "t": -2.471,
+     "annual_return": -0.0289,
+     "mdd": -0.0868,
+     "halves_sharpe": [
+      -0.965,
+      -1.825
+     ],
+     "corr_buyhold": 0.082,
+     "trades": 83,
+     "long": 38,
+     "short": 45,
+     "hit_rate": 0.458,
+     "mean_gross_bp": -6.35,
+     "mean_net_bp": -10.42
+    },
+    "cost0": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -0.89,
+     "t": -1.539,
+     "annual_return": -0.0176,
+     "mdd": -0.0561,
+     "halves_sharpe": [
+      -0.664,
+      -1.085
+     ],
+     "corr_buyhold": 0.083,
+     "trades": 83,
+     "long": 38,
+     "short": 45,
+     "hit_rate": 0.482,
+     "mean_gross_bp": -6.35,
+     "mean_net_bp": -6.35
+    }
+   },
+   "S2": {
+    "perp_taker": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -0.51,
+     "t": -0.721,
+     "annual_return": -0.0191,
+     "mdd": -0.0542,
+     "halves_sharpe": [
+      0.082,
+      -1.09
+     ],
+     "corr_buyhold": 0.02,
+     "trades": 88,
+     "long": 30,
+     "short": 58,
+     "hit_rate": 0.33,
+     "mean_gross_bp": 7.69,
+     "mean_net_bp": -4.34
+    },
+    "perp_taker_x2": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -1.846,
+     "t": -2.609,
+     "annual_return": -0.0723,
+     "mdd": -0.1401,
+     "halves_sharpe": [
+      -1.459,
+      -2.221
+     ],
+     "corr_buyhold": 0.007,
+     "trades": 88,
+     "long": 30,
+     "short": 58,
+     "hit_rate": 0.273,
+     "mean_gross_bp": 7.69,
+     "mean_net_bp": -16.41
+    },
+    "futures_1bp": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": 0.433,
+     "t": 0.612,
+     "annual_return": 0.0161,
+     "mdd": -0.0426,
+     "halves_sharpe": [
+      1.14,
+      -0.269
+     ],
+     "corr_buyhold": 0.029,
+     "trades": 88,
+     "long": 30,
+     "short": 58,
+     "hit_rate": 0.455,
+     "mean_gross_bp": 7.69,
+     "mean_net_bp": 3.66
+    },
+    "cost0": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": 0.906,
+     "t": 1.281,
+     "annual_return": 0.0339,
+     "mdd": -0.0384,
+     "halves_sharpe": [
+      1.667,
+      0.144
+     ],
+     "corr_buyhold": 0.032,
+     "trades": 88,
+     "long": 30,
+     "short": 58,
+     "hit_rate": 0.545,
+     "mean_gross_bp": 7.69,
+     "mean_net_bp": 7.69
+    }
+   },
+   "conditions": {
+    "a_S1_sharpe_gt_emax": false,
+    "b_S1_t_ge_2": false,
+    "c_S1_halves_pos": false,
+    "d_S2_sharpe_gt_0.5": false,
+    "e_S1_x2_cost_pos": false,
+    "f_S1_trades_ge_100": false
+   },
+   "flag": "NOT_PROMISING"
+  },
+  "A_B_N96_m2.0_H16": {
+   "S1": {
+    "perp_taker": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -3.739,
+     "t": -6.468,
+     "annual_return": -0.1855,
+     "mdd": -0.4417,
+     "halves_sharpe": [
+      -3.105,
+      -4.417
+     ],
+     "corr_buyhold": -0.022,
+     "trades": 438,
+     "long": 225,
+     "short": 213,
+     "hit_rate": 0.324,
+     "mean_gross_bp": -0.63,
+     "mean_net_bp": -12.68
+    },
+    "perp_taker_x2": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -6.665,
+     "t": -11.529,
+     "annual_return": -0.3618,
+     "mdd": -0.6635,
+     "halves_sharpe": [
+      -5.69,
+      -7.679
+     ],
+     "corr_buyhold": -0.015,
+     "trades": 438,
+     "long": 225,
+     "short": 213,
+     "hit_rate": 0.21,
+     "mean_gross_bp": -0.63,
+     "mean_net_bp": -24.72
+    },
+    "futures_1bp": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -1.42,
+     "t": -2.457,
+     "annual_return": -0.0684,
+     "mdd": -0.2218,
+     "halves_sharpe": [
+      -1.123,
+      -1.742
+     ],
+     "corr_buyhold": -0.026,
+     "trades": 438,
+     "long": 225,
+     "short": 213,
+     "hit_rate": 0.406,
+     "mean_gross_bp": -0.63,
+     "mean_net_bp": -4.68
+    },
+    "cost0": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -0.19,
+     "t": -0.329,
+     "annual_return": -0.0092,
+     "mdd": -0.1099,
+     "halves_sharpe": [
+      -0.091,
+      -0.298
+     ],
+     "corr_buyhold": -0.027,
+     "trades": 438,
+     "long": 225,
+     "short": 213,
+     "hit_rate": 0.475,
+     "mean_gross_bp": -0.63,
+     "mean_net_bp": -0.63
+    }
+   },
+   "S2": {
+    "perp_taker": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -2.595,
+     "t": -3.668,
+     "annual_return": -0.2094,
+     "mdd": -0.3559,
+     "halves_sharpe": [
+      -2.447,
+      -2.744
+     ],
+     "corr_buyhold": -0.112,
+     "trades": 384,
+     "long": 212,
+     "short": 172,
+     "hit_rate": 0.388,
+     "mean_gross_bp": 1.35,
+     "mean_net_bp": -10.9
+    },
+    "perp_taker_x2": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -5.324,
+     "t": -7.527,
+     "annual_return": -0.4444,
+     "mdd": -0.5963,
+     "halves_sharpe": [
+      -5.328,
+      -5.314
+     ],
+     "corr_buyhold": -0.111,
+     "trades": 384,
+     "long": 212,
+     "short": 172,
+     "hit_rate": 0.25,
+     "mean_gross_bp": 1.35,
+     "mean_net_bp": -23.13
+    },
+    "futures_1bp": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -0.695,
+     "t": -0.982,
+     "annual_return": -0.0557,
+     "mdd": -0.1534,
+     "halves_sharpe": [
+      -0.48,
+      -0.917
+     ],
+     "corr_buyhold": -0.111,
+     "trades": 384,
+     "long": 212,
+     "short": 172,
+     "hit_rate": 0.461,
+     "mean_gross_bp": 1.35,
+     "mean_net_bp": -2.9
+    },
+    "cost0": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": 0.321,
+     "t": 0.454,
+     "annual_return": 0.0259,
+     "mdd": -0.1035,
+     "halves_sharpe": [
+      0.609,
+      0.02
+     ],
+     "corr_buyhold": -0.108,
+     "trades": 384,
+     "long": 212,
+     "short": 172,
+     "hit_rate": 0.495,
+     "mean_gross_bp": 1.35,
+     "mean_net_bp": 1.35
+    }
+   },
+   "conditions": {
+    "a_S1_sharpe_gt_emax": false,
+    "b_S1_t_ge_2": false,
+    "c_S1_halves_pos": false,
+    "d_S2_sharpe_gt_0.5": false,
+    "e_S1_x2_cost_pos": false,
+    "f_S1_trades_ge_100": true
+   },
+   "flag": "NOT_PROMISING"
+  },
+  "B_tsmom_L20": {
+   "S1": {
+    "perp_taker": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": 0.034,
+     "t": 0.058,
+     "annual_return": 0.0037,
+     "mdd": -0.2328,
+     "halves_sharpe": [
+      0.024,
+      0.043
+     ],
+     "corr_buyhold": 0.126,
+     "trades": 85,
+     "long_days": 469,
+     "short_days": 440
+    },
+    "perp_taker_x2": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -0.294,
+     "t": -0.508,
+     "annual_return": -0.032,
+     "mdd": -0.302,
+     "halves_sharpe": [
+      -0.27,
+      -0.316
+     ],
+     "corr_buyhold": 0.128,
+     "trades": 85,
+     "long_days": 469,
+     "short_days": 440
+    },
+    "futures_1bp": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": 0.244,
+     "t": 0.421,
+     "annual_return": 0.0264,
+     "mdd": -0.1853,
+     "halves_sharpe": [
+      0.211,
+      0.275
+     ],
+     "corr_buyhold": 0.124,
+     "trades": 85,
+     "long_days": 469,
+     "short_days": 440
+    },
+    "cost0": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": 0.372,
+     "t": 0.643,
+     "annual_return": 0.0403,
+     "mdd": -0.1588,
+     "halves_sharpe": [
+      0.323,
+      0.418
+     ],
+     "corr_buyhold": 0.123,
+     "trades": 85,
+     "long_days": 469,
+     "short_days": 440
+    }
+   },
+   "S2": {
+    "perp_taker": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -0.495,
+     "t": -0.699,
+     "annual_return": -0.0856,
+     "mdd": -0.2634,
+     "halves_sharpe": [
+      -0.2,
+      -0.882
+     ],
+     "corr_buyhold": 0.152,
+     "trades": 73,
+     "long_days": 342,
+     "short_days": 280
+    },
+    "perp_taker_x2": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -0.786,
+     "t": -1.112,
+     "annual_return": -0.1369,
+     "mdd": -0.3165,
+     "halves_sharpe": [
+      -0.484,
+      -1.19
+     ],
+     "corr_buyhold": 0.152,
+     "trades": 73,
+     "long_days": 342,
+     "short_days": 280
+    },
+    "futures_1bp": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -0.326,
+     "t": -0.461,
+     "annual_return": -0.0564,
+     "mdd": -0.2437,
+     "halves_sharpe": [
+      -0.053,
+      -0.683
+     ],
+     "corr_buyhold": 0.152,
+     "trades": 73,
+     "long_days": 342,
+     "short_days": 280
+    },
+    "cost0": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -0.181,
+     "t": -0.256,
+     "annual_return": -0.0313,
+     "mdd": -0.2371,
+     "halves_sharpe": [
+      0.139,
+      -0.596
+     ],
+     "corr_buyhold": 0.151,
+     "trades": 73,
+     "long_days": 342,
+     "short_days": 280
+    }
+   },
+   "conditions": {
+    "a_S1_sharpe_gt_emax": false,
+    "b_S1_t_ge_2": false,
+    "c_S1_halves_pos": true,
+    "d_S2_sharpe_gt_0.5": false,
+    "e_S1_x2_cost_pos": false,
+    "f_S1_trades_ge_100": false
+   },
+   "flag": "NOT_PROMISING"
+  },
+  "B_tsmom_L60": {
+   "S1": {
+    "perp_taker": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": 0.494,
+     "t": 0.854,
+     "annual_return": 0.0518,
+     "mdd": -0.1623,
+     "halves_sharpe": [
+      0.164,
+      0.795
+     ],
+     "corr_buyhold": 0.226,
+     "trades": 40,
+     "long_days": 498,
+     "short_days": 371
+    },
+    "perp_taker_x2": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": 0.334,
+     "t": 0.577,
+     "annual_return": 0.035,
+     "mdd": -0.1933,
+     "halves_sharpe": [
+      -0.013,
+      0.649
+     ],
+     "corr_buyhold": 0.226,
+     "trades": 40,
+     "long_days": 498,
+     "short_days": 371
+    },
+    "futures_1bp": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": 0.595,
+     "t": 1.029,
+     "annual_return": 0.0625,
+     "mdd": -0.1413,
+     "halves_sharpe": [
+      0.278,
+      0.886
+     ],
+     "corr_buyhold": 0.226,
+     "trades": 40,
+     "long_days": 498,
+     "short_days": 371
+    },
+    "cost0": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": 0.689,
+     "t": 1.192,
+     "annual_return": 0.0725,
+     "mdd": -0.1216,
+     "halves_sharpe": [
+      0.386,
+      0.969
+     ],
+     "corr_buyhold": 0.226,
+     "trades": 40,
+     "long_days": 498,
+     "short_days": 371
+    }
+   },
+   "S2": {
+    "perp_taker": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": 0.464,
+     "t": 0.656,
+     "annual_return": 0.08,
+     "mdd": -0.1488,
+     "halves_sharpe": [
+      1.183,
+      -0.449
+     ],
+     "corr_buyhold": 0.231,
+     "trades": 23,
+     "long_days": 350,
+     "short_days": 272
+    },
+    "perp_taker_x2": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": 0.37,
+     "t": 0.523,
+     "annual_return": 0.0637,
+     "mdd": -0.1656,
+     "halves_sharpe": [
+      1.138,
+      -0.606
+     ],
+     "corr_buyhold": 0.229,
+     "trades": 23,
+     "long_days": 350,
+     "short_days": 272
+    },
+    "futures_1bp": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": 0.517,
+     "t": 0.731,
+     "annual_return": 0.0892,
+     "mdd": -0.1392,
+     "halves_sharpe": [
+      1.21,
+      -0.36
+     ],
+     "corr_buyhold": 0.232,
+     "trades": 23,
+     "long_days": 350,
+     "short_days": 272
+    },
+    "cost0": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": 0.58,
+     "t": 0.82,
+     "annual_return": 0.1001,
+     "mdd": -0.1374,
+     "halves_sharpe": [
+      1.318,
+      -0.356
+     ],
+     "corr_buyhold": 0.233,
+     "trades": 23,
+     "long_days": 350,
+     "short_days": 272
+    }
+   },
+   "conditions": {
+    "a_S1_sharpe_gt_emax": false,
+    "b_S1_t_ge_2": false,
+    "c_S1_halves_pos": true,
+    "d_S2_sharpe_gt_0.5": false,
+    "e_S1_x2_cost_pos": true,
+    "f_S1_trades_ge_100": false
+   },
+   "flag": "NOT_PROMISING"
+  },
+  "C_donchian20": {
+   "S1": {
+    "perp_taker": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -0.0,
+     "t": -0.0,
+     "annual_return": -0.0,
+     "mdd": -0.1996,
+     "halves_sharpe": [
+      -0.85,
+      0.799
+     ],
+     "corr_buyhold": 0.132,
+     "trades": 24,
+     "long_days": 443,
+     "short_days": 458
+    },
+    "perp_taker_x2": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -0.101,
+     "t": -0.175,
+     "annual_return": -0.0108,
+     "mdd": -0.2209,
+     "halves_sharpe": [
+      -0.974,
+      0.717
+     ],
+     "corr_buyhold": 0.132,
+     "trades": 24,
+     "long_days": 443,
+     "short_days": 458
+    },
+    "futures_1bp": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": 0.06,
+     "t": 0.104,
+     "annual_return": 0.0064,
+     "mdd": -0.1883,
+     "halves_sharpe": [
+      -0.774,
+      0.846
+     ],
+     "corr_buyhold": 0.132,
+     "trades": 24,
+     "long_days": 443,
+     "short_days": 458
+    },
+    "cost0": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": 0.095,
+     "t": 0.165,
+     "annual_return": 0.0101,
+     "mdd": -0.1846,
+     "halves_sharpe": [
+      -0.747,
+      0.889
+     ],
+     "corr_buyhold": 0.132,
+     "trades": 24,
+     "long_days": 443,
+     "short_days": 458
+    }
+   },
+   "S2": {
+    "perp_taker": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -0.671,
+     "t": -0.949,
+     "annual_return": -0.1158,
+     "mdd": -0.3023,
+     "halves_sharpe": [
+      0.086,
+      -1.666
+     ],
+     "corr_buyhold": 0.148,
+     "trades": 16,
+     "long_days": 322,
+     "short_days": 300
+    },
+    "perp_taker_x2": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -0.757,
+     "t": -1.071,
+     "annual_return": -0.1309,
+     "mdd": -0.3169,
+     "halves_sharpe": [
+      -0.009,
+      -1.75
+     ],
+     "corr_buyhold": 0.149,
+     "trades": 16,
+     "long_days": 322,
+     "short_days": 300
+    },
+    "futures_1bp": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -0.634,
+     "t": -0.896,
+     "annual_return": -0.1094,
+     "mdd": -0.2973,
+     "halves_sharpe": [
+      0.113,
+      -1.611
+     ],
+     "corr_buyhold": 0.148,
+     "trades": 16,
+     "long_days": 322,
+     "short_days": 300
+    },
+    "cost0": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -0.576,
+     "t": -0.814,
+     "annual_return": -0.0994,
+     "mdd": -0.2815,
+     "halves_sharpe": [
+      0.214,
+      -1.606
+     ],
+     "corr_buyhold": 0.146,
+     "trades": 16,
+     "long_days": 322,
+     "short_days": 300
+    }
+   },
+   "conditions": {
+    "a_S1_sharpe_gt_emax": false,
+    "b_S1_t_ge_2": false,
+    "c_S1_halves_pos": false,
+    "d_S2_sharpe_gt_0.5": false,
+    "e_S1_x2_cost_pos": false,
+    "f_S1_trades_ge_100": false
+   },
+   "flag": "NOT_PROMISING"
+  },
+  "D_asia_breakout": {
+   "S1": {
+    "perp_taker": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -2.755,
+     "t": -4.767,
+     "annual_return": -0.2188,
+     "mdd": -0.5039,
+     "halves_sharpe": [
+      -2.395,
+      -3.099
+     ],
+     "corr_buyhold": -0.056,
+     "trades": 557,
+     "long": 271,
+     "short": 286,
+     "hit_rate": 0.384,
+     "mean_gross_bp": 0.26,
+     "mean_net_bp": -11.75
+    },
+    "perp_taker_x2": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -5.436,
+     "t": -9.404,
+     "annual_return": -0.4425,
+     "mdd": -0.7394,
+     "halves_sharpe": [
+      -5.027,
+      -5.828
+     ],
+     "corr_buyhold": -0.052,
+     "trades": 557,
+     "long": 271,
+     "short": 286,
+     "hit_rate": 0.303,
+     "mean_gross_bp": 0.26,
+     "mean_net_bp": -23.77
+    },
+    "futures_1bp": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": -0.887,
+     "t": -1.534,
+     "annual_return": -0.0699,
+     "mdd": -0.2476,
+     "halves_sharpe": [
+      -0.557,
+      -1.201
+     ],
+     "corr_buyhold": -0.058,
+     "trades": 557,
+     "long": 271,
+     "short": 286,
+     "hit_rate": 0.454,
+     "mean_gross_bp": 0.26,
+     "mean_net_bp": -3.75
+    },
+    "cost0": {
+     "days": 931,
+     "years": 2.992,
+     "sharpe": 0.061,
+     "t": 0.105,
+     "annual_return": 0.0048,
+     "mdd": -0.1282,
+     "halves_sharpe": [
+      0.365,
+      -0.23
+     ],
+     "corr_buyhold": -0.057,
+     "trades": 557,
+     "long": 271,
+     "short": 286,
+     "hit_rate": 0.494,
+     "mean_gross_bp": 0.26,
+     "mean_net_bp": 0.26
+    }
+   },
+   "S2": {
+    "perp_taker": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -1.587,
+     "t": -2.243,
+     "annual_return": -0.1913,
+     "mdd": -0.3342,
+     "halves_sharpe": [
+      -1.207,
+      -2.028
+     ],
+     "corr_buyhold": -0.093,
+     "trades": 393,
+     "long": 220,
+     "short": 173,
+     "hit_rate": 0.389,
+     "mean_gross_bp": 2.76,
+     "mean_net_bp": -9.73
+    },
+    "perp_taker_x2": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -3.589,
+     "t": -5.074,
+     "annual_return": -0.4359,
+     "mdd": -0.5915,
+     "halves_sharpe": [
+      -3.197,
+      -4.047
+     ],
+     "corr_buyhold": -0.095,
+     "trades": 393,
+     "long": 220,
+     "short": 173,
+     "hit_rate": 0.338,
+     "mean_gross_bp": 2.76,
+     "mean_net_bp": -22.17
+    },
+    "futures_1bp": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": -0.283,
+     "t": -0.4,
+     "annual_return": -0.034,
+     "mdd": -0.1277,
+     "halves_sharpe": [
+      0.043,
+      -0.659
+     ],
+     "corr_buyhold": -0.094,
+     "trades": 393,
+     "long": 220,
+     "short": 173,
+     "hit_rate": 0.433,
+     "mean_gross_bp": 2.76,
+     "mean_net_bp": -1.73
+    },
+    "cost0": {
+     "days": 623,
+     "years": 1.999,
+     "sharpe": 0.45,
+     "t": 0.636,
+     "annual_return": 0.0543,
+     "mdd": -0.0994,
+     "halves_sharpe": [
+      0.804,
+      0.043
+     ],
+     "corr_buyhold": -0.09,
+     "trades": 393,
+     "long": 220,
+     "short": 173,
+     "hit_rate": 0.473,
+     "mean_gross_bp": 2.76,
+     "mean_net_bp": 2.76
+    }
+   },
+   "conditions": {
+    "a_S1_sharpe_gt_emax": false,
+    "b_S1_t_ge_2": false,
+    "c_S1_halves_pos": false,
+    "d_S2_sharpe_gt_0.5": false,
+    "e_S1_x2_cost_pos": false,
+    "f_S1_trades_ge_100": true
+   },
+   "flag": "NOT_PROMISING"
+  }
+ },
+ "summary": {
+  "A_R_N96_m2.0_H4": {
+   "flag": "NOT_PROMISING",
+   "S1_sharpe": -6.314,
+   "S1_cost0_sharpe": -0.584,
+   "S2_sharpe": -5.711,
+   "S1_trades": 687,
+   "S1_mean_gross_bp": -0.96
+  },
+  "A_R_N96_m2.0_H16": {
+   "flag": "NOT_PROMISING",
+   "S1_sharpe": -3.348,
+   "S1_cost0_sharpe": 0.19,
+   "S2_sharpe": -3.147,
+   "S1_trades": 438,
+   "S1_mean_gross_bp": 0.63
+  },
+  "A_R_N96_m3.0_H4": {
+   "flag": "NOT_PROMISING",
+   "S1_sharpe": -3.729,
+   "S1_cost0_sharpe": -1.038,
+   "S2_sharpe": -2.805,
+   "S1_trades": 172,
+   "S1_mean_gross_bp": -3.6
+  },
+  "A_R_N96_m3.0_H16": {
+   "flag": "NOT_PROMISING",
+   "S1_sharpe": -2.625,
+   "S1_cost0_sharpe": -0.873,
+   "S2_sharpe": -1.259,
+   "S1_trades": 125,
+   "S1_mean_gross_bp": -5.44
+  },
+  "A_R_N480_m2.0_H4": {
+   "flag": "NOT_PROMISING",
+   "S1_sharpe": -5.487,
+   "S1_cost0_sharpe": -1.271,
+   "S2_sharpe": -4.21,
+   "S1_trades": 498,
+   "S1_mean_gross_bp": -2.49
+  },
+  "A_R_N480_m2.0_H16": {
+   "flag": "NOT_PROMISING",
+   "S1_sharpe": -2.853,
+   "S1_cost0_sharpe": 0.091,
+   "S2_sharpe": -1.925,
+   "S1_trades": 305,
+   "S1_mean_gross_bp": 0.35
+  },
+  "A_R_N480_m3.0_H4": {
+   "flag": "NOT_PROMISING",
+   "S1_sharpe": -3.664,
+   "S1_cost0_sharpe": -1.644,
+   "S2_sharpe": -2.003,
+   "S1_trades": 109,
+   "S1_mean_gross_bp": -6.37
+  },
+  "A_R_N480_m3.0_H16": {
+   "flag": "NOT_PROMISING",
+   "S1_sharpe": -2.36,
+   "S1_cost0_sharpe": -0.89,
+   "S2_sharpe": -0.51,
+   "S1_trades": 83,
+   "S1_mean_gross_bp": -6.35
+  },
+  "A_B_N96_m2.0_H16": {
+   "flag": "NOT_PROMISING",
+   "S1_sharpe": -3.739,
+   "S1_cost0_sharpe": -0.19,
+   "S2_sharpe": -2.595,
+   "S1_trades": 438,
+   "S1_mean_gross_bp": -0.63
+  },
+  "B_tsmom_L20": {
+   "flag": "NOT_PROMISING",
+   "S1_sharpe": 0.034,
+   "S1_cost0_sharpe": 0.372,
+   "S2_sharpe": -0.495,
+   "S1_trades": 85,
+   "S1_mean_gross_bp": null
+  },
+  "B_tsmom_L60": {
+   "flag": "NOT_PROMISING",
+   "S1_sharpe": 0.494,
+   "S1_cost0_sharpe": 0.689,
+   "S2_sharpe": 0.464,
+   "S1_trades": 40,
+   "S1_mean_gross_bp": null
+  },
+  "C_donchian20": {
+   "flag": "NOT_PROMISING",
+   "S1_sharpe": -0.0,
+   "S1_cost0_sharpe": 0.095,
+   "S2_sharpe": -0.671,
+   "S1_trades": 24,
+   "S1_mean_gross_bp": null
+  },
+  "D_asia_breakout": {
+   "flag": "NOT_PROMISING",
+   "S1_sharpe": -2.755,
+   "S1_cost0_sharpe": 0.061,
+   "S2_sharpe": -1.587,
+   "S1_trades": 557,
+   "S1_mean_gross_bp": 0.26
+  }
+ }
+}
