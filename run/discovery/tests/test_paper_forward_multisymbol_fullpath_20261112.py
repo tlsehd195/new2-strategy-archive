@@ -35,6 +35,7 @@ windows and ledgers are never touched (temp dirs only).
 """
 from __future__ import annotations
 
+import os
 import json
 import sys
 import unittest
@@ -116,6 +117,9 @@ class MultiSymbolCase(PipelineCase):
         from paper_forward import DEFAULT_CRITERIA, ForwardPaper
         from pipeline import EvolutionPipeline
         root = self.td / tag
+        # ADR 0085 (L-1): each build is an independent universe (own state dir AND own
+        # shared locked-TEST record), exactly like two separate repositories
+        self.enterContext(mock.patch.dict(os.environ, {"NEW2_LOCK_SHARED_DIR": str(root / "shared")}))
         prov = SyntheticProvider(symbols=SYMS)
         p = EvolutionPipeline(root / "state", prov, verified_fee_cost(), symbols=list(SYMS))
         sids = self.register_all(p, [dict(s, symbols=list(SYMS)) for s in [EDGE] + NOISE[:7]])
