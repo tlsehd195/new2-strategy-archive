@@ -1,0 +1,70 @@
+{
+  "version": "dca-stop-prereg-v1",
+  "status": "DRAFT_FOR_DEV_ONLY",
+  "date": "2026-11-18",
+  "requested_by": "동동 (2026-11-18): 일봉 전저점·전고점 분할 물타기(ADR 0088)에 손절만 넣어서 다시 테스트",
+  "reading": "Entry rule, add rule, tranche size, leverage 5, target +10% from average, 60-day timeout, 5-day cooldown and universe are exactly ADR 0088 (prereg dca-extreme-prereg-v1). Only a stop rule is added. The exit mode 'target_time_only' (no stop) of ADR 0088 is the control; the ADR 0088 structural stop L0*(1-s*(K+1)) is a second reference. Reference runs reproduce ADR 0088 numbers and are NOT new trials.",
+  "data": {
+    "source": "same as ADR 0088: project upload alts_2021_2026_binance_um_15m_funding.zip, 17 USDT-M alts, daily bars from 15m UTC",
+    "segments": {"S1": ["2021-01-01", "2023-09-18"], "S2": ["2024-06-19", "2025-10-20"]},
+    "never_read": ["<=2020-12-31", "2023-09-19..2024-06-18", ">=2025-10-21"],
+    "btc_eth": "not in the upload; not used"
+  },
+  "bases": [
+    {"id": "B1", "N": 30, "s": 0.04, "K": 4},
+    {"id": "B2", "N": 30, "s": 0.08, "K": 2},
+    {"id": "B3", "N": 90, "s": 0.04, "K": 4},
+    {"id": "B4", "N": 90, "s": 0.08, "K": 2}
+  ],
+  "stop_rules": {
+    "avg_close": "daily close <= avg*(1-x) (short: >= avg*(1+x)) -> exit signal, fill next open (gap risk included)",
+    "avg_intra": "the day's low (short: high) reaches avg*(1-x) -> exit the same day at the stop price; if the open already gapped beyond it, fill at the open (no slippage in the main row)",
+    "last_close": "daily close <= last_tranche_fill*(1-w) (short mirror), last tranche = the most recent fill (first entry when no add yet) -> exit signal, fill next open",
+    "last_intra": "same level as last_close but triggered intraday at the stop price, gap -> open",
+    "avg_is_recomputed_after_each_add": true,
+    "liquidation_precedence": "if the stop price is farther from the open than the liquidation price (avg*(1-1/5+0.005)) liquidation happens first; a gap open beyond liquidation is liquidated (loses margin only, ADR 0088 rule)",
+    "reentry": "after any stop the cycle ends and the ADR 0088 5-day cooldown applies, then the normal entry rule may open a new cycle (whipsaw re-entry is part of the result)"
+  },
+  "grid": {
+    "per_base": {
+      "avg_close": {"x": [0.06, 0.10, 0.15]},
+      "avg_intra": {"x": [0.06, 0.10, 0.15]},
+      "last_close": {"w": [0.05, 0.10]},
+      "last_intra": {"w": [0.05, 0.10]}
+    },
+    "n_per_base": 10,
+    "n_stop_configs_with_adds": 40,
+    "k0_controls_with_stop": {"N": [30, 90], "K": 0, "stop_rules": ["avg_close", "avg_intra"], "x": [0.06, 0.10, 0.15], "n": 12, "note": "single tranche W; last_* equals avg_* when K=0 so not repeated"},
+    "n_configs": 52,
+    "n_trials_counted": 52,
+    "references_not_counted": {
+      "per_base": ["target_time_only (no stop)", "stop_target (ADR 0088 structural stop)"],
+      "k0": ["N30 and N90 no stop"],
+      "note": "reproduce ADR 0088 results; their trials were counted in ADR 0088"
+    },
+    "fixed": {
+      "entry_band_a": 0.03, "tranche_size": "W/(K+1), W=0.05", "target": 0.10, "timeout_days": 60, "cooldown_days": 5,
+      "max_open_symbols": 20, "leverage_isolated": 5, "mmr": 0.005,
+      "funding": "actually settled", "cost": "measured alt cost PE-ed757f47 per fill and per exit; volume_scaled, x2, assumed v1 and cost0 reported"
+    },
+    "context": "ALT17-1d-scalein-v1 (same symbol set as ADR 0088; trials added to the same ADR 0087 context)"
+  },
+  "robustness_reported_not_gated": {
+    "intra_stop_slippage": "intraday-stop configs re-run with an extra 0.5% adverse fill slippage on the stop fill (not new trials)",
+    "stop_vs_control": "per base/N: change vs the no-stop control in S1/S2 Sharpe, mean/median cycle net bp, liquidated share, envelope drawdown, worst cycle",
+    "stop_exit_share": "share of cycles ended by stop, and mean net bp of stopped cycles",
+    "long_short_split": "reported"
+  },
+  "judgement_dev_only": {
+    "a": "S1 annualised Sharpe (measured cost, constant capital 1) > expected max under N=52 (and cumulative N)",
+    "b": "market-beta-removed alpha t >= 2",
+    "c": "both S1 halves positive",
+    "d": "S2 Sharpe > 0.5",
+    "e": "S1 Sharpe > 0 under volume-scaled cost",
+    "f": ">= 100 S1 cycles",
+    "g_tail": "S1 and S2 intraday-envelope max drawdown <= 0.20 of capital AND liquidated cycles <= 5% of cycles",
+    "h_stop_value": "report (not gate): whether the stop lowers liquidated share and envelope drawdown, and whether S1/S2 Sharpe rises vs the no-stop control"
+  },
+  "not_opened": ["prereg activation", "validation", "locked TEST", "IW1", "paper window"],
+  "note": "Any change of stop levels, a, W, target, timeout, leverage, universe is a new prereg and new trials."
+}

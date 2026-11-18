@@ -1,0 +1,74 @@
+{
+  "version": "dca-limit-prereg-v1",
+  "status": "DRAFT_FOR_DEV_ONLY",
+  "date": "2026-11-18",
+  "requested_by": "동동 (2026-11-18): 레버리지를 낮추고 지정가 진입만으로 다시 시험 + 이전 시험에서 이긴 거래의 공통 특징 찾기",
+  "reading": "Part 1 re-tests the ADR 0088/0089 daily prior-low/high scale-in (entry band 3%, tranche W/(K+1) with W=0.05, target avg*1.10 on the close -> next-open exit, 60-day timeout, 5-day cooldown, 17 alts, S1/S2) with (i) leverage 1x/2x/3x instead of 5x and (ii) ALL entries (first tranche and every add) as resting limit orders with an explicit fill model and the ADR 0049/0056 maker entry cost. Exits stay as in ADR 0088 (close signal, next-open market fill, full measured cost) because the user asked for limit ENTRY only. Part 2 is a descriptive winners-vs-losers contrast on the cycles of ADR 0088/0089, not a strategy test.",
+  "part1": {
+    "data": {
+      "source": "same as ADR 0088: project upload alts_2021_2026_binance_um_15m_funding.zip, 17 USDT-M alts, daily bars from 15m UTC",
+      "segments": {"S1": ["2021-01-01", "2023-09-18"], "S2": ["2024-06-19", "2025-10-20"]},
+      "never_read": ["<=2020-12-31", "2023-09-19..2024-06-18", ">=2025-10-21"]
+    },
+    "bases": [
+      {"id": "B1", "N": 30, "s": 0.04, "K": 4},
+      {"id": "B2", "N": 30, "s": 0.08, "K": 2},
+      {"id": "B3", "N": 90, "s": 0.04, "K": 4},
+      {"id": "B4", "N": 90, "s": 0.08, "K": 2}
+    ],
+    "fill_model": {
+      "first_entry": "signal as ADR 0088 (close within 3% of the prior N-day low (long) / high (short)). On signal day d a limit order is posted for day d+1 at close_d*(1-u) (long) or close_d*(1+u) (short), u in {0, 0.02}. Good-for-one-day: if not filled on d+1 it expires and the signal is lost (no chase, no market fallback). A new signal on a later day posts a new order. Lines L0/H0 and add levels are those of the signal day.",
+      "adds": "tranche k=1..K rests as a limit at L0*(1-s*k) (short: H0*(1+s*k)) from the day after the first fill, until the cycle ends. No add is posted by a close signal (ADR 0088 used close cross -> next open).",
+      "fill_condition": "long: the day's low <= limit*(1-0.0005) (5bp trade-through, queue assumption); short mirror. Touching without trade-through = no fill. Several levels can fill on the same day; the first entry and adds may fill on the same day.",
+      "fill_price": "exactly the limit price (no price improvement even when the open gaps through it).",
+      "intraday_order": "fills are booked before the day's liquidation check; the daily bar does not give the order of high/low, same convention as ADR 0088",
+      "unfilled": "counted and reported: fraction of signals that fill, fraction of add levels that fill, share of cycles with an add",
+      "robustness_not_counted": {"touch": "fill_condition margin 0 (optimistic)", "strict": "margin 0.002 (20bp trade-through, strict)", "scope": "the 12 configs with leverage 3 and no stop (8 scale-in + 4 K0), both margins"}
+    },
+    "cost": {
+      "exit_side": "measured alt cost PE-ed757f47 per exit, market (as ADR 0088)",
+      "entry_side": "per limit fill: the measured per-side cost x entry multiplier m. m = 0.70 central (ADR 0049 ratio, maker fee 2bp assumed, own-method adverse selection included); 0.47 optimistic (maker fee 0, TOUCH); 1.00 conservative (maker fee 4bp = no saving, ADR 0049). The fee tier of the account is UNKNOWN, so the conservative row is the one to trust for a decision and no row is VERIFIED.",
+      "rows": ["central (m .70)", "optimistic (m .47)", "conservative (m 1.00)", "volume_scaled (m .70)", "assumed_public_v1 (m .70)", "cost0"],
+      "note": "ADR 0049's ratio comes from 10 liquid alts, 3.4 days, arbitrary-time orders with a chase fallback. Here the miss risk is explicit in the fill model instead, so no extra fill-loss haircut. Funding actually settled."
+    },
+    "leverage_and_size": {
+      "leverage_grid": [1, 2, 3],
+      "size": "tranche notional W/(K+1) with W=0.05 of capital for every leverage (statistics are on constant capital 1). Because PnL is on notional, leverage only changes (a) the isolated liquidation level avg*(1-1/L+0.005) (short mirror) which loses the posted margin notional/L, and (b) margin used: max gross notional / L, reported. Sharpe is therefore expected to be the same across leverage except where liquidation happens; this is part of what is tested, not assumed.",
+      "mmr": 0.005
+    },
+    "stop": {"grid": ["none", "avg_close 0.15"], "avg_close_rule": "daily close <= avg*(1-0.15) (short >= avg*(1+0.15)) -> exit signal, fill next open at market with full cost (gap included), 5-day cooldown. avg recomputed after each add. Stop level not tuned (ADR 0089: stop levels did not help)."},
+    "grid": {
+      "scale_in": {"bases": 4, "leverage": 3, "stop": 2, "u": [0, 0.02], "n": 48},
+      "k0_controls": {"N": [30, 90], "K": 0, "u": [0, 0.02], "leverage": 3, "stop": "none", "n": 4, "note": "single tranche W, limit entry; shows what scale-in adds under the same fill model"},
+      "n_configs": 52,
+      "n_trials_counted": 52,
+      "fixed": {"entry_band_a": 0.03, "W": 0.05, "target": 0.10, "timeout_days": 60, "cooldown_days": 5, "max_open_symbols": 20},
+      "references_not_counted": "ADR 0088/0089 market-entry results (5x)",
+      "context": "ALT17-1d-scalein-v1 (same symbol set; trials added to the ADR 0087 context). Cumulative DEV trials before this thread: 12,034."
+    },
+    "judgement_dev_only": {
+      "primary_row": "central",
+      "a": "S1 annualised Sharpe (central cost, constant capital 1) > expected max under N=52 (cumulative N also reported)",
+      "b": "market-beta-removed alpha t >= 2",
+      "c": "both S1 halves positive",
+      "d": "S2 Sharpe > 0.5",
+      "e": "S1 Sharpe > 0 under volume_scaled cost",
+      "f": ">= 100 S1 cycles",
+      "g_tail": "S1 and S2 intraday-envelope max drawdown <= 0.20 of capital AND liquidated cycles <= 5% of cycles",
+      "h_report": "conservative-row Sharpe, fill rates, and whether lower leverage removes the liquidation loss without changing Sharpe"
+    }
+  },
+  "part2": {
+    "purpose": "Descriptive contrast of winning vs losing cycles of the ADR 0088 scale-in strategy. NOT a new strategy test, no new trials, no gate.",
+    "cycles": "the 4 ADR 0088 base configs without the structural stop (exit target_time_only: N30 s.04 K4, N30 s.08 K2, N90 s.04 K4, N90 s.08 K2; leverage 5, market entry as in ADR 0088), re-run by the ADR 0088 engine on the same data, S1 and S2 separately. The ADR 0089 stop is handled through the max adverse excursion (a winner whose adverse excursion passed 10% / 15% from the first fill is a winner a stop would have cut).",
+    "outcome": "win = cycle net > 0 (net = price PnL + funding - measured cost, over max notional). Also net bp.",
+    "design": "all cycles, wins AND losses, always shown side by side (selection-bias control); win rate, mean net, and share of total PnL by bin; losses are not dropped.",
+    "entry_time_features": ["side", "symbol", "year_half", "day_of_week", "dist_to_line (close/line-1)", "range_width (H/L-1 of the N-day window)", "vol30 (std of daily log returns, prior 30d)", "ret5", "ret20", "ret60 (own trailing returns)", "mkt_ret30 and mkt_ret90 (equal-weight 17-alt trailing returns)", "regime_bull (EW index 90d return > 0)", "mkt_vol30", "log_dollar_volume30", "concurrent_open_cycles (other open cycles of the same base at entry)", "same_day_signals (new cycles that day)"],
+    "post_hoc_variables_not_usable_as_rules": ["max adverse excursion vs first fill (from daily low/high)", "number of tranches filled", "holding days", "exit reason", "liquidated flag", "funding paid"],
+    "tests": "for each entry-time feature: AUC of the feature for win vs loss (S1, S2), 95% CI by resampling calendar months (cluster bootstrap, cycles of the same month are correlated), Bonferroni over the number of features (about 16). A feature is called 'consistent' only if the corrected S1 interval excludes 0.5 AND the S2 point estimate has the same sign with |AUC-0.5| >= 0.03. Terciles are cut on S1 and applied to S2.",
+    "rule_check": "for consistent features only: the S1-cut tercile filter applied to S2 cycles (mean net bp kept vs dropped). This is a post-hoc exploration on a segment already seen in ADR 0088, therefore NOT evidence and not a trial; any rule built from it needs its own prereg and a never-read window.",
+    "post_hoc_variables_are_descriptions": "reported only to describe what winners look like afterwards"
+  },
+  "not_opened": ["prereg activation", "validation", "locked TEST", "IW1", "paper window"],
+  "note": "Any change of grid, fill margin, u, m, stop, leverage list or universe is a new prereg and new trials."
+}
