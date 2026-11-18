@@ -1800,6 +1800,21 @@
   "flags": {}
  },
  {
+  "file": "test_winloss_combo.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 79,
+  "doc": "Tests of the ADR 0092 win-rate / loss-profile catalog and combination helpers (synthetic inputs only).",
+  "adr": [
+   "091",
+   "092"
+  ],
+  "flags": {}
+ },
+ {
   "file": "unsup_regime_dev.py",
   "class": "KEPT_INDEPENDENT",
   "reason": "k-means regime classifier on DEV S1 (ADR 0050); NOT_USEFUL",
@@ -1826,6 +1841,44 @@
   "adr": [
    "041",
    "044"
+  ],
+  "flags": {
+   "neg_shift": 1
+  }
+ },
+ {
+  "file": "winloss_catalog.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 318,
+  "doc": "Win-rate / loss-profile catalog of every published DEV result that records a hit rate (ADR 0092, Part 1).",
+  "adr": [
+   "028",
+   "088",
+   "089",
+   "090",
+   "092"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "winloss_combo_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 403,
+  "doc": "High-win-rate group vs low-win-rate / small-loss group: profile, correlation and combination, DEV only (ADR 0092).",
+  "adr": [
+   "044",
+   "088",
+   "089",
+   "091",
+   "092"
   ],
   "flags": {
    "neg_shift": 1
