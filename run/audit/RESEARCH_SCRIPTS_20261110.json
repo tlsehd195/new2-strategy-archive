@@ -623,6 +623,21 @@
   "flags": {}
  },
  {
+  "file": "dca_stop_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 364,
+  "doc": "Daily prior-extreme scale-in with a STOP rule added, DEV only (ADR 0089).",
+  "adr": [
+   "088",
+   "089"
+  ],
+  "flags": {}
+ },
+ {
   "file": "download_missing_data.py",
   "class": "RETIRED_OR_ON_HOLD",
   "reason": "v1 data pipeline; replaced by run/discovery/data_fetch.py; script itself retired (v1 paths, LEGACY_SCRIPTS.md)",
@@ -1403,6 +1418,20 @@
   "doc": "Tests for the daily scale-in (DCA) engine (ADR 0088). Needs numpy and pandas.",
   "adr": [
    "088"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_dca_stop.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 128,
+  "doc": "Tests for the stop-rule extension of the daily scale-in engine (ADR 0089). Needs numpy and pandas.",
+  "adr": [
+   "089"
   ],
   "flags": {}
  },
