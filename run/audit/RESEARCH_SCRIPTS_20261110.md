@@ -12,10 +12,10 @@ Read status: INVENTORIED = header, imports, paths and risk patterns scanned (not
 | DUPLICATE_RESEARCH | superseded by a later tool for the same hypothesis | 1 |
 | RETIRED_OR_ON_HOLD | retired v1 execution path (LEGACY_SCRIPTS.md) or on hold | 43 |
 | NEEDS_MORE_DATA | hypothesis needs a dataset the repository does not have | 21 |
-| TEST | test file of a run/ tool | 28 |
-| NOT_SURVEYED | not surveyed | 3 |
+| TEST | test file of a run/ tool | 29 |
+| NOT_SURVEYED | not surveyed | 5 |
 
-Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 57, TESTED 54
+Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 58, TESTED 56
 
 | file | lines | class | read status | reason | flags |
 |---|---|---|---|---|---|
@@ -60,7 +60,9 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 57, TESTED 54
 | `cross_section_v2_dev.py` | 255 | KEPT_INDEPENDENT | TESTED | five cross-sectional hypotheses (ADR 0040); NOT_PROMISING — traced: shift(-1) realised return, as above | neg_shift=1 |
 | `dca_extreme_dev.py` | 418 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1 |
 | `dca_extreme_prepare.py` | 85 | NOT_SURVEYED | LOGIC_TRACED | no rule — new file |  |
+| `dca_limit_dev.py` | 327 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `dca_stop_dev.py` | 364 | NOT_SURVEYED | TESTED | no rule — new file |  |
+| `dca_winners_analysis.py` | 230 | NOT_SURVEYED | LOGIC_TRACED | no rule — new file |  |
 | `download_missing_data.py` | 486 | RETIRED_OR_ON_HOLD | FULL_SOURCE_REVIEW | v1 data pipeline; replaced by run/discovery/data_fetch.py; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | network=8, v1_path=2 |
 | `evalue_v3_block.py` | 233 | STANDARD_INTERFACE | FULL_SOURCE_REVIEW | e-value v3 block tool on the EvolutionPipeline / evaluator (ADR 0042) |  |
 | `evalue_walkforward_sim.py` | 811 | KEPT_INDEPENDENT | TESTED | synthetic error-rate simulation (ADR 0025) |  |
@@ -114,6 +116,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 57, TESTED 54
 | `test_candidate_regime.py` | 48 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_cross_section_v2.py` | 111 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_dca_extreme.py` | 128 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_dca_limit.py` | 107 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_dca_stop.py` | 128 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_dev_window_guard.py` | 50 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_evalue_v3.py` | 30 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
