@@ -1,0 +1,760 @@
+family,adr,config,seg,n,hit_rate,mean_net_bp,median_net_bp,avg_win_bp,avg_loss_bp,payoff,worst_bp,skew,sr_ann,max_dd_pct,liq_share,hold,exit,direction,cost_row,group
+R9 entry-bar candidates (liquid 9),0041/0044,S-80fe4b122603f292,S1,697.0,0.4204,3.6638,,,,,-2392.3471,2.0728,0.1155,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-80fe4b122603f292,S2,230.0,0.4696,86.2207,,,,,-1045.7962,3.8303,1.6758,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-db25d24ca1ca4c96,S1,876.0,0.4098,5.0609,,,,,-2237.2788,3.5153,0.1618,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-db25d24ca1ca4c96,S2,323.0,0.5232,67.433,,,,,-1354.0328,4.4072,1.4183,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-181c15b4139efdd3,S1,332.0,0.4247,5.6295,,,,,-2211.9609,1.4116,0.0787,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-181c15b4139efdd3,S2,104.0,0.5673,105.992,,,,,-2409.6929,0.3803,1.0317,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-9d752d63324074cc,S1,1225.0,0.4073,0.682,,,,,-2293.7092,4.8786,0.0262,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-9d752d63324074cc,S2,471.0,0.4989,46.2428,,,,,-1354.0328,4.1405,1.3473,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-b5e5df1c18d5a57d,S1,504.0,0.4306,-16.2458,,,,,-2313.1677,1.7789,-0.3487,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-b5e5df1c18d5a57d,S2,141.0,0.5532,66.7368,,,,,-2587.62,1.4786,0.9169,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-1ec0bc1c95b4c488,S1,421.0,0.4276,3.4581,,,,,-2211.9609,1.9176,0.0498,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-1ec0bc1c95b4c488,S2,146.0,0.5753,63.3661,,,,,-2559.4871,0.083,0.675,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-3a3dbdf422939143,S1,845.0,0.4213,4.8148,,,,,-2313.1677,2.0917,0.0992,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-3a3dbdf422939143,S2,312.0,0.5128,77.2033,,,,,-2587.62,2.7402,1.5236,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-72655636c7034155,S1,326.0,0.4387,35.9279,,,,,-2211.9609,2.0223,0.4256,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-72655636c7034155,S2,103.0,0.5534,57.9365,,,,,-2409.6929,-0.1074,0.6196,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-ace182d55342733b,S1,1664.0,0.4201,1.6168,,,,,-2392.3471,2.4383,0.0661,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-ace182d55342733b,S2,651.0,0.4716,18.1056,,,,,-1106.1696,2.7043,0.6785,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-5f8884793cae1ba1,S1,494.0,0.4312,34.0966,,,,,-2211.9609,2.1517,0.5258,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-5f8884793cae1ba1,S2,151.0,0.543,57.2301,,,,,-2559.4871,0.226,0.5508,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-a990790314cf322d,S1,590.0,0.4237,27.0848,,,,,-2211.9609,2.4217,0.4346,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-a990790314cf322d,S2,186.0,0.5215,24.5272,,,,,-2559.4871,0.327,0.2933,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-043c5506668fb8f1,S1,796.0,0.4673,-18.5151,,,,,-11077.1226,0.9778,-0.1614,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-043c5506668fb8f1,S2,381.0,0.4961,31.5112,,,,,-4408.0655,0.6517,0.317,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-91ab3cffaa7bab47,S1,1241.0,0.4859,-1.9742,,,,,-3841.5464,-0.2553,-0.0831,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-91ab3cffaa7bab47,S2,517.0,0.4526,-52.1854,,,,,-1889.2606,-1.0205,-2.9151,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-e9d1bf7b37ad8eb8,S1,930.0,0.4258,-14.431,,,,,-2313.1677,1.3755,-0.3555,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-e9d1bf7b37ad8eb8,S2,327.0,0.5199,79.5664,,,,,-2587.62,1.4754,1.7547,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-0f439995bcd4af4d,S1,523.0,0.4283,-0.1927,,,,,-1792.7988,1.6809,-0.0037,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-0f439995bcd4af4d,S2,166.0,0.512,129.9303,,,,,-1930.991,1.6075,1.9868,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-adf9e2e1e6bc8af8,S1,339.0,0.4218,-0.4905,,,,,-2211.9609,1.7723,-0.0065,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-adf9e2e1e6bc8af8,S2,110.0,0.5909,54.4578,,,,,-2559.4871,-0.3456,0.4805,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-f8b1648d499419f6,S1,1227.0,0.4857,-4.4551,,,,,-2521.6678,0.309,-0.1993,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-f8b1648d499419f6,S2,493.0,0.4544,-35.7704,,,,,-1209.132,-0.1866,-1.9787,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-aa609b6862018d48,S1,588.0,0.4388,-1.8424,,,,,-2313.1677,1.9586,-0.0367,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-aa609b6862018d48,S2,171.0,0.5497,66.1587,,,,,-2587.62,1.4475,1.0598,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-bc62b843361277d5,S1,439.0,0.4191,-4.0303,,,,,-2398.9301,2.1269,-0.0878,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-bc62b843361277d5,S2,139.0,0.4892,71.614,,,,,-1253.7071,2.897,1.1314,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-ed2d1c8ed9cf1879,S1,1468.0,0.5136,66.9236,,,,,-11077.1226,0.7058,1.0094,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-ed2d1c8ed9cf1879,S2,678.0,0.4513,-2.2008,,,,,-4230.4823,1.7221,-0.0392,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-fd45e2af64d20e15,S1,294.0,0.4558,-10.1981,,,,,-2313.1677,1.4557,-0.1471,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-fd45e2af64d20e15,S2,87.0,0.5172,91.8005,,,,,-2587.62,1.0442,0.8963,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-8e033ef78d187315,S1,774.0,0.4302,29.3175,,,,,-2211.9609,3.1691,0.5087,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-8e033ef78d187315,S2,244.0,0.5164,49.7723,,,,,-2559.4871,0.5364,0.6763,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-21113d1f21e54643,S1,1440.0,0.4354,21.0778,,,,,-5914.8484,2.6981,0.4683,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-21113d1f21e54643,S2,581.0,0.4957,51.9423,,,,,-2559.4871,3.2367,1.0474,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-5e78172a43be4822,S1,873.0,0.4227,8.1596,,,,,-2392.3471,2.2836,0.2447,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-5e78172a43be4822,S2,318.0,0.4969,61.3924,,,,,-1045.7962,3.6148,1.4596,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-d2815e608ab226a1,S1,1566.0,0.4764,2.1886,,,,,-8679.2186,2.14,0.0375,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-d2815e608ab226a1,S2,727.0,0.4787,34.9223,,,,,-3898.7491,1.6666,0.6844,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-f2273f0c4c2e00fd,S1,880.0,0.5284,59.6162,,,,,-3148.9893,1.8187,0.9062,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-f2273f0c4c2e00fd,S2,383.0,0.5117,35.0087,,,,,-2667.0648,1.3026,0.6587,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-00bfeb8ed64b092c,S1,2087.0,0.4447,2.4571,,,,,-3839.7338,1.1954,0.0537,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-00bfeb8ed64b092c,S2,987.0,0.4904,28.2957,,,,,-2823.5512,2.4434,0.7246,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-a2aa1c77ccf11ba3,S1,481.0,0.447,1.8103,,,,,-2313.1677,1.94,0.0321,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-a2aa1c77ccf11ba3,S2,149.0,0.5101,54.4298,,,,,-2587.62,1.2974,0.8034,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-63f95ff089ff1ea1,S1,1201.0,0.428,19.9893,,,,,-2797.5424,2.7027,0.3969,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-63f95ff089ff1ea1,S2,438.0,0.4749,15.8457,,,,,-2559.4871,1.2676,0.2975,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-64db241c60255cb4,S1,1675.0,0.4436,-9.8271,,,,,-3238.8896,1.9831,-0.2541,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-64db241c60255cb4,S2,633.0,0.466,68.3075,,,,,-1930.991,2.4821,1.6765,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-3f825ccdd41fb32d,S1,937.0,0.4824,30.2466,,,,,-1204.4725,4.0793,0.8693,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-3f825ccdd41fb32d,S2,305.0,0.4787,-2.4513,,,,,-685.2912,2.3293,-0.1264,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-bdae1ff0b24876cc,S1,937.0,0.4824,30.2466,,,,,-1204.4725,4.0793,0.8693,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-bdae1ff0b24876cc,S2,305.0,0.4787,-2.4513,,,,,-685.2912,2.3293,-0.1264,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-adec1de192ad9818,S1,476.0,0.3908,-1.0774,,,,,-2392.3471,2.2374,-0.0222,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+R9 entry-bar candidates (liquid 9),0041/0044,S-adec1de192ad9818,S2,162.0,0.4938,67.4711,,,,,-704.0462,3.7893,1.1892,,,15m-engine (hours~days),engine stop/target/time,,measured alt,other
+MAP-Elites top (BTC/ETH),0019,S-9bc5bb677faa0dd3,S1,437.0,0.0275,-73.0355,,,,,-3096.6788,-8.3633,-4.2716,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-9bc5bb677faa0dd3,S2,153.0,0.0261,-86.6646,,,,,-1252.9152,-4.3039,-4.8917,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-852c9b660c650bb9,S1,386.0,0.0311,-72.924,,,,,-3096.6788,-8.2931,-3.8647,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-852c9b660c650bb9,S2,128.0,0.0234,-79.9771,,,,,-1252.9152,-4.9557,-4.46,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-f46972b73316b7a2,S1,113.0,0.4159,14.4518,,,,,-1112.5922,6.1438,0.1715,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-f46972b73316b7a2,S2,28.0,0.5,95.5473,,,,,-500.1106,2.4022,0.7393,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-1df19a12439b25fd,S1,99.0,0.4242,35.9948,,,,,-1112.5922,5.8993,0.3786,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-1df19a12439b25fd,S2,24.0,0.5,71.1952,,,,,-500.1106,2.1018,0.599,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-057a2b85f4a068b0,S1,717.0,0.311,-113.6847,,,,,-2154.3526,0.4587,-3.4629,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-057a2b85f4a068b0,S2,263.0,0.2395,-179.3512,,,,,-2169.3042,-1.8544,-6.0008,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-258fb669365d964a,S1,397.0,0.4055,-39.205,,,,,-1995.3635,2.1217,-0.9748,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-258fb669365d964a,S2,128.0,0.4609,18.7368,,,,,-2072.0726,0.8533,0.3677,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-c7f102004029c38c,S1,406.0,0.3842,-46.4069,,,,,-1693.1894,2.4153,-1.232,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-c7f102004029c38c,S2,131.0,0.4656,12.9304,,,,,-1164.1431,1.6493,0.3117,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-808166cdc1cd553f,S1,446.0,0.4036,-45.0018,,,,,-1995.3635,2.0183,-1.1755,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-808166cdc1cd553f,S2,142.0,0.4437,-1.2253,,,,,-2072.0726,0.908,-0.026,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-fbdb89d5de87517f,S1,469.0,0.3625,-66.9974,,,,,-2672.2953,1.9104,-1.1319,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-fbdb89d5de87517f,S2,154.0,0.4805,-10.2324,,,,,-2842.9884,0.3947,-0.1785,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-d033bf44022a3b5e,S1,891.0,0.2346,-77.8437,,,,,-643.7401,2.7431,-1.8199,,,15m-engine (hours~days),engine stop/target/time,,public estimate,B_low_win_small_loss
+MAP-Elites top (BTC/ETH),0019,S-d033bf44022a3b5e,S2,392.0,0.2372,-95.3562,,,,,-613.5817,8.4942,-2.612,,,15m-engine (hours~days),engine stop/target/time,,public estimate,B_low_win_small_loss
+MAP-Elites top (BTC/ETH),0019,S-ec5dd8bfdba299c7,S1,349.0,0.3868,-60.4322,,,,,-1986.8306,-0.3001,-1.9427,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-ec5dd8bfdba299c7,S2,131.0,0.313,-34.626,,,,,-593.9528,1.2909,-0.8276,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-03dcc62d54efb75e,S1,214.0,0.3692,-78.4301,,,,,-1995.3635,2.6488,-1.3102,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-03dcc62d54efb75e,S2,65.0,0.4462,-35.5713,,,,,-2072.0726,-0.2292,-0.5402,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-4b7c7d4624037064,S1,714.0,0.3389,-84.2906,,,,,-1488.6643,1.3403,-2.5267,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-4b7c7d4624037064,S2,309.0,0.3172,-100.5794,,,,,-1724.0727,2.4244,-3.3871,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-80fe4b122603f292,S1,441.0,0.3515,-51.7942,,,,,-1693.1894,2.8824,-1.517,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-80fe4b122603f292,S2,135.0,0.4222,27.8758,,,,,-652.2991,2.0732,0.7073,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-db25d24ca1ca4c96,S1,533.0,0.3546,-50.3922,,,,,-1238.3969,4.9954,-1.6582,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-db25d24ca1ca4c96,S2,178.0,0.4213,7.8076,,,,,-1302.7887,2.2471,0.2394,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-391396a9487de780,S1,538.0,0.3513,-62.2592,,,,,-1693.1894,2.4211,-1.9189,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-391396a9487de780,S2,175.0,0.4171,-9.8525,,,,,-1164.1431,1.7696,-0.2986,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-209ce2dd7db8d919,S1,434.0,0.371,-59.2655,,,,,-1995.3635,2.5164,-1.6829,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+MAP-Elites top (BTC/ETH),0019,S-209ce2dd7db8d919,S2,135.0,0.3852,3.979,,,,,-1244.0988,1.2092,0.0934,,,15m-engine (hours~days),engine stop/target/time,,public estimate,other
+IW1 refreeze members,0036,S-80fe4b122603f292,S1,441.0,0.3515,-51.7942,,,,,-1693.1894,2.8824,-1.517,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-80fe4b122603f292,S2,135.0,0.4222,27.8758,,,,,-652.2991,2.0732,0.7073,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-db25d24ca1ca4c96,S1,533.0,0.3546,-50.3922,,,,,-1238.3969,4.9954,-1.6582,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-db25d24ca1ca4c96,S2,178.0,0.4213,7.8076,,,,,-1302.7887,2.2471,0.2394,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-181c15b4139efdd3,S1,214.0,0.4065,-44.7432,,,,,-2672.2953,0.484,-0.5835,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-181c15b4139efdd3,S2,61.0,0.5574,40.6094,,,,,-1828.7861,0.8446,0.4207,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-9d752d63324074cc,S1,745.0,0.3356,-64.9936,,,,,-1238.3969,4.1449,-2.635,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-9d752d63324074cc,S2,266.0,0.3835,-3.9032,,,,,-853.9362,6.7202,-0.1041,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-b5e5df1c18d5a57d,S1,333.0,0.3934,-72.8198,,,,,-1354.6182,2.2354,-1.4224,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-b5e5df1c18d5a57d,S2,86.0,0.4884,6.5597,,,,,-865.2651,2.7914,0.1029,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-1ec0bc1c95b4c488,S1,265.0,0.3811,-58.5466,,,,,-2672.2953,1.9999,-0.6844,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-1ec0bc1c95b4c488,S2,76.0,0.5395,-3.5263,,,,,-2842.9884,-0.3303,-0.0408,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-3a3dbdf422939143,S1,518.0,0.3764,-68.9323,,,,,-2167.7403,1.6562,-1.5597,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-3a3dbdf422939143,S2,170.0,0.4882,11.3329,,,,,-2777.6347,1.413,0.2402,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-72655636c7034155,S1,206.0,0.3738,-49.6202,,,,,-2672.2953,2.3889,-0.5203,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-72655636c7034155,S2,64.0,0.5469,-38.8229,,,,,-2842.9884,-0.7868,-0.3695,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-ace182d55342733b,S1,1030.0,0.3301,-82.0311,,,,,-1693.1894,1.6684,-3.6948,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-ace182d55342733b,S2,368.0,0.3723,-17.7785,,,,,-1049.9473,4.9103,-0.5627,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-5f8884793cae1ba1,S1,307.0,0.3779,-77.1233,,,,,-3721.1635,0.5259,-1.1097,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-5f8884793cae1ba1,S2,84.0,0.4524,-64.1159,,,,,-2167.4756,0.0145,-0.8129,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-a990790314cf322d,S1,377.0,0.3528,-76.0838,,,,,-1719.3294,2.1748,-1.1949,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-a990790314cf322d,S2,101.0,0.4554,-49.9442,,,,,-1821.798,0.6973,-0.8072,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-043c5506668fb8f1,S1,511.0,0.4031,-117.3761,,,,,-6662.328,-0.5088,-1.1019,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-043c5506668fb8f1,S2,215.0,0.4,-57.7372,,,,,-3882.5992,3.5641,-0.5682,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-91ab3cffaa7bab47,S1,658.0,0.3009,-114.8402,,,,,-2154.3526,0.5682,-3.3353,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-91ab3cffaa7bab47,S2,229.0,0.214,-177.7495,,,,,-2036.9211,-1.7961,-5.9035,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-e9d1bf7b37ad8eb8,S1,596.0,0.3758,-77.2391,,,,,-2236.5096,1.3861,-1.9726,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-e9d1bf7b37ad8eb8,S2,189.0,0.4392,0.4132,,,,,-979.6115,2.3566,0.0097,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-0f439995bcd4af4d,S1,341.0,0.3724,-80.4303,,,,,-2978.9733,0.3151,-1.5577,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-0f439995bcd4af4d,S2,95.0,0.4526,47.6722,,,,,-1252.9152,2.2293,0.6683,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-adf9e2e1e6bc8af8,S1,222.0,0.3514,-79.9779,,,,,-1689.0865,2.6806,-0.9652,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-adf9e2e1e6bc8af8,S2,55.0,0.5273,18.8791,,,,,-1821.798,0.9096,0.2328,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-f8b1648d499419f6,S1,637.0,0.2904,-120.7059,,,,,-2154.3526,0.119,-3.7959,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-f8b1648d499419f6,S2,213.0,0.2488,-134.6239,,,,,-2036.9211,-0.2485,-4.6102,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-aa609b6862018d48,S1,379.0,0.3879,-80.434,,,,,-2098.1448,1.9311,-1.5757,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-aa609b6862018d48,S2,101.0,0.4653,-20.9626,,,,,-865.2651,2.9286,-0.3745,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-bc62b843361277d5,S1,278.0,0.3561,-77.7721,,,,,-1278.9796,3.5844,-1.7448,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-bc62b843361277d5,S2,76.0,0.3947,7.4073,,,,,-836.8473,1.4777,0.1283,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-ed2d1c8ed9cf1879,S1,962.0,0.4397,-61.1946,,,,,-7084.4836,-0.7677,-1.0035,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+IW1 refreeze members,0036,S-ed2d1c8ed9cf1879,S2,389.0,0.3162,-220.9983,,,,,-11073.3513,-2.7305,-3.3491,,,15m-engine (hours~days),engine stop/target/time,,assumed/estimate,other
+fast short-horizon,0045,F1_fade_k2.0_H4,S1,17569.0,0.4271,-29.8531,,,,,,,-6.0292,263.2309,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F1_fade_k2.0_H4,S2,8663.0,0.4318,-26.2849,,,,,,,-6.1191,113.8531,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F1_fade_k2.0_H16,S1,13292.0,0.4707,-25.0828,,,,,,,-3.0129,180.0928,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F1_fade_k2.0_H16,S2,6345.0,0.4507,-29.2546,,,,,,,-4.1245,92.8101,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F1_fade_k3.0_H4,S1,5623.0,0.4471,-28.5499,,,,,,,-3.1079,83.7044,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F1_fade_k3.0_H4,S2,2585.0,0.4368,-36.7945,,,,,,,-3.3652,47.5876,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F1_fade_k3.0_H16,S1,4754.0,0.4867,-15.5617,,,,,,,-0.9828,56.6907,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F1_fade_k3.0_H16,S2,2181.0,0.4402,-60.4201,,,,,,,-3.9735,65.8881,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F1_follow_k2.0_H4,S1,17569.0,0.3572,-23.1112,,,,,,,-5.0606,203.059,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F1_follow_k2.0_H4,S2,8663.0,0.3411,-27.1164,,,,,,,-6.4671,123.2817,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F1_follow_k2.0_H16,S1,13292.0,0.397,-28.3398,,,,,,,-3.4959,188.3465,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F1_follow_k2.0_H16,S2,6345.0,0.4016,-24.7014,,,,,,,-3.5544,87.1285,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F1_follow_k3.0_H4,S1,5623.0,0.3713,-23.8227,,,,,,,-2.6959,67.0865,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F1_follow_k3.0_H4,S2,2585.0,0.3764,-15.6521,,,,,,,-1.5783,25.3947,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F1_follow_k3.0_H16,S1,4754.0,0.3929,-37.3422,,,,,,,-2.334,89.4638,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F1_follow_k3.0_H16,S2,2181.0,0.4434,7.3702,,,,,,,0.5213,11.1327,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F2_follow_H4,S1,17528.0,0.2834,-29.0768,,,,,,,-14.8711,255.1858,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F2_follow_H4,S2,7820.0,0.2859,-28.7798,,,,,,,-17.5778,112.5291,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F2_follow_H16,S1,14398.0,0.3785,-28.3356,,,,,,,-8.0226,205.0739,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F2_follow_H16,S2,6385.0,0.3734,-30.5451,,,,,,,-10.9772,97.5152,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F2_fade_H4,S1,17528.0,0.3328,-26.4157,,,,,,,-13.9354,231.5076,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F2_fade_H4,S2,7820.0,0.3192,-27.2595,,,,,,,-18.1303,106.5846,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F2_fade_H16,S1,14398.0,0.4166,-27.0574,,,,,,,-7.7467,194.7861,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F2_fade_H16,S2,6385.0,0.4174,-25.4292,,,,,,,-9.2921,81.7133,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F3_th3_w15,S1,5296.0,0.3486,-24.2123,,,,,,,-3.5297,64.1141,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F3_th3_w15,S2,837.0,0.3274,-27.788,,,,,,,-3.5742,11.6293,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F3_th3_w60,S1,5296.0,0.4373,-25.6379,,,,,,,-1.7485,72.3575,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F3_th3_w60,S2,837.0,0.3943,-13.0318,,,,,,,-1.0531,7.3774,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F3_th6_w15,S1,2476.0,0.3514,-29.1057,,,,,,,-2.7698,36.3651,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F3_th6_w15,S2,207.0,0.3382,-23.2423,,,,,,,-3.2161,2.4321,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F3_th6_w60,S1,2476.0,0.456,-29.6574,,,,,,,-1.1952,46.3536,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F3_th6_w60,S2,207.0,0.401,6.0748,,,,,,,0.3232,1.6105,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F4_reversal_L4,S1,33535.0,0.4249,-25.1259,,,,,,,-15.4256,422.689,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F4_reversal_L4,S2,15402.0,0.4164,-28.0318,,,,,,,-18.1282,216.3936,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F4_reversal_L16,S1,33532.0,0.4299,-25.149,,,,,,,-14.4381,422.6743,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F4_reversal_L16,S2,15402.0,0.4135,-29.0178,,,,,,,-18.8605,223.4663,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F4_momentum_L4,S1,33535.0,0.4062,-29.7062,,,,,,,-18.256,498.0992,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F4_momentum_L4,S2,15402.0,0.4041,-28.3322,,,,,,,-18.3254,218.1866,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F4_momentum_L16,S1,33532.0,0.4014,-29.712,,,,,,,-17.0424,498.1516,,15m bars (1-16),time,both,measured,other
+fast short-horizon,0045,F4_momentum_L16,S2,15402.0,0.4048,-27.2593,,,,,,,-17.6343,209.9241,,15m bars (1-16),time,both,measured,other
+high/low + volume spike (daily),0043,R_N20_a0.10_m2.0_H3,S1,1030.0,0.5126,-138.6118,,,,,,,-0.8546,81.2118,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N20_a0.10_m2.0_H3,S2,418.0,0.5072,-193.5371,,,,,,,-1.1738,55.4114,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N20_a0.10_m2.0_H7,S1,827.0,0.526,-78.7003,,,,,,,-0.3039,59.9503,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N20_a0.10_m2.0_H7,S2,336.0,0.497,-265.813,,,,,,,-1.0141,52.4065,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N20_a0.10_m3.0_H3,S1,499.0,0.521,-293.1063,,,,,,,-1.7088,74.0857,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N20_a0.10_m3.0_H3,S2,193.0,0.544,-98.3877,,,,,,,-0.3866,29.6124,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N20_a0.10_m3.0_H7,S1,434.0,0.5115,-258.6737,,,,,,,-0.8868,60.2724,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N20_a0.10_m3.0_H7,S2,174.0,0.5402,-289.7591,,,,,,,-0.8285,32.451,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N20_a0.20_m2.0_H3,S1,1242.0,0.5032,-123.1647,,,,,,,-0.8787,89.4623,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N20_a0.20_m2.0_H3,S2,520.0,0.5077,-182.5262,,,,,,,-1.2358,64.852,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N20_a0.20_m2.0_H7,S1,960.0,0.5406,-23.9139,,,,,,,-0.1003,54.1771,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N20_a0.20_m2.0_H7,S2,407.0,0.4865,-227.7485,,,,,,,-0.9761,53.9122,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N20_a0.20_m3.0_H3,S1,587.0,0.5162,-258.1348,,,,,,,-1.6852,78.0259,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N20_a0.20_m3.0_H3,S2,220.0,0.5636,-41.0994,,,,,,,-0.1762,26.9754,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N20_a0.20_m3.0_H7,S1,506.0,0.5237,-219.9993,,,,,,,-0.8253,64.9757,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N20_a0.20_m3.0_H7,S2,196.0,0.5612,-216.0937,,,,,,,-0.6737,28.0434,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N50_a0.10_m2.0_H3,S1,737.0,0.5156,-184.0543,,,,,,,-1.0761,70.2673,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N50_a0.10_m2.0_H3,S2,380.0,0.4947,-182.8939,,,,,,,-1.0817,52.8107,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N50_a0.10_m2.0_H7,S1,603.0,0.5124,-125.6522,,,,,,,-0.4199,44.902,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N50_a0.10_m2.0_H7,S2,315.0,0.5048,-244.0645,,,,,,,-0.9158,41.1702,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N50_a0.10_m3.0_H3,S1,379.0,0.5066,-350.5858,,,,,,,-1.8862,66.7321,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N50_a0.10_m3.0_H3,S2,172.0,0.5058,-198.6322,,,,,,,-0.7183,36.5564,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N50_a0.10_m3.0_H7,S1,325.0,0.5077,-285.8315,,,,,,,-0.8843,48.4932,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N50_a0.10_m3.0_H7,S2,155.0,0.5419,-354.8448,,,,,,,-0.9533,36.4411,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N50_a0.20_m2.0_H3,S1,1003.0,0.4796,-185.8353,,,,,,,-1.2987,93.4925,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N50_a0.20_m2.0_H3,S2,499.0,0.515,-179.6826,,,,,,,-1.247,61.6433,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N50_a0.20_m2.0_H7,S1,793.0,0.4868,-181.2762,,,,,,,-0.7028,77.4712,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N50_a0.20_m2.0_H7,S2,389.0,0.4936,-300.2645,,,,,,,-1.2775,62.1312,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N50_a0.20_m3.0_H3,S1,471.0,0.4989,-303.2521,,,,,,,-1.8208,75.8919,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N50_a0.20_m3.0_H3,S2,207.0,0.5411,-103.6459,,,,,,,-0.4309,31.402,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N50_a0.20_m3.0_H7,S1,406.0,0.4852,-321.9765,,,,,,,-1.1043,70.5104,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,R_N50_a0.20_m3.0_H7,S2,184.0,0.5435,-334.3807,,,,,,,-1.019,33.97,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,B_N20_a0.10_m2.0_H7,S1,827.0,0.4498,25.5367,,,,,,,0.0987,41.6942,,days (1-5),time,both,measured,other
+high/low + volume spike (daily),0043,B_N20_a0.10_m2.0_H7,S2,336.0,0.494,212.5612,,,,,,,0.8126,32.8187,,days (1-5),time,both,measured,other
+high/low intraday,0043,FR_15m_N96_m2.0_H4,S1,81256.0,0.4475,-26.2054,,,,,,,-10.2459,1064.6734,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_15m_N96_m2.0_H4,S2,39135.0,0.4356,-26.4878,,,,,,,-10.1537,520.825,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_15m_N96_m2.0_H16,S1,49829.0,0.4918,-24.8983,,,,,,,-5.2602,620.3282,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_15m_N96_m2.0_H16,S2,23333.0,0.468,-30.589,,,,,,,-5.3818,358.04,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_15m_N96_m3.0_H4,S1,48934.0,0.4538,-25.8123,,,,,,,-8.0271,632.1659,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_15m_N96_m3.0_H4,S2,21805.0,0.4503,-25.6549,,,,,,,-7.435,279.7022,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_15m_N96_m3.0_H16,S1,34855.0,0.5001,-23.3612,,,,,,,-4.0041,407.2595,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_15m_N96_m3.0_H16,S2,15392.0,0.4717,-31.2962,,,,,,,-4.2572,241.7437,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_15m_N672_m2.0_H4,S1,45333.0,0.4516,-27.6787,,,,,,,-6.8194,627.3785,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_15m_N672_m2.0_H4,S2,23198.0,0.4363,-27.8658,,,,,,,-7.4736,323.2154,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_15m_N672_m2.0_H16,S1,26273.0,0.4962,-30.9677,,,,,,,-3.8538,407.8843,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_15m_N672_m2.0_H16,S2,13262.0,0.4625,-38.891,,,,,,,-4.6344,259.2485,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_15m_N672_m3.0_H4,S1,26374.0,0.462,-26.0255,,,,,,,-5.0821,344.0542,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_15m_N672_m3.0_H4,S2,12652.0,0.4473,-24.6429,,,,,,,-4.8826,155.8908,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_15m_N672_m3.0_H16,S1,18061.0,0.4999,-28.3673,,,,,,,-2.8141,264.8376,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_15m_N672_m3.0_H16,S2,8742.0,0.4683,-36.5652,,,,,,,-3.3535,160.2744,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_1h_N168_m2.0_H4,S1,15493.0,0.4944,-26.2989,,,,,,,-2.6066,205.7273,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_1h_N168_m2.0_H4,S2,7496.0,0.478,-28.9378,,,,,,,-2.6653,109.3023,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_1h_N168_m2.0_H24,S1,8851.0,0.5176,-46.2842,,,,,,,-1.4594,206.577,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_1h_N168_m2.0_H24,S2,4268.0,0.5157,-24.2868,,,,,,,-0.8742,69.9135,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_1h_N168_m3.0_H4,S1,8467.0,0.4999,-21.2335,,,,,,,-1.5091,106.834,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_1h_N168_m3.0_H4,S2,3831.0,0.4662,-35.5011,,,,,,,-2.1519,71.1146,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_1h_N168_m3.0_H24,S1,6130.0,0.522,-37.5971,,,,,,,-1.0469,135.7211,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_1h_N168_m3.0_H24,S2,2810.0,0.5146,-39.6869,,,,,,,-1.1092,64.9181,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_1h_N480_m2.0_H4,S1,11113.0,0.4901,-27.7033,,,,,,,-2.1431,154.8397,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_1h_N480_m2.0_H4,S2,5546.0,0.4728,-35.5467,,,,,,,-2.6869,99.6491,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_1h_N480_m2.0_H24,S1,6281.0,0.5236,-50.3956,,,,,,,-1.1877,158.6703,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_1h_N480_m2.0_H24,S2,3114.0,0.5183,-21.49,,,,,,,-0.6281,45.6975,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_1h_N480_m3.0_H4,S1,5877.0,0.5008,-23.4292,,,,,,,-1.2734,77.8004,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_1h_N480_m3.0_H4,S2,2767.0,0.4713,-41.1609,,,,,,,-2.0188,61.353,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_1h_N480_m3.0_H24,S1,4286.0,0.5289,-38.2825,,,,,,,-0.7749,107.5188,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FR_1h_N480_m3.0_H24,S2,1971.0,0.514,-37.6035,,,,,,,-0.8959,49.9792,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_15m_k4_m2.0_H4,S1,124360.0,0.4299,-25.8691,,,,,,,-12.8362,1608.5424,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_15m_k4_m2.0_H4,S2,58245.0,0.425,-25.7206,,,,,,,-12.465,749.0485,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_15m_k4_m2.0_H16,S1,67655.0,0.4831,-22.0206,,,,,,,-5.9211,745.1501,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_15m_k4_m2.0_H16,S2,30941.0,0.4658,-26.8653,,,,,,,-6.4394,421.3559,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_15m_k4_m3.0_H4,S1,66878.0,0.4404,-25.5367,,,,,,,-10.0104,853.9224,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_15m_k4_m3.0_H4,S2,30053.0,0.442,-24.1145,,,,,,,-7.9306,362.3567,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_15m_k4_m3.0_H16,S1,44424.0,0.4915,-21.2604,,,,,,,-4.3746,472.2358,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_15m_k4_m3.0_H16,S2,19731.0,0.4705,-26.8223,,,,,,,-4.5591,267.7874,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_15m_k16_m2.0_H4,S1,117224.0,0.4276,-27.2171,,,,,,,-13.099,1595.2494,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_15m_k16_m2.0_H4,S2,55080.0,0.4229,-25.9273,,,,,,,-12.1174,714.0392,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_15m_k16_m2.0_H16,S1,60708.0,0.4824,-23.8378,,,,,,,-5.6235,723.5731,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_15m_k16_m2.0_H16,S2,28155.0,0.4569,-30.8432,,,,,,,-6.4426,435.0395,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_15m_k16_m3.0_H4,S1,63667.0,0.4403,-25.9777,,,,,,,-10.0545,826.9607,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_15m_k16_m3.0_H4,S2,28248.0,0.4379,-24.8657,,,,,,,-8.3262,351.203,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_15m_k16_m3.0_H16,S1,40652.0,0.4923,-22.7718,,,,,,,-4.2848,463.8313,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_15m_k16_m3.0_H16,S2,18066.0,0.463,-31.2163,,,,,,,-5.0151,281.9765,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_1h_k4_m2.0_H4,S1,33272.0,0.4879,-22.918,,,,,,,-3.7872,381.2644,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_1h_k4_m2.0_H4,S2,14947.0,0.4646,-30.5308,,,,,,,-4.4025,231.16,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_1h_k4_m2.0_H24,S1,14860.0,0.526,-7.8119,,,,,,,-0.4294,101.8559,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_1h_k4_m2.0_H24,S2,6817.0,0.5162,-10.2736,,,,,,,-0.5543,64.739,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_1h_k4_m3.0_H4,S1,16388.0,0.492,-21.9747,,,,,,,-2.4387,180.0609,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_1h_k4_m3.0_H4,S2,7014.0,0.4599,-34.1335,,,,,,,-3.1708,128.6376,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_1h_k4_m3.0_H24,S1,10541.0,0.5307,-15.8022,,,,,,,-0.719,108.3595,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_1h_k4_m3.0_H24,S2,4700.0,0.5021,-19.6108,,,,,,,-0.8085,56.8818,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_1h_k12_m2.0_H4,S1,28735.0,0.4825,-27.377,,,,,,,-4.227,394.0784,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_1h_k12_m2.0_H4,S2,12971.0,0.4589,-30.3141,,,,,,,-3.9532,197.0495,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_1h_k12_m2.0_H24,S1,13401.0,0.5256,-25.7413,,,,,,,-1.178,184.9684,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_1h_k12_m2.0_H24,S2,6181.0,0.5122,-10.5921,,,,,,,-0.5058,52.239,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_1h_k12_m3.0_H4,S1,14262.0,0.4912,-23.5223,,,,,,,-2.4674,171.5023,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_1h_k12_m3.0_H4,S2,6146.0,0.4566,-33.2538,,,,,,,-2.7654,102.3938,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_1h_k12_m3.0_H24,S1,9320.0,0.5292,-23.2414,,,,,,,-0.9396,138.4962,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,FS_1h_k12_m3.0_H24,S2,4176.0,0.4995,-23.7971,,,,,,,-0.8681,64.0436,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BR_15m_N96_m2.0_H16,S1,39549.0,0.3833,-31.5452,,,,,,,-5.7805,626.5972,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BR_15m_N96_m2.0_H16,S2,18730.0,0.408,-23.7124,,,,,,,-3.7522,236.049,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BR_15m_N96_m3.0_H16,S1,29005.0,0.3867,-28.8773,,,,,,,-4.5041,421.5194,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BR_15m_N96_m3.0_H16,S2,12841.0,0.414,-20.7881,,,,,,,-2.5621,152.1977,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BR_15m_N672_m2.0_H16,S1,13780.0,0.3984,-30.4954,,,,,,,-2.7203,212.0813,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BR_15m_N672_m2.0_H16,S2,7111.0,0.4066,-23.3622,,,,,,,-1.9763,102.3248,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BR_15m_N672_m3.0_H16,S1,10981.0,0.4048,-27.4904,,,,,,,-2.1834,152.0977,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BR_15m_N672_m3.0_H16,S2,5323.0,0.4048,-22.402,,,,,,,-1.539,79.1691,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BR_1h_N168_m2.0_H24,S1,6349.0,0.4374,-21.9469,,,,,,,-0.5608,91.3862,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BR_1h_N168_m2.0_H24,S2,3078.0,0.4292,-40.0157,,,,,,,-1.2242,87.8506,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BR_1h_N168_m3.0_H24,S1,4577.0,0.4346,-12.612,,,,,,,-0.2961,48.8976,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BR_1h_N168_m3.0_H24,S2,2056.0,0.4407,-14.5707,,,,,,,-0.3573,41.5779,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BR_1h_N480_m2.0_H24,S1,3402.0,0.4377,-5.6757,,,,,,,-0.086,60.6841,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BR_1h_N480_m2.0_H24,S2,1696.0,0.421,-7.7312,,,,,,,-0.1749,30.6224,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BR_1h_N480_m3.0_H24,S1,2523.0,0.4415,-3.1873,,,,,,,-0.0468,45.1708,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BR_1h_N480_m3.0_H24,S2,1177.0,0.4427,25.6844,,,,,,,0.4782,20.227,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BS_15m_k4_m2.0_H16,S1,65082.0,0.3877,-31.7971,,,,,,,-8.4326,1037.4654,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BS_15m_k4_m2.0_H16,S2,29821.0,0.4095,-25.9802,,,,,,,-5.979,390.6654,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BS_15m_k4_m3.0_H16,S1,42990.0,0.3841,-31.799,,,,,,,-6.4212,686.4041,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BS_15m_k4_m3.0_H16,S2,19093.0,0.4111,-25.7239,,,,,,,-4.4925,252.5865,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BS_15m_k16_m2.0_H16,S1,55774.0,0.3892,-31.0355,,,,,,,-6.9804,868.7758,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BS_15m_k16_m2.0_H16,S2,25982.0,0.4188,-24.0838,,,,,,,-4.9109,317.0476,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BS_15m_k16_m3.0_H16,S1,37898.0,0.3872,-30.3366,,,,,,,-5.4547,577.259,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BS_15m_k16_m3.0_H16,S2,16851.0,0.4222,-22.5517,,,,,,,-3.5652,202.7169,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BS_1h_k4_m2.0_H24,S1,14452.0,0.4223,-47.9872,,,,,,,-2.5903,352.294,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BS_1h_k4_m2.0_H24,S2,6610.0,0.4458,-37.122,,,,,,,-1.9234,127.7061,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BS_1h_k4_m3.0_H24,S1,10259.0,0.4225,-41.5814,,,,,,,-1.8622,229.9432,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BS_1h_k4_m3.0_H24,S2,4536.0,0.4508,-37.3128,,,,,,,-1.4986,107.6729,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BS_1h_k12_m2.0_H24,S1,12445.0,0.4292,-26.6293,,,,,,,-1.182,175.4818,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BS_1h_k12_m2.0_H24,S2,5729.0,0.4516,-35.5616,,,,,,,-1.5841,125.66,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BS_1h_k12_m3.0_H24,S1,8678.0,0.4269,-27.5156,,,,,,,-1.0429,133.1795,,15m-1h bars,time,both,measured,other
+high/low intraday,0043,BS_1h_k12_m3.0_H24,S2,3877.0,0.4604,-24.6975,,,,,,,-0.856,91.6845,,15m-1h bars,time,both,measured,other
+OKX demo tendency,0052,T1_d0_v0_H16,S1,28093.0,0.4388,-27.5701,,,,,,,-5.5571,387.2634,,15m bars,time,short,measured,other
+OKX demo tendency,0052,T1_d0_v0_H16,S2,13109.0,0.4099,-35.9851,,,,,,,-7.7104,235.8646,,15m bars,time,short,measured,other
+OKX demo tendency,0052,T1_d0_v0_H48,S1,13455.0,0.4774,-27.419,,,,,,,-2.2895,184.4616,,15m bars,time,short,measured,other
+OKX demo tendency,0052,T1_d0_v0_H48,S2,6076.0,0.4431,-47.4553,,,,,,,-4.2085,145.8474,,15m bars,time,short,measured,other
+OKX demo tendency,0052,T1_d0_v1_H16,S1,11452.0,0.4253,-26.2797,,,,,,,-4.3937,150.4775,,15m bars,time,short,measured,other
+OKX demo tendency,0052,T1_d0_v1_H16,S2,5652.0,0.411,-29.9926,,,,,,,-5.6356,85.2308,,15m bars,time,short,measured,other
+OKX demo tendency,0052,T1_d0_v1_H48,S1,7211.0,0.4776,-26.9819,,,,,,,-1.9833,98.1762,,15m bars,time,short,measured,other
+OKX demo tendency,0052,T1_d0_v1_H48,S2,3479.0,0.4335,-45.9041,,,,,,,-3.5982,83.2119,,15m bars,time,short,measured,other
+OKX demo tendency,0052,T1_d1_v0_H16,S1,6744.0,0.4226,-29.6639,,,,,,,-3.9532,100.3035,,15m bars,time,short,measured,other
+OKX demo tendency,0052,T1_d1_v0_H16,S2,3189.0,0.4077,-31.4528,,,,,,,-4.5364,50.2936,,15m bars,time,short,measured,other
+OKX demo tendency,0052,T1_d1_v0_H48,S1,4944.0,0.4729,-32.9515,,,,,,,-2.0517,81.9849,,15m bars,time,short,measured,other
+OKX demo tendency,0052,T1_d1_v0_H48,S2,2362.0,0.4297,-52.2265,,,,,,,-3.4714,64.0182,,15m bars,time,short,measured,other
+OKX demo tendency,0052,T1_d1_v1_H16,S1,3903.0,0.413,-29.1147,,,,,,,-3.6754,56.966,,15m bars,time,short,measured,other
+OKX demo tendency,0052,T1_d1_v1_H16,S2,1861.0,0.4164,-23.9094,,,,,,,-2.9787,22.6019,,15m bars,time,short,measured,other
+OKX demo tendency,0052,T1_d1_v1_H48,S1,3168.0,0.4776,-23.1112,,,,,,,-1.3114,39.4034,,15m bars,time,short,measured,other
+OKX demo tendency,0052,T1_d1_v1_H48,S2,1530.0,0.4314,-45.748,,,,,,,-2.7428,37.0899,,15m bars,time,short,measured,other
+OKX demo tendency,0052,T2_v0_H16,S1,29828.0,0.4127,-27.6389,,,,,,,-5.4387,415.3723,,15m bars,time,long,measured,other
+OKX demo tendency,0052,T2_v0_H16,S2,12207.0,0.4098,-23.0484,,,,,,,-5.3916,142.8056,,15m bars,time,long,measured,other
+OKX demo tendency,0052,T2_v0_H48,S1,16294.0,0.4518,-26.208,,,,,,,-2.0093,238.5012,,15m bars,time,long,measured,other
+OKX demo tendency,0052,T2_v0_H48,S2,6893.0,0.457,-17.6016,,,,,,,-1.7266,73.1062,,15m bars,time,long,measured,other
+OKX demo tendency,0052,T2_v1_H16,S1,16202.0,0.4027,-27.6987,,,,,,,-5.171,227.4364,,15m bars,time,long,measured,other
+OKX demo tendency,0052,T2_v1_H16,S2,6350.0,0.403,-26.4626,,,,,,,-5.8644,84.1573,,15m bars,time,long,measured,other
+OKX demo tendency,0052,T2_v1_H48,S1,10564.0,0.4457,-22.5613,,,,,,,-1.6897,142.9247,,15m bars,time,long,measured,other
+OKX demo tendency,0052,T2_v1_H48,S2,4322.0,0.4459,-25.7328,,,,,,,-2.3318,58.1803,,15m bars,time,long,measured,other
+OKX demo tendency,0052,U_N96_m2_H4,S1,27019.0,0.4244,-24.6409,,,,,,,-7.4343,332.8857,,15m bars,time,both,measured,other
+OKX demo tendency,0052,U_N96_m2_H4,S2,13034.0,0.3993,-27.312,,,,,,,-9.3906,177.9925,,15m bars,time,both,measured,other
+OKX demo tendency,0052,U_N96_m2_H16,S1,20535.0,0.4769,-24.6888,,,,,,,-3.7226,256.674,,15m bars,time,both,measured,other
+OKX demo tendency,0052,U_N96_m2_H16,S2,9664.0,0.4526,-31.0106,,,,,,,-5.4759,149.8433,,15m bars,time,both,measured,other
+OKX demo tendency,0052,U_N96_m3_H4,S1,17195.0,0.4318,-24.5122,,,,,,,-5.4221,211.27,,15m bars,time,both,measured,other
+OKX demo tendency,0052,U_N96_m3_H4,S2,7396.0,0.4127,-27.7606,,,,,,,-6.3553,102.6588,,15m bars,time,both,measured,other
+OKX demo tendency,0052,U_N96_m3_H16,S1,14245.0,0.4782,-24.0159,,,,,,,-2.9218,174.7972,,15m bars,time,both,measured,other
+OKX demo tendency,0052,U_N96_m3_H16,S2,6096.0,0.456,-35.4139,,,,,,,-4.6237,107.9414,,15m bars,time,both,measured,other
+OKX demo tendency,0052,U_N672_m2_H4,S1,12982.0,0.4343,-27.2536,,,,,,,-5.2191,177.7615,,15m bars,time,both,measured,other
+OKX demo tendency,0052,U_N672_m2_H4,S2,6546.0,0.408,-29.2752,,,,,,,-7.2011,96.4533,,15m bars,time,both,measured,other
+OKX demo tendency,0052,U_N672_m2_H16,S1,9430.0,0.4751,-34.4221,,,,,,,-3.1894,165.0826,,15m bars,time,both,measured,other
+OKX demo tendency,0052,U_N672_m2_H16,S2,4603.0,0.4478,-44.0937,,,,,,,-4.9036,102.0942,,15m bars,time,both,measured,other
+OKX demo tendency,0052,U_N672_m3_H4,S1,8048.0,0.4435,-26.6756,,,,,,,-3.8007,107.9455,,15m bars,time,both,measured,other
+OKX demo tendency,0052,U_N672_m3_H4,S2,3697.0,0.426,-29.6123,,,,,,,-4.8762,55.0978,,15m bars,time,both,measured,other
+OKX demo tendency,0052,U_N672_m3_H16,S1,6479.0,0.4772,-32.4486,,,,,,,-2.4661,108.5597,,15m bars,time,both,measured,other
+OKX demo tendency,0052,U_N672_m3_H16,S2,2927.0,0.4609,-45.7139,,,,,,,-3.8276,66.9023,,15m bars,time,both,measured,other
+OKX demo tendency,0052,Uv0_N96_m2_H4,S1,30890.0,0.4219,-25.3037,,,,,,,-7.9325,390.8159,,15m bars,time,both,measured,other
+OKX demo tendency,0052,Uv0_N96_m2_H4,S2,15428.0,0.3934,-27.3181,,,,,,,-10.5426,210.7316,,15m bars,time,both,measured,other
+OKX demo tendency,0052,Uv0_N96_m2_H16,S1,22028.0,0.4724,-25.3933,,,,,,,-4.0133,282.8237,,15m bars,time,both,measured,other
+OKX demo tendency,0052,Uv0_N96_m2_H16,S2,10606.0,0.4496,-31.2315,,,,,,,-5.6633,165.6208,,15m bars,time,both,measured,other
+OKX demo tendency,0052,Up0_N96_m2_H4,S1,78124.0,0.3806,-25.6476,,,,,,,-14.2668,1001.8448,,15m bars,time,both,measured,other
+OKX demo tendency,0052,Up0_N96_m2_H4,S2,34974.0,0.3641,-27.44,,,,,,,-18.1424,479.8429,,15m bars,time,both,measured,other
+OKX demo tendency,0052,Up0_N96_m2_H16,S1,47031.0,0.4436,-24.3951,,,,,,,-6.6974,580.0322,,15m bars,time,both,measured,other
+OKX demo tendency,0052,Up0_N96_m2_H16,S2,20425.0,0.4317,-25.2339,,,,,,,-7.6045,259.3059,,15m bars,time,both,measured,other
+OKX demo tendency,0052,Uf_N96_m2_H4,S1,27019.0,0.3398,-28.1153,,,,,,,-9.0067,379.9294,,15m bars,time,both,measured,other
+OKX demo tendency,0052,Uf_N96_m2_H4,S2,13034.0,0.338,-25.8625,,,,,,,-9.658,172.2559,,15m bars,time,both,measured,other
+OKX demo tendency,0052,Uf_N96_m2_H16,S1,20535.0,0.3858,-28.4234,,,,,,,-4.413,292.5037,,15m bars,time,both,measured,other
+OKX demo tendency,0052,Uf_N96_m2_H16,S2,9664.0,0.3903,-22.5489,,,,,,,-4.1062,121.5483,,15m bars,time,both,measured,other
+gold XAUUSD,0086,A_R_N96_m2.0_H4,S1,687.0,0.234,-12.98,,,,,,,-6.314,59.2,,15m~days,time/engine,both,perp_taker,other
+gold XAUUSD,0086,A_R_N96_m2.0_H4,S2,579.0,0.283,-14.13,,,,,,,-5.711,56.26,,15m~days,time/engine,both,perp_taker,other
+gold XAUUSD,0086,A_R_N96_m2.0_H16,S1,438.0,0.354,-11.42,,,,,,,-3.348,40.12,,15m~days,time/engine,both,perp_taker,other
+gold XAUUSD,0086,A_R_N96_m2.0_H16,S2,384.0,0.378,-13.56,,,,,,,-3.147,41.34,,15m~days,time/engine,both,perp_taker,other
+gold XAUUSD,0086,A_R_N96_m3.0_H4,S1,172.0,0.221,-15.65,,,,,,,-3.729,23.67,,15m~days,time/engine,both,perp_taker,B_low_win_small_loss
+gold XAUUSD,0086,A_R_N96_m3.0_H4,S2,182.0,0.308,-12.0,,,,,,,-2.805,19.97,,15m~days,time/engine,both,perp_taker,B_low_win_small_loss
+gold XAUUSD,0086,A_R_N96_m3.0_H16,S1,125.0,0.328,-17.47,,,,,,,-2.625,19.75,,15m~days,time/engine,both,perp_taker,B_low_win_small_loss
+gold XAUUSD,0086,A_R_N96_m3.0_H16,S2,140.0,0.357,-10.13,,,,,,,-1.259,14.85,,15m~days,time/engine,both,perp_taker,B_low_win_small_loss
+gold XAUUSD,0086,A_R_N480_m2.0_H4,S1,498.0,0.223,-14.52,,,,,,,-5.487,51.98,,15m~days,time/engine,both,perp_taker,other
+gold XAUUSD,0086,A_R_N480_m2.0_H4,S2,409.0,0.308,-11.9,,,,,,,-4.21,38.89,,15m~days,time/engine,both,perp_taker,other
+gold XAUUSD,0086,A_R_N480_m2.0_H16,S1,305.0,0.364,-11.7,,,,,,,-2.853,30.95,,15m~days,time/engine,both,perp_taker,other
+gold XAUUSD,0086,A_R_N480_m2.0_H16,S2,245.0,0.388,-9.68,,,,,,,-1.925,22.14,,15m~days,time/engine,both,perp_taker,other
+gold XAUUSD,0086,A_R_N480_m3.0_H4,S1,109.0,0.174,-18.45,,,,,,,-3.664,18.26,,15m~days,time/engine,both,perp_taker,B_low_win_small_loss
+gold XAUUSD,0086,A_R_N480_m3.0_H4,S2,120.0,0.325,-11.08,,,,,,,-2.003,13.27,,15m~days,time/engine,both,perp_taker,B_low_win_small_loss
+gold XAUUSD,0086,A_R_N480_m3.0_H16,S1,83.0,0.337,-18.42,,,,,,,-2.36,14.42,,15m~days,time/engine,both,perp_taker,B_low_win_small_loss
+gold XAUUSD,0086,A_R_N480_m3.0_H16,S2,88.0,0.33,-4.34,,,,,,,-0.51,5.42,,15m~days,time/engine,both,perp_taker,B_low_win_small_loss
+gold XAUUSD,0086,A_B_N96_m2.0_H16,S1,438.0,0.324,-12.68,,,,,,,-3.739,44.17,,15m~days,time/engine,both,perp_taker,other
+gold XAUUSD,0086,A_B_N96_m2.0_H16,S2,384.0,0.388,-10.9,,,,,,,-2.595,35.59,,15m~days,time/engine,both,perp_taker,other
+gold XAUUSD,0086,D_asia_breakout,S1,557.0,0.384,-11.75,,,,,,,-2.755,50.39,,15m~days,time/engine,both,perp_taker,other
+gold XAUUSD,0086,D_asia_breakout,S2,393.0,0.389,-9.73,,,,,,,-1.587,33.42,,15m~days,time/engine,both,perp_taker,other
+"scale-in (5x, no stop)",0088,N30_s0.04_K0_stop_target,S1,482.0,0.3651,-105.8909,-546.8407,,,,-2055.2912,,-0.7135,33.37,0.0664,days (cycle mean 6d),target / line stop,both,measured,other
+"scale-in (5x, no stop)",0088,N30_s0.04_K0_stop_target,S2,258.0,0.3682,-143.4789,-493.7129,,,,-2050.017,,-1.4044,28.4787,0.0698,days (cycle mean 6d),target / line stop,both,measured,other
+"scale-in (5x, no stop)",0088,N30_s0.04_K0_target_time_only,S1,388.0,0.5851,-24.9358,1021.9715,,,,-2243.4432,,-0.0984,30.4465,0.4098,days (cycle mean 12d),target+10% / time 60d,both,measured,other
+"scale-in (5x, no stop)",0088,N30_s0.04_K0_target_time_only,S2,214.0,0.6028,-13.9824,1040.6566,,,,-2170.8262,,-0.0854,21.1802,0.3879,days (cycle mean 11d),target+10% / time 60d,both,measured,other
+"scale-in (5x, no stop)",0088,N30_s0.04_K2_stop_target,S1,415.0,0.5229,92.9823,967.5075,,,,-2073.6178,,-0.375,15.5301,0.1422,days (cycle mean 10d),target / line stop,both,measured,other
+"scale-in (5x, no stop)",0088,N30_s0.04_K2_stop_target,S2,227.0,0.5551,167.8932,1000.9724,,,,-2050.017,,-0.0088,9.1528,0.1145,days (cycle mean 9d),target / line stop,both,measured,other
+"scale-in (5x, no stop)",0088,N30_s0.04_K2_target_time_only,S1,380.0,0.6526,198.2069,1089.0495,,,,-2149.976,,-0.223,28.4998,0.3395,days (cycle mean 13d),target+10% / time 60d,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N30_s0.04_K2_target_time_only,S2,207.0,0.6908,262.9911,1081.5114,,,,-2117.5117,,0.3305,17.5769,0.2947,days (cycle mean 12d),target+10% / time 60d,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N30_s0.04_K4_stop_target,S1,382.0,0.644,255.0912,1071.0639,,,,-2076.6881,,-0.2742,18.8704,0.2094,days (cycle mean 12d),target / line stop,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N30_s0.04_K4_stop_target,S2,211.0,0.6777,351.2483,1070.3728,,,,-2061.1324,,0.4935,9.6976,0.1659,days (cycle mean 11d),target / line stop,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N30_s0.04_K4_target_time_only,S1,366.0,0.6585,229.4486,1087.4635,1340.5811,-1912.8148,0.7008,-2099.7407,,-0.5005,30.4049,0.3279,days (cycle mean 13d),target+10% / time 60d,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N30_s0.04_K4_target_time_only,S2,206.0,0.7087,335.1506,1078.5271,1247.8566,-1885.7671,0.6617,-2085.9586,,0.2294,13.4453,0.2718,days (cycle mean 12d),target+10% / time 60d,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N30_s0.08_K0_stop_target,S1,438.0,0.4292,-138.3652,-586.5294,,,,-2055.2912,,-0.7308,37.9672,0.1256,days (cycle mean 8d),target / line stop,both,measured,other
+"scale-in (5x, no stop)",0088,N30_s0.08_K0_stop_target,S2,239.0,0.4603,-102.922,-471.5421,,,,-2050.017,,-0.7352,26.2784,0.1297,days (cycle mean 8d),target / line stop,both,measured,other
+"scale-in (5x, no stop)",0088,N30_s0.08_K0_target_time_only,S1,388.0,0.5851,-24.9358,1021.9715,,,,-2243.4432,,-0.0984,30.4465,0.4098,days (cycle mean 12d),target+10% / time 60d,both,measured,other
+"scale-in (5x, no stop)",0088,N30_s0.08_K0_target_time_only,S2,214.0,0.6028,-13.9824,1040.6566,,,,-2170.8262,,-0.0854,21.1802,0.3879,days (cycle mean 11d),target+10% / time 60d,both,measured,other
+"scale-in (5x, no stop)",0088,N30_s0.08_K2_stop_target,S1,377.0,0.6419,199.6466,1070.5418,,,,-2136.386,,-0.1523,19.71,0.2838,days (cycle mean 13d),target / line stop,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N30_s0.08_K2_stop_target,S2,207.0,0.6667,239.1912,1073.9223,,,,-2090.5962,,0.2648,14.0137,0.2657,days (cycle mean 12d),target / line stop,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N30_s0.08_K2_target_time_only,S1,371.0,0.6388,162.0159,1070.5418,1339.3658,-1920.312,0.6975,-2136.386,,-0.3455,23.8862,0.3477,days (cycle mean 13d),target+10% / time 60d,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N30_s0.08_K2_target_time_only,S2,204.0,0.6716,230.0994,1080.4402,1272.716,-1901.8179,0.6692,-2090.5962,,0.1854,15.0074,0.3088,days (cycle mean 13d),target+10% / time 60d,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N30_s0.08_K4_stop_target,S1,366.0,0.6421,166.4774,1071.0639,,,,-2136.386,,-0.4889,16.7365,0.347,days (cycle mean 13d),target / line stop,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N30_s0.08_K4_stop_target,S2,201.0,0.6816,261.6026,1081.4275,,,,-2090.5962,,0.3539,8.2905,0.2985,days (cycle mean 13d),target / line stop,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N30_s0.08_K4_target_time_only,S1,366.0,0.6421,166.4774,1071.0639,,,,-2136.386,,-0.4889,16.7365,0.347,days (cycle mean 13d),target+10% / time 60d,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N30_s0.08_K4_target_time_only,S2,201.0,0.6816,261.6026,1081.4275,,,,-2090.5962,,0.3539,8.2905,0.2985,days (cycle mean 13d),target+10% / time 60d,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N90_s0.04_K0_stop_target,S1,227.0,0.4449,7.0329,-351.6969,,,,-2055.2912,,0.0525,12.8797,0.1145,days (cycle mean 5d),target / line stop,both,measured,other
+"scale-in (5x, no stop)",0088,N90_s0.04_K0_stop_target,S2,143.0,0.3776,-184.5085,-453.3413,,,,-2016.1778,,-1.4002,20.5967,0.0769,days (cycle mean 5d),target / line stop,both,measured,other
+"scale-in (5x, no stop)",0088,N90_s0.04_K0_target_time_only,S1,201.0,0.6318,155.377,1060.6869,,,,-2131.6668,,0.4603,11.9492,0.3582,days (cycle mean 10d),target+10% / time 60d,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N90_s0.04_K0_target_time_only,S2,121.0,0.5537,-156.4653,1012.8262,,,,-2103.9582,,-0.6038,26.5892,0.4132,days (cycle mean 10d),target+10% / time 60d,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N90_s0.04_K2_stop_target,S1,211.0,0.5687,232.5446,1017.2844,,,,-2077.9829,,0.5,3.9914,0.1469,days (cycle mean 8d),target / line stop,both,measured,other
+"scale-in (5x, no stop)",0088,N90_s0.04_K2_stop_target,S2,124.0,0.4919,-27.6594,-204.0177,,,,-2020.6811,,-0.8009,10.1347,0.1371,days (cycle mean 8d),target / line stop,both,measured,other
+"scale-in (5x, no stop)",0088,N90_s0.04_K2_target_time_only,S1,197.0,0.7005,395.2082,1131.9824,,,,-2105.9154,,0.8049,6.5112,0.2893,days (cycle mean 10d),target+10% / time 60d,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N90_s0.04_K2_target_time_only,S2,115.0,0.6435,97.464,1046.5054,,,,-2061.1324,,-0.3535,16.7175,0.3304,days (cycle mean 10d),target+10% / time 60d,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N90_s0.04_K4_stop_target,S1,199.0,0.6834,420.3207,1109.9071,,,,-2077.9829,,0.6253,4.7924,0.206,days (cycle mean 9d),target / line stop,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N90_s0.04_K4_stop_target,S2,115.0,0.6348,195.8234,1051.711,,,,-2061.1324,,-0.2784,11.5258,0.1913,days (cycle mean 10d),target / line stop,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N90_s0.04_K4_target_time_only,S1,195.0,0.7077,424.7488,1131.9824,1395.1322,-1924.6005,0.7249,-2100.0705,,0.5015,5.6212,0.2821,days (cycle mean 10d),target+10% / time 60d,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N90_s0.04_K4_target_time_only,S2,113.0,0.6726,227.7856,1061.3138,1249.9577,-1871.811,0.6678,-2061.1324,,0.0085,13.8489,0.3009,days (cycle mean 11d),target+10% / time 60d,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N90_s0.08_K0_stop_target,S1,214.0,0.472,11.516,-278.0831,,,,-2100.6746,,0.0407,15.8138,0.1542,days (cycle mean 6d),target / line stop,both,measured,other
+"scale-in (5x, no stop)",0088,N90_s0.08_K0_stop_target,S2,131.0,0.4198,-212.9581,-535.5037,,,,-2020.6811,,-1.155,20.881,0.1374,days (cycle mean 7d),target / line stop,both,measured,other
+"scale-in (5x, no stop)",0088,N90_s0.08_K0_target_time_only,S1,201.0,0.6318,155.377,1060.6869,,,,-2131.6668,,0.4603,11.9492,0.3582,days (cycle mean 10d),target+10% / time 60d,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N90_s0.08_K0_target_time_only,S2,121.0,0.5537,-156.4653,1012.8262,,,,-2103.9582,,-0.6038,26.5892,0.4132,days (cycle mean 10d),target+10% / time 60d,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N90_s0.08_K2_stop_target,S1,196.0,0.6888,388.3877,1106.7296,,,,-2100.6746,,0.8349,5.0242,0.25,days (cycle mean 10d),target / line stop,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N90_s0.08_K2_stop_target,S2,113.0,0.6195,93.9684,1038.1248,,,,-2061.1324,,-0.527,15.0371,0.2743,days (cycle mean 12d),target / line stop,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N90_s0.08_K2_target_time_only,S1,194.0,0.6856,354.7056,1106.7296,1390.9507,-1904.6483,0.7303,-2105.2907,,0.6496,5.4658,0.299,days (cycle mean 10d),target+10% / time 60d,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N90_s0.08_K2_target_time_only,S2,112.0,0.6339,127.2307,1046.4959,1255.7073,-1826.9604,0.6873,-2061.1324,,-0.2324,15.5305,0.3214,days (cycle mean 12d),target+10% / time 60d,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N90_s0.08_K4_stop_target,S1,194.0,0.6907,378.6202,1121.8935,,,,-2100.6746,,0.5988,3.4701,0.2887,days (cycle mean 10d),target / line stop,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N90_s0.08_K4_stop_target,S2,112.0,0.6339,105.1234,1046.4959,,,,-2061.1324,,-0.5249,9.8278,0.3214,days (cycle mean 12d),target / line stop,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N90_s0.08_K4_target_time_only,S1,194.0,0.6907,371.9067,1121.8935,,,,-2100.6746,,0.5278,3.4701,0.2938,days (cycle mean 10d),target+10% / time 60d,both,measured,A_high_win
+"scale-in (5x, no stop)",0088,N90_s0.08_K4_target_time_only,S2,112.0,0.6339,105.1234,1046.4959,,,,-2061.1324,,-0.5249,9.8278,0.3214,days (cycle mean 12d),target+10% / time 60d,both,measured,A_high_win
+scale-in + stop,0089,N30_s0.04_K4_avg_close0.06,S1,458.0,0.4127,-77.4981,-671.9916,,,,-2055.2912,,-0.4742,8.4266,0.0895,days (cycle mean 8d),target+10% / time 60d / stop avg_close0.06,both,measured,other
+scale-in + stop,0089,N30_s0.04_K4_avg_close0.06,S2,245.0,0.4408,-52.6663,-660.8614,,,,-2051.5491,,0.0999,5.9658,0.098,days (cycle mean 7d),target+10% / time 60d / stop avg_close0.06,both,measured,other
+scale-in + stop,0089,N30_s0.04_K4_avg_close0.10,S1,397.0,0.5718,114.9579,1032.929,,,,-2073.6178,,-0.2108,10.4025,0.1637,days (cycle mean 11d),target+10% / time 60d / stop avg_close0.1,both,measured,other
+scale-in + stop,0089,N30_s0.04_K4_avg_close0.10,S2,223.0,0.6368,254.5291,1051.8508,,,,-2051.5491,,0.8449,7.5834,0.1435,days (cycle mean 10d),target+10% / time 60d / stop avg_close0.1,both,measured,other
+scale-in + stop,0089,N30_s0.04_K4_avg_close0.15,S1,374.0,0.6524,231.1807,1088.0883,,,,-2099.7407,,-0.2885,22.8906,0.2567,days (cycle mean 13d),target+10% / time 60d / stop avg_close0.15,both,measured,A_high_win
+scale-in + stop,0089,N30_s0.04_K4_avg_close0.15,S2,207.0,0.7005,325.3461,1074.9496,,,,-2085.9586,,0.3102,13.0231,0.2319,days (cycle mean 12d),target+10% / time 60d / stop avg_close0.15,both,measured,A_high_win
+scale-in + stop,0089,N30_s0.04_K4_avg_intra0.06,S1,529.0,0.2647,-84.9094,-617.3758,,,,-912.9987,,-0.6262,5.3562,0.0,days (cycle mean 4d),target+10% / time 60d / stop avg_intra0.06,both,measured,B_low_win_small_loss
+scale-in + stop,0089,N30_s0.04_K4_avg_intra0.06,S2,273.0,0.2967,-66.8904,-619.8503,,,,-715.6302,,0.0282,4.8792,0.0,days (cycle mean 4d),target+10% / time 60d / stop avg_intra0.06,both,measured,B_low_win_small_loss
+scale-in + stop,0089,N30_s0.04_K4_avg_intra0.10,S1,447.0,0.4049,-62.0849,-994.0941,,,,-1138.5514,,-0.5116,11.2943,0.0,days (cycle mean 8d),target+10% / time 60d / stop avg_intra0.1,both,measured,other
+scale-in + stop,0089,N30_s0.04_K4_avg_intra0.10,S2,241.0,0.4772,61.5577,-980.627,,,,-1116.1551,,0.4202,4.605,0.0,days (cycle mean 7d),target+10% / time 60d / stop avg_intra0.1,both,measured,other
+scale-in + stop,0089,N30_s0.04_K4_avg_intra0.15,S1,397.0,0.5793,151.2371,1042.4867,,,,-1644.9021,,-0.3618,17.4119,0.0,days (cycle mean 11d),target+10% / time 60d / stop avg_intra0.15,both,measured,other
+scale-in + stop,0089,N30_s0.04_K4_avg_intra0.15,S2,218.0,0.6606,335.8125,1067.2317,,,,-1616.8112,,1.006,6.3414,0.0,days (cycle mean 10d),target+10% / time 60d / stop avg_intra0.15,both,measured,other
+scale-in + stop,0089,N30_s0.04_K4_last_close0.05,S1,476.0,0.3803,-86.4481,-595.1351,,,,-2055.2912,,-0.7456,10.8165,0.084,days (cycle mean 7d),target+10% / time 60d / stop last_close0.05,both,measured,other
+scale-in + stop,0089,N30_s0.04_K4_last_close0.05,S2,251.0,0.4263,-42.1245,-583.8028,,,,-2050.017,,-0.0879,6.4248,0.0876,days (cycle mean 6d),target+10% / time 60d / stop last_close0.05,both,measured,other
+scale-in + stop,0089,N30_s0.04_K4_last_close0.10,S1,382.0,0.6021,134.8419,1057.627,,,,-2099.7407,,-0.3598,18.5039,0.2356,days (cycle mean 12d),target+10% / time 60d / stop last_close0.1,both,measured,A_high_win
+scale-in + stop,0089,N30_s0.04_K4_last_close0.10,S2,218.0,0.6651,276.6654,1067.2317,,,,-2051.5491,,0.6882,9.2846,0.1881,days (cycle mean 11d),target+10% / time 60d / stop last_close0.1,both,measured,A_high_win
+scale-in + stop,0089,N30_s0.04_K4_last_intra0.05,S1,556.0,0.2176,-100.8359,-519.493,,,,-712.6364,,-1.0561,6.6449,0.0,days (cycle mean 4d),target+10% / time 60d / stop last_intra0.05,both,measured,B_low_win_small_loss
+scale-in + stop,0089,N30_s0.04_K4_last_intra0.05,S2,286.0,0.2657,-54.2043,-520.9061,,,,-932.8729,,0.114,3.686,0.0,days (cycle mean 4d),target+10% / time 60d / stop last_intra0.05,both,measured,B_low_win_small_loss
+scale-in + stop,0089,N30_s0.04_K4_last_intra0.10,S1,436.0,0.445,-27.2517,-983.4147,,,,-1974.4664,,-0.4909,16.4559,0.0069,days (cycle mean 8d),target+10% / time 60d / stop last_intra0.1,both,measured,other
+scale-in + stop,0089,N30_s0.04_K4_last_intra0.10,S2,234.0,0.5256,129.5704,995.4918,,,,-1954.0404,,0.7692,4.5869,0.0,days (cycle mean 8d),target+10% / time 60d / stop last_intra0.1,both,measured,other
+scale-in + stop,0089,N30_s0.08_K2_avg_close0.06,S1,461.0,0.4035,-92.9678,-687.9446,,,,-2055.2912,,-0.4189,10.7898,0.0889,days (cycle mean 7d),target+10% / time 60d / stop avg_close0.06,both,measured,other
+scale-in + stop,0089,N30_s0.08_K2_avg_close0.06,S2,246.0,0.4268,-79.9598,-667.5861,,,,-2050.017,,-0.2775,9.9663,0.0935,days (cycle mean 7d),target+10% / time 60d / stop avg_close0.06,both,measured,other
+scale-in + stop,0089,N30_s0.08_K2_avg_close0.10,S1,411.0,0.5158,-36.1006,967.8992,,,,-2065.304,,-0.4069,11.6155,0.1752,days (cycle mean 10d),target+10% / time 60d / stop avg_close0.1,both,measured,other
+scale-in + stop,0089,N30_s0.08_K2_avg_close0.10,S2,226.0,0.531,-49.3115,995.5164,,,,-2050.017,,-0.6217,11.8317,0.177,days (cycle mean 9d),target+10% / time 60d / stop avg_close0.1,both,measured,other
+scale-in + stop,0089,N30_s0.08_K2_avg_close0.15,S1,383.0,0.6266,147.7589,1067.5992,,,,-2136.386,,-0.2214,18.833,0.2742,days (cycle mean 12d),target+10% / time 60d / stop avg_close0.15,both,measured,A_high_win
+scale-in + stop,0089,N30_s0.08_K2_avg_close0.15,S2,207.0,0.657,202.9018,1069.7671,,,,-2090.5962,,0.3027,12.4351,0.2657,days (cycle mean 12d),target+10% / time 60d / stop avg_close0.15,both,measured,A_high_win
+scale-in + stop,0089,N30_s0.08_K2_avg_intra0.06,S1,531.0,0.2599,-94.9961,-617.3252,,,,-912.9987,,-0.8798,9.7212,0.0,days (cycle mean 4d),target+10% / time 60d / stop avg_intra0.06,both,measured,B_low_win_small_loss
+scale-in + stop,0089,N30_s0.08_K2_avg_intra0.06,S2,274.0,0.292,-71.7716,-619.4516,,,,-715.6302,,-0.3642,7.7039,0.0,days (cycle mean 4d),target+10% / time 60d / stop avg_intra0.06,both,measured,B_low_win_small_loss
+scale-in + stop,0089,N30_s0.08_K2_avg_intra0.10,S1,458.0,0.3668,-145.3909,-1000.1007,,,,-1153.4043,,-0.8873,15.2341,0.0,days (cycle mean 7d),target+10% / time 60d / stop avg_intra0.1,both,measured,other
+scale-in + stop,0089,N30_s0.08_K2_avg_intra0.10,S2,241.0,0.4274,-49.5193,-1003.1918,,,,-1116.1551,,-0.1956,7.9756,0.0,days (cycle mean 7d),target+10% / time 60d / stop avg_intra0.1,both,measured,other
+scale-in + stop,0089,N30_s0.08_K2_avg_intra0.15,S1,403.0,0.5409,31.0055,1005.0341,,,,-1711.1188,,-0.4671,18.3272,0.0,days (cycle mean 11d),target+10% / time 60d / stop avg_intra0.15,both,measured,other
+scale-in + stop,0089,N30_s0.08_K2_avg_intra0.15,S2,218.0,0.5734,80.5015,1008.7192,,,,-1616.8112,,0.1656,6.8467,0.0,days (cycle mean 10d),target+10% / time 60d / stop avg_intra0.15,both,measured,other
+scale-in + stop,0089,N30_s0.08_K2_last_close0.05,S1,482.0,0.3651,-104.0549,-595.1351,,,,-2055.2912,,-0.56,11.1803,0.0788,days (cycle mean 6d),target+10% / time 60d / stop last_close0.05,both,measured,other
+scale-in + stop,0089,N30_s0.08_K2_last_close0.05,S2,256.0,0.4141,-44.4306,-586.7814,,,,-2050.017,,0.0101,8.1427,0.0742,days (cycle mean 6d),target+10% / time 60d / stop last_close0.05,both,measured,other
+scale-in + stop,0089,N30_s0.08_K2_last_close0.10,S1,406.0,0.5394,-8.9846,1006.1182,,,,-2136.386,,-0.2959,11.5828,0.2118,days (cycle mean 10d),target+10% / time 60d / stop last_close0.1,both,measured,other
+scale-in + stop,0089,N30_s0.08_K2_last_close0.10,S2,225.0,0.5422,-38.0102,1000.9724,,,,-2050.017,,-0.554,12.0136,0.1911,days (cycle mean 9d),target+10% / time 60d / stop last_close0.1,both,measured,other
+scale-in + stop,0089,N30_s0.08_K2_last_intra0.05,S1,556.0,0.2176,-99.976,-519.4016,,,,-712.6364,,-1.0596,9.5173,0.0,days (cycle mean 4d),target+10% / time 60d / stop last_intra0.05,both,measured,B_low_win_small_loss
+scale-in + stop,0089,N30_s0.08_K2_last_intra0.05,S2,287.0,0.2648,-49.6116,-520.6848,,,,-663.8231,,-0.1813,5.9097,0.0,days (cycle mean 3d),target+10% / time 60d / stop last_intra0.05,both,measured,B_low_win_small_loss
+scale-in + stop,0089,N30_s0.08_K2_last_intra0.10,S1,458.0,0.3777,-138.4844,-1000.667,,,,-1796.1087,,-0.9726,15.8577,0.0,days (cycle mean 7d),target+10% / time 60d / stop last_intra0.1,both,measured,other
+scale-in + stop,0089,N30_s0.08_K2_last_intra0.10,S2,239.0,0.4268,-73.4881,-1004.7238,,,,-1745.8732,,-0.5323,9.2532,0.0,days (cycle mean 7d),target+10% / time 60d / stop last_intra0.1,both,measured,other
+scale-in + stop,0089,N90_s0.04_K4_avg_close0.06,S1,222.0,0.5,108.2884,361.3188,,,,-2053.6809,,0.7216,2.2143,0.1216,days (cycle mean 6d),target+10% / time 60d / stop avg_close0.06,both,measured,other
+scale-in + stop,0089,N90_s0.04_K4_avg_close0.06,S2,132.0,0.4318,-104.8826,-645.9444,,,,-2051.5491,,-0.3064,5.6021,0.0985,days (cycle mean 6d),target+10% / time 60d / stop avg_close0.06,both,measured,other
+scale-in + stop,0089,N90_s0.04_K4_avg_close0.10,S1,207.0,0.628,297.7407,1077.7675,,,,-2068.7892,,0.9166,3.4308,0.1691,days (cycle mean 8d),target+10% / time 60d / stop avg_close0.1,both,measured,A_high_win
+scale-in + stop,0089,N90_s0.04_K4_avg_close0.10,S2,118.0,0.5424,-24.7768,1015.5376,,,,-2051.5491,,-1.1198,10.953,0.1695,days (cycle mean 9d),target+10% / time 60d / stop avg_close0.1,both,measured,A_high_win
+scale-in + stop,0089,N90_s0.04_K4_avg_close0.15,S1,199.0,0.6985,416.6228,1131.9824,,,,-2077.9829,,0.7844,3.8369,0.2312,days (cycle mean 10d),target+10% / time 60d / stop avg_close0.15,both,measured,A_high_win
+scale-in + stop,0089,N90_s0.04_K4_avg_close0.15,S2,114.0,0.6228,75.5528,1049.1082,,,,-2061.1324,,-0.7897,12.947,0.2544,days (cycle mean 10d),target+10% / time 60d / stop avg_close0.15,both,measured,A_high_win
+scale-in + stop,0089,N90_s0.04_K4_avg_intra0.06,S1,233.0,0.3305,69.7432,-606.9414,,,,-912.9987,,0.6251,2.6055,0.0,days (cycle mean 4d),target+10% / time 60d / stop avg_intra0.06,both,measured,B_low_win_small_loss
+scale-in + stop,0089,N90_s0.04_K4_avg_intra0.06,S2,148.0,0.2635,-125.7903,-619.7026,,,,-661.7839,,-0.3189,4.1646,0.0,days (cycle mean 4d),target+10% / time 60d / stop avg_intra0.06,both,measured,B_low_win_small_loss
+scale-in + stop,0089,N90_s0.04_K4_avg_intra0.10,S1,224.0,0.4777,161.7014,-925.7697,,,,-1073.6381,,0.8927,3.0486,0.0,days (cycle mean 6d),target+10% / time 60d / stop avg_intra0.1,both,measured,other
+scale-in + stop,0089,N90_s0.04_K4_avg_intra0.10,S2,131.0,0.4122,-88.7235,-1003.1918,,,,-1069.7935,,-0.252,5.5681,0.0,days (cycle mean 7d),target+10% / time 60d / stop avg_intra0.1,both,measured,other
+scale-in + stop,0089,N90_s0.04_K4_avg_intra0.15,S1,206.0,0.6311,340.3394,1086.5053,,,,-1592.4312,,0.9203,4.1629,0.0,days (cycle mean 8d),target+10% / time 60d / stop avg_intra0.15,both,measured,A_high_win
+scale-in + stop,0089,N90_s0.04_K4_avg_intra0.15,S2,121.0,0.595,131.5612,1041.5156,,,,-1575.9086,,-0.1034,8.929,0.0,days (cycle mean 9d),target+10% / time 60d / stop avg_intra0.15,both,measured,A_high_win
+scale-in + stop,0089,N90_s0.04_K4_last_close0.05,S1,220.0,0.4591,44.9767,-557.9908,,,,-2053.6809,,0.3066,2.9444,0.1273,days (cycle mean 5d),target+10% / time 60d / stop last_close0.05,both,measured,other
+scale-in + stop,0089,N90_s0.04_K4_last_close0.05,S2,135.0,0.4,-129.9007,-622.6096,,,,-2020.6811,,-0.3894,5.1645,0.0963,days (cycle mean 6d),target+10% / time 60d / stop last_close0.05,both,measured,other
+scale-in + stop,0089,N90_s0.04_K4_last_close0.10,S1,204.0,0.6471,319.5862,1087.9208,,,,-2100.0705,,0.9146,3.4308,0.1961,days (cycle mean 9d),target+10% / time 60d / stop last_close0.1,both,measured,A_high_win
+scale-in + stop,0089,N90_s0.04_K4_last_close0.10,S2,116.0,0.5776,7.037,1039.8202,,,,-2051.5491,,-0.8726,12.5064,0.2328,days (cycle mean 10d),target+10% / time 60d / stop last_close0.1,both,measured,A_high_win
+scale-in + stop,0089,N90_s0.04_K4_last_intra0.05,S1,241.0,0.2739,26.954,-512.5248,,,,-884.0274,,0.4004,2.1871,0.0,days (cycle mean 3d),target+10% / time 60d / stop last_intra0.05,both,measured,B_low_win_small_loss
+scale-in + stop,0089,N90_s0.04_K4_last_intra0.05,S2,154.0,0.2208,-125.1119,-521.247,,,,-748.6032,,-0.4259,3.3371,0.0,days (cycle mean 3d),target+10% / time 60d / stop last_intra0.05,both,measured,B_low_win_small_loss
+scale-in + stop,0089,N90_s0.04_K4_last_intra0.10,S1,221.0,0.5023,195.9822,757.4127,,,,-1732.5233,,1.0329,3.5355,0.0,days (cycle mean 6d),target+10% / time 60d / stop last_intra0.1,both,measured,other
+scale-in + stop,0089,N90_s0.04_K4_last_intra0.10,S2,126.0,0.4365,-104.9194,-1004.613,,,,-1954.0404,,-0.6917,7.8487,0.0,days (cycle mean 7d),target+10% / time 60d / stop last_intra0.1,both,measured,other
+scale-in + stop,0089,N90_s0.08_K2_avg_close0.06,S1,223.0,0.4888,75.9336,-609.663,,,,-2053.6809,,0.478,3.2785,0.1256,days (cycle mean 6d),target+10% / time 60d / stop avg_close0.06,both,measured,other
+scale-in + stop,0089,N90_s0.08_K2_avg_close0.06,S2,135.0,0.4296,-91.6086,-645.6161,,,,-2020.6811,,-0.2814,7.4583,0.0963,days (cycle mean 6d),target+10% / time 60d / stop avg_close0.06,both,measured,other
+scale-in + stop,0089,N90_s0.08_K2_avg_close0.10,S1,209.0,0.5933,201.2492,1021.8011,,,,-2053.6809,,0.6625,4.0,0.1866,days (cycle mean 8d),target+10% / time 60d / stop avg_close0.1,both,measured,other
+scale-in + stop,0089,N90_s0.08_K2_avg_close0.10,S2,123.0,0.4878,-185.0794,-933.2923,,,,-2048.3744,,-1.2338,11.7909,0.1951,days (cycle mean 9d),target+10% / time 60d / stop avg_close0.1,both,measured,other
+scale-in + stop,0089,N90_s0.08_K2_avg_close0.15,S1,201.0,0.6667,306.6193,1085.3587,,,,-2100.6746,,0.6035,4.5083,0.2637,days (cycle mean 9d),target+10% / time 60d / stop avg_close0.15,both,measured,A_high_win
+scale-in + stop,0089,N90_s0.08_K2_avg_close0.15,S2,115.0,0.5826,-26.1441,1019.6679,,,,-2061.1324,,-0.986,15.3361,0.2783,days (cycle mean 11d),target+10% / time 60d / stop avg_close0.15,both,measured,A_high_win
+scale-in + stop,0089,N90_s0.08_K2_avg_intra0.06,S1,234.0,0.3248,54.7645,-606.5444,,,,-912.9987,,0.4166,3.9208,0.0,days (cycle mean 4d),target+10% / time 60d / stop avg_intra0.06,both,measured,B_low_win_small_loss
+scale-in + stop,0089,N90_s0.08_K2_avg_intra0.06,S2,148.0,0.2568,-137.5133,-618.8364,,,,-687.3159,,-0.7875,6.6529,0.0,days (cycle mean 4d),target+10% / time 60d / stop avg_intra0.06,both,measured,B_low_win_small_loss
+scale-in + stop,0089,N90_s0.08_K2_avg_intra0.10,S1,225.0,0.4578,106.6061,-960.1484,,,,-1073.6381,,0.6248,5.3228,0.0,days (cycle mean 5d),target+10% / time 60d / stop avg_intra0.1,both,measured,other
+scale-in + stop,0089,N90_s0.08_K2_avg_intra0.10,S2,136.0,0.3897,-141.6698,-1003.2347,,,,-1087.8464,,-0.6239,6.8983,0.0,days (cycle mean 6d),target+10% / time 60d / stop avg_intra0.1,both,measured,other
+scale-in + stop,0089,N90_s0.08_K2_avg_intra0.15,S1,207.0,0.599,244.7973,1053.1053,,,,-1636.3018,,0.6745,5.7152,0.0,days (cycle mean 8d),target+10% / time 60d / stop avg_intra0.15,both,measured,other
+scale-in + stop,0089,N90_s0.08_K2_avg_intra0.15,S2,125.0,0.552,1.1583,997.5161,,,,-1587.9819,,-0.2465,10.0709,0.0,days (cycle mean 9d),target+10% / time 60d / stop avg_intra0.15,both,measured,other
+scale-in + stop,0089,N90_s0.08_K2_last_close0.05,S1,225.0,0.4356,-2.7017,-566.9813,,,,-2053.6809,,0.0094,4.9445,0.1289,days (cycle mean 5d),target+10% / time 60d / stop last_close0.05,both,measured,other
+scale-in + stop,0089,N90_s0.08_K2_last_close0.05,S2,139.0,0.4029,-98.8235,-621.5689,,,,-2020.6811,,-0.2768,6.2477,0.0791,days (cycle mean 6d),target+10% / time 60d / stop last_close0.05,both,measured,other
+scale-in + stop,0089,N90_s0.08_K2_last_close0.10,S1,207.0,0.6087,216.0783,1028.7769,,,,-2053.6809,,0.6941,4.0,0.2077,days (cycle mean 8d),target+10% / time 60d / stop last_close0.1,both,measured,A_high_win
+scale-in + stop,0089,N90_s0.08_K2_last_close0.10,S2,121.0,0.5124,-143.1949,988.9633,,,,-2048.3744,,-0.9118,12.9021,0.2149,days (cycle mean 9d),target+10% / time 60d / stop last_close0.1,both,measured,A_high_win
+scale-in + stop,0089,N90_s0.08_K2_last_intra0.05,S1,241.0,0.2739,27.6705,-512.5248,,,,-584.5358,,0.2794,3.465,0.0,days (cycle mean 3d),target+10% / time 60d / stop last_intra0.05,both,measured,B_low_win_small_loss
+scale-in + stop,0089,N90_s0.08_K2_last_intra0.05,S2,155.0,0.2258,-107.9875,-520.0109,,,,-589.1213,,-0.6183,5.6234,0.0,days (cycle mean 3d),target+10% / time 60d / stop last_intra0.05,both,measured,B_low_win_small_loss
+scale-in + stop,0089,N90_s0.08_K2_last_intra0.10,S1,224.0,0.4732,133.0912,-955.2904,,,,-1807.5016,,0.7607,5.3439,0.0,days (cycle mean 5d),target+10% / time 60d / stop last_intra0.1,both,measured,other
+scale-in + stop,0089,N90_s0.08_K2_last_intra0.10,S2,135.0,0.3852,-174.2256,-1005.6667,,,,-1745.8732,,-0.9754,8.1726,0.0,days (cycle mean 6d),target+10% / time 60d / stop last_intra0.1,both,measured,other
+scale-in + stop,0089,N30_s0.04_K0_avg_close0.06,S1,462.0,0.3896,-115.1455,-693.1418,,,,-2055.2912,,-0.6767,35.7396,0.0909,days (cycle mean 7d),target+10% / time 60d / stop avg_close0.06,both,measured,other
+scale-in + stop,0089,N30_s0.04_K0_avg_close0.06,S2,247.0,0.4251,-84.4765,-667.2386,,,,-2050.017,,-0.6577,28.2165,0.0972,days (cycle mean 7d),target+10% / time 60d / stop avg_close0.06,both,measured,other
+scale-in + stop,0089,N30_s0.04_K0_avg_close0.10,S1,415.0,0.4675,-152.3408,-1028.1024,,,,-2065.775,,-0.712,42.8831,0.1807,days (cycle mean 10d),target+10% / time 60d / stop avg_close0.1,both,measured,other
+scale-in + stop,0089,N30_s0.04_K0_avg_close0.10,S2,231.0,0.5325,-25.0319,995.6255,,,,-2050.017,,-0.1686,20.8348,0.1602,days (cycle mean 9d),target+10% / time 60d / stop avg_close0.1,both,measured,other
+scale-in + stop,0089,N30_s0.04_K0_avg_close0.15,S1,392.0,0.5638,-58.3218,1009.0873,,,,-2243.4432,,-0.2427,31.6498,0.3393,days (cycle mean 11d),target+10% / time 60d / stop avg_close0.15,both,measured,other
+scale-in + stop,0089,N30_s0.04_K0_avg_close0.15,S2,216.0,0.588,-25.3073,1027.6742,,,,-2050.017,,-0.1444,21.6671,0.3102,days (cycle mean 11d),target+10% / time 60d / stop avg_close0.15,both,measured,other
+scale-in + stop,0089,N30_s0.04_K0_avg_intra0.06,S1,531.0,0.2599,-95.2652,-616.9775,,,,-912.9987,,-0.9244,29.4411,0.0,days (cycle mean 4d),target+10% / time 60d / stop avg_intra0.06,both,measured,B_low_win_small_loss
+scale-in + stop,0089,N30_s0.04_K0_avg_intra0.06,S2,273.0,0.2894,-78.0245,-619.0084,,,,-715.6302,,-0.9517,22.4941,0.0,days (cycle mean 4d),target+10% / time 60d / stop avg_intra0.06,both,measured,B_low_win_small_loss
+scale-in + stop,0089,N30_s0.04_K0_avg_intra0.10,S1,464.0,0.3534,-170.6041,-1002.2334,,,,-1260.4767,,-1.1443,42.3704,0.0,days (cycle mean 7d),target+10% / time 60d / stop avg_intra0.1,both,measured,other
+scale-in + stop,0089,N30_s0.04_K0_avg_intra0.10,S2,243.0,0.4115,-86.2572,-1005.6142,,,,-1116.1551,,-0.7081,26.9472,0.0,days (cycle mean 7d),target+10% / time 60d / stop avg_intra0.1,both,measured,other
+scale-in + stop,0089,N30_s0.04_K0_avg_intra0.15,S1,414.0,0.4879,-103.3175,-1313.6379,,,,-1761.2326,,-0.4888,33.3309,0.0,days (cycle mean 10d),target+10% / time 60d / stop avg_intra0.15,both,measured,other
+scale-in + stop,0089,N30_s0.04_K0_avg_intra0.15,S2,227.0,0.5154,-81.9332,937.6017,,,,-1616.8112,,-0.5278,26.6009,0.0,days (cycle mean 9d),target+10% / time 60d / stop avg_intra0.15,both,measured,other
+scale-in + stop,0089,N90_s0.04_K0_avg_close0.06,S1,223.0,0.4709,43.9291,-650.589,,,,-2053.6809,,0.1949,13.5531,0.13,days (cycle mean 6d),target+10% / time 60d / stop avg_close0.06,both,measured,other
+scale-in + stop,0089,N90_s0.04_K0_avg_close0.06,S2,136.0,0.4265,-103.6228,-654.3848,,,,-2020.6811,,-0.6054,19.5439,0.1029,days (cycle mean 6d),target+10% / time 60d / stop avg_close0.06,both,measured,other
+scale-in + stop,0089,N90_s0.04_K0_avg_close0.10,S1,212.0,0.566,127.8804,1014.7951,,,,-2053.6809,,0.4617,12.5291,0.1887,days (cycle mean 7d),target+10% / time 60d / stop avg_close0.1,both,measured,other
+scale-in + stop,0089,N90_s0.04_K0_avg_close0.10,S2,127.0,0.5039,-146.0687,55.9538,,,,-2048.4336,,-0.6255,23.5782,0.1811,days (cycle mean 8d),target+10% / time 60d / stop avg_close0.1,both,measured,other
+scale-in + stop,0089,N90_s0.04_K0_avg_close0.15,S1,204.0,0.6225,159.4841,1059.4534,,,,-2131.6668,,0.4899,12.1663,0.2892,days (cycle mean 9d),target+10% / time 60d / stop avg_close0.15,both,measured,A_high_win
+scale-in + stop,0089,N90_s0.04_K0_avg_close0.15,S2,122.0,0.5328,-186.7816,1003.2667,,,,-2048.4336,,-0.7441,26.0467,0.3033,days (cycle mean 9d),target+10% / time 60d / stop avg_close0.15,both,measured,A_high_win
+scale-in + stop,0089,N90_s0.04_K0_avg_intra0.06,S1,234.0,0.3248,55.252,-606.5444,,,,-912.9987,,0.371,11.7625,0.0,days (cycle mean 4d),target+10% / time 60d / stop avg_intra0.06,both,measured,B_low_win_small_loss
+scale-in + stop,0089,N90_s0.04_K0_avg_intra0.06,S2,148.0,0.2568,-140.9096,-618.1375,,,,-687.3159,,-1.2913,19.3411,0.0,days (cycle mean 4d),target+10% / time 60d / stop avg_intra0.06,both,measured,B_low_win_small_loss
+scale-in + stop,0089,N90_s0.04_K0_avg_intra0.10,S1,225.0,0.4489,92.8746,-963.3592,,,,-1073.6381,,0.4475,15.2747,0.0,days (cycle mean 5d),target+10% / time 60d / stop avg_intra0.1,both,measured,other
+scale-in + stop,0089,N90_s0.04_K0_avg_intra0.10,S2,137.0,0.3869,-158.4742,-1003.2776,,,,-1087.8464,,-1.0166,20.952,0.0,days (cycle mean 6d),target+10% / time 60d / stop avg_intra0.1,both,measured,other
+scale-in + stop,0089,N90_s0.04_K0_avg_intra0.15,S1,209.0,0.5502,104.7793,1009.0156,,,,-1636.3018,,0.3773,15.8687,0.0,days (cycle mean 7d),target+10% / time 60d / stop avg_intra0.15,both,measured,other
+scale-in + stop,0089,N90_s0.04_K0_avg_intra0.15,S2,125.0,0.488,-166.0624,-1147.2517,,,,-1594.3854,,-0.7758,22.4274,0.0,days (cycle mean 9d),target+10% / time 60d / stop avg_intra0.15,both,measured,other
+scale-in low-lev limit,0090,N30_s0.04_K4_L1_none_u0.00,S1,286.0,0.8182,362.2732,1162.8555,,,,-10006.5989,,0.0277,47.1011,0.042,days (cycle mean 25d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L1_none_u0.00,S2,164.0,0.8049,296.3369,1133.2936,,,,-9990.443,,-0.4015,42.8129,0.0427,days (cycle mean 21d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L1_none_u0.02,S1,265.0,0.8113,403.4503,1178.2732,,,,-9923.9435,,0.1175,41.9801,0.0377,days (cycle mean 24d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L1_none_u0.02,S2,148.0,0.7905,123.5153,1103.8142,,,,-9990.5394,,-0.542,50.4897,0.0608,days (cycle mean 20d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L1_avg_close_u0.00,S1,368.0,0.6902,305.3909,1098.1528,,,,-10006.5989,,-0.2262,29.1771,0.0027,days (cycle mean 13d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L1_avg_close_u0.00,S2,208.0,0.7212,287.7712,1080.7713,,,,-7954.6478,,-0.6133,28.9152,0.0,days (cycle mean 12d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L1_avg_close_u0.02,S1,327.0,0.6942,331.2879,1107.3702,,,,-4381.0977,,0.0705,25.1041,0.0,days (cycle mean 13d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L1_avg_close_u0.02,S2,185.0,0.7027,227.1286,1071.9777,,,,-9965.3671,,-0.3874,27.9953,0.0054,days (cycle mean 12d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L2_none_u0.00,S1,305.0,0.8098,428.4513,1161.5887,,,,-5028.7666,,0.2369,32.6238,0.1049,days (cycle mean 21d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L2_none_u0.00,S2,172.0,0.7849,289.5356,1108.2062,,,,-5046.2537,,-0.4053,36.288,0.1105,days (cycle mean 19d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L2_none_u0.02,S1,282.0,0.8014,425.4859,1167.4985,,,,-5027.8143,,0.219,31.2837,0.1064,days (cycle mean 20d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L2_none_u0.02,S2,154.0,0.7597,121.9215,1082.8194,,,,-5045.8233,,-0.5851,37.1397,0.1299,days (cycle mean 18d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L2_avg_close_u0.00,S1,368.0,0.6902,318.9779,1098.1528,,,,-5006.5989,,-0.1678,29.1771,0.0027,days (cycle mean 13d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L2_avg_close_u0.00,S2,208.0,0.7212,305.4339,1080.7713,,,,-5050.7575,,-0.5244,26.2858,0.0288,days (cycle mean 12d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L2_avg_close_u0.02,S1,327.0,0.6942,326.9718,1107.3702,,,,-4950.1197,,0.053,25.1041,0.0031,days (cycle mean 13d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L2_avg_close_u0.02,S2,185.0,0.7027,239.427,1071.9777,,,,-5044.2388,,-0.3358,25.9672,0.0216,days (cycle mean 12d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L3_none_u0.00,S1,326.0,0.7638,315.3501,1135.213,,,,-3468.0879,,-0.1163,48.8262,0.2025,days (cycle mean 18d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L3_none_u0.00,S2,189.0,0.7725,365.65,1100.4709,,,,-3424.0173,,-0.1569,29.4651,0.1746,days (cycle mean 15d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L3_none_u0.02,S1,296.0,0.75,258.5848,1126.7132,,,,-3468.5552,,-0.1783,44.9327,0.2196,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L3_none_u0.02,S2,170.0,0.7529,250.915,1073.386,,,,-3377.5722,,-0.2465,31.1536,0.1824,days (cycle mean 14d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L3_avg_close_u0.00,S1,369.0,0.6911,290.4177,1092.7056,,,,-3391.2305,,-0.3,32.4628,0.0542,days (cycle mean 13d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L3_avg_close_u0.00,S2,209.0,0.7177,316.6725,1078.4027,,,,-3424.0173,,-0.4798,22.7491,0.0622,days (cycle mean 12d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L3_avg_close_u0.02,S1,328.0,0.6921,298.7499,1107.0308,,,,-3391.4483,,-0.0731,26.7311,0.0579,days (cycle mean 13d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L3_avg_close_u0.02,S2,186.0,0.7043,266.7641,1071.979,,,,-3377.5722,,-0.1951,24.4045,0.0591,days (cycle mean 11d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L1_none_u0.00,S1,279.0,0.8172,407.6934,1164.1223,,,,-9891.0249,,0.1289,41.7924,0.0358,days (cycle mean 26d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L1_none_u0.00,S2,164.0,0.8049,272.6518,1133.5993,,,,-9992.4732,,-0.3558,48.2849,0.0488,days (cycle mean 21d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L1_none_u0.02,S1,264.0,0.8182,436.3874,1208.9523,,,,-9926.0117,,0.1958,41.636,0.0379,days (cycle mean 24d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L1_none_u0.02,S2,151.0,0.8079,199.6779,1107.8102,,,,-9992.634,,-0.3326,49.803,0.0596,days (cycle mean 20d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L1_avg_close_u0.00,S1,362.0,0.6878,333.6935,1095.6134,,,,-4354.9712,,-0.0066,24.9972,0.0,days (cycle mean 14d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L1_avg_close_u0.00,S2,201.0,0.7114,306.8408,1093.0849,,,,-8015.5069,,-0.3327,25.135,0.0,days (cycle mean 13d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L1_avg_close_u0.02,S1,324.0,0.7006,380.5884,1146.7896,,,,-4257.1623,,0.2932,23.5251,0.0,days (cycle mean 14d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L1_avg_close_u0.02,S2,182.0,0.7088,250.1189,1072.7726,,,,-7887.4712,,-0.1769,26.288,0.0,days (cycle mean 12d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L2_none_u0.00,S1,301.0,0.8106,453.5806,1167.9798,,,,-5029.6376,,0.3013,29.5326,0.0997,days (cycle mean 22d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L2_none_u0.00,S2,172.0,0.7907,326.4256,1132.9415,,,,-5047.7006,,-0.1958,35.6397,0.1105,days (cycle mean 19d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L2_none_u0.02,S1,282.0,0.8121,490.9933,1204.723,,,,-5027.8522,,0.396,29.4658,0.1028,days (cycle mean 21d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L2_none_u0.02,S2,155.0,0.7742,188.0586,1097.0997,,,,-5044.3425,,-0.3482,36.2638,0.1226,days (cycle mean 19d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L2_avg_close_u0.00,S1,362.0,0.6878,333.6935,1095.6134,,,,-4354.9712,,-0.0066,24.9972,0.0,days (cycle mean 14d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L2_avg_close_u0.00,S2,201.0,0.7114,304.2002,1093.0849,,,,-5055.4919,,-0.3501,24.6044,0.0199,days (cycle mean 13d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L2_avg_close_u0.02,S1,324.0,0.7006,375.2098,1146.7896,,,,-4951.5496,,0.271,23.5251,0.0031,days (cycle mean 14d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L2_avg_close_u0.02,S2,182.0,0.7088,255.7776,1072.7726,,,,-5044.3425,,-0.1515,24.8432,0.0165,days (cycle mean 12d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L3_none_u0.00,S1,321.0,0.7664,336.7867,1138.1747,,,,-3468.1778,,-0.0251,45.8842,0.1963,days (cycle mean 18d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L3_none_u0.00,S2,185.0,0.773,405.3033,1120.1077,,,,-3381.034,,0.1511,28.6182,0.1676,days (cycle mean 16d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L3_none_u0.02,S1,294.0,0.7551,306.2702,1162.3154,,,,-3468.9566,,-0.0111,39.8688,0.2109,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L3_none_u0.02,S2,170.0,0.7647,305.9944,1078.9419,,,,-3377.6759,,0.0508,29.3199,0.1706,days (cycle mean 15d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L3_avg_close_u0.00,S1,363.0,0.686,288.7723,1092.7056,,,,-3387.6744,,-0.202,29.1695,0.0523,days (cycle mean 14d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L3_avg_close_u0.00,S2,202.0,0.7129,323.8881,1093.2192,,,,-3388.8252,,-0.2406,22.9057,0.0594,days (cycle mean 13d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L3_avg_close_u0.02,S1,325.0,0.6985,342.1981,1144.0155,,,,-3388.0374,,0.1298,25.59,0.0523,days (cycle mean 13d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L3_avg_close_u0.02,S2,183.0,0.7104,276.0528,1072.999,,,,-3377.6759,,-0.0435,23.983,0.0601,days (cycle mean 12d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L1_none_u0.00,S1,178.0,0.8876,797.839,1260.9005,,,,-9990.2091,,0.8459,18.7622,0.0337,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L1_none_u0.00,S2,91.0,0.7253,-338.8847,1081.2061,,,,-10012.2591,,-1.0823,54.4601,0.0989,days (cycle mean 22d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L1_none_u0.02,S1,140.0,0.8429,437.6881,1198.8654,,,,-10211.1187,,0.2388,18.9045,0.05,days (cycle mean 19d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L1_none_u0.02,S2,90.0,0.7111,-352.7466,1051.5337,,,,-10022.3687,,-1.156,53.8435,0.1,days (cycle mean 19d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L1_avg_close_u0.00,S1,198.0,0.7828,663.5404,1183.799,,,,-4727.976,,0.8793,7.2872,0.0,days (cycle mean 11d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L1_avg_close_u0.00,S2,111.0,0.6667,97.9589,1062.7255,,,,-7954.6478,,-1.0189,25.9418,0.0,days (cycle mean 11d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L1_avg_close_u0.02,S1,159.0,0.7421,448.478,1146.4761,,,,-4706.2351,,0.4431,7.5165,0.0,days (cycle mean 11d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L1_avg_close_u0.02,S2,108.0,0.6667,44.8681,1043.8094,,,,-8286.9388,,-1.156,25.7647,0.0,days (cycle mean 9d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L2_none_u0.00,S1,182.0,0.8626,727.4298,1229.9164,,,,-5026.4218,,0.8931,12.0667,0.0824,days (cycle mean 15d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L2_none_u0.00,S2,95.0,0.6947,-231.8936,1065.4573,,,,-5012.2591,,-1.3834,39.4345,0.2,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L2_none_u0.02,S1,146.0,0.8151,404.9818,1179.0497,,,,-5026.4826,,0.2158,11.9854,0.1096,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L2_none_u0.02,S2,94.0,0.6809,-254.7968,1041.6911,,,,-5026.0162,,-1.5204,39.0654,0.2021,days (cycle mean 15d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L2_avg_close_u0.00,S1,198.0,0.7828,652.0339,1183.799,,,,-4954.4681,,0.8281,8.4966,0.0101,days (cycle mean 11d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L2_avg_close_u0.00,S2,111.0,0.6667,116.5937,1062.7255,,,,-4998.0027,,-0.9596,24.9076,0.018,days (cycle mean 11d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L2_avg_close_u0.02,S1,159.0,0.7421,433.7061,1146.4761,,,,-4954.6858,,0.388,8.2969,0.0126,days (cycle mean 11d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L2_avg_close_u0.02,S2,108.0,0.6667,92.988,1043.8094,,,,-5026.0162,,-1.008,24.7967,0.0278,days (cycle mean 9d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L3_none_u0.00,S1,186.0,0.8333,702.4518,1219.616,,,,-3455.3905,,0.9377,9.909,0.1344,days (cycle mean 14d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L3_none_u0.00,S2,101.0,0.703,108.2568,1076.5169,,,,-3342.5947,,-0.6386,27.5929,0.2178,days (cycle mean 15d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L3_none_u0.02,S1,149.0,0.7852,416.8495,1155.5591,,,,-3455.9097,,0.3244,9.9488,0.1812,days (cycle mean 14d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L3_none_u0.02,S2,98.0,0.6837,29.2567,1041.6911,,,,-3359.3495,,-0.9087,27.5338,0.2245,days (cycle mean 13d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L3_avg_close_u0.00,S1,198.0,0.7828,648.1139,1183.799,,,,-3340.4801,,0.8231,7.7933,0.0354,days (cycle mean 11d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L3_avg_close_u0.00,S2,111.0,0.6667,130.5766,1062.7255,,,,-3342.5947,,-0.9304,23.361,0.0541,days (cycle mean 11d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L3_avg_close_u0.02,S1,159.0,0.7421,443.3585,1146.4761,,,,-3340.4852,,0.4272,7.6201,0.0377,days (cycle mean 11d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L3_avg_close_u0.02,S2,108.0,0.6667,131.002,1043.8094,,,,-3359.3495,,-0.8934,22.7818,0.0648,days (cycle mean 9d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L1_none_u0.00,S1,174.0,0.8793,739.7066,1212.637,,,,-9990.3644,,0.7115,21.5681,0.0345,days (cycle mean 18d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L1_none_u0.00,S2,90.0,0.7,-389.4645,1087.3701,,,,-10013.121,,-1.0691,55.9672,0.1,days (cycle mean 22d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L1_none_u0.02,S1,140.0,0.8429,461.584,1192.7383,,,,-10210.8307,,0.3016,18.5545,0.05,days (cycle mean 19d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L1_none_u0.02,S2,88.0,0.7045,-391.051,1044.4576,,,,-10013.1725,,-1.1336,55.2406,0.1023,days (cycle mean 20d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L1_avg_close_u0.00,S1,196.0,0.7755,616.0612,1150.4819,,,,-4641.9831,,0.8422,7.7109,0.0,days (cycle mean 11d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L1_avg_close_u0.00,S2,110.0,0.6364,57.3469,1073.6098,,,,-8015.5069,,-1.0055,27.4672,0.0,days (cycle mean 12d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L1_avg_close_u0.02,S1,158.0,0.7468,494.4122,1122.2832,,,,-4605.7483,,0.6462,6.7223,0.0,days (cycle mean 12d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L1_avg_close_u0.02,S2,106.0,0.6509,51.9996,1040.9805,,,,-7887.4712,,-1.0405,26.9757,0.0,days (cycle mean 9d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L2_none_u0.00,S1,179.0,0.8547,655.6139,1169.6823,,,,-5043.8209,,0.7491,14.5422,0.0894,days (cycle mean 16d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L2_none_u0.00,S2,96.0,0.6875,-218.5863,1079.051,,,,-5013.121,,-1.2822,39.2532,0.1979,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L2_none_u0.02,S1,146.0,0.8219,469.0924,1177.4568,,,,-5026.5256,,0.3879,11.8238,0.1027,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L2_none_u0.02,S2,92.0,0.6739,-289.5189,1041.3067,,,,-5013.1725,,-1.4858,40.3855,0.2065,days (cycle mean 15d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L2_avg_close_u0.00,S1,196.0,0.7755,616.3745,1150.4819,,,,-4580.5649,,0.8437,7.7109,0.0051,days (cycle mean 11d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L2_avg_close_u0.00,S2,110.0,0.6364,84.7791,1073.6098,,,,-4997.9655,,-0.9183,25.9584,0.0091,days (cycle mean 12d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L2_avg_close_u0.02,S1,158.0,0.7468,494.5899,1122.2832,,,,-4577.6738,,0.6469,6.7223,0.0063,days (cycle mean 12d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L2_avg_close_u0.02,S2,106.0,0.6509,79.2583,1040.9805,,,,-4998.0438,,-0.9591,25.531,0.0094,days (cycle mean 9d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L3_none_u0.00,S1,184.0,0.8261,647.7677,1161.5644,,,,-3446.5608,,0.8518,12.3941,0.1413,days (cycle mean 14d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L3_none_u0.00,S2,100.0,0.67,6.4357,1080.3051,,,,-3342.595,,-0.8028,30.9487,0.24,days (cycle mean 16d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L3_none_u0.02,S1,149.0,0.7852,428.1471,1138.5127,,,,-3447.4261,,0.3908,10.561,0.1812,days (cycle mean 15d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L3_none_u0.02,S2,96.0,0.6771,27.8128,1041.8943,,,,-3342.5931,,-0.7921,27.962,0.2188,days (cycle mean 14d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L3_avg_close_u0.00,S1,196.0,0.7755,605.988,1150.4819,,,,-3340.5411,,0.8001,8.425,0.0306,days (cycle mean 11d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L3_avg_close_u0.00,S2,112.0,0.6429,93.2125,1073.6098,,,,-3342.595,,-0.9602,25.526,0.0536,days (cycle mean 11d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L3_avg_close_u0.02,S1,158.0,0.7468,484.5794,1122.2832,,,,-3340.5496,,0.6106,7.4066,0.0316,days (cycle mean 12d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L3_avg_close_u0.02,S2,106.0,0.6509,89.8739,1040.9805,,,,-3342.5931,,-0.9416,24.1618,0.0566,days (cycle mean 9d),target+10% / time 60d / stop avg_close,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K0_L3_none_u0.00,S1,322.0,0.6677,-91.1873,1108.9536,,,,-3463.4359,,-0.3307,55.4651,0.2919,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K0_L3_none_u0.00,S2,183.0,0.6776,-127.4972,1095.6266,,,,-3504.6557,,-0.4399,39.3675,0.2896,days (cycle mean 16d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K0_L3_none_u0.02,S1,289.0,0.6747,-81.5582,1096.6604,,,,-3464.5346,,-0.3176,53.7198,0.2872,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K0_L3_none_u0.02,S2,162.0,0.6728,-90.6993,1102.5717,,,,-3443.8593,,-0.2913,34.8565,0.2654,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K0_L3_none_u0.00,S1,181.0,0.7624,379.2926,1157.5997,,,,-3468.4013,,0.8842,13.2648,0.1934,days (cycle mean 15d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K0_L3_none_u0.00,S2,106.0,0.6226,-314.6701,1053.5987,,,,-3384.8567,,-0.893,35.1308,0.3113,days (cycle mean 14d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K0_L3_none_u0.02,S1,147.0,0.7143,184.4419,1163.2184,,,,-3470.9642,,0.4234,13.4769,0.2177,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K0_L3_none_u0.02,S2,96.0,0.6354,-271.7166,1028.3177,,,,-3340.9832,,-0.6995,31.8576,0.3021,days (cycle mean 14d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L3_none_u0.00_touch,S1,326.0,0.7638,316.7674,1136.4836,,,,-3468.0879,,-0.1033,48.4947,0.2025,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L3_none_u0.00_touch,S2,190.0,0.7789,371.2468,1100.6193,,,,-3424.0173,,-0.1479,29.4651,0.1737,days (cycle mean 15d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L3_none_u0.00_strict,S1,324.0,0.7593,304.3965,1135.213,,,,-3468.0879,,-0.1483,49.2104,0.2037,days (cycle mean 18d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L3_none_u0.00_strict,S2,187.0,0.7701,357.1133,1100.4709,,,,-3424.0173,,-0.174,29.4664,0.1765,days (cycle mean 15d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L3_none_u0.02_touch,S1,297.0,0.7475,236.0261,1126.1277,,,,-3468.5552,,-0.2383,44.6013,0.2222,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L3_none_u0.02_touch,S2,170.0,0.7529,249.0624,1072.4897,,,,-3377.5722,,-0.2431,31.1536,0.1824,days (cycle mean 14d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L3_none_u0.02_strict,S1,293.0,0.7474,244.5242,1118.2147,,,,-3468.5552,,-0.2147,45.662,0.2218,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K4_L3_none_u0.02_strict,S2,169.0,0.7515,245.2661,1072.999,,,,-3377.5722,,-0.2549,31.5938,0.1893,days (cycle mean 14d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L3_none_u0.00_touch,S1,321.0,0.7664,337.279,1144.1319,,,,-3468.1778,,-0.0208,45.6643,0.1963,days (cycle mean 18d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L3_none_u0.00_touch,S2,186.0,0.7742,409.7037,1122.136,,,,-3381.034,,0.1608,28.6182,0.1667,days (cycle mean 16d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L3_none_u0.00_strict,S1,318.0,0.7673,341.8965,1136.8979,,,,-3468.1778,,-0.0198,44.6958,0.195,days (cycle mean 18d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L3_none_u0.00_strict,S2,183.0,0.7705,398.1895,1124.1644,,,,-3381.034,,0.1241,28.6206,0.1694,days (cycle mean 16d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L3_none_u0.02_touch,S1,295.0,0.7525,284.994,1154.6465,,,,-3468.9566,,-0.0686,39.6488,0.2136,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L3_none_u0.02_touch,S2,170.0,0.7647,306.0325,1078.9419,,,,-3377.6759,,0.051,29.3199,0.1706,days (cycle mean 15d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L3_none_u0.02_strict,S1,291.0,0.7526,293.0919,1160.8345,,,,-3468.9566,,-0.0434,40.7075,0.2131,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.08_K2_L3_none_u0.02_strict,S2,168.0,0.7619,296.3167,1080.3712,,,,-3377.6759,,0.0212,29.634,0.1786,days (cycle mean 15d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L3_none_u0.00_touch,S1,187.0,0.8342,706.3382,1221.0624,,,,-3455.3905,,0.9497,9.9045,0.1337,days (cycle mean 14d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L3_none_u0.00_touch,S2,101.0,0.703,108.3011,1076.5169,,,,-3342.5947,,-0.6388,27.5926,0.2178,days (cycle mean 15d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L3_none_u0.00_strict,S1,184.0,0.8315,692.8138,1199.3796,,,,-3440.9056,,0.9078,9.909,0.1359,days (cycle mean 14d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L3_none_u0.00_strict,S2,101.0,0.703,107.1439,1076.0975,,,,-3342.5947,,-0.651,27.6206,0.2178,days (cycle mean 15d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L3_none_u0.02_touch,S1,150.0,0.7867,426.3377,1165.0521,,,,-3455.9097,,0.3675,9.6938,0.18,days (cycle mean 14d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L3_none_u0.02_touch,S2,98.0,0.6837,29.3053,1041.6911,,,,-3359.3495,,-0.909,27.5336,0.2245,days (cycle mean 13d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L3_none_u0.02_strict,S1,147.0,0.7823,409.4977,1143.5676,,,,-3441.4247,,0.2858,10.2471,0.1837,days (cycle mean 15d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K4_L3_none_u0.02_strict,S2,97.0,0.6804,10.1481,1039.9734,,,,-3359.3495,,-0.9362,27.7339,0.2268,days (cycle mean 13d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L3_none_u0.00_touch,S1,186.0,0.8333,680.3148,1166.9466,,,,-3446.5608,,0.9742,12.3867,0.1344,days (cycle mean 14d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L3_none_u0.00_touch,S2,100.0,0.67,6.5084,1080.3051,,,,-3342.595,,-0.803,30.9482,0.24,days (cycle mean 16d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L3_none_u0.00_strict,S1,182.0,0.8242,640.8399,1158.3031,,,,-3446.5608,,0.8235,12.3941,0.1429,days (cycle mean 14d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L3_none_u0.00_strict,S2,100.0,0.67,6.5544,1080.3051,,,,-3342.595,,-0.8019,30.9493,0.24,days (cycle mean 16d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L3_none_u0.02_touch,S1,150.0,0.7867,437.1148,1154.4276,,,,-3447.4261,,0.4383,10.1361,0.18,days (cycle mean 15d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L3_none_u0.02_touch,S2,96.0,0.6771,27.8885,1041.8943,,,,-3342.5931,,-0.7925,27.9615,0.2188,days (cycle mean 14d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L3_none_u0.02_strict,S1,147.0,0.7823,419.8338,1134.4523,,,,-3447.4261,,0.3429,10.8363,0.1837,days (cycle mean 15d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.08_K2_L3_none_u0.02_strict,S2,95.0,0.6737,9.6379,1041.5681,,,,-3342.5931,,-0.8111,28.2487,0.2211,days (cycle mean 14d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K0_L3_none_u0.00_touch,S1,322.0,0.6677,-89.1034,1108.9536,,,,-3463.4359,,-0.3245,55.4651,0.2919,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K0_L3_none_u0.00_touch,S2,183.0,0.6776,-127.4972,1095.6266,,,,-3504.6557,,-0.4399,39.3675,0.2896,days (cycle mean 16d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K0_L3_none_u0.00_strict,S1,321.0,0.6667,-97.973,1102.1073,,,,-3463.4359,,-0.3491,56.5077,0.2928,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K0_L3_none_u0.00_strict,S2,181.0,0.674,-145.07,1095.6266,,,,-3504.6557,,-0.4941,39.3675,0.2928,days (cycle mean 16d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K0_L3_none_u0.02_touch,S1,290.0,0.6759,-77.3675,1096.9999,,,,-3464.5346,,-0.3064,53.7198,0.2862,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K0_L3_none_u0.02_touch,S2,162.0,0.6728,-90.6993,1102.5717,,,,-3443.8593,,-0.2913,34.8565,0.2654,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K0_L3_none_u0.02_strict,S1,287.0,0.6725,-91.3136,1095.8755,,,,-3464.5346,,-0.3407,53.561,0.2892,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N30_s0.04_K0_L3_none_u0.02_strict,S2,161.0,0.6708,-96.539,1103.9136,,,,-3443.8593,,-0.306,34.8995,0.2671,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K0_L3_none_u0.00_touch,S1,182.0,0.7637,383.557,1156.5071,,,,-3468.4013,,0.8979,13.2648,0.1923,days (cycle mean 15d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K0_L3_none_u0.00_touch,S2,106.0,0.6226,-314.6701,1053.5987,,,,-3384.8567,,-0.893,35.1308,0.3113,days (cycle mean 14d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K0_L3_none_u0.00_strict,S1,179.0,0.7598,364.0859,1151.3342,,,,-3468.4013,,0.8554,13.2648,0.1955,days (cycle mean 15d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K0_L3_none_u0.00_strict,S2,106.0,0.6321,-305.9165,1053.5987,,,,-3384.8567,,-0.8684,35.1308,0.3113,days (cycle mean 14d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K0_L3_none_u0.02_touch,S1,148.0,0.7162,190.8026,1155.9899,,,,-3470.9642,,0.4405,13.4769,0.2162,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K0_L3_none_u0.02_touch,S2,96.0,0.6354,-271.7166,1028.3177,,,,-3340.9832,,-0.6995,31.8576,0.3021,days (cycle mean 14d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K0_L3_none_u0.02_strict,S1,145.0,0.7103,167.6772,1148.2344,,,,-3470.9642,,0.3785,13.4634,0.2207,days (cycle mean 17d),target+10% / time 60d,both,central,A_high_win
+scale-in low-lev limit,0090,N90_s0.04_K0_L3_none_u0.02_strict,S2,95.0,0.6316,-292.6222,1023.3978,,,,-3340.9832,,-0.7473,32.5684,0.3053,days (cycle mean 14d),target+10% / time 60d,both,central,A_high_win
+kimchi premium,(results/kp),"BTCUSDT_s1:(90, 'B80', 16)",S1,82.0,0.5244,-16.8274,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"BTCUSDT_s1:(90, 'B80', 48)",S1,82.0,0.4634,-5.6683,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"BTCUSDT_s1:(90, 'B90', 16)",S1,53.0,0.5283,1.4745,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"BTCUSDT_s1:(90, 'B90', 48)",S1,53.0,0.4906,-19.3738,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"BTCUSDT_s1:(288, 'B80', 16)",S1,52.0,0.5769,-9.7968,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"BTCUSDT_s1:(288, 'B80', 48)",S1,52.0,0.5192,-3.6048,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"BTCUSDT_s1:(288, 'B90', 16)",S1,28.0,0.5714,-21.8734,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"BTCUSDT_s1:(288, 'B90', 48)",S1,28.0,0.5,-26.6082,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"BTCUSDT_s2:(90, 'B80', 16)",S2,62.0,0.4355,-17.102,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"BTCUSDT_s2:(90, 'B80', 48)",S2,62.0,0.4355,-18.6023,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"BTCUSDT_s2:(90, 'B90', 16)",S2,39.0,0.5128,-11.9675,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"BTCUSDT_s2:(90, 'B90', 48)",S2,39.0,0.4872,-14.6074,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"BTCUSDT_s2:(288, 'B80', 16)",S2,20.0,0.3,-32.4601,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"BTCUSDT_s2:(288, 'B80', 48)",S2,20.0,0.5,-36.5156,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"BTCUSDT_s2:(288, 'B90', 16)",S2,9.0,0.2222,-56.2024,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"BTCUSDT_s2:(288, 'B90', 48)",S2,9.0,0.2222,-97.4218,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"ETHUSDT_s1:(90, 'B80', 16)",S1,126.0,0.4841,-19.2653,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"ETHUSDT_s1:(90, 'B80', 48)",S1,126.0,0.5476,4.1967,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"ETHUSDT_s1:(90, 'B90', 16)",S1,88.0,0.4659,-12.2497,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"ETHUSDT_s1:(90, 'B90', 48)",S1,88.0,0.5227,-9.7864,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"ETHUSDT_s1:(288, 'B80', 16)",S1,88.0,0.5114,-15.6938,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"ETHUSDT_s1:(288, 'B80', 48)",S1,88.0,0.5341,-14.9587,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"ETHUSDT_s1:(288, 'B90', 16)",S1,49.0,0.551,-12.7967,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"ETHUSDT_s1:(288, 'B90', 48)",S1,49.0,0.5306,-15.3843,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"ETHUSDT_s2:(90, 'B80', 16)",S2,0.0,,,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"ETHUSDT_s2:(90, 'B80', 48)",S2,0.0,,,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"ETHUSDT_s2:(90, 'B90', 16)",S2,0.0,,,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"ETHUSDT_s2:(90, 'B90', 48)",S2,0.0,,,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"ETHUSDT_s2:(288, 'B80', 16)",S2,0.0,,,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"ETHUSDT_s2:(288, 'B80', 48)",S2,0.0,,,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"ETHUSDT_s2:(288, 'B90', 16)",S2,0.0,,,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+kimchi premium,(results/kp),"ETHUSDT_s2:(288, 'B90', 48)",S2,0.0,,,,,,,,,,,,bars (16),time,long,net16 (win_rate is gross),other
+new-listing short,0062-0064 era (strong hypotheses),L1_E1_H7,S1,137.0,0.6861,362.8999,,,,,,,,,,days,time,short,measured (hit rate is GROSS),A_high_win
+new-listing short,0062-0064 era (strong hypotheses),L1_E1_H7,S2,297.0,0.6734,-236.8229,,,,,,,,,,days,time,short,measured (hit rate is GROSS),A_high_win
+new-listing short,0062-0064 era (strong hypotheses),L2_E1_H14,S1,136.0,0.6691,137.3548,,,,,,,,,,days,time,short,measured (hit rate is GROSS),A_high_win
+new-listing short,0062-0064 era (strong hypotheses),L2_E1_H14,S2,290.0,0.6793,-752.1263,,,,,,,,,,days,time,short,measured (hit rate is GROSS),A_high_win
+new-listing short,0062-0064 era (strong hypotheses),L3_E1_H30,S1,131.0,0.7786,977.6235,,,,,,,,,,days,time,short,measured (hit rate is GROSS),A_high_win
+new-listing short,0062-0064 era (strong hypotheses),L3_E1_H30,S2,274.0,0.6861,250.8978,,,,,,,,,,days,time,short,measured (hit rate is GROSS),A_high_win
+new-listing short,0062-0064 era (strong hypotheses),L4_E3_H7,S1,137.0,0.6204,91.1272,,,,,,,,,,days,time,short,measured (hit rate is GROSS),A_high_win
+new-listing short,0062-0064 era (strong hypotheses),L4_E3_H7,S2,296.0,0.652,-240.9389,,,,,,,,,,days,time,short,measured (hit rate is GROSS),A_high_win
+new-listing short,0062-0064 era (strong hypotheses),L5_E3_H14,S1,133.0,0.6466,87.3353,,,,,,,,,,days,time,short,measured (hit rate is GROSS),A_high_win
+new-listing short,0062-0064 era (strong hypotheses),L5_E3_H14,S2,290.0,0.7034,-1052.2193,,,,,,,,,,days,time,short,measured (hit rate is GROSS),A_high_win
+new-listing short,0062-0064 era (strong hypotheses),L6_E3_H30,S1,130.0,0.7462,925.3984,,,,,,,,,,days,time,short,measured (hit rate is GROSS),A_high_win
+new-listing short,0062-0064 era (strong hypotheses),L6_E3_H30,S2,270.0,0.6963,525.9654,,,,,,,,,,days,time,short,measured (hit rate is GROSS),A_high_win
+BTC/ETH engine long_top,0028,long_top#1:spec:rsi+volume_z:long,DEV(all),108.0,0.9907,9.5355,,,,,,,3.0563,1.3557,,0h median,engine,long,public estimate v1,A_high_win
+BTC/ETH engine long_top,0028,long_top#2:spec:rsi+volume_z:long,DEV(all),117.0,0.9915,9.6543,,,,,,,3.2039,1.3557,,0h median,engine,long,public estimate v1,A_high_win
+BTC/ETH engine long_top,0028,long_top#3:spec:breakout_k+volume_z:long,DEV(all),78.0,0.5769,88.8816,,,,,,,1.8086,2.7194,,8h median,engine,long,public estimate v1,other
+BTC/ETH engine long_top,0028,long_top#4:spec:breakout_k+volume_z:long,DEV(all),66.0,0.5758,94.2154,,,,,,,1.6416,2.5774,,8h median,engine,long,public estimate v1,other
+BTC/ETH engine long_top,0028,long_top#5:spec:ret_z:long,DEV(all),111.0,0.5405,73.0151,,,,,,,1.2179,15.8957,,16h median,engine,long,public estimate v1,other
+BTC/ETH engine long_top,0028,long_top#6:spec:breakout_k+rsi+volume_z:long,DEV(all),280.0,0.5036,52.0823,,,,,,,1.5616,16.1697,,16h median,engine,long,public estimate v1,other
+BTC/ETH engine long_top,0028,long_top#7:spec:breakout_k+rsi+volume_z:long,DEV(all),283.0,0.4947,50.6618,,,,,,,1.5373,10.2754,,12h median,engine,long,public estimate v1,other
+BTC/ETH engine long_top,0028,long_top#8:spec:breakout_k+volume_z:long,DEV(all),298.0,0.5,52.0347,,,,,,,1.5349,15.5349,,16h median,engine,long,public estimate v1,other
+BTC/ETH engine long_top,0028,long_top#9:spec:breakout_k+taker_share_z:long,DEV(all),331.0,0.4804,45.8964,,,,,,,1.5909,12.531,,12h median,engine,long,public estimate v1,other
+BTC/ETH engine long_top,0028,long_top#10:spec:breakout_k+rsi:long,DEV(all),339.0,0.4867,40.7787,,,,,,,1.4857,11.0081,,12h median,engine,long,public estimate v1,other
+BTC/ETH engine short_top,0028,short_top#1:spec:taker_share_z:short,DEV(all),11.0,1.0,61.6609,,,,,,,1.5134,0.0,,2h median,engine,short,public estimate v1,other
+BTC/ETH engine short_top,0028,short_top#2:spec:breakout_k+funding_z:short,DEV(all),3.0,1.0,382.6268,,,,,,,0.7435,0.0,,64h median,engine,short,public estimate v1,other
+BTC/ETH engine short_top,0028,short_top#3:spec:ret_z+taker_share_z:short,DEV(all),3.0,1.0,290.0238,,,,,,,0.7885,0.0,,6h median,engine,short,public estimate v1,other
+BTC/ETH engine short_top,0028,short_top#4:spec:ret_z+taker_share_z:short,DEV(all),3.0,1.0,611.1775,,,,,,,0.7756,0.0,,96h median,engine,short,public estimate v1,other
+BTC/ETH engine short_top,0028,short_top#5:spec:funding_z:short,DEV(all),15.0,1.0,38.9275,,,,,,,1.228,0.0,,0h median,engine,short,public estimate v1,other
+BTC/ETH engine short_top,0028,short_top#6:spec:taker_share_z:short,DEV(all),3.0,1.0,961.8932,,,,,,,0.7857,0.0,,96h median,engine,short,public estimate v1,other
+BTC/ETH engine short_top,0028,short_top#7:spec:funding_z+ret_z:short,DEV(all),11.0,1.0,63.9827,,,,,,,1.15,0.0,,0h median,engine,short,public estimate v1,other
+BTC/ETH engine short_top,0028,short_top#8:spec:funding_z:short,DEV(all),10.0,1.0,62.6287,,,,,,,1.1392,0.0,,0h median,engine,short,public estimate v1,other
+BTC/ETH engine short_top,0028,short_top#9:spec:ret_z+taker_share_z:short,DEV(all),3.0,1.0,35.9787,,,,,,,0.7885,0.0,,0h median,engine,short,public estimate v1,other
+BTC/ETH engine short_top,0028,short_top#10:spec:funding_z+taker_share_z:short,DEV(all),4.0,1.0,194.8856,,,,,,,0.8729,0.0,,16h median,engine,short,public estimate v1,other
+BTC/ETH engine short_pass_top,0028,short_pass_top#1:spec:funding_z+taker_share_z:short,DEV(all),99.0,0.5556,56.9257,,,,,,,1.1175,14.5661,,16h median,engine,short,public estimate v1,other
+BTC/ETH engine short_pass_top,0028,short_pass_top#2:spec:funding_z+taker_share_z:short,DEV(all),337.0,0.4866,38.7677,,,,,,,1.2646,14.4367,,16h median,engine,short,public estimate v1,other
+BTC/ETH engine short_pass_top,0028,short_pass_top#3:spec:taker_share_z:short,DEV(all),289.0,0.4844,38.5103,,,,,,,1.1319,18.6957,,16h median,engine,short,public estimate v1,other
+BTC/ETH engine short_pass_top,0028,short_pass_top#4:spec:taker_share_z:short,DEV(all),267.0,0.5019,46.9926,,,,,,,0.9255,36.1774,,32h median,engine,short,public estimate v1,other
+BTC/ETH engine short_pass_top,0028,short_pass_top#5:spec:taker_share_z:short,DEV(all),281.0,0.4911,34.4533,,,,,,,0.9709,23.5329,,16h median,engine,short,public estimate v1,other
+BTC/ETH engine short_pass_top,0028,short_pass_top#6:spec:vol_ratio:short,DEV(all),58.0,0.5862,156.6938,,,,,,,0.5039,53.0049,,192h median,engine,short,public estimate v1,other
+BTC/ETH engine short_pass_top,0028,short_pass_top#7:spec:taker_share_z:short,DEV(all),89.0,0.5281,39.3194,,,,,,,0.7938,19.4543,,16h median,engine,short,public estimate v1,other
+BTC/ETH engine short_pass_top,0028,short_pass_top#8:spec:taker_share_z:short,DEV(all),290.0,0.5,23.0117,,,,,,,0.778,12.1247,,16h median,engine,short,public estimate v1,other
+BTC/ETH engine short_pass_top,0028,short_pass_top#9:spec:vol_ratio:short,DEV(all),188.0,0.5319,49.8159,,,,,,,0.4528,65.4841,,96h median,engine,short,public estimate v1,other

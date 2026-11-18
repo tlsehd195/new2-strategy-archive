@@ -1,6 +1,6 @@
 # 소스 감사 표 2026-11-10 (ADR 0070)
 
-- 대상: 125개 파일 (INVENTORIED였던 run/*.py 112개 + 핵심 모듈 12개)
+- 대상: 136개 파일 (INVENTORIED였던 run/*.py 112개 + 핵심 모듈 12개)
 - 검토자: 읽기 전용 독립 검토 에이전트. 각 행은 검토자의 주장이다.
   `spot_checked`가 참인 행만 작성자가 직접 다시 읽어 확인했다.
 - 모든 행에서 lines_read = lines_total(파일 전체를 읽음).
@@ -12,8 +12,8 @@
 | 수준 | 개수 |
 |---|---|
 | FULL_SOURCE_REVIEW | 34 |
-| LOGIC_TRACED | 52 |
-| TESTED | 39 |
+| LOGIC_TRACED | 58 |
+| TESTED | 44 |
 | INVENTORIED | 0 |
 | NOT_REVIEWED | 0 |
 | BLOCKED | 0 |
@@ -22,9 +22,9 @@
 
 | 항목 | NONE_FOUND | POSSIBLE | CONFIRMED | UNKNOWN |
 |---|---|---|---|---|
-| leakage_risk | 99 | 21 | 5 | 0 |
-| cost_risk | 64 | 55 | 6 | 0 |
-| backtest_error_risk | 39 | 68 | 18 | 0 |
+| leakage_risk | 110 | 21 | 5 | 0 |
+| cost_risk | 75 | 55 | 6 | 0 |
+| backtest_error_risk | 50 | 68 | 18 | 0 |
 
 ## CONFIRMED 발견(전부)
 
@@ -334,3 +334,14 @@
 | `x8_taker_flow_diag.py` | LOGIC_TRACED | 307 | NONE_FOUND | POSSIBLE | CONFIRMED |  |  |
 | `x9_engine_crosscheck.py` | LOGIC_TRACED | 178 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
 | `x9_ticket_size_diag.py` | LOGIC_TRACED | 316 | POSSIBLE | POSSIBLE | CONFIRMED |  |  |
+| `dca_extreme_dev.py` | LOGIC_TRACED | 418 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `dca_extreme_prepare.py` | LOGIC_TRACED | 85 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_dca_extreme.py` | TESTED | 128 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `dca_stop_dev.py` | LOGIC_TRACED | 364 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_dca_stop.py` | TESTED | 128 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `dca_limit_dev.py` | LOGIC_TRACED | 327 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `dca_winners_analysis.py` | LOGIC_TRACED | 230 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_dca_limit.py` | TESTED | 107 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `winloss_catalog.py` | TESTED | 318 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `winloss_combo_dev.py` | LOGIC_TRACED | 403 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_winloss_combo.py` | TESTED | 79 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |

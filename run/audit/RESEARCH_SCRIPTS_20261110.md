@@ -12,10 +12,10 @@ Read status: INVENTORIED = header, imports, paths and risk patterns scanned (not
 | DUPLICATE_RESEARCH | superseded by a later tool for the same hypothesis | 1 |
 | RETIRED_OR_ON_HOLD | retired v1 execution path (LEGACY_SCRIPTS.md) or on hold | 43 |
 | NEEDS_MORE_DATA | hypothesis needs a dataset the repository does not have | 21 |
-| TEST | test file of a run/ tool | 29 |
-| NOT_SURVEYED | not surveyed | 5 |
+| TEST | test file of a run/ tool | 30 |
+| NOT_SURVEYED | not surveyed | 7 |
 
-Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 58, TESTED 56
+Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 58, TESTED 59
 
 | file | lines | class | read status | reason | flags |
 |---|---|---|---|---|---|
@@ -139,8 +139,11 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 58, TESTED 56
 | `test_structural_search.py` | 83 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_unsup_regime.py` | 55 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_wide_universe.py` | 152 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_winloss_combo.py` | 79 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `unsup_regime_dev.py` | 199 | KEPT_INDEPENDENT | TESTED | k-means regime classifier on DEV S1 (ADR 0050); NOT_USEFUL |  |
 | `wide_universe_dev.py` | 383 | KEPT_INDEPENDENT | TESTED | wide-universe panel with effective independent names (ADR 0047); variant of broad_universe_dev — traced: shift(-1) realised return, as above | neg_shift=1 |
+| `winloss_catalog.py` | 318 | NOT_SURVEYED | TESTED | no rule — new file |  |
+| `winloss_combo_dev.py` | 403 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1 |
 | `x10_calendar_diag.py` | 283 | INTEGRATED_CORE | LOGIC_TRACED | calendar = legacy family tod and features hour_utc / dow_utc (v2); script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=2 |
 | `x10_engine_crosscheck.py` | 162 | RETIRED_OR_ON_HOLD | LOGIC_TRACED | v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029) | v1_path=2, cointrader=1 |
 | `x12_engine_crosscheck.py` | 179 | RETIRED_OR_ON_HOLD | LOGIC_TRACED | v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029) | future_index=1, v1_path=2, cointrader=1 |

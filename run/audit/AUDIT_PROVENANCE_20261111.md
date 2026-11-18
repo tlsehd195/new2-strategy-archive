@@ -2,7 +2,7 @@
 
 `SOURCE_AUDIT_20261110`의 `lines_read == lines_total`은 **독립 검토 에이전트의 주장**이다. 작성자가 파일 전체를 읽었다는 증거가 아니다. 이 표는 주장과 작성자 직접 확인을 분리한다.
 
-- 검토 에이전트 행: 133개 (모두 '전체 읽음' 주장, 작성자 미검증)
+- 검토 에이전트 행: 136개 (모두 '전체 읽음' 주장, 작성자 미검증)
 - 2026-11-10 작성자 부분 재확인(SPOT, 지목된 주장만): 5개 — alt_funding_r2_diag.py, liquid_search_dev.py, run/discovery/newlisting_collect.py, run/discovery/repro_bundle.py, run/discovery/store.py
 - 2026-11-11 작성자 직접 재검토: 8개 (아래)
 - 2026-11-10 표에는 핵심 엔진 모듈(pipeline, portfolio_multi, evaluator, costs_bridge, data_quality)의 행이 없었다. 아래 작성자 행이 처음이다.
