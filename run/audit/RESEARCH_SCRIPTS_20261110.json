@@ -654,6 +654,21 @@
   "flags": {}
  },
  {
+  "file": "dca_struct_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 352,
+  "doc": "Structural tail fixes of the daily prior-extreme scale-in strategy, DEV only (ADR 0091).",
+  "adr": [
+   "088",
+   "091"
+  ],
+  "flags": {}
+ },
+ {
   "file": "dca_winners_analysis.py",
   "class": "NOT_SURVEYED",
   "reason": "no rule — new file",
@@ -1477,6 +1492,20 @@
   "doc": "Tests for the stop-rule extension of the daily scale-in engine (ADR 0089). Needs numpy and pandas.",
   "adr": [
    "089"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_dca_struct.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 85,
+  "doc": "Tests for the structural-fix extension of the daily scale-in engine (ADR 0091). Needs numpy and pandas.",
+  "adr": [
+   "091"
   ],
   "flags": {}
  },
