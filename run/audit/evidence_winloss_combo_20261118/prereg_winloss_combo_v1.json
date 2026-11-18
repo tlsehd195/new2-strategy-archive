@@ -1,0 +1,56 @@
+{
+ "version": "prereg-winloss-combo-v1",
+ "date": "2026-11-18",
+ "adr": "0092",
+ "request": "동동 2026-11-18: 지금까지 만들고 시험한 전략 중 승률이 높은 것들을 모아 특징을 찾고, 승률은 낮지만 손실이 작은 것들을 모아 특징을 찾고, 서로 합칠 수 있는지 연구",
+ "status": "committed before any daily series of this study is computed; Part 1 reads only already-published result files",
+ "never_read": ["2020 (IW1) and earlier", "2023-09-19..2024-06-18", "2025-10-21 onwards", "validation / locked / paper windows"],
+ "honesty": "S1 and S2 of every family were already looked at (many times for the scale-in family). Everything here is post-hoc exploration on spent DEV data, not evidence. No prereg is activated, no window is opened.",
+
+ "part1_catalog": {
+  "sources": "every published DEV result file that records a per-trade / per-cycle hit rate (list fixed in run/winloss_catalog.py SOURCES); duplicate re-scorings of the same candidates under other cost rows are listed once (primary measured / public-estimate cost row)",
+  "unit": "one row per (family, config, segment S1/S2)",
+  "fields": ["n", "hit_rate", "mean_net_bp", "median_net_bp", "avg_win_bp", "avg_loss_bp", "payoff", "worst_bp", "skew", "sr_ann", "max_dd_pct", "cost_row"],
+  "missing_rule": "a value not recorded in the source is reported as null ('기록 없음'), never estimated",
+  "groups_on_S1": {
+   "A_high_win": "hit_rate >= 0.60 and n >= 30",
+   "B_low_win_small_loss": "hit_rate <= 0.45 and n >= 30 and every recorded loss metric is small: worst single trade/cycle >= -1000 bp (if recorded) and S1 max drawdown <= 30% (if recorded) and payoff >= 1.5 (if recorded); if no loss metric is recorded the row is B_undetermined",
+   "other": "everything else"
+  },
+  "features_compared": ["family", "direction", "holding period class", "exit structure (target / stop / time)", "S1 mean net sign", "S2 mean net sign", "S1/S2 SR", "cost row"]
+ },
+
+ "part2_rerun_profile": {
+  "counted_trials": 0,
+  "why_not_counted": "re-runs of configs already counted in ADR 0044/0088/0089 (R9 candidates on a 7-symbol subset are a restricted re-scoring used only to assign group membership)",
+  "A_members": "ADR 0088 bases B1..B4 (N30 s.04 K4, N30 s.08 K2, N90 s.04 K4, N90 s.08 K2), 5x, no stop, market entry, 17-alt daily engine (dca_stop_dev.simulate_stop with stop none = ADR 0088 exactly), measured cost row",
+  "B_candidates": {
+   "B_DS": "ADR 0089 average-close stop configs of the same four bases, x in {0.06, 0.10} (8 configs, same signal as A)",
+   "B_R9": "the 33 R9 entry-bar candidates (ADR 0044 engine path, candidate_regime_dev.score_candidate), symbols restricted to the 7 liquid ones present in the project archive (BNB XRP SOL ADA DOGE LTC LINK; BTC/ETH are not in the archive and the exchange is unreachable here), public-estimate cost estimate_v3_alts, trades booked on entry day"
+  },
+  "B_membership_rule": "S1 trade/cycle hit_rate <= 0.45 and S1 payoff (mean win / |mean loss|) >= 1.5 and S1 n >= 30",
+  "A_membership_check": "A members are reported with their S1 hit rate; the analysis keeps all four even if one falls below 0.60",
+  "bundles": "equal-weight mean of member daily net series (A, B_DS, B_R9); a B bundle with fewer than 2 members is dropped",
+  "regime": "market = equal-weight mean of next-open-to-open returns of the 17 alts; up day if trailing 90-day cumulative market return known at the day's start is > 0 (30-day variant also reported)",
+  "stats": ["Pearson and Spearman daily correlation A vs each B bundle in S1 and S2, all days and per regime", "mean daily net sign of each bundle in each cell S1/S2 x up/down, and calendar 2022", "per-trade avg win, avg loss, payoff, worst, liquidation share of every member"]
+ },
+
+ "gate_for_part3": "Part 3 runs for a B bundle only if its S1 daily Pearson correlation with A is <= 0.30; if no B bundle passes the gate, Part 3 is not run and no trials are spent",
+
+ "part3_combination_grid": {
+  "counted_trials": "28 if both B bundles pass the gate (10 per B bundle + 8 exit-mix rows); rows of a B bundle that fails the gate are not run and not counted; the 8 exit-mix rows are counted if B_DS passes",
+  "context_id": "ALT17-1d-winloss-combo-v1",
+  "scaling": "before combining, each bundle is scaled to have the same S1 daily standard deviation as A (scale factor computed on S1 only and applied unchanged to S2)",
+  "rows_per_B_bundle": [
+   "static w_A = 0.25 / 0.50 / 0.75 (3)",
+   "inverse trailing-60d-vol weights, no look-ahead (1)",
+   "regime switch 90d: up -> A, down -> B; and up -> B, down -> A (2)",
+   "regime switch 30d: same two (2)",
+   "regime tilt 90d: up -> 0.75A/0.25B, down -> 0.25A/0.75B; and the reverse (2)"
+  ],
+  "exit_mix_rows": "same-signal exit mixing on the scale-in signal: for each base B1..B4, half capital follows the no-stop rule and half the avg-close stop x in {0.06, 0.10} (8) = 0.5*series(none) + 0.5*series(stop x), equivalent to two independent half-size books on the same signals",
+  "selection": "choose the single row with the highest S1 annualised SR (measured / public-estimate cost)",
+  "pass_rule": "combination counts as useful only if ALL: (a) S1 SR of the chosen row > expected max SR of N skill-less trials for N = grid size AND for N = cumulative DEV trials (dev_search_trials.jsonl sum + pending unmerged ADR 0091 32 if not yet in the file + this grid); (b) S2 SR > 0.5; (c) the row's SR is higher than the better of its two components in BOTH S1 and S2; (d) S1 and S2 envelope/close max drawdown not worse than the worse component. Otherwise NOT_USEFUL",
+  "also_reported": ["S1 SR, S2 SR, ann return, close max drawdown, worst 20-day sum, daily hit rate of every row", "how many rows beat both components in S1 and in S2"]
+ }
+}
