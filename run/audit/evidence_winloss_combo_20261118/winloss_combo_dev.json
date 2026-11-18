@@ -2846,8 +2846,8 @@
  },
  "trials": {
   "this_grid": 10,
-  "prior_file_sum": 12086,
-  "pending_unmerged_adr0091": 32,
+  "prior_file_sum": 12118,
+  "pending_unmerged_adr0091": 0,
   "cumulative": 12128
  },
  "selection": {

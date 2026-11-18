@@ -1,0 +1,33 @@
+{
+ "version": "dca-struct-prereg-v1",
+ "status": "PREREGISTERED_BEFORE_DATA_READ",
+ "date": "2026-11-18",
+ "requested_by": "동동 (win often, lose big at once: fix structurally)",
+ "reading": "DEV only. S1 2021-01-01..2023-09-18 is the choosing segment, S2 2024-06-19..2025-10-20 is the confirming segment. Not opened: validation, locked, IW1, paper, 2020, 2023-09-19..2024-06-18, 2025-10-21 onwards. NOTE: S1 and S2 were already seen in ADR 0088/0089/0090 for the same strategy family, so this is post-hoc improvement search on spent data, NOT evidence; cumulative DEV trials 12,086 + 32.",
+ "engine": "ADR 0088 daily engine (run/dca_extreme_dev.py): entry band 3% of prior N-day low/high (long near low, short near high), market entry at next open, add levels L0*(1-s*k) k=1..K on close crossing -> next open, target avg*1.10 on close -> next open, 60-day timeout, 5-day cooldown, no stop, isolated liquidation avg*(1-1/lev+0.005), real funding, measured alt cost (estimate_v3_alts) per fill, 17 alts, first 90 days of each segment lookback only. Base notional W=0.05 per cycle.",
+ "bases": {"B1": {"N": 30, "s": 0.04, "K": 4}, "B4": {"N": 90, "s": 0.08, "K": 2}},
+ "variants_per_base": {
+  "C5": "control, lev 5, nothing else (must reproduce ADR 0088 N{N}_s{s}_K{K}_target_time_only exactly)",
+  "C3": "control, lev 3, nothing else (comparison anchor for all deltas)",
+  "T60": "lev 3, tranche weights proportional to 0.6^i (i=0..K), normalized to sum 1 (total notional W unchanged; first tranche biggest)",
+  "T35": "lev 3, weights proportional to 0.35^i normalized",
+  "CAP3": "lev 3, a new cycle is refused when open cycles >= 3 (candidates of a day ranked by distance to the line, nearest first, ties by symbol order); adds are never refused",
+  "CAP6": "lev 3, same with 6",
+  "REG10": "lev 3, new entry refused when the equal-weight mean of 30-day close returns over all symbols with data is <= -10% (long) or >= +10% (short); signal day close, causal",
+  "REG20": "lev 3, same with 20%",
+  "TM20": "lev 3, once a cycle has been held >= 20 days the position is halved pro rata at the next open (market, full cost); remaining half continues with the same target/timeout",
+  "TM40": "lev 3, same with 40 days",
+  "PT4": "lev 3, once close >= avg*(1+0.04) half is sold at the next open (once), remaining half continues; target avg*1.10 (original avg), timeout unchanged; target takes precedence when both on the same close",
+  "PT6": "lev 3, same with 0.06",
+  "VN4": "lev 3, cycle size multiplier m=clip(0.04/sigma20,0.5,1.5), sigma20 = std of last 20 daily close returns at signal day, fixed at entry",
+  "VN3": "lev 3, same with 0.03",
+  "CMB3": "lev 3, T60 + CAP6 + REG20 + PT6 together (pre-declared combination, one shot)",
+  "CMB2": "lev 2, same combination"
+ },
+ "n_configs": 32,
+ "counted_trials": 32,
+ "context_id": "ALT17-1d-scalein-v1",
+ "criteria": "standard flag a-g as ADR 0088 (S1 SR > null max SR for N=32, alpha_t>=2, both S1 halves >0, S2 SR > 0.5, volume_scaled S1 SR >0, >=100 S1 cycles, envelope DD<=0.20 and liquidated share <=0.05 in S1 and S2). Descriptive improvement read vs C3 of the same base: IMPROVES = in S1 envelope DD lower AND cycle net 5th percentile higher AND worst cycle higher AND SR not lower by more than 0.10; CONFIRMED_S2 only if the same four hold in S2. Also report S1/S2 SR sign consistency. Cumulative-trials null max SR (N=12,086+32) reported next to N=32.",
+ "not_opened": "validation, locked test, IW1, paper forward, prereg activation",
+ "note": "Result is reported as is. Anything that improves in DEV after seeing results is post-hoc and is not evidence; no prereg is activated."
+}
