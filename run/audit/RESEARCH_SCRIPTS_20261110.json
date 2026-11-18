@@ -1502,7 +1502,7 @@
   "read_status": "TESTED",
   "traced": null,
   "legacy": false,
-  "lines": 84,
+  "lines": 85,
   "doc": "Tests for the structural-fix extension of the daily scale-in engine (ADR 0091). Needs numpy and pandas.",
   "adr": [
    "091"

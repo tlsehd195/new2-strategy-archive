@@ -24,9 +24,9 @@ import numpy as np
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-import broad_universe_dev as bu  # noqa: E402
-import dca_extreme_dev as base  # noqa: E402
-from broad_universe_dev import expected_max_sr  # noqa: E402
+import broad_universe_dev as bu
+import dca_extreme_dev as base
+from broad_universe_dev import expected_max_sr
 
 VERSION = "dca-struct-dev-v1"
 EVID = HERE / "audit" / "evidence_dca_struct_20261118"

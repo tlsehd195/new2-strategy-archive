@@ -119,7 +119,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 58, TESTED 58
 | `test_dca_extreme.py` | 128 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_dca_limit.py` | 107 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_dca_stop.py` | 128 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
-| `test_dca_struct.py` | 84 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_dca_struct.py` | 85 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_dev_window_guard.py` | 50 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_evalue_v3.py` | 30 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_evalue_walkforward.py` | 115 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |

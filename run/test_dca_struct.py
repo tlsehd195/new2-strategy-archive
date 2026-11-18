@@ -1,5 +1,6 @@
 """Tests for the structural-fix extension of the daily scale-in engine (ADR 0091). Needs numpy and pandas."""
 
+import itertools
 import json
 import sys
 import unittest
@@ -9,9 +10,9 @@ import numpy as np
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-import dca_extreme_dev as base  # noqa: E402
-import dca_struct_dev as x  # noqa: E402
-from test_dca_extreme import ctx_for, frames, total  # noqa: E402
+import dca_extreme_dev as base
+import dca_struct_dev as x
+from test_dca_extreme import ctx_for, frames, total
 
 N = 0.05
 
@@ -46,7 +47,7 @@ class StructTest(unittest.TestCase):
     def test_weights_sum_to_one_and_taper_front_loaded(self):
         w = x.weights(4, 0.6)
         self.assertAlmostEqual(sum(w), 1.0)
-        self.assertTrue(all(a > b for a, b in zip(w, w[1:])))
+        self.assertTrue(all(a > b for a, b in itertools.pairwise(w)))
         self.assertEqual(x.weights(2, None), [1 / 3] * 3)
 
     def test_partial_take_profit_halves_and_keeps_total_pnl(self):
