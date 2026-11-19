@@ -1137,6 +1137,24 @@
   "flags": {}
  },
  {
+  "file": "maker_lowloss_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 709,
+  "doc": "Limit-order (maker) bundle of small-profit / low-loss DEV members, take-profit only when net > 0 (ADR 0093).",
+  "adr": [
+   "044",
+   "089",
+   "090",
+   "092",
+   "093"
+  ],
+  "flags": {}
+ },
+ {
   "file": "maker_rescore_dev.py",
   "class": "KEPT_INDEPENDENT",
   "reason": "maker re-pricing of published panel candidates (ADR 0056)",
@@ -1660,6 +1678,20 @@
   "doc": "Tests for the limit-order entry cost estimate (ADR 0049). Needs numpy.",
   "adr": [
    "049"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_maker_lowloss.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 113,
+  "doc": "Tests of the ADR 0093 maker low-loss bundle tool (synthetic inputs + the committed catalog).",
+  "adr": [
+   "093"
   ],
   "flags": {}
  },

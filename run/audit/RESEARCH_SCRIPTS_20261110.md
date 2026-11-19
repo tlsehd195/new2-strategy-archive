@@ -12,10 +12,10 @@ Read status: INVENTORIED = header, imports, paths and risk patterns scanned (not
 | DUPLICATE_RESEARCH | superseded by a later tool for the same hypothesis | 1 |
 | RETIRED_OR_ON_HOLD | retired v1 execution path (LEGACY_SCRIPTS.md) or on hold | 43 |
 | NEEDS_MORE_DATA | hypothesis needs a dataset the repository does not have | 21 |
-| TEST | test file of a run/ tool | 31 |
-| NOT_SURVEYED | not surveyed | 8 |
+| TEST | test file of a run/ tool | 32 |
+| NOT_SURVEYED | not surveyed | 9 |
 
-Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 58, TESTED 61
+Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 58, TESTED 63
 
 | file | lines | class | read status | reason | flags |
 |---|---|---|---|---|---|
@@ -94,6 +94,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 58, TESTED 61
 | `lowliq_cost_calibration.py` | 113 | STANDARD_INTERFACE | TESTED | volume-scaled alt cost calibration (ADR 0041), feeds CostContext |  |
 | `maker_entry_estimate.py` | 377 | KEPT_INDEPENDENT | TESTED | maker-entry cost estimate from public books (ADR 0049) | future_index=2 |
 | `maker_entry_reeval.py` | 194 | STANDARD_INTERFACE | FULL_SOURCE_REVIEW | re-evaluates engine DEV candidates with maker cost (ADR 0049) |  |
+| `maker_lowloss_dev.py` | 709 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `maker_rescore_dev.py` | 129 | KEPT_INDEPENDENT | TESTED | maker re-pricing of published panel candidates (ADR 0056) |  |
 | `n2_engine_crosscheck.py` | 240 | RETIRED_OR_ON_HOLD | LOGIC_TRACED | v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029) | v1_path=1 |
 | `n2_maker_exec_diag.py` | 389 | NEEDS_MORE_DATA | LOGIC_TRACED | maker execution layer needs queue / order-book history; maker cost estimated by maker_entry_estimate.py; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=1 |
@@ -131,6 +132,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 58, TESTED 61
 | `test_independent_check.py` | 61 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_independent_samples.py` | 33 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_maker_entry.py` | 96 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_maker_lowloss.py` | 113 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_maker_rescore.py` | 43 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_null_power.py` | 91 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_okx_tendency.py` | 141 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |

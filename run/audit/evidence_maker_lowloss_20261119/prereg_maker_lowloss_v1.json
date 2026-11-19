@@ -1,0 +1,81 @@
+{
+  "version": "prereg-maker-lowloss-v1",
+  "date": "2026-11-19",
+  "adr": "0093",
+  "request": "동동 2026-11-19: 모든 거래는 지정가로 하고 지금까지 테스트한 전략들 중에서 수익은 나는데 많이 안 나는 것들로, 대신 손실이나 청산도 적은 것들로 모아서 해봐. 수수료 포함해서 + 일 때만 익절",
+  "status": "committed before any series of this study is computed. The member list below was read from the already-published ADR 0092 catalog (no new computation).",
+  "never_read": ["2020 (IW1) and earlier", "2023-09-19..2024-06-18", "2025-10-21 onwards", "validation / locked / paper windows"],
+  "honesty": "S1 and S2 were already looked at for every member. Members are chosen on S1 numbers, so S1 is selection-biased; S2 has also been seen before. Post-hoc exploration on spent DEV data, not evidence. No prereg is activated, no window is opened.",
+
+  "selection": {
+    "source": "run/audit/evidence_winloss_combo_20261118/winloss_catalog_rows.csv",
+    "source_sha256": "0401835b8f98cf48fc3a61969cb102bb4a365ef3a390e9d5cc97daa228c22c95",
+    "rule_on_S1_rows": [
+      "n >= 30",
+      "mean_net_bp > 0 and sr_ann > 0  (profit after the family's own cost row, i.e. '수익은 난다')",
+      "'수익이 많이 안 난다' is not used to exclude anything: no S1 row has sr_ann above 1.04, all below the chance maximum (2.49 at the cumulative trial count), so every positive row is 'small'",
+      "at least one loss metric recorded (worst_bp, max_dd_pct, liq_share)",
+      "every recorded loss metric small: worst_bp >= -2500 (worst trade/cycle no worse than -25%), max_dd_pct <= 20, liq_share <= 0.05"
+    ],
+    "rows_passing": 30,
+    "dedupe": "S-3f825ccdd41fb32d and S-bdae1ff0b24876cc have identical S1 and S2 numbers (same rule); keep S-3f825ccdd41fb32d only",
+    "dropped_no_data": "MAP-Elites S-f46972b73316b7a2, S-1df19a12439b25fd: BTC/ETH only, not in the project archive and the exchange is unreachable here. Reported as not run, not counted.",
+    "members_R9": ["S-80fe4b122603f292", "S-db25d24ca1ca4c96", "S-181c15b4139efdd3", "S-9d752d63324074cc", "S-1ec0bc1c95b4c488",
+                   "S-3a3dbdf422939143", "S-72655636c7034155", "S-ace182d55342733b", "S-5f8884793cae1ba1", "S-a990790314cf322d",
+                   "S-8e033ef78d187315", "S-5e78172a43be4822", "S-a2aa1c77ccf11ba3", "S-3f825ccdd41fb32d"],
+    "members_scalein": ["N90_s0.04_K4_avg_intra0.06", "N90_s0.04_K4_avg_intra0.10", "N90_s0.04_K4_avg_intra0.15",
+                        "N90_s0.04_K4_last_intra0.05", "N90_s0.04_K4_last_intra0.10",
+                        "N90_s0.08_K2_avg_intra0.06", "N90_s0.08_K2_avg_intra0.10", "N90_s0.08_K2_avg_intra0.15",
+                        "N90_s0.08_K2_last_intra0.05", "N90_s0.08_K2_last_intra0.10",
+                        "N90_s0.04_K0_avg_intra0.06", "N90_s0.04_K0_avg_intra0.10", "N90_s0.04_K0_avg_intra0.15"],
+    "n_members": 27
+  },
+
+  "execution_model": {
+    "principle": "every order that can wait is a resting limit (maker) order: all entries, every profit-taking exit. Exits that cannot wait are market (taker) orders with full cost: stop-loss, liquidation, hard time cap. A limit order fills only when the price trades THROUGH it by FILL_MARGIN = 5 bp; the fill price is the limit itself (no improvement). Orders that do not fill are lost (entries) or stay resting (exits). This makes fills adverse-selected by construction (an entry fills only when price moves against it).",
+    "scalein": {
+      "engine": "ADR 0089 dca_stop_dev.simulate_stop semantics (17 alts daily, W 0.05, band 3%, 5x isolated, liquidation avg*(1-1/5+mmr), intra stops avg_intra / last_intra at x, cooldown 5, lookback 90), with ADR 0090 limit entries (first tranche: limit at the signal close, good for the next day only; adds: resting at L0*(1-s*k))",
+      "take_profit": "resting limit at P_tp = max(avg*(1+0.10), P_be*(1+1bp)) for a long (mirror for a short), where P_be is the price at which the cycle's net (gross + funding - entry costs paid - maker exit cost, all at the conservative cost row) is zero. Active from the day after the last fill; not active on a day an add filled. Within a day, liquidation and stop are checked first: if either is touched the take-profit does not fill that day (conservative).",
+      "stop_and_liquidation": "as ADR 0089, market fill with full (taker) cost",
+      "variant_CTRL": "60 days held -> market exit at the next open (taker), as the original",
+      "variant_RULE": "60 days held and not exited -> the take-profit limit is lowered to P_be*(1+1bp) (net > 0 only) and keeps resting; stop and liquidation stay active; hard cap 120 days held -> market exit at the next open (taker), reason CAP"
+    },
+    "r9": {
+      "engine": "ADR 0044 spec signal (build_spec_signal on closed bars), 15m bars, 7 symbols (BNB XRP SOL ADA DOGE LTC LINK), one position per symbol, no overlap (next signal only after the exit), funding from the archive (FundingIndex, settlements in (entry, exit]), per-side cost = CostContext.from_public_estimate(estimate_v3_alts).quote(ORDER_VALUE, previous bar traded value)",
+      "entry": "signal on bar t close -> limit at bar t+1 open, valid during bar t+1 only; fills if bar t+1 low <= open*(1-5bp) (long; short mirror); else the signal is lost (counted)",
+      "variant_CTRL": "exit at the open of bar entry+horizon, market (taker)",
+      "variant_RULE": "from bar entry+horizon a sell limit rests at P = max(open of bar entry+horizon, P_be*(1+1bp)) (long; short mirror), P_be from entry maker cost + maker exit cost + funding up to that bar at the conservative row; fills on the first bar whose high >= P*(1+5bp); if not filled by bar entry+2*horizon -> market exit at that bar's open (taker), reason CAP. No stop (the originals have none).",
+      "booking": "trade net booked on the exit day, basket average over the 7 symbols"
+    },
+    "cost_rows": {
+      "maker_multiplier_of_measured_side_cost": {"optimistic": 0.47, "central": 0.70, "conservative": 1.00},
+      "taker_multiplier": 1.00,
+      "decision_row": "conservative (account fee tier UNKNOWN; ADR 0049: at maker fee 4bp the limit-order saving is 0)",
+      "breakeven_P_be_uses": "conservative row in every cost row, so trade paths are identical across rows"
+    },
+    "reference_runs_not_counted": "the same members with market entries and original exits (reproduction of ADR 0089 / ADR 0092 numbers on this code path)"
+  },
+
+  "trials": {
+    "counted": 60,
+    "breakdown": "27 members x 2 exit variants (CTRL, RULE) = 54; bundles ALL / R9 / SCALEIN x 2 variants = 6",
+    "context_id": "ALT-maker-lowloss-bundle-v1"
+  },
+
+  "bundle": {
+    "groups": {"ALL": "27 members", "R9": "14 R9 members", "SCALEIN": "13 scale-in members"},
+    "construction": "each member's daily net series (decision row) scaled to equal S1 daily volatility (scale computed on S1 only, applied unchanged to S2); bundle = equal-weight mean over members on the common day grid (days covered by both engines); the bundle is then scaled to 10% annual volatility on S1 (same factor on S2)",
+    "stats": ["sr_ann", "close max drawdown", "worst day", "hit rate of trades", "worst trade", "liquidation share", "share of RULE exits that ended at CAP"]
+  },
+
+  "gate_bundle_DEV_PROMISING_all_of": {
+    "a": "S1 sr_ann (decision row) > expected maximum SR of N=60 independent trials, and the cumulative N is reported",
+    "b": "S2 sr_ann (decision row) > 0.5",
+    "c": "S1 and S2 close max drawdown <= 20% at the 10%-vol scale",
+    "d": "scale-in liquidation share <= 5% in S1 and S2, worst R9 trade >= -25% in S1 and S2",
+    "e": "central row S1 and S2 sr_ann > 0",
+    "otherwise": "NOT_PROMISING"
+  },
+  "member_report": "per member and variant: S1/S2 trades, entry fill rate, hit rate, mean net bp, worst, sr_ann, exit reasons, CAP share; the RULE-vs-CTRL difference per member is descriptive only",
+  "decision_if_promising": "nothing is activated; a DEV_PROMISING bundle would need a new prereg on an unseen window and VERIFIED cost before anything else"
+}
