@@ -12,10 +12,10 @@ Read status: INVENTORIED = header, imports, paths and risk patterns scanned (not
 | DUPLICATE_RESEARCH | superseded by a later tool for the same hypothesis | 1 |
 | RETIRED_OR_ON_HOLD | retired v1 execution path (LEGACY_SCRIPTS.md) or on hold | 43 |
 | NEEDS_MORE_DATA | hypothesis needs a dataset the repository does not have | 21 |
-| TEST | test file of a run/ tool | 49 |
-| NOT_SURVEYED | not surveyed | 27 |
+| TEST | test file of a run/ tool | 50 |
+| NOT_SURVEYED | not surveyed | 28 |
 
-Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 97
+Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 99
 
 | file | lines | class | read status | reason | flags |
 |---|---|---|---|---|---|
@@ -75,6 +75,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 97
 | `f2x6_fng_extreme_diag.py` | 322 | INTEGRATED_CORE | LOGIC_TRACED | Fear & Greed extremes = legacy family fng and features fng_max / fng_min; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | future_index=2, v1_path=3 |
 | `fast_short_dev.py` | 404 | KEPT_INDEPENDENT | TESTED | fast short-horizon panel strategies (ADR 0045); NOT_PROMISING |  |
 | `fng_refresh_check.py` | 36 | INTEGRATED_CORE | FULL_SOURCE_REVIEW | F&G refresh check; F&G is a dataset of the engine (fng); script itself retired (v1 paths, LEGACY_SCRIPTS.md) | network=2, v1_path=1 |
+| `forward_nearmiss.py` | 246 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `forward_v2_entry_bar_dev.py` | 86 | STANDARD_INTERFACE | TESTED | prereg v2 entry bar via canonicalize_spec + CostContext (ADR 0036) |  |
 | `fr_crosscheck_engine_cost.py` | 198 | INTEGRATED_CORE | LOGIC_TRACED | funding extremes = legacy family fund_z and feature funding_z; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=2, cointrader=1 |
 | `fr_extreme_diag.py` | 213 | INTEGRATED_CORE | LOGIC_TRACED | funding extremes = legacy family fund_z and feature funding_z; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=2 |
@@ -144,6 +145,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 97
 | `test_evalue_v3.py` | 30 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_evalue_walkforward.py` | 115 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_fast_short.py` | 132 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_forward_nearmiss.py` | 85 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_forward_v2_entry_bar.py` | 36 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_gold_dev.py` | 65 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_h4_retest.py` | 114 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |

@@ -1,0 +1,51 @@
+{
+ "schema": "forward_nearmiss_prereg_v1",
+ "status": "ACTIVE_FORWARD_PAPER (research record only: no orders, no account). Committed before forward_start; the tool refuses to evaluate if the first commit of this file is at or after forward_start.",
+ "written": "see git commit time (authoritative)",
+ "written_before_any_result": true,
+ "data_state_when_written": "No Binance data dated 2025-10-21 or later has been read by this archive's DEV tools. Forward days (2026-11-23 on) do not exist yet.",
+ "requested_by": "동동, 2026-11-20 12:12 UTC '2' (answer to Claude's plan: step 2 = record CL1, FIP1, AF1 as forward paper). ADR 0110 option A, ADR 0111 IW0 result.",
+ "candidates": [
+  "CL1_CLOSE_LOCATION",
+  "FIP1_FROGPAN",
+  "AF1_AGGFUND_TIMING"
+ ],
+ "dropped_before_forward": {
+  "DS1_DISPERSION": "IW0 SR -1.22 (ADR 0111)",
+  "COMBO": "IW0 SR -0.19 (contained DS1)"
+ },
+ "candidate_definitions": {
+  "CL1_CLOSE_LOCATION": "run/newsrc_r11_dev.py compute()['CL1_CLOSE_LOCATION'], long top quintile / short bottom quintile (wide_universe_dev.pick, long_top=True)",
+  "FIP1_FROGPAN": "run/newsrc_r12_dev.py frog(), long top / short bottom quintile",
+  "AF1_AGGFUND_TIMING": "run/newsrc_r3_dev.py af1(), equal-weight U50 long when the 7-day median funding <= its 180-day median, else flat"
+ },
+ "universe": "ADR 0047 U50 (cut-off bar i-2, 30-day mean quote volume rank) with BTCUSDT and ETHUSDT excluded (never fetched or read: their validation, lock and paper windows stay untouched)",
+ "forward_start": "2026-11-23",
+ "lookback_from": "2026-05-01 (signal input only; no return before forward_start is evaluated)",
+ "rebalance": "every 14 days on the Monday grid anchored 2026-11-23; trade at the open of day i; weights drift; real funding; ADR 0041 calibrated cost (rows cal, cal_x2, cost0); engine newsrc_engine.run_segment",
+ "data": "Binance public monthly archives (S3 mirror of data.binance.vision): 1d klines, fundingRate, 15m (23:45 bar). Evaluation runs only through the end of the last complete archive month.",
+ "statistics": {
+  "daily_series": "cal net daily return",
+  "test": "one-sided Newey-West (lag 14) t of the mean",
+  "multiplicity": "Holm over the 3 candidates (m=3 fixed)"
+ },
+ "alpha_family": 0.0213,
+ "alpha_source": "the forward-data alpha share 0.0213 reserved for the never-registered v2 forward window (ADR 0025 split 7:3 with v3 0.0091; ADR 0039 left it unassigned). Total forward alpha stays 0.0304. If the user prefers another source this file must be replaced by a new version BEFORE forward_start.",
+ "schedule": {
+  "interim": "at 182 forward days (on or after 2027-05-23): a candidate with NW t < -1 is FORWARD_FAIL_FUTILITY and stops (futility only; it cannot pass at interim)",
+  "final": "at 364 forward days (2027-11-21): FORWARD_PASS only if Holm-significant at alpha 0.0213 AND both halves SR > 0 AND cal_x2 mean > 0; else FORWARD_FAIL. Only the first 364 forward days count."
+ },
+ "power_note": "a true net SR of 0.8 gives t ~0.8 after 12 months; FORWARD_PASS needs roughly true SR >= 2. Most likely outcome for these candidates is FORWARD_FAIL (not significant) even if the edge is real. Stated before any forward day exists.",
+ "after_result": "FORWARD_PASS is a research result. Any real trading still needs VERIFIED cost from real fills and the user's explicit decision. No candidate, parameter, universe or cost change after this commit.",
+ "code_sha256": {
+  "run/forward_nearmiss.py": "86cb83a805b9286691a17e9f847b7467e096aa774108fdc29680a14a9394e0c9",
+  "run/newsrc_engine.py": "ec6cc8db3892fc2984fbc9209e660f08fe332d71d30243db841d8eb925034995",
+  "run/newsrc_r3_dev.py": "ae8f512c96ee6a20b6deaee26c42fee3ee23cfe2e40f37a9844e02c5999b02f4",
+  "run/newsrc_r11_dev.py": "4e33681cf95ca25eade178fb541d9b5a660fb2559fb912ea7b821f81779c60c8",
+  "run/newsrc_r12_dev.py": "5b6a146c736c4fa24fe33c37548e4b03e20f5f564a75199aedd37a5c51c10e7c",
+  "run/wide_universe_dev.py": "8cd23cd4794ed2e0df5427f82963ab46a32217f4d8eafb97dff9cd9c7041a9db",
+  "run/broad_universe_dev.py": "2f91c73e505dcf511eb083deded7fcc4132345dee00f7ace05373f7d78111f22",
+  "run/cross_section_v2_dev.py": "0da6997fd30203ad78245b4dc97104fb0084c7d533700a6b05c408976c8cc475",
+  "run/broad_universe_fetch.py": "d1df2c8cb1b49a6d769c0085b7e3ca88a4b6727d781443a26c76ef4e1be97dfd"
+ }
+}

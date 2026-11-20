@@ -847,6 +847,20 @@
   }
  },
  {
+  "file": "forward_nearmiss.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 246,
+  "doc": "Forward paper record of the near-miss candidates CL1, FIP1, AF1 (ADR 0112).",
+  "adr": [
+   "112"
+  ],
+  "flags": {}
+ },
+ {
   "file": "forward_v2_entry_bar_dev.py",
   "class": "STANDARD_INTERFACE",
   "reason": "prereg v2 entry bar via canonicalize_spec + CostContext (ADR 0036)",
@@ -1869,6 +1883,20 @@
   "doc": "Tests for the fast short-horizon DEV check (ADR 0045). Needs numpy and pandas.",
   "adr": [
    "045"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_forward_nearmiss.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 85,
+  "doc": "Tests for the forward paper record of CL1/FIP1/AF1 (ADR 0112). Synthetic data only.",
+  "adr": [
+   "112"
   ],
   "flags": {}
  },
