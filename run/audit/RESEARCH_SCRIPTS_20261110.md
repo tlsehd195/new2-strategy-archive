@@ -12,10 +12,10 @@ Read status: INVENTORIED = header, imports, paths and risk patterns scanned (not
 | DUPLICATE_RESEARCH | superseded by a later tool for the same hypothesis | 1 |
 | RETIRED_OR_ON_HOLD | retired v1 execution path (LEGACY_SCRIPTS.md) or on hold | 43 |
 | NEEDS_MORE_DATA | hypothesis needs a dataset the repository does not have | 21 |
-| TEST | test file of a run/ tool | 47 |
-| NOT_SURVEYED | not surveyed | 25 |
+| TEST | test file of a run/ tool | 50 |
+| NOT_SURVEYED | not surveyed | 28 |
 
-Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 93
+Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 99
 
 | file | lines | class | read status | reason | flags |
 |---|---|---|---|---|---|
@@ -57,6 +57,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 93
 | `c9_inspect.py` | 37 | NEEDS_MORE_DATA | FULL_SOURCE_REVIEW | DVOL implied volatility: not in the repository; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=2 |
 | `candidate_regime_dev.py` | 236 | STANDARD_INTERFACE | TESTED | per-regime scorecard via canonicalize_spec + CostContext (ADR 0044) |  |
 | `compare_selection_dev.py` | 107 | STANDARD_INTERFACE | FULL_SOURCE_REVIEW | compares two evolve ledgers (ADR 0019) |  |
+| `confirm_iw0.py` | 225 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1 |
 | `cross_section_v2_dev.py` | 255 | KEPT_INDEPENDENT | TESTED | five cross-sectional hypotheses (ADR 0040); NOT_PROMISING — traced: shift(-1) realised return, as above | neg_shift=1 |
 | `dca_extreme_dev.py` | 418 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1 |
 | `dca_extreme_prepare.py` | 85 | NOT_SURVEYED | LOGIC_TRACED | no rule — new file |  |
@@ -74,6 +75,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 93
 | `f2x6_fng_extreme_diag.py` | 322 | INTEGRATED_CORE | LOGIC_TRACED | Fear & Greed extremes = legacy family fng and features fng_max / fng_min; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | future_index=2, v1_path=3 |
 | `fast_short_dev.py` | 404 | KEPT_INDEPENDENT | TESTED | fast short-horizon panel strategies (ADR 0045); NOT_PROMISING |  |
 | `fng_refresh_check.py` | 36 | INTEGRATED_CORE | FULL_SOURCE_REVIEW | F&G refresh check; F&G is a dataset of the engine (fng); script itself retired (v1 paths, LEGACY_SCRIPTS.md) | network=2, v1_path=1 |
+| `forward_nearmiss.py` | 246 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `forward_v2_entry_bar_dev.py` | 86 | STANDARD_INTERFACE | TESTED | prereg v2 entry bar via canonicalize_spec + CostContext (ADR 0036) |  |
 | `fr_crosscheck_engine_cost.py` | 198 | INTEGRATED_CORE | LOGIC_TRACED | funding extremes = legacy family fund_z and feature funding_z; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=2, cointrader=1 |
 | `fr_extreme_diag.py` | 213 | INTEGRATED_CORE | LOGIC_TRACED | funding extremes = legacy family fund_z and feature funding_z; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=2 |
@@ -106,6 +108,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 93
 | `newsrc_r11_dev.py` | 133 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `newsrc_r12_dev.py` | 103 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `newsrc_r13_dev.py` | 119 | NOT_SURVEYED | TESTED | no rule — new file |  |
+| `newsrc_r14_dev.py` | 157 | NOT_SURVEYED | TESTED | no rule — new file | network=2 |
 | `newsrc_r1_dev.py` | 527 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1 |
 | `newsrc_r2_dev.py` | 133 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `newsrc_r3_dev.py` | 156 | NOT_SURVEYED | TESTED | no rule — new file |  |
@@ -132,6 +135,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 93
 | `test_broad_universe.py` | 79 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_bundle_regime.py` | 43 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_candidate_regime.py` | 48 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_confirm_iw0.py` | 67 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_cross_section_v2.py` | 111 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_dca_extreme.py` | 128 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_dca_limit.py` | 107 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
@@ -141,6 +145,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 93
 | `test_evalue_v3.py` | 30 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_evalue_walkforward.py` | 115 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_fast_short.py` | 132 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_forward_nearmiss.py` | 85 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_forward_v2_entry_bar.py` | 36 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_gold_dev.py` | 65 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_h4_retest.py` | 114 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
@@ -157,6 +162,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 93
 | `test_newsrc_r11.py` | 50 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r12.py` | 53 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r13.py` | 51 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_newsrc_r14.py` | 44 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r2.py` | 57 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r3.py` | 52 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r4.py` | 41 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
