@@ -111,3 +111,4 @@
 | [0105](0105-new-sources-round10-volterm-corrchange-pricevolume-obv.md) | 반복 탐색 10라운드 4건(단기/장기 변동성 비, 시장 상관 변화, 가격·거래량 상관, OBV 괴리): 모두 NOT_PROMISING, S1 전부 음수 | Accepted (측정) |
 | [0106](0106-new-sources-round11-tradesize-closelocation-amihud.md) | 반복 탐색 11라운드 4건(평균 체결 크기 변화·수준, 14일 종가 위치, 비유동성 변화): 모두 NOT_PROMISING; 종가 위치 CL1 S1 0.98·S2 1.52지만 알파 t 1.50, S1 뒤 절반 음수 | Accepted (측정) |
 | [0107](0107-new-sources-round12-breadth-dispersion-frogpan.md) | 반복 탐색 12라운드 3건(시장 폭 타이밍, 횡단면 분산 타이밍, 개구리 냄비 모멘텀): 모두 NOT_PROMISING; FIP1 S1 1.00이나 알파 t 1.57, S1 뒤 절반 음수 | Accepted (측정) |
+| [0108](0108-new-sources-round13-pairs-peer-reversal.md) | 반복 탐색 13라운드 3건(상관 상위 페어 트레이딩 2건, 유사 종목 대비 반전): 모두 NOT_PROMISING, S1·S2 모두 음수 | Accepted (측정) |
