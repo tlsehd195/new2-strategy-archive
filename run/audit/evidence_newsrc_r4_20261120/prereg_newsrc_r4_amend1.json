@@ -1,0 +1,9 @@
+{
+ "schema": "newsrc_r4_prereg_amendment_v1",
+ "amends": "prereg_newsrc_r4_v1.json (commit 2c7098f)",
+ "written": "2026-11-20T09:05Z",
+ "reason": "First run found ReferenceRateUSD empty in the Coin Metrics files for most assets during the DEV segments (e.g. sol, link, doge on 2022-01-01..03), so the preregistered supply series was empty for every name and SI1/SI2 had no position at all. No SI value has been computed or compared with returns. The other four trials ran and are unchanged by this amendment.",
+ "change": "supply price = the perp daily close of the same day instead of ReferenceRateUSD. ln(supply[a]/supply[b]) does not depend on the 1000x unit of a perp, so the growth signal is the same quantity (perp close tracks the spot index within the basis).",
+ "trials_affected": ["SI1_SUPPLY28_U50", "SI2_SUPPLY90_U50", "SI2_SUPPLY90_W200"],
+ "trial_count": "unchanged (6); the first run of SI with an empty series is not counted separately"
+}
