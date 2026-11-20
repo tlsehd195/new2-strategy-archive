@@ -12,10 +12,10 @@ Read status: INVENTORIED = header, imports, paths and risk patterns scanned (not
 | DUPLICATE_RESEARCH | superseded by a later tool for the same hypothesis | 1 |
 | RETIRED_OR_ON_HOLD | retired v1 execution path (LEGACY_SCRIPTS.md) or on hold | 43 |
 | NEEDS_MORE_DATA | hypothesis needs a dataset the repository does not have | 21 |
-| TEST | test file of a run/ tool | 51 |
-| NOT_SURVEYED | not surveyed | 30 |
+| TEST | test file of a run/ tool | 55 |
+| NOT_SURVEYED | not surveyed | 34 |
 
-Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 60, TESTED 101
+Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 60, TESTED 109
 
 | file | lines | class | read status | reason | flags |
 |---|---|---|---|---|---|
@@ -101,6 +101,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 60, TESTED 101
 | `maker_entry_reeval.py` | 194 | STANDARD_INTERFACE | FULL_SOURCE_REVIEW | re-evaluates engine DEV candidates with maker cost (ADR 0049) |  |
 | `maker_lowloss_dev.py` | 709 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `maker_rescore_dev.py` | 129 | KEPT_INDEPENDENT | TESTED | maker re-pricing of published panel candidates (ADR 0056) |  |
+| `ml_combo_r15b_dev.py` | 238 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `n2_engine_crosscheck.py` | 240 | RETIRED_OR_ON_HOLD | LOGIC_TRACED | v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029) | v1_path=1 |
 | `n2_maker_exec_diag.py` | 389 | NEEDS_MORE_DATA | LOGIC_TRACED | maker execution layer needs queue / order-book history; maker cost estimated by maker_entry_estimate.py; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=1 |
 | `newlisting_short_dev.py` | 288 | KEPT_INDEPENDENT | LOGIC_TRACED | new-listing short event study (ADR 0060); funding read per DEV segment since ADR 0066 — traced: load_symbol (segment filter), fund_sum (read 2021-01..2025-10 incl. the never-read gap) | neg_shift=1 |
@@ -110,6 +111,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 60, TESTED 101
 | `newsrc_r12_dev.py` | 103 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `newsrc_r13_dev.py` | 119 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `newsrc_r14_dev.py` | 157 | NOT_SURVEYED | TESTED | no rule — new file | network=2 |
+| `newsrc_r15_dev.py` | 172 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1, network=2 |
 | `newsrc_r1_dev.py` | 527 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1 |
 | `newsrc_r2_dev.py` | 133 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `newsrc_r3_dev.py` | 156 | NOT_SURVEYED | TESTED | no rule — new file |  |
@@ -158,12 +160,14 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 60, TESTED 101
 | `test_maker_entry.py` | 96 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_maker_lowloss.py` | 113 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_maker_rescore.py` | 43 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_ml_combo_r15b.py` | 60 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r1.py` | 70 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r10.py` | 33 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r11.py` | 50 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r12.py` | 53 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r13.py` | 51 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r14.py` | 44 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_newsrc_r15.py` | 66 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r2.py` | 57 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r3.py` | 52 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r4.py` | 41 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
@@ -179,12 +183,16 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 60, TESTED 101
 | `test_residual_signals.py` | 96 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_stepm_block_sim.py` | 37 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_structural_search.py` | 83 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_traders_r15d.py` | 58 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_unsup_regime.py` | 55 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_valentini_of_dev.py` | 108 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_valentini_vp_r15c.py` | 69 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_wide_universe.py` | 152 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_winloss_combo.py` | 79 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `traders_r15d_dev.py` | 160 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `unsup_regime_dev.py` | 199 | KEPT_INDEPENDENT | TESTED | k-means regime classifier on DEV S1 (ADR 0050); NOT_USEFUL |  |
 | `valentini_of_dev.py` | 579 | NOT_SURVEYED | TESTED | no rule — new file |  |
+| `valentini_vp_r15c_dev.py` | 211 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `wide_universe_dev.py` | 383 | KEPT_INDEPENDENT | TESTED | wide-universe panel with effective independent names (ADR 0047); variant of broad_universe_dev — traced: shift(-1) realised return, as above | neg_shift=1 |
 | `winloss_catalog.py` | 318 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `winloss_combo_dev.py` | 403 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1 |

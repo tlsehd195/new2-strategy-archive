@@ -116,4 +116,5 @@
 | [0110](0110-confirm-near-miss-candidates-plan-draft.md) | 근접 후보 5개(CL1, FIP1, DS1, AF1, 묶음) 고정 후 IW0 현물 2017~19와 페이퍼 기록으로 확인하는 계획 초안; 아무 구간도 열지 않음 | Proposed (초안) |
 | [0111](0111-iw0-stage1-confirmation-result.md) | IW0(2017~19 현물) 1단계 확인 4건 모두 FAIL(Holm 0.05); DS1 −1.22로 기각, CL1 0.85·FIP1 0.72는 부호만 같고 유의하지 않음; IW0 소진 | Accepted (측정) |
 | [0112](0112-forward-paper-record-cl1-fip1-af1.md) | CL1·FIP1·AF1 전진 페이퍼 기록 2026-11-23 시작(공개 아카이브로 사후 계산, 주문 없음, BTC/ETH 제외); 182일 중간 실패 점검, 364일 최종(Holm α 0.0213) | Accepted (기록) |
+| [0113](0113-external-literature-ml-combo-famous-traders.md) | 외부 문헌 3건(해시 리본, 같은 요일 계절성, 선물 만기 창), 지도+비지도+강화학습 결합 2건, 발렌티니 거래량 프로파일 근사 2건, 쿨라매기 돌파·미너비니 템플릿 2건: 모두 NOT_PROMISING | Accepted (측정) |
 | [0114](0114-valentini-orderflow-full-process-aggtrades.md) | 발렌티니 방식 전체(지도, 뉴욕 추세·런던 평균회귀, A/B 등급, 0.25% 위험, 하루·주간 손실 규칙, 일지)를 체결 단위 aggTrades 1분 주문흐름으로 재현, 3건 모두 NOT_PROMISING; 손절 폭 대비 비용 0.83R이 벽 | Accepted (측정) |

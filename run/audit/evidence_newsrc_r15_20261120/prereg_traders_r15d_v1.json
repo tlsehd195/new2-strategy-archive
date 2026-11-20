@@ -1,0 +1,43 @@
+{
+ "schema": "traders_r15d_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper, IW0 or IW1 data)",
+ "written": "see git commit time (authoritative)",
+ "written_before_any_result": true,
+ "data_state_when_written": "Daily Binance USDT-M data of the U50 universe is downloaded (same as rounds 1-15); no trader rule signal or trade has been computed. Rounds 15, 15b, 15c preregs committed.",
+ "requested_by": "동동, 2026-11-20 13:53 UTC '이런 트레이더들 유명한 사람들 전략들 가져와서 테스트 해봐 너무 예전 사람 말고'. Coordinator: active in the last 10-15 years, public interviews/talks/competition records, rules fixed before results, non-reproducible methods excluded with reasons.",
+ "traders_selected": {
+  "Kristjan Kullamagi (Qullamaggie)": "Swing trader active 2013-, public streams and his site (qullamaggie.com 'My 3 timeless setups'), Chat With Traders interview. Breakout setup: a 30-100%+ move in 1-3 months, then an orderly consolidation with higher lows and tightening range for 2 weeks-2 months near the 10/20-day MAs; buy the break of the range high; stop at the low of the entry day; sell 1/3-1/2 after 3-5 days and trail the rest with the 10- or 20-day MA. Secondary summaries: tikamalma.substack.com 'Qullamaggie Swing Trading Setups', tradingresourcehub.substack.com interview notes.",
+  "Mark Minervini": "US Investing Championship winner 1997 and again 2021 (recent); books 'Trade Like a Stock Market Wizard' (2013), 'Think & Trade Like a Champion' (2017). Trend Template (8 criteria): price > 150d and 200d SMA; 150d > 200d; 200d rising at least 1 month; 50d > 150d and 200d; price > 50d; price >= 30% above 52-week low; price within 25% of 52-week high; relative strength rank >= 70. Summaries: chartmill.com 'Mark Minervini Trend Template', mql5.com 'Automating Classic Market Methods (Part 4)'."
+ },
+ "traders_excluded": {
+  "Fabio Valentini": "tested separately as round 15c (volume-profile approximation)",
+  "Qullamaggie episodic pivots": "needs earnings/news catalysts; no event feed for crypto in S1",
+  "Minervini VCP pattern itself": "visual contraction count is discretionary; only the Trend Template is codable",
+  "Ross Cameron (small-cap gap and go)": "needs stock float, news and premarket data; not a crypto structure",
+  "Andrea Unger (World Cup 2008-10, 2012)": "his systems are sold, not published with exact rules",
+  "Peter Brandt, Linda Raschke, Larry Williams": "older generation (asked: not too old) and largely discretionary chart reading",
+  "crypto-Twitter traders (anonymous accounts)": "no audited record and discretionary calls"
+ },
+ "rules_fixed_here_because_ambiguous": {
+  "data": "only daily open/close/quote volume exist in this pipeline (no daily high/low), so 'low of day' -> entry-day open, 'range high' -> highest close; 52 weeks -> 252 daily closes is replaced by 365 calendar days of closes (crypto trades every day)",
+  "timing": "project engine convention: decided on the close of bar i-2 (cut), traded at the open of day i (one extra day of delay vs a live breakout entry; stated)",
+  "relative strength": "percentile of the 126-day close return within the current U50"
+ },
+ "scope": "DEV only. No criteria change. A DEV_PROMISING flag only leads to a report to the user. No variants after the result.",
+ "universe": "ADR 0047/0096-0109 U50 at cut-off bar i-2; entries only from U50; open positions are kept even if the coin leaves U50",
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "eval_from": "2021-04-12", "use": "decides"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "eval_from": "2024-09-30", "use": "report + fixed S2 > 0.5 condition"},
+  "rebalance": "daily (hold = 1); trade at open of day i; real funding; ADR 0041 calibrated cost on every weight change; held weights drift (no re-weighting trade unless stated)",
+  "never_read": [["2000-01-01", "2020-12-31"], ["2023-09-19", "2024-06-18"], ["2025-10-21", "2099-12-31"]],
+  "history_note": "no lookback reaches before the segment read start: a rule needing more history than available is simply off (MV1 needs 365 days, so it can be on in S1 only from about 2022-01 and in S2 only from about 2025-06; stated, low power)"
+ },
+ "trials": {
+  "QM1_BREAKOUT_U50": "c = cut. Prior move: max(close[c-60..c-10]) / min(close[c-90..c-30]) >= 1.30 with the min's day before the max's day. Consolidation: over c-14..c-1 the close range max/min - 1 <= 0.20, and that range <= the close range over c-29..c-15. Surfing: close[c-1] >= SMA20[c-1]. Trigger: close[c] > max(close[c-14..c-1]). Entry: long 5% of capital at the open of day i if not held and fewer than 20 positions (ties by higher prior move). Exits (checked on close of each later cut, executed at the next trading open): stop = close < min(close[entry_cut-14..entry_cut-1]) (consolidation low); from the 5th holding day on, close < SMA10; 60 holding days maximum. No partial sales (single exit; stated simplification).",
+  "MV1_TREND_TEMPLATE_U50": "At cut c a coin passes if all 8 hold: close > SMA150 and > SMA200; SMA150 > SMA200; SMA200[c] > SMA200[c-21]; SMA50 > SMA150 and > SMA200; close > SMA50; close >= 1.30 x min(close[c-364..c]); close >= 0.75 x max(close[c-364..c]); 126-day return percentile within U50 >= 0.70 (SMAs need full windows; any NaN -> fail). Hold the passing U50 coins equal weight (gross 1); if the passing set is unchanged the drifted weights are kept, otherwise all are reset to equal weight; flat when none pass."
+ },
+ "n_trials": 2,
+ "context_id": "U50-1d-traders-r15d-v1",
+ "decision_rule": "identical to ADR 0094/0096-0109 (newsrc_engine.flag); DSR N=2 and cumulative N, PBO CSCV-16 reported.",
+ "after_result": "Trial count +2 regardless. No variants in this thread; if nothing passes, report NOT_PROMISING and stop."
+}
