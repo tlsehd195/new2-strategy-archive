@@ -1,0 +1,85 @@
+{
+ "prereg_id": "valentini-orderflow-v1",
+ "adr": "0114",
+ "requested_by": "동동 2026-11-20 14:14 UTC (replicate Fabio Valentini properly), 14:18 UTC ('become Valentini himself': model his whole process)",
+ "committed_before": "any aggTrades file of this round is downloaded; no signal, no P&L, no order-flow statistic of these symbols has been computed. The strategy script is committed (hash recorded in the result file) before it is run on data.",
+ "goal": "Model Fabio Valentini's published day-trading process as a whole (pre-market map, direction, location, validation, aggression, two models, A/B setup tiers, 0.25% risk, daily loss rules, journal) on Binance USD-M tick data (aggTrades), and judge it with the unchanged DEV criteria. Imitating a person's process is not the same as having an edge: the verdict depends only on the numbers.",
+ "sources": {
+  "futureshive": "https://www.futureshive.com/blog/fabio-valentini-worlds-best-scalper-deepcharts (World Cup podiums Q4'23 68.6%, Q1'24 89.5%, Q4'24 218.3%, Q1'25 169.7%; Direction, Location, Aggression; AMT, value area)",
+  "briefread": "https://briefread.pages.dev/en/summary/trading-live-with-the-1-scalper (summary of his video: trend model in NY targeting prior balance, mean-reversion model in London first hour/consolidation, location -> validation -> aggression, big trade filter 30 NQ contracts NY / 20 London, candle close beyond level, move stop to breakeven)",
+  "forex_in_rs": "https://www.forex.in.rs/footprint-vwap-compounding (secondary interview summary, unverified: NY open first 2-3h, map of prior H/L/VWAP/HVN/LVN, bias above VAH + rising VWAP + higher lows, stacked imbalance/absorption/delta flip, stop 1-2 ticks beyond absorption, scratch if pressure lost in 2-3 bars, scale at +1R, trail after +1.5R, 0.25% risk, A/B/C = 1/0.5/0.25, 3 consecutive losses -> stop, +2R day -> halve size, two down days -> halve for the week, 8-12 tickets/session)",
+  "pickmytrade_vendor": "https://blog.pickmytrade.trade/fabio-valentini-pro-scalper-nasdaq-scalping-strategy/ (vendor script, not affiliated; used only as a cross-check: 0.25% risk, 3 daily losses)"
+ },
+ "translation_to_crypto": {
+  "instrument": "He trades one very liquid future (NQ) at a time. Here: the 15 alts of the ADR 0045 engine (measured alt cost record), but at most ONE open position in the whole book at any time (first qualifying signal by time, ties by symbol order). BTC/ETH are not used: BTC is excluded from S2 and has no measured alt-style cost row; ETH is not in the measured record.",
+  "big_trade": "One aggTrade (one taker order at one price) with notional >= the 99.5th percentile of that symbol's aggTrade notionals in the previous processed month (NQ 30 contracts is not transferable; a relative threshold is used).",
+  "footprint": "1-minute bars built from aggTrades by run/aggtrades_minute_build.py: delta = (2*buy_qv - qv)/qv, big_net = (big_buy_qv - big_sell_qv)/qv, sell_at_low_qv / buy_at_high_qv = aggressive volume printed within 2 bp of the minute extreme."
+ },
+ "data": {
+  "segments": {"S1": "2021-01-01..2023-09-18, entries from 2021-03-01 (choose)", "S2": "2024-06-19..2025-10-20, entries from 2024-08-19 (report)"},
+  "never_read": ["2020 and earlier (IW1, IW0 spent)", "2023-09-19..2024-06-18 (validation/locked)", "2025-10-21 onwards"],
+  "boundary_months": "2023-09, 2024-06, 2025-10 downloaded as daily files for allowed days only",
+  "funding": "funding/*.csv from /mnt/project-files/data/alts_2021_2026_binance_um_15m_funding.zip (same as ADR 0045)"
+ },
+ "map": {
+  "profile": "At each window start, volume profile of the previous 24h of 1-minute bars (minute VWAP, quote volume), bin width 10 bp of the price at window start. POC = max bin, value area = 70% of volume grown from POC (larger neighbour first). VAH/VAL = value-area edges.",
+  "vwap": "Daily VWAP anchored at 00:00 UTC; rising = VWAP now > VWAP 30 minutes earlier.",
+  "prior_day": "Previous UTC day high and low.",
+  "htf_lows": "Higher lows on 15m = low of last completed 15m bar > low of the one before (mirror for shorts)."
+ },
+ "models": {
+  "TREND_NY": {
+   "window": "New entries 09:30-12:30 America/New_York (DST aware); all positions of this model closed at 16:00 New York.",
+   "direction": "Long only when price (last close) > VAH, daily VWAP rising and 15m higher lows; short mirror (< VAL, VWAP falling, lower highs). No lean -> no trade.",
+   "imbalance": "A 1-minute close beyond VAH (VAL) inside the window, not more than one value-area width beyond it. A later close back inside the value area cancels the breakout.",
+   "location": "Pullback after the breakout: a minute whose low <= VAH + 0.25*(VAH-VAL) while its close stays >= VAH (mirror for shorts).",
+   "validation": "Within the touch minute and the next 3 minutes, either absorption (sell_at_low_qv >= 2x its mean over the previous 60 minutes and close in the upper half of the minute range) or a delta flip (minute delta >= +0.15 right after a minute with delta < 0).",
+   "aggression_trigger": "Same minute as the validation or later within the 3 minutes: delta > 0, big_net > 0, close > open and close > VAH (full candle close beyond the level). Enter at the next minute open.",
+   "stop": "Lowest low since the location touch minus 2 bp; distance at least 0.10% (widened to 0.10%), skip if > 1.5%.",
+   "management": "Scratch: exit at next open if each of the 3 minutes after entry has delta < 0 and the 3rd close is below entry. Take 50% at +1R and move the stop to breakeven. After +1.5R trail the stop to the lowest low of the last 5 minutes (never loosen). Final target: VAH + (VAH-VAL), at least entry + 2R.",
+   "tier": "A (full risk) if the trigger minute big_net >= 0.20 and its quote volume >= 2x its 60-minute mean, else B (half risk)."
+  },
+  "MEANREV_LONDON": {
+   "window": "New entries 08:00-11:00 Europe/London (DST aware); positions of this model closed at 12:00 London.",
+   "failed_auction": "Price trades beyond VAH (minute high > VAH) and within 30 minutes a 1-minute close returns inside (close < VAH) (mirror at VAL).",
+   "validation": "At least one minute of the excursion shows absorption at the extreme: buy_at_high_qv >= 2x its 60-minute mean and close in the lower half of the minute range (mirror: sell_at_low_qv, upper half).",
+   "aggression_trigger": "The re-entry minute (or one of the next 2 minutes, still inside the value area) has delta < 0 and big_net < 0 (mirror > 0). Enter at the next minute open.",
+   "stop": "Excursion extreme + 2 bp; same distance bounds as TREND_NY.",
+   "management": "Target POC; skip if POC is less than 1R away. Take 50% at +1R and move the stop to breakeven; remainder at POC. Same scratch rule.",
+   "tier": "Same A/B rule."
+  }
+ },
+ "risk": {
+  "risk_per_trade": "0.25% of equity for tier A, 0.125% for tier B; position weight (notional / equity) = risk / stop distance, capped at 3.0.",
+  "one_position": "At most one open position in the whole book (he trades one instrument at a time).",
+  "daily": "Trading day = New York calendar date. Stop for the day after 3 losing trades (a scratch at a loss counts as a loss). Max 12 entries per day. After the day's closed P&L reaches +2R, only tier A trades are taken and at half risk.",
+  "weekly": "After two consecutive losing trading days, all risk is halved until the end of that ISO week.",
+  "news": "Not modelled (no economic calendar in the archive); listed as discretionary/missing."
+ },
+ "fills_and_costs": {
+  "entry": "Taker at the next minute open.",
+  "stop": "Exit at the stop price, or at the minute open if it gaps through; stop and target in the same minute -> stop first.",
+  "target": "Limit at the target price when the minute high (low) reaches it.",
+  "cost_rows": "Same 7 rows as ADR 0045 (measured, measured_x2, volume_scaled, assumed_public_v1, cost0, maker_both, maker_entry_taker_exit) via fast_short_dev.make_cost_fns; per side with the 15-minute quote volume of the 15 minutes before the fill and its 30-day mean. A partial exit pays exit cost on its share. Judged on 'measured'.",
+  "funding": "Positions pay/receive funding for every funding timestamp strictly inside (entry, exit]."
+ },
+ "trials": {
+  "VF1_TREND_NY": "TREND_NY model alone with the full risk rules",
+  "VF2_MEANREV_LONDON": "MEANREV_LONDON model alone with the full risk rules",
+  "VF3_FULL_VALENTINI": "Both models, one shared book and shared daily/weekly risk rules (the headline replication)",
+  "count": 3,
+  "context_id": "ALT15-1m-aggtrades-valentini-of-v1"
+ },
+ "judgement": {
+  "unchanged": "fast_short_dev.flag: S1 measured SR > expected max SR of N=3 trials, S1 alpha t >= 2, both S1 halves > 0, S2 SR > 0.5, S1 volume_scaled SR > 0, S1 trades >= 300. Daily series = exit-day P&L and entry/exit-day costs, as in ADR 0045. DSR against the cumulative trial count reported. No relaxation; any pass only becomes DEV_PROMISING and still needs a separate prereg and the user's explicit go for any confirmation window.",
+  "journal": "Every trade is written to a journal (time, symbol, model, tier, map levels, trigger flow numbers, exit reason, R multiple)."
+ },
+ "discretionary_not_modelled": [
+  "Reading the live footprint and tape 'feel' (how fast aggression arrives, pulling/stacking of resting orders); aggTrades shows executed volume only, no order book.",
+  "Choosing which instrument to trade that day and when the market is 'his' (he stands aside on days that do not fit).",
+  "News stand-aside around Tier-1 releases.",
+  "Judging balance vs imbalance from context (composite profiles, multi-day balance, LVN shape); here a fixed 24h profile.",
+  "Discretionary A/B/C grading beyond the two objective conditions; C tier not used.",
+  "Intraday adaptation after compression days; discretionary early exits beyond the scratch rule."
+ ]
+}
