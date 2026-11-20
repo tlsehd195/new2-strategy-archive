@@ -99,34 +99,66 @@ def fetch(sym: str, kind: str, stamp: str, tmp: Path, tries: int = 6):
     raise RuntimeError(f"download failed {url}")
 
 
-def parse(path: Path) -> dict:
-    """Columns price, qty, t, ibm as numpy arrays (streamed from the zip, only 4 columns kept)."""
+def batches(path: Path, t0: int, t1: int):
+    """Stream (price, qty, t, ibm) numpy batches from the zip, rows already filtered to [t0, t1]."""
     import pyarrow.csv as pc
     with zipfile.ZipFile(path) as z, z.open(z.namelist()[0]) as fh:
-        head = fh.peek(20)[:20] if hasattr(fh, "peek") else b""
+        has_header = fh.read(12).startswith(b"agg_trade_id")
+    names = ["a", "price", "quantity", "f", "l", "transact_time", "is_buyer_maker"]
+    ro = pc.ReadOptions(column_names=None if has_header else names, block_size=1 << 25)
+    co = pc.ConvertOptions(include_columns=["price", "quantity", "transact_time", "is_buyer_maker"])
     with zipfile.ZipFile(path) as z, z.open(z.namelist()[0]) as fh:
-        has_header = head.startswith(b"agg_trade_id")
-        names = ["a", "price", "quantity", "f", "l", "transact_time", "is_buyer_maker"]
-        ro = pc.ReadOptions(column_names=None if has_header else names, block_size=1 << 26)
-        co = pc.ConvertOptions(include_columns=["price", "quantity", "transact_time", "is_buyer_maker"])
-        tb = pc.read_csv(fh, read_options=ro, convert_options=co)
-    ibm = tb.column("is_buyer_maker")
-    ibm = ibm.to_numpy() if str(ibm.type) == "bool" else np.char.lower(ibm.to_numpy().astype(str)) == "true"
-    return {"price": tb.column("price").to_numpy().astype(float), "qty": tb.column("quantity").to_numpy().astype(float),
-            "t": tb.column("transact_time").to_numpy().astype(np.int64), "ibm": np.asarray(ibm, bool)}
+        for rb in pc.open_csv(fh, read_options=ro, convert_options=co):
+            t = rb.column("transact_time").to_numpy().astype(np.int64)
+            keep = (t >= t0) & (t <= t1)  # filter to DEV the moment it is parsed
+            if not keep.any():
+                continue
+            ibm = rb.column("is_buyer_maker")
+            ibm = (ibm.to_numpy(zero_copy_only=False) if str(ibm.type) == "bool"
+                   else np.char.lower(ibm.to_numpy(zero_copy_only=False).astype(str)) == "true")
+            yield (rb.column("price").to_numpy().astype(float)[keep], rb.column("quantity").to_numpy().astype(float)[keep],
+                   t[keep], np.asarray(ibm, bool)[keep])
 
 
-def aggregate(d: dict, big: float) -> dict:
-    """1-minute bars from time-sorted trade arrays, built one UTC day at a time (bounded memory)."""
-    o = np.argsort(d["t"], kind="stable")
-    t_all = d["t"][o]
-    day = t_all // 86_400_000
-    cuts = np.flatnonzero(np.r_[True, day[1:] != day[:-1], True])
-    parts = []
-    for a, b in zip(cuts[:-1], cuts[1:]):
-        idx = o[a:b]
-        parts.append(_agg_day(d["price"][idx], d["qty"][idx], t_all[a:b], d["ibm"][idx], big))
-    return {k: np.concatenate([p[k] for p in parts]) for k in FIELDS}
+def aggregate_stream(paths: list, t0: int, t1: int, big: float):
+    """1-minute bars from streamed batches; the last (possibly incomplete) minute of a batch is carried over.
+
+    Returns (bars, notional array for the month's 99.5th percentile, rows)."""
+    parts, notes, carry, rows = [], [], None, 0
+    for path in paths:
+        for p, q, t, ibm in batches(path, t0, t1):
+            notes.append((p * q))
+            rows += len(t)
+            if carry is not None:
+                p, q, t, ibm = (np.concatenate([c, x]) for c, x in zip(carry, (p, q, t, ibm)))
+            o = np.argsort(t, kind="stable")
+            p, q, t, ibm = p[o], q[o], t[o], ibm[o]
+            last = t[-1] // 60_000
+            cut = np.searchsorted(t // 60_000, last, "left")
+            carry = (p[cut:], q[cut:], t[cut:], ibm[cut:])
+            if cut > 0:
+                parts.append(_agg_day(p[:cut], q[:cut], t[:cut], ibm[:cut], big))
+    if carry is not None and len(carry[2]):
+        parts.append(_agg_day(*carry, big))
+    if not parts:
+        return None, None, 0
+    bars = {k: np.concatenate([x[k] for x in parts]) for k in FIELDS}
+    if np.any(np.diff(bars["t"]) <= 0):  # out-of-order rows across batches: merge duplicate minutes
+        bars = _merge(bars)
+    return bars, np.concatenate(notes), rows
+
+
+def _merge(bars: dict) -> dict:
+    import pandas as pd
+    df = pd.DataFrame(bars)
+    df["pv"] = df["vwap"].fillna(0) * df["qv"]
+    g = df.groupby("t", sort=True)
+    out = g.agg(open=("open", "first"), high=("high", "max"), low=("low", "min"), close=("close", "last"),
+                qv=("qv", "sum"), pv=("pv", "sum"), buy_qv=("buy_qv", "sum"), big_buy_qv=("big_buy_qv", "sum"),
+                big_sell_qv=("big_sell_qv", "sum"), n_trades=("n_trades", "sum"),
+                sell_at_low_qv=("sell_at_low_qv", "sum"), buy_at_high_qv=("buy_at_high_qv", "sum")).reset_index()
+    out["vwap"] = out["pv"] / out["qv"].where(out["qv"] > 0)
+    return {k: out[k].to_numpy() for k in FIELDS}
 
 
 def _agg_day(p, qty, t, ibm, big) -> dict:
@@ -172,34 +204,33 @@ def run_symbol(sym: str, out: str) -> dict:
             continue
         tmp = Path(out) / "_raw"
         tmp.mkdir(exist_ok=True)
-        frames = []
+        paths = []
         for kind, stamp in parts:
             path = fetch(sym, kind, stamp, tmp)
-            if path is None:
-                continue
-            d = parse(path)
-            path.unlink()
-            keep = (d["t"] >= t0) & (d["t"] <= t1)  # filter to DEV the moment it is parsed
-            frames.append({k: v[keep] for k, v in d.items()})
-            del d
-        n_rows = sum(len(f["t"]) for f in frames)
-        if n_rows == 0:
+            if path is not None:
+                paths.append(path)
+        if not paths:
             log["months"][ym] = "missing"
             continue
-        df = {k: np.concatenate([f[k] for f in frames]) for k in ("price", "qty", "t", "ibm")}
-        del frames
-        notional = df["price"] * df["qty"]
+        big = prev_q.get(seg)
+        if big is None:  # warm-up month: own 99.5th percentile (first pass)
+            notes = [(p * q) for path in paths for p, q, _t, _i in batches(path, t0, t1)]
+            big = float(np.quantile(np.concatenate(notes), BIG_Q)) if notes else float("inf")
+            del notes
+        bars, notional, n_rows = aggregate_stream(paths, t0, t1, big)
+        for path in paths:
+            path.unlink()
+        if bars is None:
+            log["months"][ym] = "missing"
+            continue
         own_q = float(np.quantile(notional, BIG_Q))
         del notional
-        big = prev_q.get(seg, own_q)
-        bars = aggregate(df, big)
         np.savez_compressed(target, **{k: np.asarray(v) for k, v in bars.items()})
         thr[ym] = {"segment": seg, "big_threshold_used": big, "q995_next": own_q,
                    "warmup_own_month": seg not in prev_q, "rows": int(n_rows), "minutes": int(len(bars["t"]))}
         prev_q[seg] = own_q
         thr_path.write_text(json.dumps(thr, indent=1))
         log["months"][ym] = n_rows
-        del df
     return log
 
 
