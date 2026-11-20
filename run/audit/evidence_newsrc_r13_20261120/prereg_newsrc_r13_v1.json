@@ -1,0 +1,29 @@
+{
+ "schema": "newsrc_r13_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "see git commit time (authoritative)",
+ "written_before_any_result": true,
+ "data_state_when_written": "No series below has been computed on alts. Rounds 1-12 (ADR 0096-0107) known, all NOT_PROMISING. The recommended 'continue' on the direction card is followed until an answer arrives.",
+ "requested_by": "동동, 2026-11-20 '기준을 통과하는 전략이 나올때까지 계속 돌려 멈추지 말고'. Round 13 of that loop.",
+ "dedupe_against_earlier_work": {
+  "already_tested_not_repeated": ["market-residual reversal (0051)", "cross-sectional short-term reversal and momentum ranks (many)", "beta and market-correlation change (0097, 0105)"],
+  "new_here": ["pairs trading on log-price spreads of the most correlated U50 pairs (new structure: many dollar-neutral two-name bets)", "peer-group relative reversal (peers = most correlated names, an industry stand-in)"]
+ },
+ "scope": "DEV only. No criteria change. A DEV_PROMISING flag only leads to a report to the user.",
+ "universe": "exactly ADR 0047/0096-0107 U50 (cut-off bar i-2)",
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "eval_from": "2021-04-12", "use": "decides"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "eval_from": "2024-09-30", "use": "report + fixed S2 > 0.5 condition"},
+  "rebalance": "every 14 days on the Monday grid; trade at open of day i; weights drift; real funding; ADR 0041 calibrated cost",
+  "never_read": [["2000-01-01", "2020-12-31"], ["2023-09-19", "2024-06-18"], ["2025-10-21", "2099-12-31"]],
+  "BTCUSDT": "not read in S2"
+ },
+ "trials": {
+  "PR1_PAIRS_K20_Z1_U50": "names with all 90 closes in cut-89..cut; rank all pairs by correlation of daily returns over cut-89..cut; take the top K=20 pairs; for each pair regress ln close_a on ln close_b with intercept over cut-89..cut, z = last residual / stdev of residuals; if z > 1.0 short a and long b, if z < -1.0 long a and short b, each leg 0.5/K; weights of all pairs are summed per name",
+  "PR2_PAIRS_K50_Z15_U50": "same as PR1 with K=50 and entry |z| > 1.5",
+  "PG1_PEER_REVERSAL_U50": "peers of each name = the 5 other U50 names with the highest daily-return correlation over cut-89..cut-14 (>= 60 valid pairs of days); signal = name's return close[cut]/close[cut-13]-1 minus the mean of its peers' same return; long the LOWEST quintile, short the HIGHEST (wide_universe_dev.pick)"
+ },
+ "n_trials": 3,
+ "decision_rule": "identical to ADR 0094/0096-0107; DSR N=3 and cumulative N, PBO CSCV-16 reported",
+ "after_result": "Variants are new trials needing a new prereg. Trial count +3 regardless."
+}
