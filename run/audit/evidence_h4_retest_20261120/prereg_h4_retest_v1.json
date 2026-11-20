@@ -1,0 +1,49 @@
+{
+ "schema": "h4_retest_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "2026-11-20T06:40Z",
+ "written_before_any_result": true,
+ "data_state_when_written": "the project 15m archive (data/alts_2021_2026_binance_um_15m_funding.zip) is unpacked in a scratch dir; no 4h bar, signal, return or P&L of any rule below has been computed",
+ "requested_by": "동동, 2026-11-20: '4시간으로 해봐' (after being told the base data is 15m and some tests aggregate to daily). Read as: resample the 15m data to 4h bars and test strategies whose signal and decisions are on 4h bars; fills still simulated on 15m bars.",
+ "question": "Do trend, mean-reversion, high/low-line + volume-spike and cross-sectional rules decided on 4h bars (fewer trades than 15m/1h, more samples than daily) earn more than the conservative measured cost on liquid Binance USDT-M alts in DEV?",
+ "scope": "DEV only. No validation, locked, paper or IW1 window. No criteria change, no prereg v2/v3 change. A DEV_PROMISING flag can only lead to a proposal of a NEW preregistered forward window, which needs the user's explicit go.",
+ "duplicates_checked": "ADR 0045 F4 (4-hourly cross-section, 1h/4h lookback, hold 4h), ADR 0045 F1/F2 (1h signals held 1h/4h), ADR 0046 (15m/1h hi/lo lines), ADR 0052 (1h decisions, 4h/12h holds) and ADR 0043 (daily hi/lo) are NOT repeated: every rule below is decided on a 4h bar close with 4h-bar lookbacks, and the cross-section family uses a 1-day hold, different from F4.",
+ "not_tested_and_why": "Scale-in (ADR 0088-0091) is not re-run on 4h: its wall is the cycle payoff ratio (~0.5, take-profit +10% vs liquidation tail), which a finer bar does not change, and it needs a separate tranche engine. A 4h scale-in would be a separate prereg if the user asks.",
+ "universe": {
+  "symbols": ["ADAUSDT", "AVAXUSDT", "BCHUSDT", "BNBUSDT", "DOGEUSDT", "LINKUSDT", "LTCUSDT", "NEARUSDT", "SOLUSDT", "TRXUSDT", "UNIUSDT", "XLMUSDT", "XMRUSDT", "XRPUSDT", "ZECUSDT"],
+  "why": "same 15 full-history alts as ADR 0045 (BTC/ETH are not in the archive; HYPE/SUI start too late)",
+  "survivorship_caveat": "today's survivors, not point in time: a negative result is robust, a positive one suspect. Stated in advance."
+ },
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "first_entry_from": "2021-03-01", "use": "the only segment that decides anything"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "first_entry_from": "2024-08-19", "use": "reported, used only in the fixed S2 > 0.5 condition"}
+ },
+ "never_read": [["2000-01-01", "2020-12-31", "IW1"], ["2023-09-19", "2024-06-18", "BTC validation/locked TEST + embargo, all symbols"], ["2025-10-21", "2099-12-31", "ETH validation/locked/paper + embargo, all symbols"]],
+ "bars": {
+  "h4": "UTC 4h bars 00-04, 04-08, ..., built from the 16 15m bars inside: open = first open, close = last close, high = max high, low = min low, quote volume = sum. A 4h bar with any of its 16 15m bars missing is missing (never filled).",
+  "decision": "at the close of a 4h bar (= close of the 15m bar opening at 03:45, 07:45, ..., 23:45), using 4h bars up to and including it",
+  "execution": "open of the next 15m bar (= open of the next 4h bar). Hold H 4h bars = 16 H 15m bars; exit at the 15m open 16 H bars later. P&L open-to-open plus settled funding. Fixed hold, no stop, no target.",
+  "positions": "the ADR 0045 engine (run/fast_short_dev.py simulate): one position per symbol (signals while held are ignored), weight 0.05, at most 20 open, ties by |score| then symbol name"
+ },
+ "families": {
+  "T1_breakout": {"rule": "close > max(high of the previous N 4h bars) -> long; close < min(low of the previous N) -> short (current bar excluded from the line)", "grid": {"N": [20, 60], "H": [6, 18]}, "ids": "T1_N{N}_H{H}", "configs": 4},
+  "T2_ema_cross": {"rule": "EMA(fast) and EMA(slow) of 4h closes (pandas ewm span, adjust=False, min_periods=slow); on the bar where sign(fast - slow) changes from the previous bar, enter in the new sign's direction", "grid": {"fast_slow": [[10, 40], [20, 80]], "H": [6, 18]}, "ids": "T2_f{fast}s{slow}_H{H}", "configs": 4},
+  "T3_overreaction_fade": {"rule": "r = ln(close/open) of the 4h bar; sigma = std of r over the previous 180 4h bars (30 days, current excluded, 180 required); z = r/sigma; |z| >= k -> trade against the move", "grid": {"k": [2.0, 3.0], "H": [1, 6]}, "ids": "T3_k{k}_H{H}", "configs": 4},
+  "T4_hilo_volume_fade": {"rule": "line H/L = max high / min low of the previous N 4h bars (current excluded); p = (close - L)/(H - L); v = quote volume / mean quote volume of the previous 42 4h bars; v >= 2 and p >= 0.9 -> short, v >= 2 and p <= 0.1 -> long (closes outside the line included)", "grid": {"N": [42, 180], "H": [6, 18]}, "ids": "T4_N{N}_H{H}", "configs": 4},
+  "T5_cross_section": {"rule": "every 6 4h bars from the first 4h bar of the segment (once a day at the 23:45 15m bar close, i.e. the 20-24 UTC 4h bar), with >= 8 symbols valid: score = ln(close_j / open of the 4h bar L-1 bars earlier) over L 4h bars; reversal: long 3 lowest, short 3 highest; momentum: the opposite; hold 6 4h bars (1 day), no overlap", "grid": {"L": [6, 42], "direction": ["reversal", "momentum"]}, "ids": "T5_{dir}_L{L}", "configs": 4}
+ },
+ "trials": "exactly 20 configs, each run once; recorded as 20 DEV evaluations in run/audit/dev_search_trials.jsonl under context ALT15-4h-retest-v1 and added to the cumulative count (12,196 before -> 12,216). Any change afterwards is a NEW trial.",
+ "cost": {
+  "decides": "measured alt cost record run/audit/alt_cost_measured_20261027/estimate_v3_alts.json (ESTIMATED_FROM_PUBLIC_DATA), taker at both ends (market orders), impact from the 15m bar before each fill, as ADR 0045",
+  "volume_scaled": "ADR 0041 calibrated cost; must keep S1 Sharpe > 0 (condition e)",
+  "limit_chase": "limit (maker) orders with chase of unfilled orders: measured cost x 0.70 per side (ADR 0049 R_B_matched; includes missed fills chased at market and adverse selection). Reported, with its own informational flag; does NOT decide.",
+  "reported_only": ["measured_x2", "assumed_public_v1", "cost0", "maker_both (2bp per side, perfect fills, UNVERIFIABLE optimistic bound)"],
+  "funding": "actual settled funding on every position held across a settlement"
+ },
+ "statistics": {
+  "unit": "daily returns on constant capital as ADR 0045 (gross booked on exit day, costs on fill days)",
+  "flag": "DEV_PROMISING only if under measured cost: (a) S1 annual Sharpe > expected max of 20 unskilled trials over the S1 length, (b) beta-adjusted alpha t >= 2, (c) both S1 halves > 0, (d) S2 Sharpe > 0.5, (e) S1 Sharpe under volume_scaled > 0, (f) >= 300 S1 trades. Otherwise NOT_PROMISING.",
+  "multiple_testing": "DSR (Bailey & Lopez de Prado) at N=20 and at cumulative N=12,216 with the cross-trial SR variance of these 20; PBO by CSCV with 16 partitions on the S1 daily measured-cost net returns of the 20; expected max Sharpe at N=20 and at cumulative N reported",
+  "power_stated_in_advance": "minimum annual Sharpe detectable with 80% power at Bonferroni 0.05/20 over S1 (~2.55 years) is (z(1-0.0025)+z(0.8))/sqrt(2.55) ~ 2.4. Same-time trades across 15 alts are correlated through the market (ADR 0059: few independent bets), so the effective sample is closer to days than trades. A true annual Sharpe of 0.5-1 would mostly come out NOT_PROMISING; a negative result means 'no strong edge visible after cost', not 'no edge'."
+ }
+}
