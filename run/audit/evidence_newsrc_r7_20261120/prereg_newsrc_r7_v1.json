@@ -1,0 +1,37 @@
+{
+ "schema": "newsrc_r7_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "see git commit time (authoritative; run/audit/PREREG_TIME_CORRECTION_20261120.md)",
+ "written_before_any_result": true,
+ "data_state_when_written": "Coin Metrics files are on disk (ADR 0099); their column volume_reported_spot_usd_1d (all 473 files) has never been read into a signal. CapMrktEstUSD was used only as supply growth and turnover/mcap (0099). Rounds 1-6 (ADR 0096-0101) known, all NOT_PROMISING.",
+ "requested_by": "동동, 2026-11-20 '기준을 통과하는 전략이 나올때까지 계속 돌려 멈추지 말고'. Round 7 of that loop.",
+ "dedupe_against_earlier_work": {
+  "already_tested_not_repeated": ["Binance spot vs perp volume (0096 V1/V2)", "size via perp quote volume (0040 N1)", "turnover/mcap (0099 TO1)", "rounds 1-6"],
+  "new_here": [
+   "all-exchange reported spot volume (Coin Metrics) vs Binance perp volume: where trading happens outside Binance perps",
+   "size by estimated market capitalisation (not by volume)",
+   "market-cap rank minus volume rank (attention relative to size)"
+  ]
+ },
+ "scope": "DEV only. No criteria change. A DEV_PROMISING flag only leads to a report to the user.",
+ "universe": "exactly ADR 0047/0096-0101 U50 (cut-off bar i-2); Coin Metrics asset mapping as ADR 0099; rows outside DEV segments never read",
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "eval_from": "2021-04-12", "use": "decides"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "eval_from": "2024-09-30", "use": "report + fixed S2 > 0.5 condition"},
+  "rebalance": "every 14 days on the Monday grid; trade at open of day i; weights drift; real funding",
+  "never_read": [["2000-01-01", "2020-12-31"], ["2023-09-19", "2024-06-18"], ["2025-10-21", "2099-12-31"]],
+  "BTCUSDT": "not read in S2"
+ },
+ "quintile_rule": "names of the universe with a signal; K = floor(n_with_signal / 5); need n_with_signal >= 10; equal weight 1/(2K) (as ADR 0099)",
+ "trials": {
+  "XS1_SPOTSHARE_LEVEL_U50": "ln(sum volume_reported_spot_usd_1d cut-27..cut / sum Binance perp quote volume cut-27..cut) (>= 20 days both > 0); long the HIGHEST (spot-led demand across venues)",
+  "XS2_SPOTSHARE_CHANGE_U50": "mean daily ln ratio over cut-6..cut minus over cut-34..cut-7 (>= 5 / >= 20 days); long the HIGHEST",
+  "SZ1_MCAP_SIZE_U50": "ln(mean CapMrktEstUSD cut-6..cut) (>= 5 days); long the LOWEST (small caps)",
+  "AT1_ATTENTION_U50": "rank of 30-day mean perp quote volume (1 = largest) minus rank of mean CapMrktEstUSD cut-6..cut, within names with both; long the LOWEST (traded little relative to size)"
+ },
+ "n_trials": 4,
+ "cost": "ADR 0041 calibrated cost 'cal' decides; cal_x2, cal_tail_x2 conditions; cost0 reference",
+ "decision_rule": "identical to ADR 0094/0096-0101; DSR N=4 and cumulative N, PBO CSCV-16 over the 4 S1 series reported",
+ "known_limits_written_before_results": "Coin Metrics community history may be revised (not point-in-time); reported spot volume includes venues with inflated volume.",
+ "after_result": "Variants are new trials needing a new prereg. Trial count +4 regardless."
+}
