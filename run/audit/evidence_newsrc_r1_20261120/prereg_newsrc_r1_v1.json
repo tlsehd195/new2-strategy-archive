@@ -1,0 +1,49 @@
+{
+ "schema": "newsrc_r1_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "2026-11-20T07:05Z",
+ "written_before_any_result": true,
+ "data_state_when_written": "No Binance spot kline file, no spot listing date and no premiumIndexKlines file has been downloaded or computed by this archive for these hypotheses. USDT-M daily klines (already spent by ADR 0035/0040/0047/0094) are being re-downloaded; no series of the hypotheses below has been computed. 180-day-high proximity on alts has never been computed in this archive.",
+ "requested_by": "동동, 2026-11-20 '기준을 통과하는 전략이 나올때까지 계속 돌려 멈추지 말고' (repeat preregistered DEV rounds with new information sources / structures, no relaxation of criteria). This is round 1 of that loop.",
+ "dedupe_against_earlier_work": {
+  "already_tested_not_repeated": [
+   "28d cross-sectional momentum, 7d reversal, funding carry (7d funding level), low vol, taker flow, size, volume shock, MAX (ADR 0035/0040/0041/0047)",
+   "market-residual signals (0051), 101 Alphas (0054), metrics OI / long-short ratios (0094), time-series momentum (0094)",
+   "new perp listing short (0060), spot-index/perp basis harvest as carry (0060), cash-and-carry / funding carry / pairs / settlement timing (0020)",
+   "hi/lo lines + volume spikes on 15m/1h/4h/daily single-name timing (0043/0046/0095), calendar seasonality BTC/ETH (X10)"
+  ],
+  "new_here": [
+   "180-day-high proximity (anchoring, George-Hwang style) as a cross-sectional rank on alts",
+   "Binance SPOT volume as an information source: perp/spot quote-volume ratio level and its change (leverage-driven vs spot-driven trading) -- spot data never used before",
+   "premium index (perp vs index) change = basis momentum cross-section on alts (only the level/carry and harvest were tested; C1 basis momentum prereg of 2026-10-12 was BTC/ETH only)",
+   "event: Binance SPOT listing of a coin that already trades as a USDT-M perp (sell-the-news short), never tested (0060 was the perp listing itself)"
+  ]
+ },
+ "scope": "DEV only. No validation, locked, paper or IW1 window. No criteria change. A DEV_PROMISING flag only leads to a report to the user; any forward window needs the user's explicit go.",
+ "universe": {
+  "rule": "exactly ADR 0047/0094: every USDT-quoted symbol of the public Binance USDT-M archive incl. delisted; at rebalance day i cut-off = bar i-2; eligible = >=60 daily bars, open at day i, 30-day mean quote volume >= 2,000,000 USDT; ranked desc; U50 = ranks 1..50, W200 = ranks 1..200",
+  "spot_mapping": "spot symbol = perp symbol with a leading '1000000', '1000' or '1M' unit prefix removed (e.g. 1000PEPEUSDT -> PEPEUSDT); a perp with no spot USDT pair in the spot archive has no V signal (excluded from V ranks, never imputed)"
+ },
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "use": "the only segment that decides anything"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "use": "reported, and used only in the fixed S2 > 0.5 condition"},
+  "rebalance": "cross-sectional trials rebalance every 14 days on the Monday grid of wide_universe_dev.rebalance_days (anchor S1 2021-03-01, S2 2024-08-19); signal at bar i-2, trade at the open of day i, weights drift between rebalances, real funding",
+  "P_family_eval_start": "first grid day whose cut-179 is inside the segment: S1 from 2021-07-05 or the first grid day after, S2 from 2024-12-16 or the first grid day after",
+  "never_read": [["2000-01-01", "2020-12-31"], ["2023-09-19", "2024-06-18"], ["2025-10-21", "2099-12-31"]],
+  "BTCUSDT": "not read in S2"
+ },
+ "trials": {
+  "P1_HIGH180_U50": "signal = close[cut] / max(close[cut-179..cut]); quintile long-short (wide_universe_dev.pick), long the names nearest their 180-day high, short the farthest; U50",
+  "P1_HIGH180_W200": "same on W200",
+  "V1_PERPSPOT_LEVEL_U50": "signal = ln(sum perp quote volume cut-27..cut / sum spot quote volume cut-27..cut), needs >=20 spot days; long the LOWEST quintile (spot-driven), short the highest (leverage-driven); U50",
+  "V2_PERPSPOT_CHANGE_U50": "signal = mean daily ln(perp qv/spot qv) over cut-6..cut minus mean over cut-34..cut-7 (>=5 and >=20 valid days); long the lowest quintile (falling leverage share), short the highest; U50",
+  "B1_PREMIUM_MOM_U50": "signal = mean daily premium-index close over cut-6..cut minus mean over cut-34..cut-7 (>=5 and >=20 days); long the lowest quintile, short the highest (rising basis = crowding unwinds); U50",
+  "E1_SPOTLIST_SHORT_H7": "event: first day L of the spot USDT pair in the spot archive where the perp already had >=30 daily bars before L and the perp is eligible (>=2M 30d volume) at L+1; short the perp at the open of L+1, cover at the open of L+8; each event weight -0.10 of capital (fixed, no compounding), concurrent events add; events where L+1 or L+8 falls outside an allowed segment are dropped",
+  "E1_SPOTLIST_SHORT_H28": "same with cover at the open of L+29"
+ },
+ "n_trials": 7,
+ "cost": "ADR 0041 calibrated cost (wide_universe_dev.side_cost row 'cal', ESTIMATED from measured books, volume-scaled) on every weight change incl. event entry and exit; rows cal_x2 and cal_tail_x2 are conditions; cost0 is reference only",
+ "decision_rule": "identical to ADR 0094: DEV_PROMISING only if S1 annual SR (cal) > expected max SR of 7 null trials, market alpha t >= 2 (market = equal-weight U50 daily return), both S1 halves SR > 0, S2 SR > 0.5, S1 SR > 0 under cal_x2 and cal_tail_x2. Event trials: the daily P&L series over the whole segment (days with no open event = 0). Event trials with fewer than 20 S1 events are INSUFFICIENT_EVENTS = NOT_PROMISING. Everything else NOT_PROMISING. Also reported, not relaxing anything: DSR at N=7 and cumulative N, PBO CSCV-16 over the 5 cross-sectional trials on their common S1 span, null max at cumulative N.",
+ "power_note_written_before_results": "14-day rebalance gives about 60 S1 decisions (P family about 50). Even so, the minimum detectable annual SR at 80% power, Bonferroni 0.05/7, over 2.2-2.7 years is about 2.0-2.2; at cumulative N (~12,200 trials) the null max is about 2.4-2.7. Small true effects (SR 0.5-1) will mostly read NOT_PROMISING.",
+ "after_result": "Any variant (other lookback, hold, quintile, direction, universe) is a NEW trial needing a new prereg. Trial count +7 regardless of result."
+}
