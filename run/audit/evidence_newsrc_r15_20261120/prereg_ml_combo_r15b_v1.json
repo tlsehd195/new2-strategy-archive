@@ -1,0 +1,42 @@
+{
+ "schema": "ml_combo_r15b_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper, IW0 or IW1 data)",
+ "written": "see git commit time (authoritative)",
+ "written_before_any_result": true,
+ "data_state_when_written": "No feature, label or model output has been computed. Round 15 (prereg_newsrc_r15_v1.json, 3 trials) is committed and not yet run.",
+ "requested_by": "동동, 2026-11-20 12:15 UTC: combine reinforcement, supervised and unsupervised learning ('강화학습 지도학습 비지도학습 ... 3개를 종합'). Coordinator conditions: train on earlier data, confirm on later data, keep criteria and trial correction, RL last with cost in the reward, do not repeat ADR 0050's k-means regime filter the same way.",
+ "not_possible_as_asked": "Training BTC 'from the very beginning' would read IW0 (2017-19, spent), IW1 (2020), validation/locked windows and BTC in S2. Not done. U50 alts inside DEV segments only.",
+ "dedupe_against_earlier_work": {
+  "already_tested_not_repeated": ["k-means regime classifier trained on S1 and used as an on/off filter (0050)", "single hand-made cross-sectional signals (0035/0040/0047/0096-0109)"],
+  "new_here": ["walk-forward supervised model that combines 8 known features into one rank forecast", "unsupervised market-state clusters used only as the RL state (not as a filter)", "RL (offline tabular, contextual-bandit form) that sizes exposure of the supervised portfolio with cost in the reward"]
+ },
+ "scope": "DEV only. No criteria change. A DEV_PROMISING flag only leads to a report to the user. No retuning after the result.",
+ "universe": "exactly ADR 0047/0096-0109 U50 (cut-off bar i-2), recomputed at every rebalance and at every training sample day",
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "eval_from": "2021-04-12", "use": "decides"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "eval_from": "2024-09-30", "use": "report + fixed S2 > 0.5 condition"},
+  "rebalance": "every 7 days on the engine Monday grid (hold = 7); trade at open of day i; real funding; ADR 0041 calibrated cost",
+  "never_read": [["2000-01-01", "2020-12-31"], ["2023-09-19", "2024-06-18"], ["2025-10-21", "2099-12-31"]],
+  "BTCUSDT": "not read in S2"
+ },
+ "walk_forward": {
+  "sample_days": "every 7th day of the engine grid of each segment, starting at the first grid-aligned day with index >= 35",
+  "label": "for sample day s: cross-sectional centred percentile rank of open[s+7]/open[s]-1 over U50(s)",
+  "usable_at_rebalance_i": "only samples with s + 7 <= i - 2 (label fully observed before the cut-off). In S2 all S1 samples are also usable (earlier DEV data); nothing from the never-read ranges.",
+  "refit": "at every rebalance, on all usable samples; flat if fewer than 8 usable sample weeks",
+  "features_at_cut": "cross-sectional centred percentile ranks over U50 of: r1 (close cut / close cut-1 - 1), r7, r28, vol28 (std of daily close returns cut-27..cut), volume shock ln(mean qv cut-6..cut / mean qv cut-34..cut-7), taker-buy share 7d (sum tbq / sum qv), funding sum 7d (cut-6..cut), MAX28 (largest daily close return cut-27..cut); missing rank -> 0"
+ },
+ "models": {
+  "supervised": "ridge regression without intercept, beta = (X'X + 10 I)^-1 X'y on stacked (coin, sample) rows; prediction = X_cut beta",
+  "unsupervised": "k-means k=3 (numpy, k-means++ init with seed 0, 100 iterations) on z-scored market state per sample day: U50 equal-weight 7d and 28d return, mean vol28, cross-sectional std of r7; z-score uses usable samples only; clusters relabelled by ascending mean 28d return; refit at every rebalance",
+  "rl": "offline tabular RL with exogenous states (reduces to a contextual bandit, gamma = 0, stated). State = (cluster 0-2, sign of the ML1 portfolio's gross return in the last completed sample week: up/down) = 6 states. Actions = exposure {0, 0.5, 1} of the ML1 portfolio. Reward for sample week s and action a = a x (gross 7d open-to-open return of the walk-forward ML1 portfolio formed at s - 0.0030), i.e. 30bp per week per unit exposure for cost (calibrated full weekly turnover 2 x ~15bp). Q(state, a) = mean reward over usable samples in that state; choose argmax, ties -> smaller exposure; fewer than 4 samples in the state -> 0.5. Gross <= 1 so liquidation is not reachable; stated."
+ },
+ "trials": {
+  "ML1_SUP_U50": "long the highest quintile of the ridge prediction, short the lowest (wide_universe_dev.pick, long_top=True)",
+  "ML2_COMBO_U50": "ML1 weights x RL exposure chosen for the current state (cluster at cut, sign of ML1's last completed sample week)"
+ },
+ "n_trials": 2,
+ "context_id": "U50-7d-ml-combo-r15b-v1",
+ "decision_rule": "identical to ADR 0094/0096-0109 (newsrc_engine.flag); DSR N=2 and cumulative N, PBO CSCV-16 reported.",
+ "after_result": "Trial count +2 regardless. No variants (other models, features, horizons) in this thread; if nothing passes, report NOT_PROMISING and stop."
+}

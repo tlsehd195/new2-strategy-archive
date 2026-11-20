@@ -1,0 +1,45 @@
+{
+ "schema": "newsrc_r15_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper, IW0 or IW1 data)",
+ "written": "see git commit time (authoritative)",
+ "written_before_any_result": true,
+ "data_state_when_written": "Only the header line of Coin Metrics csv/btc.csv was looked at (HashRate column present). No hash-rate value, no return series of any trial has been computed. Rounds 1-14 (ADR 0096-0109) all NOT_PROMISING; IW0 spent (ADR 0111); forward paper of CL1/FIP1/AF1 kept running (ADR 0112) and is not touched.",
+ "requested_by": "동동, 2026-11-20 12:20 UTC '현재까지 검증해본 전략을 제외한 다른 전략을 찾아서 검증해봐'. Round 15: candidates collected from external literature/community sources, one fixed set, then stop.",
+ "sources": {
+  "HR1": "Charles Edwards (Capriole), 'Hash Ribbons & Bitcoin Bottoms', Medium 2019-10-30: 1-month SMA of BTC hash rate crossing above 2-month SMA marks the end of miner capitulation (buy).",
+  "SE1": "Long, Zaremba, Demir, Szczygielski, Vasenin, 'Seasonality in the cross-section of cryptocurrency returns', Finance Research Letters 35 (2020) 101566: coins with high past same-weekday returns outperform on that weekday.",
+  "EX1": "Quantpedia (C. Dujava), 'Cryptocurrency Market Dynamics Around Bitcoin Futures Expiration Events', 2024-03-27: around the CME expiry (last Friday of the month) hold the Thursday before, the weekend and Monday after, avoid the expiry day itself."
+ },
+ "dedupe_against_earlier_work": {
+  "already_tested_not_repeated": ["TS momentum / MA timing (0094 L1/L2, 0095 T2)", "on-chain supply, MVRV, active addresses (0099)", "ETH on-chain timing (0103)", "stablecoin supply timing (0109)", "weekend momentum (0104)", "session momentum (0101)", "calendar/session seasonality of BTC/ETH single names (X10)", "short-term reversal/momentum ranks (many)", "pairs (0108)"],
+  "new_here": ["BTC network hash rate (miner capitulation) as timing of the alt index", "cross-sectional same-weekday seasonality (rank by past returns on the same weekday)", "monthly futures-expiry calendar window"]
+ },
+ "screened_out_before_testing": {
+  "halving clock (Molnar 2026, SSRN 6977940)": "3-4 events in all history, none decidable inside DEV segments",
+  "Puell multiple, NVT signal, Mayer multiple": "derived from BTC price (BTC is not read in S2) and are price/MA ratios, i.e. TS momentum already tested",
+  "funding-settlement hour price pressure": "15m round trips; ADR 0045 cost wall (26.6bp) far above reported effects",
+  "options VRP / skew": "Deribit blocked from here, Binance BVOL starts 2023-06 (no S1)",
+  "liquidation cascades": "only 2 days of liquidation data",
+  "exchange flows, social sentiment, Google Trends, token unlocks": "sources blocked or no history; attention tested in 0102",
+  "Hash Ribbon variant with 10/20-day BTC price SMA filter": "needs BTC price in S2"
+ },
+ "scope": "DEV only. No criteria change. A DEV_PROMISING flag only leads to a report to the user. No variants after the result; the round ends whatever the outcome.",
+ "universe": "exactly ADR 0047/0096-0109 U50 (cut-off bar i-2), recomputed at every rebalance",
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "eval_from": "2021-04-12", "use": "decides"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "eval_from": "2024-09-30", "use": "report + fixed S2 > 0.5 condition"},
+  "rebalance": "DAILY (hold = 1) from the first Monday of the eval range; trade at open of day i; real funding; ADR 0041 calibrated cost on every weight change. For the two timing trials, when the rule stays on and the U50 set is unchanged the drifted holdings are kept (no re-weighting trade).",
+  "never_read": [["2000-01-01", "2020-12-31"], ["2023-09-19", "2024-06-18"], ["2025-10-21", "2099-12-31"]],
+  "BTCUSDT": "not read in S2 (Coin Metrics BTC HashRate is a network series, not a BTC price)",
+  "hashrate_rows": "only rows dated inside the segment read range; value for day d is the Coin Metrics row dated d; only days <= cut"
+ },
+ "trials": {
+  "HR1_HASHRIBBON_U50": "H = Coin Metrics btc HashRate. SMA30 and SMA60 of H over days cut-29..cut and cut-59..cut (>= 25 and >= 50 valid values). If SMA30 > SMA60 hold the equal-weight U50 long (1/n each), else flat.",
+  "SE1_SAMEWEEKDAY_U50": "For trading day i with weekday w: signal = mean of open-to-open daily returns r_d (open d+1 / open d - 1) over days d <= cut, d >= i-364, weekday(d) = w (>= 12 values). Long the HIGHEST quintile, short the LOWEST (wide_universe_dev.pick, long_top=True). Rebalanced every day.",
+  "EX1_EXPIRY_WINDOW_U50": "F = last Friday of the calendar month (UTC, no holiday adjustment). Hold the equal-weight U50 long on days Thursday F-1, Saturday F+1, Sunday F+2, Monday F+3 (each day = open of that day to open of the next); flat on every other day including F."
+ },
+ "n_trials": 3,
+ "context_id": "U50-1d-newsrc-r15-v1",
+ "decision_rule": "identical to ADR 0094/0096-0109 (newsrc_engine.flag): S1 SR > expected max of 3 null trials, alpha t >= 2, both S1 halves > 0, S2 > 0.5, S1 cal_x2 > 0 and cal_tail_x2 > 0; DSR N=3 and cumulative N, PBO CSCV-16 reported.",
+ "after_result": "Trial count +3 regardless. If nothing passes: report NOT_PROMISING and stop (no further rounds in this thread)."
+}
