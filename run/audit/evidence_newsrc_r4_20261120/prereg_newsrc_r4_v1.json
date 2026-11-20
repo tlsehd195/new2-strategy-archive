@@ -1,0 +1,41 @@
+{
+ "schema": "newsrc_r4_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "2026-11-20T08:45Z",
+ "written_before_any_result": true,
+ "data_state_when_written": "Coin Metrics community data (github.com/coinmetrics/data, csv/<asset>.csv, last commit 2026-05-24) downloaded for the 473 of 490 ever-W200 perps whose base asset has a file. Only the column headers were counted (CapMrktEstUSD in 392 files, ReferenceRateUSD 442, AdrActCnt 55, CapMVRVCur 52, exchange flows 2). No value of any column has been read into a signal or compared with returns.",
+ "requested_by": "동동, 2026-11-20 '기준을 통과하는 전략이 나올때까지 계속 돌려 멈추지 말고'. Round 4 of that loop.",
+ "dedupe_against_earlier_work": {
+  "already_tested_not_repeated": ["size via quote volume (0040 N1)", "volume shock (0040), metrics OI (0094)", "rounds 1-3 (0096-0098)", "token unlock schedules were 'absent' in ADR 0060: this is the first supply series"],
+  "new_here": [
+   "first on-chain / fundamental source in this archive: Coin Metrics community data",
+   "implied circulating supply = CapMrktEstUSD / ReferenceRateUSD; its growth = token issuance / unlock / inflation proxy",
+   "speculative turnover = perp quote volume / market cap",
+   "active address growth and MVRV for the subset of chains that have them"
+  ]
+ },
+ "scope": "DEV only. No criteria change. A DEV_PROMISING flag only leads to a report to the user.",
+ "universe": "exactly ADR 0047/0096-0098 (U50/W200 by 30-day mean perp quote volume >= 2M USDT, >=60 bars, cut-off bar i-2). Coin Metrics asset = perp base with a leading 1000/1000000/1M prefix removed, lowercased (coinmetrics_map.json); only rows dated inside the DEV segments are read",
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "eval_from": "2021-04-12", "use": "decides"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "eval_from": "2024-09-30", "use": "report + fixed S2 > 0.5 condition"},
+  "rebalance": "every 14 days on the Monday grid; trade at open of day i; weights drift; real funding",
+  "never_read": [["2000-01-01", "2020-12-31"], ["2023-09-19", "2024-06-18"], ["2025-10-21", "2099-12-31"]],
+  "BTCUSDT": "not read in S2"
+ },
+ "quintile_rule": "names of the universe with a signal; K = floor(n_with_signal / 5); need n_with_signal >= 10 (else flat); equal weight 1/(2K) per name",
+ "trials": {
+  "SI1_SUPPLY28_U50": "ln(supply[cut] / supply[cut-28]), supply = CapMrktEstUSD / ReferenceRateUSD (both > 0); long the LOWEST growth, short the highest",
+  "SI2_SUPPLY90_U50": "same with cut-89",
+  "SI2_SUPPLY90_W200": "same on W200",
+  "TO1_TURNOVER_MCAP_U50": "ln(mean perp quote volume cut-27..cut / mean CapMrktEstUSD cut-27..cut) (>= 20 days); long the LOWEST",
+  "AA1_ACTIVE_ADDR_U50": "ln(mean AdrActCnt cut-27..cut / mean AdrActCnt cut-55..cut-28) (>= 20 days each); long the HIGHEST",
+  "MV1_MVRV_U50": "CapMVRVCur at cut (latest value within 3 days); long the LOWEST"
+ },
+ "n_trials": 6,
+ "cost": "ADR 0041 calibrated cost 'cal' decides; cal_x2, cal_tail_x2 conditions; cost0 reference",
+ "decision_rule": "identical to ADR 0094/0096-0098; DSR N=6 and cumulative N, PBO CSCV-16 over the 6 S1 series reported",
+ "known_limits_written_before_results": "Coin Metrics community history may be revised after the fact (not point-in-time); market cap estimate and supply can be backfilled. A DEV_PROMISING here would need a point-in-time forward check before anything else. AA1/MV1 cover about 50 chains of 490 names, so their universe-with-signal is small.",
+ "power_note_written_before_results": "about 64 S1 rebalances over 2.4 years; MDE at 80% (Bonferroni 0.05/6) about 2.1; cumulative-N null max about 2.5",
+ "after_result": "Variants are new trials needing a new prereg. Trial count +6 regardless."
+}
