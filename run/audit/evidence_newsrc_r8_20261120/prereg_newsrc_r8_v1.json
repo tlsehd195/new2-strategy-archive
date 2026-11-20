@@ -1,0 +1,30 @@
+{
+ "schema": "newsrc_r8_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "see git commit time (authoritative)",
+ "written_before_any_result": true,
+ "data_state_when_written": "Coin Metrics eth.csv is on disk (ADR 0099); its columns CapMVRVCur, FlowInExNtv, FlowOutExNtv, SplyExNtv, AdrActCnt, FeeTotNtv have never been read into a signal for timing. Only eth.csv and btc.csv carry exchange flows. btc.csv is not used (BTC is not read in S2). Rounds 1-7 (ADR 0096-0102) known, all NOT_PROMISING.",
+ "requested_by": "동동, 2026-11-20 '기준을 통과하는 전략이 나올때까지 계속 돌려 멈추지 말고'. Round 8 of that loop.",
+ "dedupe_against_earlier_work": {
+  "already_tested_not_repeated": ["cross-sectional MVRV / active addresses (0099)", "aggregate funding and quarterly-basis timing (0098 AF1, 0100 QB1)", "regime classifiers on price (0044/0050)", "vol-managed index (0097)"],
+  "new_here": ["on-chain market timing of the alt index from Ethereum fundamentals: valuation (MVRV), exchange net flows, exchange-held supply, network activity"]
+ },
+ "scope": "DEV only. No criteria change. A DEV_PROMISING flag only leads to a report to the user.",
+ "position": "when ON: long every U50 name equally (gross 1); when OFF: flat. Decided at cut (bar i-2) on the 14-day Monday grid, traded at the open of day i; weights drift; real funding; ADR 0041 calibrated cost",
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "eval_from": "2021-07-05", "use": "decides"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "eval_from": "2024-12-16", "use": "report + fixed S2 > 0.5 condition"},
+  "never_read": [["2000-01-01", "2020-12-31"], ["2023-09-19", "2024-06-18"], ["2025-10-21", "2099-12-31"]],
+  "BTCUSDT": "not read in S2; btc.csv not read at all"
+ },
+ "trials": {
+  "OC1_ETH_MVRV_TIMING": "ON when ETH CapMVRVCur at cut <= its median over cut-179..cut (>= 120 values)",
+  "OC2_ETH_NETFLOW_TIMING": "net = FlowInExNtv - FlowOutExNtv; ON when the 7-day sum ending at cut <= the median of the same 7-day sums over cut-179..cut (net outflow regime)",
+  "OC3_ETH_EXSUPPLY_TIMING": "ON when ln(SplyExNtv[cut] / SplyExNtv[cut-28]) < 0 (supply on exchanges falling)",
+  "OC4_ETH_ACTIVITY_TIMING": "ON when ln(mean AdrActCnt cut-27..cut / mean AdrActCnt cut-55..cut-28) > 0 (network activity rising)"
+ },
+ "n_trials": 4,
+ "decision_rule": "identical to ADR 0094/0096-0102 (alpha t vs EW U50 market matters most for a timing rule); DSR N=4 and cumulative N, PBO CSCV-16 reported",
+ "known_limits_written_before_results": "Timing rules are one directional bet at a time: about 58 decisions in S1 and effectively one independent name; MDE about 2.1. Coin Metrics history may be revised.",
+ "after_result": "Variants are new trials needing a new prereg. Trial count +4 regardless."
+}

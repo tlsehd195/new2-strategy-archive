@@ -1,0 +1,34 @@
+{
+ "schema": "newsrc_r9_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "see git commit time (authoritative)",
+ "written_before_any_result": true,
+ "data_state_when_written": "No series below has been computed. Rounds 1-8 (ADR 0096-0103) known, all NOT_PROMISING. Checked before writing (count only, no returns): funding-interval switches 8h -> 4/2/1h occur 11 times in S1 (10 names), too few for an event test, so that idea is not run and not counted.",
+ "requested_by": "동동, 2026-11-20 '기준을 통과하는 전략이 나올때까지 계속 돌려 멈추지 말고'. Round 9 of that loop.",
+ "dedupe_against_earlier_work": {
+  "already_tested_not_repeated": ["size/volume (0040, 0102)", "momentum/reversal/session momentum (0035/0047/0101)", "new-listing short (0060) is an event at listing day only"],
+  "new_here": [
+   "listing age (days since the first USDT-M daily bar in the archive) as a cross-sectional rank",
+   "large-to-small lead-lag (Hou 2007): last 7-day return of the 10 largest names times the equal-weight next-40 basket",
+   "weekend momentum: sum of Saturday+Sunday returns over the last 8 weekends"
+  ]
+ },
+ "scope": "DEV only. No criteria change. A DEV_PROMISING flag only leads to a report to the user.",
+ "universe": "exactly ADR 0047/0096-0103 (U50/W200, cut-off bar i-2); age is counted from the first daily bar of the symbol in the whole public archive listing month (first monthly file), using only that first date",
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "eval_from": "2021-04-12", "use": "decides"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "eval_from": "2024-09-30", "use": "report + fixed S2 > 0.5 condition"},
+  "rebalance": "every 14 days on the Monday grid; trade at open of day i; weights drift; real funding; ADR 0041 calibrated cost",
+  "never_read": [["2000-01-01", "2020-12-31"], ["2023-09-19", "2024-06-18"], ["2025-10-21", "2099-12-31"]],
+  "BTCUSDT": "not read in S2"
+ },
+ "trials": {
+  "AG1_AGE_U50": "age in days at cut = cut day minus the symbol's first daily bar date (from the daily files on disk; a first bar before 2021-01-01 counts as 2021-01-01 minus nothing: age is then the segment-relative lower bound, flagged); wide_universe_dev.pick quintile, long the OLDEST",
+  "AG2_AGE_W200": "same on W200",
+  "LL1_LEADLAG_U50": "L = equal-weight 7-day return (cut-6..cut close-to-close) of U50 ranks 1-10; if L > 0 long ranks 11-50 equally (gross 1), else flat",
+  "WK1_WEEKEND_MOM_U50": "sum of close-to-close returns on Saturdays and Sundays (UTC day of the return) over the last 56 days cut-55..cut (>= 12 valid); quintile, long the HIGHEST"
+ },
+ "n_trials": 4,
+ "decision_rule": "identical to ADR 0094/0096-0103; DSR N=4 and cumulative N, PBO CSCV-16 reported",
+ "after_result": "Variants are new trials needing a new prereg. Trial count +4 regardless."
+}
