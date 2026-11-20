@@ -12,10 +12,10 @@ Read status: INVENTORIED = header, imports, paths and risk patterns scanned (not
 | DUPLICATE_RESEARCH | superseded by a later tool for the same hypothesis | 1 |
 | RETIRED_OR_ON_HOLD | retired v1 execution path (LEGACY_SCRIPTS.md) or on hold | 43 |
 | NEEDS_MORE_DATA | hypothesis needs a dataset the repository does not have | 21 |
-| TEST | test file of a run/ tool | 43 |
-| NOT_SURVEYED | not surveyed | 21 |
+| TEST | test file of a run/ tool | 44 |
+| NOT_SURVEYED | not surveyed | 22 |
 
-Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 85
+Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 87
 
 | file | lines | class | read status | reason | flags |
 |---|---|---|---|---|---|
@@ -102,6 +102,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 85
 | `n2_maker_exec_diag.py` | 389 | NEEDS_MORE_DATA | LOGIC_TRACED | maker execution layer needs queue / order-book history; maker cost estimated by maker_entry_estimate.py; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=1 |
 | `newlisting_short_dev.py` | 288 | KEPT_INDEPENDENT | LOGIC_TRACED | new-listing short event study (ADR 0060); funding read per DEV segment since ADR 0066 — traced: load_symbol (segment filter), fund_sum (read 2021-01..2025-10 incl. the never-read gap) | neg_shift=1 |
 | `newsrc_engine.py` | 241 | NOT_SURVEYED | LOGIC_TRACED | no rule — new file | neg_shift=1 |
+| `newsrc_r10_dev.py` | 98 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `newsrc_r1_dev.py` | 527 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1 |
 | `newsrc_r2_dev.py` | 133 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `newsrc_r3_dev.py` | 156 | NOT_SURVEYED | TESTED | no rule — new file |  |
@@ -149,6 +150,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 85
 | `test_maker_lowloss.py` | 113 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_maker_rescore.py` | 43 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r1.py` | 70 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_newsrc_r10.py` | 33 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r2.py` | 57 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r3.py` | 52 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r4.py` | 41 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |

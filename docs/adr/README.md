@@ -108,3 +108,4 @@
 | [0102](0102-new-sources-round7-cm-spot-volume-share-mcap-attention.md) | 반복 탐색 7라운드 4건(여러 거래소 현물 거래대금 비중 수준·변화, 시가총액 규모, 관심도 격차): 모두 NOT_PROMISING; 사전등록 작성 시각 정정은 `run/audit/PREREG_TIME_CORRECTION_20261120.md` | Accepted (측정) |
 | [0103](0103-new-sources-round8-eth-onchain-timing.md) | 반복 탐색 8라운드 4건(이더리움 온체인 MVRV·거래소 순유출·거래소 공급·활성 주소로 알트 지수 타이밍): 모두 NOT_PROMISING; 순유출 신호는 S1·S2 모두 음수 | Accepted (측정) |
 | [0104](0104-new-sources-round9-age-leadlag-weekend.md) | 반복 탐색 9라운드 4건(상장 경과일 U50/W200, 대형→소형 선행 타이밍, 주말 모멘텀): 모두 NOT_PROMISING; 펀딩 주기 변경 이벤트는 S1 11건이라 시험 안 함 | Accepted (측정) |
+| [0105](0105-new-sources-round10-volterm-corrchange-pricevolume-obv.md) | 반복 탐색 10라운드 4건(단기/장기 변동성 비, 시장 상관 변화, 가격·거래량 상관, OBV 괴리): 모두 NOT_PROMISING, S1 전부 음수 | Accepted (측정) |
