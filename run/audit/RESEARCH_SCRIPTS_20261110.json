@@ -1322,6 +1322,22 @@
   "flags": {}
  },
  {
+  "file": "newsrc_r14_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 157,
+  "doc": "Round 14 of the repeated new-source search, DEV only (ADR 0109).",
+  "adr": [
+   "109"
+  ],
+  "flags": {
+   "network": 2
+  }
+ },
+ {
   "file": "newsrc_r1_dev.py",
   "class": "NOT_SURVEYED",
   "reason": "no rule — new file",
@@ -2048,6 +2064,20 @@
   "doc": "Tests for round 13 of the new-source search (ADR 0108). Needs numpy and pandas.",
   "adr": [
    "108"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_newsrc_r14.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 44,
+  "doc": "Tests for round 14 of the new-source search (ADR 0109). Needs numpy and pandas.",
+  "adr": [
+   "109"
   ],
   "flags": {}
  },
