@@ -113,3 +113,4 @@
 | [0107](0107-new-sources-round12-breadth-dispersion-frogpan.md) | 반복 탐색 12라운드 3건(시장 폭 타이밍, 횡단면 분산 타이밍, 개구리 냄비 모멘텀): 모두 NOT_PROMISING; FIP1 S1 1.00이나 알파 t 1.57, S1 뒤 절반 음수 | Accepted (측정) |
 | [0108](0108-new-sources-round13-pairs-peer-reversal.md) | 반복 탐색 13라운드 3건(상관 상위 페어 트레이딩 2건, 유사 종목 대비 반전): 모두 NOT_PROMISING, S1·S2 모두 음수 | Accepted (측정) |
 | [0109](0109-new-sources-round14-stablecoin-supply-vwap.md) | 반복 탐색 14라운드 3건(스테이블코인 공급 증가 타이밍 2건, 30일 VWAP 대비 가격): 모두 NOT_PROMISING | Accepted (측정) |
+| [0110](0110-confirm-near-miss-candidates-plan-draft.md) | 근접 후보 5개(CL1, FIP1, DS1, AF1, 묶음) 고정 후 IW0 현물 2017~19와 페이퍼 기록으로 확인하는 계획 초안; 아무 구간도 열지 않음 | Proposed (초안) |
