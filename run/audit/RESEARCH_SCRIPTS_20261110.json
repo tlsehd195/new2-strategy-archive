@@ -906,6 +906,22 @@
   "flags": {}
  },
  {
+  "file": "h4_retest_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 327,
+  "doc": "4h-bar retest of trend / mean-reversion / hi-lo + volume / cross-section rules, DEV only (ADR 0095).",
+  "adr": [
+   "045",
+   "049",
+   "095"
+  ],
+  "flags": {}
+ },
+ {
   "file": "hilo_intraday_dev.py",
   "class": "KEPT_INDEPENDENT",
   "reason": "high/low line + volume spike, 15m/1h panel (ADR 0046); variant of hilo_volume_dev",
@@ -1642,6 +1658,20 @@
   "doc": "Tests for run/gold_dev.py (ADR 0086).",
   "adr": [
    "086"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_h4_retest.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 114,
+  "doc": "Tests for the 4h-bar retest DEV check (ADR 0095). Needs numpy and pandas.",
+  "adr": [
+   "095"
   ],
   "flags": {}
  },

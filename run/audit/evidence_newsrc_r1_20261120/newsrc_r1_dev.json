@@ -147,10 +147,10 @@
     "mean_turnover_per_rebalance": 0.7929950206682274
    },
    "null_max_sr_ann_N7": 0.9338009839124082,
-   "null_max_sr_ann_cumulative": 2.6322204178754727,
+   "null_max_sr_ann_cumulative": 2.6324870174572848,
    "flag": "NOT_PROMISING",
    "dsr_N7": 0.4834680915002346,
-   "dsr_cumulative": 0.08897651464486955
+   "dsr_cumulative": 0.08894352007231432
   },
   "W200:P1_HIGH180": {
    "S1": {
@@ -268,10 +268,10 @@
     "mean_turnover_per_rebalance": 0.7141851243944966
    },
    "null_max_sr_ann_N7": 0.9338009839124082,
-   "null_max_sr_ann_cumulative": 2.6322204178754727,
+   "null_max_sr_ann_cumulative": 2.6324870174572848,
    "flag": "NOT_PROMISING",
    "dsr_N7": 0.05875379429089356,
-   "dsr_cumulative": 0.001846996789315214
+   "dsr_cumulative": 0.0018457585889476436
   },
   "U50:V1_PERPSPOT_LEVEL": {
    "S1": {
@@ -389,10 +389,10 @@
     "mean_turnover_per_rebalance": 0.7225715163937664
    },
    "null_max_sr_ann_N7": 0.8683152467919644,
-   "null_max_sr_ann_cumulative": 2.447627664925207,
+   "null_max_sr_ann_cumulative": 2.4478755683710847,
    "flag": "NOT_PROMISING",
    "dsr_N7": 0.4696344249876401,
-   "dsr_cumulative": 0.06495607372408863
+   "dsr_cumulative": 0.06492746828098794
   },
   "U50:V2_PERPSPOT_CHANGE": {
    "S1": {
@@ -510,10 +510,10 @@
     "mean_turnover_per_rebalance": 1.5953814702002007
    },
    "null_max_sr_ann_N7": 0.8683152467919644,
-   "null_max_sr_ann_cumulative": 2.447627664925207,
+   "null_max_sr_ann_cumulative": 2.4478755683710847,
    "flag": "NOT_PROMISING",
    "dsr_N7": 0.3403155308823047,
-   "dsr_cumulative": 0.03356507202516834
+   "dsr_cumulative": 0.03354844411071212
   },
   "U50:B1_PREMIUM_MOM": {
    "S1": {
@@ -631,10 +631,10 @@
     "mean_turnover_per_rebalance": 1.661041374316658
    },
    "null_max_sr_ann_N7": 0.8683152467919644,
-   "null_max_sr_ann_cumulative": 2.447627664925207,
+   "null_max_sr_ann_cumulative": 2.4478755683710847,
    "flag": "NOT_PROMISING",
    "dsr_N7": 0.17048376626870176,
-   "dsr_cumulative": 0.009071472949298331
+   "dsr_cumulative": 0.0090660556399359
   },
   "EVT:E1_SPOTLIST_SHORT_H7": {
    "S1": {
@@ -752,10 +752,10 @@
     "short_hit_rate": 0.7272727272727273
    },
    "null_max_sr_ann_N7": 0.8683152467919644,
-   "null_max_sr_ann_cumulative": 2.447627664925207,
+   "null_max_sr_ann_cumulative": 2.4478755683710847,
    "flag": "INSUFFICIENT_EVENTS (NOT_PROMISING)",
    "dsr_N7": 0.2181644528158384,
-   "dsr_cumulative": 0.014110763243076585
+   "dsr_cumulative": 0.014102780274575233
   },
   "EVT:E1_SPOTLIST_SHORT_H28": {
    "S1": {
@@ -873,10 +873,10 @@
     "short_hit_rate": 0.4444444444444444
    },
    "null_max_sr_ann_N7": 0.8683152467919644,
-   "null_max_sr_ann_cumulative": 2.447627664925207,
+   "null_max_sr_ann_cumulative": 2.4478755683710847,
    "flag": "INSUFFICIENT_EVENTS (NOT_PROMISING)",
    "dsr_N7": 0.2181644528158384,
-   "dsr_cumulative": 0.014110763243076585
+   "dsr_cumulative": 0.014102780274575233
   }
  },
  "events": {
@@ -1009,8 +1009,8 @@
  },
  "multiple_testing": {
   "n_trials_here": 7,
-  "prior_trials_on_main": 12196,
-  "cumulative": 12203,
+  "prior_trials_on_main": 12216,
+  "cumulative": 12223,
   "cross_trial_var_sr_daily": 0.00033878115165290944,
   "pbo_cscv_16_xs5": 0.7902874902874902,
   "pbo_combinations": 12870,

@@ -12,10 +12,10 @@ Read status: INVENTORIED = header, imports, paths and risk patterns scanned (not
 | DUPLICATE_RESEARCH | superseded by a later tool for the same hypothesis | 1 |
 | RETIRED_OR_ON_HOLD | retired v1 execution path (LEGACY_SCRIPTS.md) or on hold | 43 |
 | NEEDS_MORE_DATA | hypothesis needs a dataset the repository does not have | 21 |
-| TEST | test file of a run/ tool | 34 |
-| NOT_SURVEYED | not surveyed | 11 |
+| TEST | test file of a run/ tool | 35 |
+| NOT_SURVEYED | not surveyed | 12 |
 
-Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 58, TESTED 67
+Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 58, TESTED 69
 
 | file | lines | class | read status | reason | flags |
 |---|---|---|---|---|---|
@@ -79,6 +79,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 58, TESTED 67
 | `fr_extreme_diag.py` | 213 | INTEGRATED_CORE | LOGIC_TRACED | funding extremes = legacy family fund_z and feature funding_z; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=2 |
 | `fr_supplementary.py` | 47 | INTEGRATED_CORE | LOGIC_TRACED | funding extremes = legacy family fund_z and feature funding_z; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=1 |
 | `gold_dev.py` | 340 | KEPT_INDEPENDENT | TESTED | gold XAUUSD single-asset DEV feasibility, third-party spot bid/ask feed (ADR 0086); NOT_PROMISING |  |
+| `h4_retest_dev.py` | 327 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `hilo_intraday_dev.py` | 343 | KEPT_INDEPENDENT | TESTED | high/low line + volume spike, 15m/1h panel (ADR 0046); variant of hilo_volume_dev — traced: swing_lines: future-looking pivot test shifted by k (known at j+k) — causal | neg_shift=3 |
 | `hilo_volume_dev.py` | 288 | KEPT_INDEPENDENT | TESTED | high/low line + volume spike, daily panel (ADR 0043); NOT_PROMISING — traced: shift(-1) realised return, as above | neg_shift=1 |
 | `iw1_statistic_dev.py` | 78 | STANDARD_INTERFACE | LOGIC_TRACED | IW1 statistic re-score via evaluator.run_event_study (ADR 0019/0036) |  |
@@ -129,6 +130,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 58, TESTED 67
 | `test_fast_short.py` | 132 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_forward_v2_entry_bar.py` | 36 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_gold_dev.py` | 65 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_h4_retest.py` | 114 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_hilo_intraday.py` | 129 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_hilo_volume.py` | 108 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_independent_check.py` | 61 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
