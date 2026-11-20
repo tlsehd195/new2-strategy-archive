@@ -575,6 +575,22 @@
   "flags": {}
  },
  {
+  "file": "confirm_iw0.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 225,
+  "doc": "Stage 1 of the near-miss confirmation (ADR 0110/0111): IW0, Binance spot 2017-08..2019-12.",
+  "adr": [
+   "110"
+  ],
+  "flags": {
+   "neg_shift": 1
+  }
+ },
+ {
   "file": "cross_section_v2_dev.py",
   "class": "KEPT_INDEPENDENT",
   "reason": "five cross-sectional hypotheses (ADR 0040); NOT_PROMISING",
@@ -1714,6 +1730,20 @@
   "doc": "Tests for the candidate regime scorecard helpers (ADR 0044).",
   "adr": [
    "044"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_confirm_iw0.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 67,
+  "doc": "Tests for the IW0 confirmation tool (ADR 0111). Synthetic data only; needs numpy and pandas.",
+  "adr": [
+   "111"
   ],
   "flags": {}
  },
