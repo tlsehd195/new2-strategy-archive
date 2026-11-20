@@ -1248,6 +1248,24 @@
   }
  },
  {
+  "file": "newsrc_engine.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "LOGIC_TRACED",
+  "traced": null,
+  "legacy": false,
+  "lines": 241,
+  "doc": "Shared cross-sectional DEV engine of the repeated new-source rounds (ADR 0097 onwards).",
+  "adr": [
+   "041",
+   "047",
+   "097"
+  ],
+  "flags": {
+   "neg_shift": 1
+  }
+ },
+ {
   "file": "newsrc_r1_dev.py",
   "class": "NOT_SURVEYED",
   "reason": "no rule — new file",
@@ -1263,6 +1281,97 @@
   "flags": {
    "neg_shift": 1
   }
+ },
+ {
+  "file": "newsrc_r2_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 133,
+  "doc": "Round 2 of the repeated new-source search, DEV only (ADR 0097).",
+  "adr": [
+   "041",
+   "047",
+   "096",
+   "097"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "newsrc_r3_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 156,
+  "doc": "Round 3 of the repeated new-source search, DEV only (ADR 0098).",
+  "adr": [
+   "096",
+   "098"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "newsrc_r4_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 189,
+  "doc": "Round 4 of the repeated new-source search, DEV only (ADR 0099).",
+  "adr": [
+   "099"
+  ],
+  "flags": {
+   "network": 2
+  }
+ },
+ {
+  "file": "newsrc_r5_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 223,
+  "doc": "Round 5 of the repeated new-source search, DEV only (ADR 0100).",
+  "adr": [
+   "100"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "newsrc_r6_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 183,
+  "doc": "Round 6 of the repeated new-source search, DEV only (ADR 0101).",
+  "adr": [
+   "101"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "newsrc_r7_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 126,
+  "doc": "Round 7 of the repeated new-source search, DEV only (ADR 0102).",
+  "adr": [
+   "099",
+   "102"
+  ],
+  "flags": {}
  },
  {
   "file": "null_power_report.py",
@@ -1799,6 +1908,90 @@
   "doc": "Tests for the round-1 new-source DEV check (ADR 0096). Needs numpy and pandas.",
   "adr": [
    "096"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_newsrc_r2.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 57,
+  "doc": "Tests for round 2 of the new-source search (ADR 0097) and the shared engine. Needs numpy and pandas.",
+  "adr": [
+   "097"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_newsrc_r3.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 52,
+  "doc": "Tests for round 3 of the new-source search (ADR 0098). Needs numpy and pandas.",
+  "adr": [
+   "098"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_newsrc_r4.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 41,
+  "doc": "Tests for round 4 (Coin Metrics on-chain / supply) of the new-source search (ADR 0099). Needs numpy and pandas.",
+  "adr": [
+   "099"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_newsrc_r5.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 45,
+  "doc": "Tests for round 5 (COIN-M basis / volume share) of the new-source search (ADR 0100). Needs numpy and pandas.",
+  "adr": [
+   "100"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_newsrc_r6.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 49,
+  "doc": "Tests for round 6 (sessions, jumps, funding volatility) of the new-source search (ADR 0101). Needs numpy and pandas.",
+  "adr": [
+   "101"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_newsrc_r7.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 24,
+  "doc": "Tests for round 7 (Coin Metrics spot volume share, size, attention) of the new-source search (ADR 0102).",
+  "adr": [
+   "102"
   ],
   "flags": {}
  },
