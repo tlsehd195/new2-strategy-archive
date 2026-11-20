@@ -1,0 +1,26 @@
+{
+ "schema": "valentini_vp_r15c_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper, IW0 or IW1 data)",
+ "written": "see git commit time (authoritative)",
+ "written_before_any_result": true,
+ "data_state_when_written": "The project 15m archive (15 alts) was unzipped; no volume profile, trigger or trade has been computed. Rounds 15 and 15b preregs are committed.",
+ "requested_by": "동동, 2026-11-20 13:51 UTC '파비오 발렌티니'. Coordinator: write his public method as objective rules, approximate order flow with 15m volume profile if tick data is unavailable, state it is an approximation, no criteria relaxation.",
+ "sources": {
+  "closest_to_his_words": "briefread.pages.dev summary of his YouTube 'Trading LIVE with the #1 Scalper in the WORLD' (2025-10-07): auction market theory, trade only when out of balance; trend model in the New York session (imbalance days, target previous balance), mean-reversion model in the London session (back to balance); location -> validation (low volume nodes, order flow) -> execution (big orders, aggression); full candle close beyond the key level before entry; be wrong immediately.",
+  "background": "futureshive.com: NQ futures scalper, Robbins World Cup podium finishes (Q4 2023 2nd 68.6%, Q1 2024 3rd 89.5%, Q4 2024 2nd 218.3%, Q1 2025 3rd 169.7%); no published rule numbers.",
+  "third_party_not_used_as_his": "forex.in.rs and pickmytrade.trade numbers (0.25% risk, 2R target, absorption 2x volume, 24-row profile) are vendor settings, not his; only the 24-row profile and 2x volume threshold are borrowed as neutral defaults."
+ },
+ "approximation_stated": "His edge is read from tick order flow (footprint, delta, big-trade prints) on NQ futures. Not available here for S1. Proxies: previous-day value area from 15m bars (mid price (open+close)/2 x quote volume, 24 equal bins, 70% value area), aggression = 15m quote volume > 2 x mean of the previous 20 bars, delta sign = taker-buy share of the bar (tbq/qv). Market = 15 liquid Binance USDT-M alts, not NQ. A failure therefore says 'this volume-profile approximation does not work on crypto alts', not that his discretionary method fails.",
+ "scope": "DEV only. No criteria change. A DEV_PROMISING flag only leads to a report to the user. No variants after the result.",
+ "data": "project 15m archive: 15 alts of fast_short_dev.SYMBOLS, klines + funding; S1 2021-01-01..2023-09-18 decides (entries from 2021-03-01), S2 2024-06-19..2025-10-20 reported; never reads 2020, 2023-09-19..2024-06-18, 2025-10-21+",
+ "profile": "for UTC day D use the 96 bars of day D-1: price = (open+close)/2, weight = quote volume; 24 equal bins between min and max price; POC = bin with most volume (lowest bin on ties); value area grows from the POC adding the neighbouring bin with more volume (upper on ties) until >= 70% of the day's volume; VAH = upper edge of the highest VA bin, VAL = lower edge of the lowest. Skip day if < 90 valid bars on D-1.",
+ "trials": {
+  "VP1_NY_IMBALANCE": "decision bars that start 13:30..16:15 UTC (bar 54..65 of day D). Long: close > VAH, qv > 2 x mean qv of the previous 20 bars, tbq/qv > 0.55. Short: close < VAL, same volume rule, tbq/qv < 0.45. First trigger per coin per day only. Enter at the next bar's open. Exit at the next bar's open after the first bar that (a) closes back inside the value area (long: close <= VAH; short: close >= VAL) = stop, or (b) closes at or beyond VAH + (VAH - VAL) (short: VAL - (VAH - VAL)) = target; otherwise at the open of the 20:00 UTC bar (bar 80).",
+  "VP2_LONDON_REVERSION": "decision bars that start 07:00..09:45 UTC (bar 28..39 of day D). Short: some earlier bar of day D closed > VAH and this bar closes inside [VAL, VAH] with tbq/qv < 0.5. Long: some earlier bar of day D closed < VAL, this bar closes inside [VAL, VAH] with tbq/qv > 0.5. First trigger per coin per day only. Enter at the next bar's open. Exit at the next bar's open after the first bar that (a) reaches the POC mid price by close (short: close <= POC; long: close >= POC) = target, or (b) closes outside the value area again on the entry side (short: close > VAH; long: close < VAL) = stop; otherwise at the open of the 12:00 UTC bar (bar 48)."
+ },
+ "accounting": "ADR 0045 engine fast_short_dev.simulate unchanged: 5% of capital per trade, at most 20 open, one position per coin, measured alt cost per side (decides), measured_x2, volume_scaled, cost0, maker rows reported; real funding over the holding window.",
+ "n_trials": 2,
+ "context_id": "ALT15-15m-valentini-vp-r15c-v1",
+ "decision_rule": "fast_short_dev.flag unchanged: S1 measured SR > expected max of 2 null trials, alpha t >= 2, both S1 halves > 0, S2 measured SR > 0.5, S1 volume_scaled SR > 0, S1 trades >= 300. DSR N=2 and cumulative N reported.",
+ "after_result": "Trial count +2 regardless. No variants (other sessions, thresholds, targets) in this thread."
+}
