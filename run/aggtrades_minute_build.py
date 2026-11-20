@@ -30,17 +30,15 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
-import io
 import json
 import sys
+import subprocess
 import time
-import urllib.request
 import zipfile
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -84,54 +82,67 @@ def plan() -> list:
     return jobs
 
 
-def fetch(sym: str, kind: str, stamp: str, tries: int = 5):
+def fetch(sym: str, kind: str, stamp: str, tmp: Path, tries: int = 6):
+    """Download one zip to ``tmp`` with curl (stalled transfers are aborted and retried); None on 404."""
     url = f"{S3}/{kind}/aggTrades/{sym}/{sym}-aggTrades-{stamp}.zip"
+    dst = tmp / f"{sym}-{stamp}.zip"
     for i in range(tries):
-        try:
-            with urllib.request.urlopen(url, timeout=600) as r:
-                return r.read()
-        except urllib.error.HTTPError as e:
-            if e.code == 404:
-                return None
-            time.sleep(2 ** i)
-        except Exception:  # network hiccup
-            time.sleep(2 ** i)
+        r = subprocess.run(["curl", "-s", "-o", str(dst), "-w", "%{http_code}", "--speed-limit", "200000",
+                            "--speed-time", "20", "--max-time", "1800", url], capture_output=True, text=True)
+        code = r.stdout.strip()
+        if code == "404":
+            dst.unlink(missing_ok=True)
+            return None
+        if r.returncode == 0 and code == "200":
+            return dst
+        time.sleep(2 ** i)
     raise RuntimeError(f"download failed {url}")
 
 
-def parse(blob: bytes) -> pd.DataFrame:
-    with zipfile.ZipFile(io.BytesIO(blob)) as z:
-        raw = z.read(z.namelist()[0])
-    head = raw[:20]
-    has_header = head.startswith(b"agg_trade_id")
-    kw = dict(header=0 if has_header else None, usecols=[1, 2, 5, 6],
-              names=None if has_header else ["a", "price", "quantity", "f", "l", "transact_time", "is_buyer_maker"])
-    try:
-        df = pd.read_csv(io.BytesIO(raw), engine="pyarrow", **kw)
-    except Exception:
-        df = pd.read_csv(io.BytesIO(raw), **kw)
-    df.columns = ["price", "qty", "t", "ibm"]
-    if df["ibm"].dtype != bool:
-        df["ibm"] = df["ibm"].astype(str).str.lower().eq("true")
-    return df
+def parse(path: Path) -> dict:
+    """Columns price, qty, t, ibm as numpy arrays (streamed from the zip, only 4 columns kept)."""
+    import pyarrow.csv as pc
+    with zipfile.ZipFile(path) as z, z.open(z.namelist()[0]) as fh:
+        head = fh.peek(20)[:20] if hasattr(fh, "peek") else b""
+    with zipfile.ZipFile(path) as z, z.open(z.namelist()[0]) as fh:
+        has_header = head.startswith(b"agg_trade_id")
+        names = ["a", "price", "quantity", "f", "l", "transact_time", "is_buyer_maker"]
+        ro = pc.ReadOptions(column_names=None if has_header else names, block_size=1 << 26)
+        co = pc.ConvertOptions(include_columns=["price", "quantity", "transact_time", "is_buyer_maker"])
+        tb = pc.read_csv(fh, read_options=ro, convert_options=co)
+    ibm = tb.column("is_buyer_maker")
+    ibm = ibm.to_numpy() if str(ibm.type) == "bool" else np.char.lower(ibm.to_numpy().astype(str)) == "true"
+    return {"price": tb.column("price").to_numpy().astype(float), "qty": tb.column("quantity").to_numpy().astype(float),
+            "t": tb.column("transact_time").to_numpy().astype(np.int64), "ibm": np.asarray(ibm, bool)}
 
 
-def aggregate(df: pd.DataFrame, big: float) -> dict:
-    df = df.sort_values("t", kind="stable")
-    p = df["price"].to_numpy(float)
-    qv = p * df["qty"].to_numpy(float)
-    buy = ~df["ibm"].to_numpy(bool)
-    mi = (df["t"].to_numpy(np.int64) // 60_000)
-    starts = np.flatnonzero(np.r_[True, mi[1:] != mi[:-1]])
-    seg_id = np.cumsum(np.r_[True, mi[1:] != mi[:-1]]) - 1
+def aggregate(d: dict, big: float) -> dict:
+    """1-minute bars from time-sorted trade arrays, built one UTC day at a time (bounded memory)."""
+    o = np.argsort(d["t"], kind="stable")
+    t_all = d["t"][o]
+    day = t_all // 86_400_000
+    cuts = np.flatnonzero(np.r_[True, day[1:] != day[:-1], True])
+    parts = []
+    for a, b in zip(cuts[:-1], cuts[1:]):
+        idx = o[a:b]
+        parts.append(_agg_day(d["price"][idx], d["qty"][idx], t_all[a:b], d["ibm"][idx], big))
+    return {k: np.concatenate([p[k] for p in parts]) for k in FIELDS}
+
+
+def _agg_day(p, qty, t, ibm, big) -> dict:
+    qv = p * qty
+    buy = ~ibm
+    mi = t // 60_000
+    new = np.r_[True, mi[1:] != mi[:-1]]
+    starts = np.flatnonzero(new)
+    seg_id = np.cumsum(new) - 1
     hi = np.maximum.reduceat(p, starts)
     lo = np.minimum.reduceat(p, starts)
     qsum = np.add.reduceat(qv, starts)
-    lo_r, hi_r = lo[seg_id], hi[seg_id]
-    at_low = p <= lo_r * (1 + EXTREME_BP)
-    at_high = p >= hi_r * (1 - EXTREME_BP)
+    at_low = p <= lo[seg_id] * (1 + EXTREME_BP)
+    at_high = p >= hi[seg_id] * (1 - EXTREME_BP)
     isbig = qv >= big
-    out = {
+    return {
         "t": mi[starts] * 60_000, "open": p[starts], "high": hi, "low": lo,
         "close": p[np.r_[starts[1:] - 1, len(p) - 1]],
         "vwap": np.add.reduceat(qv * p, starts) / np.where(qsum > 0, qsum, np.nan),
@@ -142,7 +153,6 @@ def aggregate(df: pd.DataFrame, big: float) -> dict:
         "sell_at_low_qv": np.add.reduceat(np.where(~buy & at_low, qv, 0.0), starts),
         "buy_at_high_qv": np.add.reduceat(np.where(buy & at_high, qv, 0.0), starts),
     }
-    return out
 
 
 def run_symbol(sym: str, out: str) -> dict:
@@ -160,30 +170,36 @@ def run_symbol(sym: str, out: str) -> dict:
             prev_q[seg] = thr[ym]["q995_next"]
             log["months"][ym] = "cached"
             continue
+        tmp = Path(out) / "_raw"
+        tmp.mkdir(exist_ok=True)
         frames = []
         for kind, stamp in parts:
-            blob = fetch(sym, kind, stamp)
-            if blob is None:
+            path = fetch(sym, kind, stamp, tmp)
+            if path is None:
                 continue
-            df = parse(blob)
-            del blob
-            df = df[(df["t"] >= t0) & (df["t"] <= t1)]  # filter to DEV the moment it is parsed
-            frames.append(df)
-        if not frames or sum(len(f) for f in frames) == 0:
+            d = parse(path)
+            path.unlink()
+            keep = (d["t"] >= t0) & (d["t"] <= t1)  # filter to DEV the moment it is parsed
+            frames.append({k: v[keep] for k, v in d.items()})
+            del d
+        n_rows = sum(len(f["t"]) for f in frames)
+        if n_rows == 0:
             log["months"][ym] = "missing"
             continue
-        df = pd.concat(frames, ignore_index=True)
-        notional = (df["price"] * df["qty"]).to_numpy(float)
+        df = {k: np.concatenate([f[k] for f in frames]) for k in ("price", "qty", "t", "ibm")}
+        del frames
+        notional = df["price"] * df["qty"]
         own_q = float(np.quantile(notional, BIG_Q))
+        del notional
         big = prev_q.get(seg, own_q)
         bars = aggregate(df, big)
         np.savez_compressed(target, **{k: np.asarray(v) for k, v in bars.items()})
         thr[ym] = {"segment": seg, "big_threshold_used": big, "q995_next": own_q,
-                   "warmup_own_month": seg not in prev_q, "rows": int(len(df)), "minutes": int(len(bars["t"]))}
+                   "warmup_own_month": seg not in prev_q, "rows": int(n_rows), "minutes": int(len(bars["t"]))}
         prev_q[seg] = own_q
         thr_path.write_text(json.dumps(thr, indent=1))
-        log["months"][ym] = len(df)
-        del df, frames
+        log["months"][ym] = n_rows
+        del df
     return log
 
 
