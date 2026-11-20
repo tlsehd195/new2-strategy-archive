@@ -1,0 +1,30 @@
+{
+ "schema": "newsrc_r11_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "see git commit time (authoritative)",
+ "written_before_any_result": true,
+ "data_state_when_written": "No series below has been computed on alts. The trade-count, high and low columns of the daily klines have not been read by any round of this loop. Rounds 1-10 (ADR 0096-0105) known, all NOT_PROMISING. The recommended 'continue' on the direction card is followed until an answer arrives.",
+ "requested_by": "동동, 2026-11-20 '기준을 통과하는 전략이 나올때까지 계속 돌려 멈추지 말고'. Round 11 of that loop.",
+ "dedupe_against_earlier_work": {
+  "already_tested_not_repeated": ["size / Amihud level (0040 N1), taker flow (0040/0047), volume shock (0040), high/low line breakouts (0043), 180-day high (0096), price-volume correlation and OBV (0105)"],
+  "new_here": ["average trade size change (quote volume per trade, first use of the trade-count column)", "average trade size level net of liquidity", "close location value inside the daily range (first use of daily high/low in this loop)", "change in Amihud illiquidity"]
+ },
+ "scope": "DEV only. No criteria change. A DEV_PROMISING flag only leads to a report to the user.",
+ "universe": "exactly ADR 0047/0096-0105 U50 (cut-off bar i-2)",
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "eval_from": "2021-04-12", "use": "decides"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "eval_from": "2024-09-30", "use": "report + fixed S2 > 0.5 condition"},
+  "rebalance": "every 14 days on the Monday grid; trade at open of day i; weights drift; real funding; ADR 0041 calibrated cost; wide_universe_dev.pick quintiles",
+  "never_read": [["2000-01-01", "2020-12-31"], ["2023-09-19", "2024-06-18"], ["2025-10-21", "2099-12-31"]],
+  "BTCUSDT": "not read in S2"
+ },
+ "trials": {
+  "TS1_TRADESIZE_CHANGE_U50": "ats_t = qv_t / count_t; ln(mean ats over cut-13..cut / mean ats over cut-89..cut-14) (>= 10 / >= 50 valid days); long the HIGHEST (larger trades arriving)",
+  "TS2_TRADESIZE_RESID_U50": "residual of ln(mean ats over cut-27..cut) regressed cross-sectionally on ln(mean qv over cut-27..cut) with intercept (>= 20 valid days); long the HIGHEST",
+  "CL1_CLOSE_LOCATION_U50": "mean over cut-13..cut of (2*close - high - low) / (high - low), days with high > low only (>= 10 valid); long the HIGHEST",
+  "IL1_AMIHUD_CHANGE_U50": "amihud = mean |r_t| / qv_t; ln(amihud over cut-27..cut / amihud over cut-89..cut-28) (>= 20 / >= 40 valid); long the LOWEST (liquidity improving)"
+ },
+ "n_trials": 4,
+ "decision_rule": "identical to ADR 0094/0096-0105; DSR N=4 and cumulative N, PBO CSCV-16 reported",
+ "after_result": "Variants are new trials needing a new prereg. Trial count +4 regardless."
+}

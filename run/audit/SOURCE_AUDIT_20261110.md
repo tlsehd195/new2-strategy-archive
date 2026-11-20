@@ -1,6 +1,6 @@
 # 소스 감사 표 2026-11-10 (ADR 0070)
 
-- 대상: 163개 파일 (INVENTORIED였던 run/*.py 112개 + 핵심 모듈 12개)
+- 대상: 169개 파일 (INVENTORIED였던 run/*.py 112개 + 핵심 모듈 12개)
 - 검토자: 읽기 전용 독립 검토 에이전트. 각 행은 검토자의 주장이다.
   `spot_checked`가 참인 행만 작성자가 직접 다시 읽어 확인했다.
 - 모든 행에서 lines_read = lines_total(파일 전체를 읽음).
@@ -12,8 +12,8 @@
 | 수준 | 개수 |
 |---|---|
 | FULL_SOURCE_REVIEW | 34 |
-| LOGIC_TRACED | 72 |
-| TESTED | 57 |
+| LOGIC_TRACED | 75 |
+| TESTED | 60 |
 | INVENTORIED | 0 |
 | NOT_REVIEWED | 0 |
 | BLOCKED | 0 |
@@ -22,9 +22,9 @@
 
 | 항목 | NONE_FOUND | POSSIBLE | CONFIRMED | UNKNOWN |
 |---|---|---|---|---|
-| leakage_risk | 137 | 21 | 5 | 0 |
-| cost_risk | 102 | 55 | 6 | 0 |
-| backtest_error_risk | 77 | 68 | 18 | 0 |
+| leakage_risk | 143 | 21 | 5 | 0 |
+| cost_risk | 108 | 55 | 6 | 0 |
+| backtest_error_risk | 83 | 68 | 18 | 0 |
 
 ## CONFIRMED 발견(전부)
 
@@ -372,3 +372,9 @@
 | `test_newsrc_r8.py` | TESTED | 36 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `newsrc_r9_dev.py` | LOGIC_TRACED | 107 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `test_newsrc_r9.py` | TESTED | 28 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `newsrc_r10_dev.py` | LOGIC_TRACED | 98 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_newsrc_r10.py` | TESTED | 33 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `newsrc_r11_dev.py` | LOGIC_TRACED | 133 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_newsrc_r11.py` | TESTED | 50 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `newsrc_r12_dev.py` | LOGIC_TRACED | 103 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_newsrc_r12.py` | TESTED | 53 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |

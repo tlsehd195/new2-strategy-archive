@@ -1,0 +1,30 @@
+{
+ "schema": "newsrc_r10_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "see git commit time (authoritative)",
+ "written_before_any_result": true,
+ "data_state_when_written": "No series below has been computed on alts. Rounds 1-9 (ADR 0096-0104) known, all NOT_PROMISING. A direction card was posted to the user (continue / new data / stop); the recommended 'continue' is followed until an answer arrives.",
+ "requested_by": "동동, 2026-11-20 '기준을 통과하는 전략이 나올때까지 계속 돌려 멈추지 말고'. Round 10 of that loop.",
+ "dedupe_against_earlier_work": {
+  "already_tested_not_repeated": ["volatility level (LOWVOL30, 0035/0047), idio vol (0051), beta/coskew (0097), taker flow (0040/0047), volume shock (0040)"],
+  "new_here": ["volatility term structure (7-day vs 90-day realised vol) rank", "change in market correlation (decoupling) rank", "price-volume correlation rank", "on-balance-volume divergence rank"]
+ },
+ "scope": "DEV only. No criteria change. A DEV_PROMISING flag only leads to a report to the user.",
+ "universe": "exactly ADR 0047/0096-0104 U50 (cut-off bar i-2); market m = equal-weight U50 close-to-close return",
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "eval_from": "2021-04-12", "use": "decides"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "eval_from": "2024-09-30", "use": "report + fixed S2 > 0.5 condition"},
+  "rebalance": "every 14 days on the Monday grid; trade at open of day i; weights drift; real funding; ADR 0041 calibrated cost; wide_universe_dev.pick quintiles",
+  "never_read": [["2000-01-01", "2020-12-31"], ["2023-09-19", "2024-06-18"], ["2025-10-21", "2099-12-31"]],
+  "BTCUSDT": "not read in S2"
+ },
+ "trials": {
+  "VR1_VOLRATIO_U50": "stdev of daily returns cut-6..cut / stdev cut-89..cut (>= 5 / >= 60 valid); long the LOWEST",
+  "CR1_CORRCHANGE_U50": "corr(r, m) over cut-27..cut minus corr over cut-89..cut-28 (>= 20 / >= 40 valid); long the LOWEST (decoupling)",
+  "PV1_PRICEVOL_CORR_U50": "corr(r_t, ln(qv_t / qv_t-1)) over cut-27..cut (>= 20 valid); long the HIGHEST",
+  "OB1_OBV_DIVERGENCE_U50": "OBV_t = cumulative sum of sign(r_t) * qv_t over cut-27..cut; signal = OBV_cut / sum(qv cut-27..cut) minus the 28-day return rank-free value r28 = close[cut]/close[cut-28]-1, both cross-sectionally z-scored first; long the HIGHEST (volume accumulation ahead of price)"
+ },
+ "n_trials": 4,
+ "decision_rule": "identical to ADR 0094/0096-0104; DSR N=4 and cumulative N, PBO CSCV-16 reported",
+ "after_result": "Variants are new trials needing a new prereg. Trial count +4 regardless."
+}

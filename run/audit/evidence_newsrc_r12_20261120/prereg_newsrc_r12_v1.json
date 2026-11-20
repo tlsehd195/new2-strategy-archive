@@ -1,0 +1,29 @@
+{
+ "schema": "newsrc_r12_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "see git commit time (authoritative)",
+ "written_before_any_result": true,
+ "data_state_when_written": "No series below has been computed on alts. Rounds 1-11 (ADR 0096-0106) known, all NOT_PROMISING (closest R11 CL1 close location S1 0.98, alpha t 1.50). Binance option BVOL index archive starts 2023-06-20, so it cannot cover S1 and is not used. The recommended 'continue' on the direction card is followed until an answer arrives.",
+ "requested_by": "동동, 2026-11-20 '기준을 통과하는 전략이 나올때까지 계속 돌려 멈추지 말고'. Round 12 of that loop.",
+ "dedupe_against_earlier_work": {
+  "already_tested_not_repeated": ["per-coin time-series momentum (0094 L1/L2)", "cross-sectional momentum ranks (many)", "aggregate funding timing (0098)", "vol-managed index (0097)", "regime classifier (0050)", "close location (0106)"],
+  "new_here": ["market breadth timing of the U50 index (share of names above their own 50-day mean)", "cross-sectional dispersion timing of the U50 index", "frog-in-the-pan momentum (information discreteness)"]
+ },
+ "scope": "DEV only. No criteria change. A DEV_PROMISING flag only leads to a report to the user.",
+ "universe": "exactly ADR 0047/0096-0106 U50 (cut-off bar i-2)",
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "eval_from": "2021-04-12", "use": "decides"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "eval_from": "2024-09-30", "use": "report + fixed S2 > 0.5 condition"},
+  "rebalance": "every 14 days on the Monday grid; trade at open of day i; weights drift; real funding; ADR 0041 calibrated cost; wide_universe_dev.pick quintiles for FIP1",
+  "never_read": [["2000-01-01", "2020-12-31"], ["2023-09-19", "2024-06-18"], ["2025-10-21", "2099-12-31"]],
+  "BTCUSDT": "not read in S2"
+ },
+ "trials": {
+  "BR1_BREADTH_U50": "breadth = share of U50 names (with >= 40 closes in cut-49..cut) whose close[cut] > mean close over cut-49..cut; if breadth > 0.5 hold the equal-weight U50 long (1/n each), else flat",
+  "DS1_DISPERSION_U50": "disp_d = cross-sectional stdev of U50 daily returns on day d; D = mean disp over cut-13..cut; if D < median of the same 14-day mean over the 180 days ending at cut (window ends cut-13*k not needed: rolling 14-day means over cut-179..cut, >= 120 values) hold the equal-weight U50 long, else flat",
+  "FIP1_FROGPAN_U50": "PRET = close[cut]/close[cut-89]-1; ID = sign(PRET) * (share of negative-return days - share of positive-return days) over cut-89..cut (>= 60 valid); signal = z(PRET) - z(ID) across U50 (cross-sectional z); long the HIGHEST quintile, short the LOWEST (pick)"
+ },
+ "n_trials": 3,
+ "decision_rule": "identical to ADR 0094/0096-0106; DSR N=3 and cumulative N, PBO CSCV-16 reported",
+ "after_result": "Variants are new trials needing a new prereg. Trial count +3 regardless."
+}

@@ -1266,6 +1266,48 @@
   }
  },
  {
+  "file": "newsrc_r10_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 98,
+  "doc": "Round 10 of the repeated new-source search, DEV only (ADR 0105).",
+  "adr": [
+   "105"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "newsrc_r11_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 133,
+  "doc": "Round 11 of the repeated new-source search, DEV only (ADR 0106).",
+  "adr": [
+   "106"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "newsrc_r12_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 103,
+  "doc": "Round 12 of the repeated new-source search, DEV only (ADR 0107).",
+  "adr": [
+   "107"
+  ],
+  "flags": {}
+ },
+ {
   "file": "newsrc_r1_dev.py",
   "class": "NOT_SURVEYED",
   "reason": "no rule — new file",
@@ -1936,6 +1978,48 @@
   "doc": "Tests for the round-1 new-source DEV check (ADR 0096). Needs numpy and pandas.",
   "adr": [
    "096"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_newsrc_r10.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 33,
+  "doc": "Tests for round 10 of the new-source search (ADR 0105). Needs numpy and pandas.",
+  "adr": [
+   "105"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_newsrc_r11.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 50,
+  "doc": "Tests for round 11 of the new-source search (ADR 0106). Needs numpy and pandas.",
+  "adr": [
+   "106"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_newsrc_r12.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 53,
+  "doc": "Tests for round 12 of the new-source search (ADR 0107). Needs numpy and pandas.",
+  "adr": [
+   "107"
   ],
   "flags": {}
  },
