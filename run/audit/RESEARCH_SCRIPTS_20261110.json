@@ -1280,6 +1280,20 @@
   "flags": {}
  },
  {
+  "file": "newsrc_r11_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 133,
+  "doc": "Round 11 of the repeated new-source search, DEV only (ADR 0106).",
+  "adr": [
+   "106"
+  ],
+  "flags": {}
+ },
+ {
   "file": "newsrc_r1_dev.py",
   "class": "NOT_SURVEYED",
   "reason": "no rule — new file",
@@ -1964,6 +1978,20 @@
   "doc": "Tests for round 10 of the new-source search (ADR 0105). Needs numpy and pandas.",
   "adr": [
    "105"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_newsrc_r11.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 50,
+  "doc": "Tests for round 11 of the new-source search (ADR 0106). Needs numpy and pandas.",
+  "adr": [
+   "106"
   ],
   "flags": {}
  },

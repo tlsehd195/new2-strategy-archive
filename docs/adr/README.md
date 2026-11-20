@@ -109,3 +109,4 @@
 | [0103](0103-new-sources-round8-eth-onchain-timing.md) | 반복 탐색 8라운드 4건(이더리움 온체인 MVRV·거래소 순유출·거래소 공급·활성 주소로 알트 지수 타이밍): 모두 NOT_PROMISING; 순유출 신호는 S1·S2 모두 음수 | Accepted (측정) |
 | [0104](0104-new-sources-round9-age-leadlag-weekend.md) | 반복 탐색 9라운드 4건(상장 경과일 U50/W200, 대형→소형 선행 타이밍, 주말 모멘텀): 모두 NOT_PROMISING; 펀딩 주기 변경 이벤트는 S1 11건이라 시험 안 함 | Accepted (측정) |
 | [0105](0105-new-sources-round10-volterm-corrchange-pricevolume-obv.md) | 반복 탐색 10라운드 4건(단기/장기 변동성 비, 시장 상관 변화, 가격·거래량 상관, OBV 괴리): 모두 NOT_PROMISING, S1 전부 음수 | Accepted (측정) |
+| [0106](0106-new-sources-round11-tradesize-closelocation-amihud.md) | 반복 탐색 11라운드 4건(평균 체결 크기 변화·수준, 14일 종가 위치, 비유동성 변화): 모두 NOT_PROMISING; 종가 위치 CL1 S1 0.98·S2 1.52지만 알파 t 1.50, S1 뒤 절반 음수 | Accepted (측정) |
