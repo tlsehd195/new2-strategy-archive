@@ -1090,6 +1090,24 @@
   "flags": {}
  },
  {
+  "file": "lowfreq_nonprice_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 455,
+  "doc": "Low-frequency (28-day) time-series momentum + Binance metrics cross-section, DEV only (ADR 0094).",
+  "adr": [
+   "041",
+   "047",
+   "094"
+  ],
+  "flags": {
+   "neg_shift": 1
+  }
+ },
+ {
   "file": "lowliq_cost_calibration.py",
   "class": "STANDARD_INTERFACE",
   "reason": "volume-scaled alt cost calibration (ADR 0041), feeds CostContext",
@@ -1664,6 +1682,20 @@
   "adr": [
    "055",
    "059"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_lowfreq_nonprice.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 102,
+  "doc": "Tests for the low-frequency / metrics DEV check (ADR 0094). Needs numpy and pandas.",
+  "adr": [
+   "094"
   ],
   "flags": {}
  },

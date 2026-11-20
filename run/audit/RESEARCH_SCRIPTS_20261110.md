@@ -12,10 +12,10 @@ Read status: INVENTORIED = header, imports, paths and risk patterns scanned (not
 | DUPLICATE_RESEARCH | superseded by a later tool for the same hypothesis | 1 |
 | RETIRED_OR_ON_HOLD | retired v1 execution path (LEGACY_SCRIPTS.md) or on hold | 43 |
 | NEEDS_MORE_DATA | hypothesis needs a dataset the repository does not have | 21 |
-| TEST | test file of a run/ tool | 32 |
-| NOT_SURVEYED | not surveyed | 9 |
+| TEST | test file of a run/ tool | 33 |
+| NOT_SURVEYED | not surveyed | 10 |
 
-Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 58, TESTED 63
+Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 58, TESTED 65
 
 | file | lines | class | read status | reason | flags |
 |---|---|---|---|---|---|
@@ -91,6 +91,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 58, TESTED 63
 | `l3_engine_crosscheck.py` | 185 | RETIRED_OR_ON_HOLD | LOGIC_TRACED | v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029) | future_index=1, v1_path=2, cointrader=1 |
 | `l3_rv_tail_diag.py` | 335 | INTEGRATED_CORE | LOGIC_TRACED | realised-vol tail z ~ vol_ratio (engine) and range_z (v2); the exact RV-z rule is not a registered feature (partial); script itself retired (v1 paths, LEGACY_SCRIPTS.md) — traced: header rule only | future_index=2, v1_path=2 |
 | `liquid_search_dev.py` | 927 | STANDARD_INTERFACE | FULL_SOURCE_REVIEW | DEV search on a liquid universe via evaluator + CostContext, forbidden-read guard (ADR 0024) |  |
+| `lowfreq_nonprice_dev.py` | 455 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1 |
 | `lowliq_cost_calibration.py` | 113 | STANDARD_INTERFACE | TESTED | volume-scaled alt cost calibration (ADR 0041), feeds CostContext |  |
 | `maker_entry_estimate.py` | 377 | KEPT_INDEPENDENT | TESTED | maker-entry cost estimate from public books (ADR 0049) | future_index=2 |
 | `maker_entry_reeval.py` | 194 | STANDARD_INTERFACE | FULL_SOURCE_REVIEW | re-evaluates engine DEV candidates with maker cost (ADR 0049) |  |
@@ -131,6 +132,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 58, TESTED 63
 | `test_hilo_volume.py` | 108 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_independent_check.py` | 61 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_independent_samples.py` | 33 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_lowfreq_nonprice.py` | 102 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_maker_entry.py` | 96 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_maker_lowloss.py` | 113 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_maker_rescore.py` | 43 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |

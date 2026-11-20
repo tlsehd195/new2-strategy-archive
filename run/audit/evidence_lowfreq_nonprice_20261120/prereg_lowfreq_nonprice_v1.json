@@ -1,0 +1,57 @@
+{
+ "schema": "lowfreq_nonprice_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "2026-11-20T03:30Z",
+ "written_before_any_result": true,
+ "data_state_when_written": "No Binance 'metrics' archive file (open interest, long/short ratios) has been downloaded or computed by this archive. The daily klines (already spent by ADR 0035/0040/0047) are being re-downloaded for the universe; no series of the hypotheses below has been computed. Metrics files are downloaded only after this file is committed.",
+ "requested_by": "동동, 2026-11-20 '추천대로 진행해봐' (coordinator's recommendation: (1) low-frequency long-holding strategies where cost is a small share, (2) new hypotheses from collected non-price data, (3) a wider cross-section where possible; dedupe against earlier ADRs; DEV only).",
+ "dedupe_against_earlier_work": {
+  "already_tested_not_repeated": [
+   "28-day cross-sectional momentum, 7-day reversal, funding carry, low volatility, taker flow on U50/W200/T150 (ADR 0035/0040/0041/0047)",
+   "size, volume shock, MAX, composite (ADR 0040)",
+   "market-residual signals (ADR 0051), 101 Alphas (ADR 0054), new-listing short (ADR 0060/0061)",
+   "intraday OI direction / OI change and crowd-positioning ratios at 1h-12h horizons on BTC/ETH (NEW2 research, strategy_research_v2.md N1, ADR-0070 of NEW2)"
+  ],
+  "new_here": [
+   "time-series (own-trend) momentum per coin at 12-week lookback with 28-day rebalance, long/flat and long/short (all earlier momentum rows were cross-sectional ranks)",
+   "cross-sectional use of the Binance metrics archive (open-interest growth in coin units, global account long/short ratio, top-trader position ratio vs global account ratio) at 28-day rebalance on U50 and W200"
+  ],
+  "not_testable_and_not_counted": {
+   "liquidations.db": "2 days of data (2026-10-13..10-14, 5,061 rows, BTC/ETH on OKX/Bybit); too short for any low-frequency test",
+   "public order book 80h / alt order book 96h": "3-4 days each; used for cost estimation only; too short for a low-frequency signal",
+   "funding": "already the carry hypothesis H3 (ADR 0035/0047) and funding-extreme families",
+   "new listings": "ADR 0060/0061 (forward collector only)"
+  }
+ },
+ "scope": "DEV only. No validation, locked, paper or IW1 window. No criteria change. A DEV_PROMISING flag can only lead to a proposal of a NEW preregistered forward window, which needs the user's explicit go.",
+ "universe": {
+  "rule": "exactly ADR 0047: every USDT-quoted symbol of the public Binance USDT-M archive incl. delisted; at rebalance day i cut-off = bar i-2; eligible = >=60 daily bars, open at day i, 30-day mean quote volume v30 >= 2,000,000 USDT; ranked by v30 desc, ties by name",
+  "U50": "ranks 1..50", "W200": "ranks 1..200", "min_universe_size": 30,
+  "segment_rule": "BTCUSDT is not read in S2; every symbol obeys never_read"
+ },
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "rebalance_grid_anchor": "2021-03-01", "use": "the only segment that decides anything"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "rebalance_grid_anchor": "2024-08-19", "use": "reported, and used only in the fixed S2 > 0.5 condition"},
+  "metrics_family_S1_start": "metrics archive starts 2021-12-01 for most symbols; M hypotheses are evaluated in S1 from 2022-01-03 (the first 28-day grid day whose cut-28 is >= 2021-12-01), about 1.71 years"
+ },
+ "never_read": [["2000-01-01", "2020-12-31", "IW1"], ["2023-09-19", "2024-06-18", "BTC validation/locked TEST + embargo, all symbols"], ["2025-10-21", "2099-12-31", "ETH validation/locked/paper + embargo, all symbols"]],
+ "rebalance": "every 28 days on the grid; signal at cut-off bar i-2; trade at the open of day i; weights drift between rebalances; trade |target - drifted| at each rebalance (ADR 0040/0047 convention); real settled funding applied",
+ "hypotheses": [
+  {"id": "L1_TSMOM84_LONGFLAT", "universe": "U50", "economics": "time-series momentum (Moskowitz-Ooi-Pedersen 2012; crypto: Liu-Tsyvinski 2021)", "signal": "close(cut)/close(cut-84)-1", "weights": "+1/n for each of the n U50 names with signal > 0, 0 otherwise (n = names with a finite signal); gross <= 1, long or cash"},
+  {"id": "L2_TSMOM84_LS", "universe": "U50", "economics": "same, long/short", "signal": "close(cut)/close(cut-84)-1", "weights": "+1/n if signal > 0, -1/n if signal <= 0; gross 1"},
+  {"id": "M1_OIGROWTH28", "universes": ["U50", "W200"], "economics": "leverage crowding unwinds: names whose open interest (coin units) grew most get sold", "signal": "ln(OI_coins(cut) / OI_coins(cut-28)); OI_coins(day) = last 5-minute sum_open_interest of that UTC day", "long": "lowest", "selection": "quintile long-short, K = floor(n/5) per side, equal weight 1/(2K)"},
+  {"id": "M2_RETAILLS7", "universes": ["U50", "W200"], "economics": "contrarian to crowded retail accounts", "signal": "mean of count_long_short_ratio over the 7 days cut-6..cut (day value = mean of its 5-minute rows; >= 6 of 7 days required)", "long": "lowest", "selection": "quintile long-short"},
+  {"id": "M3_TOPVSRETAIL7", "universes": ["U50", "W200"], "economics": "follow large accounts against retail", "signal": "mean over the 7 days of ln(sum_toptrader_long_short_ratio) - ln(count_long_short_ratio) (>= 6 of 7 days)", "long": "highest", "selection": "quintile long-short"}
+ ],
+ "n_counted_trials": 8,
+ "missing_data_rule": "a name without a finite signal is left out of that rebalance; if fewer than 2K names (or, for L, none) have a signal the book is flat until the next rebalance and the skip is counted. Missing return days count as 0 and are counted.",
+ "cost": {
+  "decides": "ADR 0041 volume-scaled low-liquidity calibration ('cal', ESTIMATED from measured public order books), as ADR 0047",
+  "reported_and_in_conditions": ["cal_x2", "cal_tail_x2 (x2 only on names thinner than the thinnest measured book)"],
+  "reported_only": ["cost0"]
+ },
+ "flag_rule": "DEV_PROMISING only if all hold on the hypothesis' own evaluation span: S1 'cal' annual SR > expected max SR of 8 unskilled trials at that span length; beta-adjusted alpha t >= 2 (vs the equal-weight universe); both S1 halves > 0; S2 'cal' SR > 0.5; S1 cal_x2 > 0 and cal_tail_x2 > 0. Otherwise NOT_PROMISING.",
+ "multiple_testing": "8 trials appended to run/audit/dev_search_trials.jsonl (context U50W200-28d-lowfreq-nonprice-v1). Reported: null max SR at N=8 and at the cumulative N; DSR (Bailey-Lopez de Prado, engine_lib.deflated_sharpe) at N=8 and cumulative N with the cross-trial SR variance of these 8; PBO (engine_lib.pbo_cscv, 16 partitions) over the 8 S1 'cal' daily series on their common span (2022-01-03..2023-09-18). Report only, no gate change.",
+ "power_note_written_before_results": "With 28-day rebalancing there are only about 33 (L, S1) or 22 (M, S1) rebalance decisions; the 80% minimum detectable annual SR at Bonferroni 0.05/8 is about 2.1 (2.55 years) and about 2.6 (1.71 years). Directional returns of alts carry about 1.6 independent bets (ADR 0059), so L1/L2 are weak tests by construction. A NOT_PROMISING result here does NOT show the effect is absent.",
+ "benchmark_reported_not_counted": "U50 equal-weight buy-and-hold rebalanced on the same grid (B0), cost 'cal'"
+}
