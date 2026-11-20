@@ -1233,6 +1233,20 @@
   "flags": {}
  },
  {
+  "file": "ml_combo_r15b_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 238,
+  "doc": "Round 15b, DEV only (ADR 0113): supervised + unsupervised + RL walk-forward combination.",
+  "adr": [
+   "113"
+  ],
+  "flags": {}
+ },
+ {
   "file": "n2_engine_crosscheck.py",
   "class": "RETIRED_OR_ON_HOLD",
   "reason": "v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029)",
@@ -1364,6 +1378,23 @@
    "109"
   ],
   "flags": {
+   "network": 2
+  }
+ },
+ {
+  "file": "newsrc_r15_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 172,
+  "doc": "Round 15 of the new-source search, DEV only (ADR 0113): strategies from external sources.",
+  "adr": [
+   "113"
+  ],
+  "flags": {
+   "neg_shift": 1,
    "network": 2
   }
  },
@@ -2056,6 +2087,20 @@
   "flags": {}
  },
  {
+  "file": "test_ml_combo_r15b.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 60,
+  "doc": "Tests for round 15b (ADR 0113): supervised + unsupervised + RL combination. Needs numpy and pandas.",
+  "adr": [
+   "113"
+  ],
+  "flags": {}
+ },
+ {
   "file": "test_newsrc_r1.py",
   "class": "TEST",
   "reason": "unit test of a run/ tool (root-level research tests, CI)",
@@ -2136,6 +2181,20 @@
   "doc": "Tests for round 14 of the new-source search (ADR 0109). Needs numpy and pandas.",
   "adr": [
    "109"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_newsrc_r15.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 66,
+  "doc": "Tests for round 15 of the new-source search (ADR 0113). Needs numpy and pandas.",
+  "adr": [
+   "113"
   ],
   "flags": {}
  },
@@ -2346,6 +2405,20 @@
   "flags": {}
  },
  {
+  "file": "test_traders_r15d.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 58,
+  "doc": "Tests for round 15d (ADR 0113): Qullamaggie breakout and Minervini trend template. Needs numpy and pandas.",
+  "adr": [
+   "113"
+  ],
+  "flags": {}
+ },
+ {
   "file": "test_unsup_regime.py",
   "class": "TEST",
   "reason": "unit test of a run/ tool (root-level research tests, CI)",
@@ -2356,6 +2429,20 @@
   "doc": "Tests for the unsupervised regime classifier helpers (ADR 0050).",
   "adr": [
    "050"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "test_valentini_vp_r15c.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 69,
+  "doc": "Tests for round 15c (ADR 0113): volume-profile approximation of Valentini rules. Needs numpy.",
+  "adr": [
+   "113"
   ],
   "flags": {}
  },
@@ -2389,6 +2476,20 @@
   "flags": {}
  },
  {
+  "file": "traders_r15d_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 160,
+  "doc": "Round 15d, DEV only (ADR 0113): rules of recent well-known traders on the U50 alts.",
+  "adr": [
+   "113"
+  ],
+  "flags": {}
+ },
+ {
   "file": "unsup_regime_dev.py",
   "class": "KEPT_INDEPENDENT",
   "reason": "k-means regime classifier on DEV S1 (ADR 0050); NOT_USEFUL",
@@ -2400,6 +2501,21 @@
   "adr": [
    "044",
    "050"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "valentini_vp_r15c_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 211,
+  "doc": "Round 15c, DEV only (ADR 0113): Fabio Valentini style auction-market rules, volume-profile approximation.",
+  "adr": [
+   "045",
+   "113"
   ],
   "flags": {}
  },
