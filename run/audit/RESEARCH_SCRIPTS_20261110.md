@@ -12,10 +12,10 @@ Read status: INVENTORIED = header, imports, paths and risk patterns scanned (not
 | DUPLICATE_RESEARCH | superseded by a later tool for the same hypothesis | 1 |
 | RETIRED_OR_ON_HOLD | retired v1 execution path (LEGACY_SCRIPTS.md) or on hold | 43 |
 | NEEDS_MORE_DATA | hypothesis needs a dataset the repository does not have | 21 |
-| TEST | test file of a run/ tool | 35 |
-| NOT_SURVEYED | not surveyed | 12 |
+| TEST | test file of a run/ tool | 41 |
+| NOT_SURVEYED | not surveyed | 19 |
 
-Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 58, TESTED 69
+Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 81
 
 | file | lines | class | read status | reason | flags |
 |---|---|---|---|---|---|
@@ -101,7 +101,14 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 58, TESTED 69
 | `n2_engine_crosscheck.py` | 240 | RETIRED_OR_ON_HOLD | LOGIC_TRACED | v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029) | v1_path=1 |
 | `n2_maker_exec_diag.py` | 389 | NEEDS_MORE_DATA | LOGIC_TRACED | maker execution layer needs queue / order-book history; maker cost estimated by maker_entry_estimate.py; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=1 |
 | `newlisting_short_dev.py` | 288 | KEPT_INDEPENDENT | LOGIC_TRACED | new-listing short event study (ADR 0060); funding read per DEV segment since ADR 0066 — traced: load_symbol (segment filter), fund_sum (read 2021-01..2025-10 incl. the never-read gap) | neg_shift=1 |
+| `newsrc_engine.py` | 241 | NOT_SURVEYED | LOGIC_TRACED | no rule — new file | neg_shift=1 |
 | `newsrc_r1_dev.py` | 527 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1 |
+| `newsrc_r2_dev.py` | 133 | NOT_SURVEYED | TESTED | no rule — new file |  |
+| `newsrc_r3_dev.py` | 156 | NOT_SURVEYED | TESTED | no rule — new file |  |
+| `newsrc_r4_dev.py` | 189 | NOT_SURVEYED | TESTED | no rule — new file | network=2 |
+| `newsrc_r5_dev.py` | 223 | NOT_SURVEYED | TESTED | no rule — new file |  |
+| `newsrc_r6_dev.py` | 183 | NOT_SURVEYED | TESTED | no rule — new file |  |
+| `newsrc_r7_dev.py` | 126 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `null_power_report.py` | 106 | KEPT_INDEPENDENT | FULL_SOURCE_REVIEW | summary of null_power_sim runs (ADR 0048) |  |
 | `null_power_sim.py` | 397 | STANDARD_INTERFACE | TESTED | null / planted-edge runs of the DEV pipeline (ADR 0048) |  |
 | `okx_real_cost.py` | 55 | KEPT_INDEPENDENT | FULL_SOURCE_REVIEW | round-trip cost back-calculation from a fills CSV (ADR 0058); demo records are not cost evidence |  |
@@ -140,6 +147,12 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 58, TESTED 69
 | `test_maker_lowloss.py` | 113 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_maker_rescore.py` | 43 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r1.py` | 70 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_newsrc_r2.py` | 57 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_newsrc_r3.py` | 52 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_newsrc_r4.py` | 41 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_newsrc_r5.py` | 45 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_newsrc_r6.py` | 49 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_newsrc_r7.py` | 24 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_null_power.py` | 91 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_okx_tendency.py` | 141 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_pdf_check.py` | 127 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |

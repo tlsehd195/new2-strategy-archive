@@ -1,6 +1,6 @@
 # 소스 감사 표 2026-11-10 (ADR 0070)
 
-- 대상: 146개 파일 (INVENTORIED였던 run/*.py 112개 + 핵심 모듈 12개)
+- 대상: 159개 파일 (INVENTORIED였던 run/*.py 112개 + 핵심 모듈 12개)
 - 검토자: 읽기 전용 독립 검토 에이전트. 각 행은 검토자의 주장이다.
   `spot_checked`가 참인 행만 작성자가 직접 다시 읽어 확인했다.
 - 모든 행에서 lines_read = lines_total(파일 전체를 읽음).
@@ -12,8 +12,8 @@
 | 수준 | 개수 |
 |---|---|
 | FULL_SOURCE_REVIEW | 34 |
-| LOGIC_TRACED | 63 |
-| TESTED | 49 |
+| LOGIC_TRACED | 70 |
+| TESTED | 55 |
 | INVENTORIED | 0 |
 | NOT_REVIEWED | 0 |
 | BLOCKED | 0 |
@@ -22,9 +22,9 @@
 
 | 항목 | NONE_FOUND | POSSIBLE | CONFIRMED | UNKNOWN |
 |---|---|---|---|---|
-| leakage_risk | 120 | 21 | 5 | 0 |
-| cost_risk | 85 | 55 | 6 | 0 |
-| backtest_error_risk | 60 | 68 | 18 | 0 |
+| leakage_risk | 133 | 21 | 5 | 0 |
+| cost_risk | 98 | 55 | 6 | 0 |
+| backtest_error_risk | 73 | 68 | 18 | 0 |
 
 ## CONFIRMED 발견(전부)
 
@@ -355,3 +355,16 @@
 | `test_h4_retest.py` | TESTED | 114 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `newsrc_r1_dev.py` | LOGIC_TRACED | 527 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `test_newsrc_r1.py` | TESTED | 70 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `newsrc_engine.py` | LOGIC_TRACED | 241 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `newsrc_r2_dev.py` | LOGIC_TRACED | 133 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_newsrc_r2.py` | TESTED | 57 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `newsrc_r3_dev.py` | LOGIC_TRACED | 156 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_newsrc_r3.py` | TESTED | 52 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `newsrc_r4_dev.py` | LOGIC_TRACED | 189 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_newsrc_r4.py` | TESTED | 41 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `newsrc_r5_dev.py` | LOGIC_TRACED | 223 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_newsrc_r5.py` | TESTED | 45 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `newsrc_r6_dev.py` | LOGIC_TRACED | 183 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_newsrc_r6.py` | TESTED | 49 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `newsrc_r7_dev.py` | LOGIC_TRACED | 126 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_newsrc_r7.py` | TESTED | 24 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |

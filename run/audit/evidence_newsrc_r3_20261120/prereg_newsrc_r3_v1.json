@@ -1,0 +1,41 @@
+{
+ "schema": "newsrc_r3_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "2026-11-20T08:20Z",
+ "written_before_any_result": true,
+ "data_state_when_written": "Rounds 1-2 (ADR 0096/0097) results are known (all NOT_PROMISING). None of the series below has been computed: aggregate-funding timing, alt-vs-ETH relative trend, turnover-conditioned momentum, realised skewness rank, volume-conditioned reversal, perp-vs-spot close divergence. Spot 1d closes for ever-U50 names are already downloaded (ADR 0096) but their close was never used.",
+ "requested_by": "동동, 2026-11-20 '기준을 통과하는 전략이 나올때까지 계속 돌려 멈추지 말고'. Round 3 of that loop.",
+ "dedupe_against_earlier_work": {
+  "already_tested_not_repeated": ["per-coin funding carry and funding extremes (0035/0047, 10-14 preregs)", "MOM28, REV7, MAX, volume shock, taker flow (0035/0040/0047)", "regime classifiers (0044/0050)", "rounds 1-2 (0096/0097)"],
+  "new_here": [
+   "market-wide (aggregate) funding as a timing signal for the alt index (crowding of the whole market, not a per-coin rank)",
+   "alt-season rotation: alt index vs ETH relative trend",
+   "momentum conditioned on turnover change (Lee-Swaminathan late-stage momentum)",
+   "realised skewness rank (Amaya et al.), different from MAX",
+   "short-term reversal only in names without a volume shock (liquidity-driven reversal, Avramov et al.)",
+   "perp-vs-spot close divergence (perp/spot - 1) as a cross-sectional mispricing signal"
+  ]
+ },
+ "scope": "DEV only. No criteria change. A DEV_PROMISING flag only leads to a report to the user.",
+ "universe": "exactly ADR 0047/0096/0097 (U50 by 30-day mean quote volume >= 2M USDT, >=60 bars, cut-off bar i-2)",
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "eval_from": "2021-07-05", "use": "decides"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "eval_from": "2024-12-16", "use": "report + fixed S2 > 0.5 condition"},
+  "rebalance": "every 14 days on the Monday grid (anchors 2021-03-01, 2024-08-19); trade at open of day i; weights drift; real funding",
+  "never_read": [["2000-01-01", "2020-12-31"], ["2023-09-19", "2024-06-18"], ["2025-10-21", "2099-12-31"]],
+  "BTCUSDT": "not read in S2"
+ },
+ "trials": {
+  "AF1_AGGFUND_TIMING_U50": "F = median over U50 names of the 7-day summed funding at cut; long all U50 names equally (gross 1) when F <= median of the same F series over the previous 180 days (computed at each past day cut-179..cut with that day's U50 = current U50 names), else flat",
+  "AE1_ALT_VS_ETH_U50": "A = EW cumulative return of U50 names other than ETHUSDT over cut-27..cut, E = ETHUSDT return same days; if A > E: long U50 ex-ETH equally (gross 0.5) and short ETHUSDT 0.5; else the reverse; flat if ETHUSDT not eligible",
+  "MT1_MOM_TURNOVER_U50": "among U50: mom = close[cut]/close[cut-27]-1, tchg = ln(mean qv cut-6..cut / mean qv cut-34..cut-7); long names in the top half of mom AND bottom half of tchg, short names in the bottom half of mom AND top half of tchg; equal weight 0.5/n per side",
+  "SK1_REALSKEW_U50": "skewness of daily close-to-close returns over cut-89..cut (>= 60); quintile long-short, long the LOWEST",
+  "RV1_QUIET_REVERSAL_U50": "among U50 names whose volume shock ln(mean qv cut-6..cut / mean qv cut-34..cut-7) is below the U50 median: 7-day return quintile (K = floor(n_sub/5)) long the LOWEST, short the HIGHEST",
+  "PS1_PERP_SPOT_GAP_U50": "mean over cut-6..cut of perp close / spot close - 1 (>= 5 days, spot pair as ADR 0096 mapping); quintile long-short, long the LOWEST"
+ },
+ "n_trials": 6,
+ "cost": "ADR 0041 calibrated cost 'cal' decides; cal_x2, cal_tail_x2 conditions; cost0 reference",
+ "decision_rule": "identical to ADR 0094/0096/0097 (S1 SR > expected max of 6 null trials, alpha t >= 2 vs EW U50, both S1 halves > 0, S2 > 0.5, S1 > 0 under cal_x2 and cal_tail_x2); DSR N=6 and cumulative N, PBO CSCV-16 over the 6 S1 series reported",
+ "power_note_written_before_results": "about 58 S1 rebalances over 2.2 years; MDE at 80% (Bonferroni 0.05/6) about 2.2; cumulative-N null max about 2.6",
+ "after_result": "Variants are new trials needing a new prereg. Trial count +6 regardless."
+}

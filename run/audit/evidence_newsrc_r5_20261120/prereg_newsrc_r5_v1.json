@@ -1,0 +1,41 @@
+{
+ "schema": "newsrc_r5_prereg_v1",
+ "status": "DRAFT_FOR_DEV_ONLY (never activates a forward window, never opens validation, locked, paper or IW1 data)",
+ "written": "see git commit time (authoritative; run/audit/PREREG_TIME_CORRECTION_20261120.md)",
+ "written_before_any_result": true,
+ "data_state_when_written": "Only the S3 directory listing of Binance COIN-M monthly klines was read (50 *_PERP symbols; quarterly contracts: BTC 26, ETH 26, BNB 25, XRP 25, ADA 21, LINK 21, BCH 20, DOT 20, LTC 20, SOL 10, EOS/ETC/FIL/TRX 2). No COIN-M kline file has been downloaded. Rounds 1-4 (ADR 0096-0099) are known, all NOT_PROMISING; round 3 AF1 (aggregate funding timing) was the closest (S1 0.77).",
+ "requested_by": "동동, 2026-11-20 '기준을 통과하는 전략이 나올때까지 계속 돌려 멈추지 말고'. Round 5 of that loop.",
+ "dedupe_against_earlier_work": {
+  "already_tested_not_repeated": ["USDT-M funding carry / aggregate funding timing (0035/0047/0098)", "premium index momentum (0096)", "quarterly curve C5 prereg of 2026-10-12 was BTC/ETH only", "cash-and-carry upper bound (0020)"],
+  "new_here": [
+   "Binance COIN-M (coin-margined) futures: first use of this market",
+   "alt quarterly futures basis (term structure) as a market-timing and a cross-sectional signal",
+   "coin-margined perp volume share (holders who post the coin itself as collateral) vs USDT-M volume"
+  ],
+  "note_on_AF1": "QB1 uses the same on/off rule shape as AF1 (round 3) on a different data source. It is a new counted trial; it is not a re-test of AF1, and AF1's S1 result is not used to set any parameter here (rule copied from the AF1 prereg written before AF1's result)."
+ },
+ "scope": "DEV only. No criteria change. A DEV_PROMISING flag only leads to a report to the user.",
+ "universe": "traded legs are USDT-M perps of ADR 0047 U50 (cut-off bar i-2); COIN-M series are signals only",
+ "segments": {
+  "S1": {"read": ["2021-01-01", "2023-09-18"], "eval_from": "2021-07-05", "use": "decides"},
+  "S2": {"read": ["2024-06-19", "2025-10-20"], "eval_from": "2024-12-16", "use": "report + fixed S2 > 0.5 condition"},
+  "rebalance": "every 14 days on the Monday grid; trade at open of day i; weights drift; real funding",
+  "never_read": [["2000-01-01", "2020-12-31"], ["2023-09-19", "2024-06-18"], ["2025-10-21", "2099-12-31"]],
+  "BTCUSDT": "not read in S2; BTCUSD COIN-M series also not used in S2 (and not used at all in the signals below)"
+ },
+ "definitions": {
+  "quarterly_basis": "for base X at day d: the COIN-M quarterly contract XUSD_YYMMDD with the nearest expiry more than 14 days after d; basis_ann = (quarterly close / XUSD_PERP close - 1) * 365 / days to expiry (expiry day from the contract name, 08:00 UTC)",
+  "cm_usd_volume": "COIN-M kline column 7 (base asset volume) * close"
+ },
+ "trials": {
+  "QB1_QBASIS_TIMING_U50": "B = median basis_ann over ETH and alts with a quarterly series at cut (>= 4 names); long all U50 names equally (gross 1) when B[cut] <= median of B over cut-179..cut (>= 120 days), else flat",
+  "QB2_QBASIS_XS": "cross-section of the bases with a quarterly series that are also in U50 at the rebalance (ETH included): 7-day mean basis_ann; K = floor(n/3), n >= 6; long the LOWEST K, short the HIGHEST K, equal weight 1/(2K)",
+  "CM1_CMSHARE_LEVEL_U50": "ln(sum cm_usd_volume cut-27..cut / sum USDT-M quote volume cut-27..cut) for U50 names with a XUSD_PERP (>= 20 days); K = floor(n/5), n >= 10; long the HIGHEST share",
+  "CM2_CMSHARE_CHANGE_U50": "mean daily ln share over cut-6..cut minus over cut-34..cut-7 (>= 5 / >= 20 days); same K rule; long the HIGHEST"
+ },
+ "n_trials": 4,
+ "cost": "ADR 0041 calibrated cost 'cal' on the USDT-M legs decides; cal_x2, cal_tail_x2 conditions; cost0 reference",
+ "decision_rule": "identical to ADR 0094/0096-0099; DSR N=4 and cumulative N, PBO CSCV-16 over the 4 S1 series reported",
+ "power_note_written_before_results": "about 58 S1 rebalances over 2.2 years; MDE at 80% (Bonferroni 0.05/4) about 2.1; QB2 has only 6-10 names (2-3 per side)",
+ "after_result": "Variants are new trials needing a new prereg. Trial count +4 regardless."
+}
