@@ -12,10 +12,10 @@ Read status: INVENTORIED = header, imports, paths and risk patterns scanned (not
 | DUPLICATE_RESEARCH | superseded by a later tool for the same hypothesis | 1 |
 | RETIRED_OR_ON_HOLD | retired v1 execution path (LEGACY_SCRIPTS.md) or on hold | 43 |
 | NEEDS_MORE_DATA | hypothesis needs a dataset the repository does not have | 21 |
-| TEST | test file of a run/ tool | 45 |
-| NOT_SURVEYED | not surveyed | 23 |
+| TEST | test file of a run/ tool | 46 |
+| NOT_SURVEYED | not surveyed | 24 |
 
-Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 89
+Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 91
 
 | file | lines | class | read status | reason | flags |
 |---|---|---|---|---|---|
@@ -104,6 +104,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 89
 | `newsrc_engine.py` | 241 | NOT_SURVEYED | LOGIC_TRACED | no rule — new file | neg_shift=1 |
 | `newsrc_r10_dev.py` | 98 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `newsrc_r11_dev.py` | 133 | NOT_SURVEYED | TESTED | no rule — new file |  |
+| `newsrc_r12_dev.py` | 103 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `newsrc_r1_dev.py` | 527 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1 |
 | `newsrc_r2_dev.py` | 133 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `newsrc_r3_dev.py` | 156 | NOT_SURVEYED | TESTED | no rule — new file |  |
@@ -153,6 +154,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 89
 | `test_newsrc_r1.py` | 70 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r10.py` | 33 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r11.py` | 50 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_newsrc_r12.py` | 53 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r2.py` | 57 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r3.py` | 52 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_newsrc_r4.py` | 41 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
