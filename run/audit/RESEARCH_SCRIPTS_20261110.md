@@ -12,16 +12,17 @@ Read status: INVENTORIED = header, imports, paths and risk patterns scanned (not
 | DUPLICATE_RESEARCH | superseded by a later tool for the same hypothesis | 1 |
 | RETIRED_OR_ON_HOLD | retired v1 execution path (LEGACY_SCRIPTS.md) or on hold | 43 |
 | NEEDS_MORE_DATA | hypothesis needs a dataset the repository does not have | 21 |
-| TEST | test file of a run/ tool | 54 |
-| NOT_SURVEYED | not surveyed | 32 |
+| TEST | test file of a run/ tool | 55 |
+| NOT_SURVEYED | not surveyed | 34 |
 
-Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 107
+Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 60, TESTED 109
 
 | file | lines | class | read status | reason | flags |
 |---|---|---|---|---|---|
 | `a1_engine_crosscheck.py` | 185 | RETIRED_OR_ON_HOLD | LOGIC_TRACED | v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029) | future_index=1, v1_path=2, cointrader=1 |
 | `a1_family_precheck.py` | 129 | INTEGRATED_CORE | LOGIC_TRACED | A1 Amihud illiquidity z (prior-960 window) = feature illiq_z of opt-in set v2 (ADR 0066); script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=2 |
 | `a1_illiq_diag.py` | 263 | INTEGRATED_CORE | LOGIC_TRACED | A1 Amihud illiquidity z (prior-960 window) = feature illiq_z of opt-in set v2 (ADR 0066); script itself retired (v1 paths, LEGACY_SCRIPTS.md) — traced: header rule (z vs prior 960, shift 1) — used for illiq_z | future_index=5, v1_path=2 |
+| `aggtrades_minute_build.py` | 254 | NOT_SURVEYED | LOGIC_TRACED | no rule — new file | network=2 |
 | `alpha101_dev.py` | 164 | KEPT_INDEPENDENT | TESTED | weekly cross-section of 101 Alphas (ADR 0054): multi-asset panel, engine is per-symbol; NOT_PROMISING |  |
 | `alt_download.py` | 62 | RETIRED_OR_ON_HOLD | FULL_SOURCE_REVIEW | alt funding extremes, v1 rounds; funding signal = funding_z in the engine (BTC/ETH), alt cross-sections re-done by broad/wide_universe_dev; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | network=3, v1_path=2 |
 | `alt_download_r2.py` | 61 | RETIRED_OR_ON_HOLD | FULL_SOURCE_REVIEW | alt funding extremes, v1 rounds; funding signal = funding_z in the engine (BTC/ETH), alt cross-sections re-done by broad/wide_universe_dev; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | network=3, v1_path=2 |
@@ -184,11 +185,13 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 59, TESTED 107
 | `test_structural_search.py` | 83 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_traders_r15d.py` | 58 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_unsup_regime.py` | 55 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_valentini_of_dev.py` | 108 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_valentini_vp_r15c.py` | 69 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_wide_universe.py` | 152 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_winloss_combo.py` | 79 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `traders_r15d_dev.py` | 160 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `unsup_regime_dev.py` | 199 | KEPT_INDEPENDENT | TESTED | k-means regime classifier on DEV S1 (ADR 0050); NOT_USEFUL |  |
+| `valentini_of_dev.py` | 579 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `valentini_vp_r15c_dev.py` | 211 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `wide_universe_dev.py` | 383 | KEPT_INDEPENDENT | TESTED | wide-universe panel with effective independent names (ADR 0047); variant of broad_universe_dev — traced: shift(-1) realised return, as above | neg_shift=1 |
 | `winloss_catalog.py` | 318 | NOT_SURVEYED | TESTED | no rule — new file |  |

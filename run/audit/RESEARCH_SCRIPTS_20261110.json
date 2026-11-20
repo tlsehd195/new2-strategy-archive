@@ -45,6 +45,22 @@
   }
  },
  {
+  "file": "aggtrades_minute_build.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "LOGIC_TRACED",
+  "traced": null,
+  "legacy": false,
+  "lines": 254,
+  "doc": "Build 1-minute order-flow bars from Binance USD-M aggTrades, DEV ranges only (ADR 0114).",
+  "adr": [
+   "114"
+  ],
+  "flags": {
+   "network": 2
+  }
+ },
+ {
   "file": "alpha101_dev.py",
   "class": "KEPT_INDEPENDENT",
   "reason": "weekly cross-section of 101 Alphas (ADR 0054): multi-asset panel, engine is per-symbol; NOT_PROMISING",
@@ -2433,6 +2449,20 @@
   "flags": {}
  },
  {
+  "file": "test_valentini_of_dev.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 108,
+  "doc": "Synthetic checks of run/valentini_of_dev.py and run/aggtrades_minute_build.py (ADR 0114). No market data.",
+  "adr": [
+   "114"
+  ],
+  "flags": {}
+ },
+ {
   "file": "test_valentini_vp_r15c.py",
   "class": "TEST",
   "reason": "unit test of a run/ tool (root-level research tests, CI)",
@@ -2501,6 +2531,21 @@
   "adr": [
    "044",
    "050"
+  ],
+  "flags": {}
+ },
+ {
+  "file": "valentini_of_dev.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 579,
+  "doc": "Fabio Valentini full-process replication on Binance aggTrades order flow, DEV only (ADR 0114).",
+  "adr": [
+   "045",
+   "114"
   ],
   "flags": {}
  },
