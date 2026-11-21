@@ -1,0 +1,122 @@
+name: forward-nearmiss-monthly
+# ADR 0115. Monthly run of the forward paper record of CL1, FIP1, AF1 (ADR 0112).
+# No orders, no account, no key: it downloads Binance's public monthly archives
+# (BTCUSDT / ETHUSDT are never fetched by run/forward_nearmiss.py), evaluates the
+# frozen preregistration and stores the result file on the separate branch
+# `forward-results` (never main).  It opens one GitHub issue per month (assigned to
+# the owner) with the stage and verdicts, or a failure issue when something broke.
+# It never touches the validation / locked / IW windows (the tool refuses them).
+on:
+  schedule:
+    # archives for the previous month are normally up by the 2nd; day 5 is the retry
+    - cron: "17 6 3,5 * *"
+  workflow_dispatch:
+    inputs:
+      asof:
+        description: "evaluation date YYYY-MM-DD (default: today, UTC)"
+        required: false
+        default: ""
+permissions:
+  contents: write   # push the result file to the forward-results branch only
+  issues: write
+concurrency:
+  group: forward-nearmiss
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      ASOF_IN: ${{ inputs.asof }}
+      GH_TOKEN: ${{ github.token }}
+      RESULTS_BRANCH: forward-results
+      EVID: run/audit/evidence_forward_nearmiss_20261120
+    steps:
+      # full history: the tool reads the first commit time of the preregistration
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Resolve dates and skip if this month is already recorded
+        id: when
+        run: |
+          set -euo pipefail
+          ASOF="${ASOF_IN:-$(date -u +%F)}"
+          [[ "$ASOF" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || { echo "asof must be YYYY-MM-DD"; exit 1; }
+          LAST_END=$(date -u -d "${ASOF%-*}-01 -1 day" +%F)
+          LAST_YM="${LAST_END:0:7}"
+          echo "asof=$ASOF" >> "$GITHUB_OUTPUT"
+          echo "last_end=$LAST_END" >> "$GITHUB_OUTPUT"
+          echo "last_ym=$LAST_YM" >> "$GITHUB_OUTPUT"
+          git fetch origin "$RESULTS_BRANCH" || true
+          if git cat-file -e "origin/$RESULTS_BRANCH:$EVID/forward_${LAST_END}.json" 2>/dev/null; then
+            echo "already recorded: forward_${LAST_END}.json"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Restore downloaded archives (immutable monthly files)
+        if: steps.when.outputs.skip != 'true'
+        uses: actions/cache@v4
+        with:
+          path: fwd-data
+          key: fwd-data-${{ steps.when.outputs.last_ym }}
+          restore-keys: fwd-data-
+      - name: Install numpy / pandas (same pins as research-ci)
+        if: steps.when.outputs.skip != 'true'
+        run: python -m pip install --quiet "numpy==2.2.6" "pandas==2.2.3"
+      - name: Fetch public monthly archives
+        if: steps.when.outputs.skip != 'true'
+        run: python3 run/forward_nearmiss.py fetch --data-dir fwd-data --asof "${{ steps.when.outputs.asof }}"
+      - name: Check the last complete month is really there
+        if: steps.when.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          n=$(ls fwd-data/daily/*-1d-${{ steps.when.outputs.last_ym }}.csv 2>/dev/null | wc -l)
+          echo "daily files for ${{ steps.when.outputs.last_ym }}: $n"
+          [ "$n" -ge 100 ] || { echo "archive for ${{ steps.when.outputs.last_ym }} not complete yet"; exit 1; }
+      - name: Evaluate (frozen preregistration)
+        if: steps.when.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          python3 run/forward_nearmiss.py evaluate --data-dir fwd-data \
+            --asof "${{ steps.when.outputs.asof }}" \
+            --out "$RUNNER_TEMP/forward_${{ steps.when.outputs.last_end }}.json" | tee "$RUNNER_TEMP/summary.txt"
+      - name: Store the result on the forward-results branch and open the issue
+        if: steps.when.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          F="forward_${{ steps.when.outputs.last_end }}.json"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git rev-parse --verify -q "origin/$RESULTS_BRANCH" >/dev/null; then
+            git checkout -q -B "$RESULTS_BRANCH" "origin/$RESULTS_BRANCH"
+          else
+            git checkout -q -B "$RESULTS_BRANCH" origin/main
+          fi
+          mkdir -p "$EVID"
+          cp "$RUNNER_TEMP/$F" "$EVID/$F"
+          git add "$EVID/$F"
+          git commit -q -m "forward paper record CL1/FIP1/AF1: $F (ADR 0115, automatic, no orders)"
+          git push origin "$RESULTS_BRANCH"
+          {
+            echo "CL1·FIP1·AF1 전진 모의 기록 — ${{ steps.when.outputs.last_end }}까지 계산 (주문 없음, 자동 실행)"
+            echo
+            echo '```'
+            cat "$RUNNER_TEMP/summary.txt"
+            echo '```'
+            echo
+            echo "결과 파일: \`$EVID/$F\` ([forward-results 브랜치](https://github.com/${{ github.repository }}/blob/$RESULTS_BRANCH/$EVID/$F))"
+            echo "규칙은 ADR 0112의 사전등록 그대로입니다. 중간 점검 182일(2027-05-23 이후), 최종 364일(2027-11-21). 이 이슈는 알림용이며 닫아도 됩니다."
+          } > "$RUNNER_TEMP/issue.md"
+          gh issue create --repo "${{ github.repository }}" --assignee tlsehd195 \
+            --title "전진 모의 기록 ${{ steps.when.outputs.last_end }}: $(head -n1 "$RUNNER_TEMP/summary.txt")" \
+            --body-file "$RUNNER_TEMP/issue.md"
+      - name: Failure notice
+        if: failure()
+        run: |
+          gh issue create --repo "${{ github.repository }}" --assignee tlsehd195 \
+            --title "전진 모의 기록 자동 실행 실패 (${{ steps.when.outputs.last_ym }})" \
+            --body "실행이 실패했습니다. 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} . 3일에 실패하면 5일에 한 번 더 시도하고, 그 뒤에도 실패면 수동 실행(workflow_dispatch)이 필요합니다. 기록에 구멍이 생겨도 아카이브는 사후에 받을 수 있어 데이터는 잃지 않습니다."
