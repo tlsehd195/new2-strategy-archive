@@ -118,3 +118,4 @@
 | [0112](0112-forward-paper-record-cl1-fip1-af1.md) | CL1·FIP1·AF1 전진 페이퍼 기록 2026-11-23 시작(공개 아카이브로 사후 계산, 주문 없음, BTC/ETH 제외); 182일 중간 실패 점검, 364일 최종(Holm α 0.0213) | Accepted (기록) |
 | [0113](0113-external-literature-ml-combo-famous-traders.md) | 외부 문헌 3건(해시 리본, 같은 요일 계절성, 선물 만기 창), 지도+비지도+강화학습 결합 2건, 발렌티니 거래량 프로파일 근사 2건, 쿨라매기 돌파·미너비니 템플릿 2건: 모두 NOT_PROMISING | Accepted (측정) |
 | [0114](0114-valentini-orderflow-full-process-aggtrades.md) | 발렌티니 방식 전체(지도, 뉴욕 추세·런던 평균회귀, A/B 등급, 0.25% 위험, 하루·주간 손실 규칙, 일지)를 체결 단위 aggTrades 1분 주문흐름으로 재현, 3건 모두 NOT_PROMISING; 손절 폭 대비 비용 0.83R이 벽 | Accepted (측정) |
+| [0115](0115-forward-nearmiss-monthly-automation.md) | CL1·FIP1·AF1 전진 모의 기록(ADR 0112)의 매달 자동 실행: GitHub Actions가 3일(5일 재시도) fetch→evaluate, 결과 파일은 forward-results 브랜치, 달마다 알림 이슈·실패 이슈; 규칙·구간 불변, 주문 없음 | Accepted (운영) |
