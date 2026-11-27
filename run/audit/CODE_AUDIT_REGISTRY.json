@@ -2088,13 +2088,13 @@
   {
    "added_after_baseline": true,
    "kind": "test",
-   "lines": 171,
+   "lines": 181,
    "note": "written in full and read by the author in ADR 0116",
    "path": "run/discovery/tests/test_adr0116_portfolio_inputs.py",
    "prior_status": null,
    "review_by": "ADR 0116 thread author (2026-11-27)",
-   "reviewed_sha256": "2a4c5f33577e75bbd8153ef0b3670b6cee854e95acaf6bd645c3f9e6cca95118",
-   "sha256": "2a4c5f33577e75bbd8153ef0b3670b6cee854e95acaf6bd645c3f9e6cca95118",
+   "reviewed_sha256": "0c010148064b9423d0526024eff72c02fd0f2de8483056a0f1a74ef68237cd00",
+   "sha256": "0c010148064b9423d0526024eff72c02fd0f2de8483056a0f1a74ef68237cd00",
    "status": "FULL_SOURCE_REVIEW",
    "tests": []
   },

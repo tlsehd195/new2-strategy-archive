@@ -79,12 +79,22 @@ class DecisionIndexBoundaryTest(unittest.TestCase):
         r = sim(self.b, [sig(8)])                      # entry would be the last (forced-close) bar
         self.assertEqual((r.trades, r.signals_unexecuted_at_data_end), (0, 1))
 
-    def test_numpy_integer_accepted(self):
-        try:
-            import numpy as np
-        except ImportError:  # pragma: no cover - CI unit step is stdlib-only
-            self.skipTest("numpy not installed")
-        self.assertEqual(sim(self.b, [sig(np.int64(2), h=2)]).trades, 1)
+    def test_registered_integral_accepted(self):
+        # numpy integers are registered as numbers.Integral without subclassing int;
+        # this stdlib stand-in behaves the same way (the engine suite is stdlib-only)
+        import numbers
+
+        class Int64Like:
+            def __init__(self, v):
+                self.v = v
+
+            def __index__(self):
+                return self.v
+
+            __int__ = __index__
+
+        numbers.Integral.register(Int64Like)
+        self.assertEqual(sim(self.b, [sig(Int64Like(2), h=2)]).trades, 1)
 
 
 class SignalFieldTest(unittest.TestCase):
