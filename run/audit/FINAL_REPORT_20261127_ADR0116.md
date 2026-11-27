@@ -11,7 +11,15 @@
 - 이번에 직접 읽은 범위: 지시문이 지목한 경로(전진 기록 `forward_nearmiss`·`newsrc_engine`, 일봉 엔진의 데이터 경로, `portfolio.py` 입력 처리, `paper_forward` 펀딩 조회, `data_fetch` 재시도·분류, `funding_schedule`, `src/*.ts` 4개 전부, `run_cycle.sh` 모드 처리, `portfolio_sim.py`, `research-ci.yml` 전체, 감사 도구 3개).
 - 레지스트리 상태(검토 해시 기준): 아래 표. 상태는 해당 sha256에서만 유효하고, 바뀌면 CI가 `CHANGED_SINCE_REVIEW`로 바꾼다.
 
-REGISTRY_TABLE
+| 종류 | FULL_SOURCE_REVIEW | LOGIC_TRACED | TESTED | PARTIALLY_REVIEWED | NOT_REVIEWED | CHANGED_SINCE_REVIEW | EXEMPTED_WITH_REASON | 합계 |
+|---|---|---|---|---|---|---|---|---|
+| config | 1 | 0 | 0 | 0 | 4 | 0 | 0 | 5 |
+| source | 33 | 73 | 16 | 22 | 76 | 7 | 1 | 228 |
+| test | 9 | 0 | 53 | 2 | 65 | 0 | 0 | 129 |
+| workflow | 0 | 0 | 0 | 1 | 2 | 0 | 0 | 3 |
+| 합계 | 43 | 73 | 69 | 25 | 147 | 7 | 1 | 365 |
+
+FULL_SOURCE_REVIEW / LOGIC_TRACED / TESTED 중 다수는 SOURCE_AUDIT_20261110의 독립 검토자 주장(작성자 미재확인)을 해시와 함께 옮긴 것이다(`review_by` 열).
 
 - 지시문 §11(연구 스크립트 202개 전수 정밀 검토)은 끝나지 않았다. 이번에 바꾼 파일 외에는 다시 읽지 않았고, 그 사실을 상태로 남겼다(E절).
 
@@ -42,7 +50,21 @@ ADR 0116 "발견" 표의 F-01~F-15. 요약:
 - 문서: ADR 0116, `docs/data_integrity_standard.md`, ADR 목록, `run/discovery/README.md`, `docs/worklog.md`.
 
 ## D. 테스트 결과
-TEST_TABLE
+| 항목 | 결과 |
+|---|---|
+| 엔진 단위 테스트 `run/discovery/tests` 전체 (Python 3.13, stdlib) | 1,206개 통과 (2,130초). 실행 뒤 `locked_shared/` 생성 없음 |
+| 엔진 단위 테스트 전체 (Python 3.11) | RESULT_311 |
+| 페이퍼·데이터 조회·포트폴리오 관련 묶음 (변경 후 코드, 3.13) | 230개 통과 |
+| 루트 연구 테스트 `run/test_*.py` (3.11 + numpy 2.2.6 / pandas 2.2.3, CI 고정 버전) | 323개 통과 |
+| 루트 연구 테스트 (3.13 + numpy 2.5.3 / pandas 3.0.5) | 323개 통과 |
+| bun 테스트 `src/tests` (bun 1.4.4) | 35개 통과 |
+| TypeScript strict 타입 검사 (typescript 5.7.3, bun-types 1.1.38) | 오류 0 (일부러 넣은 타입 오류는 잡힘을 확인) |
+| `bun build --no-bundle` 4개 파일 | 통과 |
+| ruff E9/F63/F7/F82 (run/*.py, run/audit, run/discovery), F (run/discovery) | 통과 |
+| 감사 검사: code_audit_registry / zero_fill_scan / source_audit / audit_provenance / research inventory | 모두 통과 |
+| shellcheck | 이 환경에 없음 — GitHub CI에서만 실행 |
+
+새 테스트: `test_research_data_integrity.py` 10, `test_forward_nearmiss.py` 무결성 클래스, `test_cross_section_v2.py` 1, `test_code_audit_registry.py` 7, `test_zero_fill_scan.py` 2, `test_adr0116_portfolio_inputs.py` 16, `test_adr0116_funding_causes.py` 6, `test_adr0116_legacy_entrypoints.py` 3, bun 35. 기준 커밋에서 같은 묶음(discovery 5개 파일)을 격리 없이 돌리면 base·변경 후 모두 같은 잠금 관련 실패가 나는데, 원인은 F-15(격리 모듈 미로드)였고 격리하면 모두 통과한다.
 
 ## E. 해결하지 못한 문제 (UNRESOLVED)
 1. 연구 스크립트 전수 정밀 검토(§11): 미완료. 레지스트리상 NOT_REVIEWED / CHANGED_SINCE_REVIEW 파일 수는 A절 표와 같다.
