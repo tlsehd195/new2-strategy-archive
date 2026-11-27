@@ -18,10 +18,9 @@
  *  - 재시도: 1회 점검당 최대 3회, 2/4/8초 지수 백오프, HTTP 429는 Retry-After(최대 300초)를 따른다.
  *    점검 주기는 1시간 그대로 — 무제한 재요청 없음.
  */
-import { appendFileSync, existsSync, readFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { accessSync, constants, mkdirSync } from "node:fs";
 
 export const PORT = 3021;
 export const THRESH = { fear: 25, greed: 75 }; // F2/X6 셀 thr25/75 양측 정의와 동일 (재검증 규격)
@@ -48,8 +47,12 @@ export function ensureWritableDir(dir: string): string {
   } catch (e) {
     throw new Error(`cannot create data directory ${dir}: ${String(e)}`);
   }
+  // a real write, not access(W_OK): the permission bits alone are not reliable
+  // (bun 1.1 returned success on a 0555 directory; Windows ACLs and network mounts differ)
+  const probe = join(dir, `.write-probe-${process.pid}-${Date.now()}`);
   try {
-    accessSync(dir, constants.W_OK);
+    writeFileSync(probe, "");
+    unlinkSync(probe);
   } catch (e) {
     throw new Error(`data directory ${dir} is not writable: ${String(e)}`);
   }

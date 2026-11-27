@@ -9,7 +9,7 @@
  * 게이트웨이 규격 준수: 이 서비스는 외부(Binance/OKX)로 나가는 클라이언트일 뿐, 외부 요청 URL에 절대경로 사용 안 함.
  */
 import { Database } from "bun:sqlite";
-import { accessSync, constants, mkdirSync } from "node:fs";
+import { mkdirSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -30,8 +30,12 @@ export function ensureWritableDir(dir: string): string {
   } catch (e) {
     throw new Error(`cannot create data directory ${dir}: ${String(e)}`);
   }
+  // a real write, not access(W_OK): the permission bits alone are not reliable
+  // (bun 1.1 returned success on a 0555 directory; Windows ACLs and network mounts differ)
+  const probe = join(dir, `.write-probe-${process.pid}-${Date.now()}`);
   try {
-    accessSync(dir, constants.W_OK);
+    writeFileSync(probe, "");
+    unlinkSync(probe);
   } catch (e) {
     throw new Error(`data directory ${dir} is not writable: ${String(e)}`);
   }

@@ -5114,13 +5114,13 @@
   {
    "added_after_baseline": false,
    "kind": "source",
-   "lines": 291,
+   "lines": 294,
    "note": "written in ADR 0116, read in full, dedicated tests pass",
    "path": "src/fng_watcher_index.ts",
    "prior_status": null,
    "review_by": "ADR 0116 thread author (2026-11-27)",
-   "reviewed_sha256": "c96852b6eec3b765fd35a1fadb2f6e36d8325242bf12e88d07944a13ad6d7b6a",
-   "sha256": "c96852b6eec3b765fd35a1fadb2f6e36d8325242bf12e88d07944a13ad6d7b6a",
+   "reviewed_sha256": "76932c9c9d75f933ea3a98c29ac3973bd0ba2d1b25587dfe468794a3cfe28e86",
+   "sha256": "76932c9c9d75f933ea3a98c29ac3973bd0ba2d1b25587dfe468794a3cfe28e86",
    "status": "TESTED",
    "tests": [
     "src/tests/collectors.test.ts"
@@ -5157,13 +5157,13 @@
   {
    "added_after_baseline": false,
    "kind": "source",
-   "lines": 239,
+   "lines": 243,
    "note": "paths, DB open, record validation read and tested; WS / OKX polling loop read only where records are built",
    "path": "src/liq_collector_index.ts",
    "prior_status": null,
    "review_by": "ADR 0116 thread author (2026-11-27)",
-   "reviewed_sha256": "bf5bddb4f480e909fb90dc4a68e676a7fba005ba888a0d35c1f1a047601b788e",
-   "sha256": "bf5bddb4f480e909fb90dc4a68e676a7fba005ba888a0d35c1f1a047601b788e",
+   "reviewed_sha256": "3cc8d3caf23a315d8a6dbe3c018bad34981cd4bb344764cc1c2c87234295e201",
+   "sha256": "3cc8d3caf23a315d8a6dbe3c018bad34981cd4bb344764cc1c2c87234295e201",
    "status": "PARTIALLY_REVIEWED",
    "tests": [
     "src/tests/collectors.test.ts"
@@ -5185,13 +5185,13 @@
   {
    "added_after_baseline": false,
    "kind": "source",
-   "lines": 640,
+   "lines": 644,
    "note": "rewritten in ADR 0116; ledger replay / recovery / statistics tested; the Bybit WebSocket handler is read but not exercised (no network)",
    "path": "src/maker_fill_monitor_index.ts",
    "prior_status": null,
    "review_by": "ADR 0116 thread author (2026-11-27)",
-   "reviewed_sha256": "53ceb7ae4b7d5363bf92c0f579eb29c7b5cbcb8931b5c83202791291ea035442",
-   "sha256": "53ceb7ae4b7d5363bf92c0f579eb29c7b5cbcb8931b5c83202791291ea035442",
+   "reviewed_sha256": "144ebf52aaf0ad15e2ee15b9d60bc443f1ff91e274692e9df68326a08247eba2",
+   "sha256": "144ebf52aaf0ad15e2ee15b9d60bc443f1ff91e274692e9df68326a08247eba2",
    "status": "TESTED",
    "tests": [
     "src/tests/maker_fill_monitor.test.ts"

@@ -36,7 +36,7 @@
  *    셀별·종목별·일자별(UTC, 주문 시각) 집계를 낸다.
  *  - 원장 쓰기 실패는 숨기지 않는다: 기록되지 않은 주문은 추적하지 않고 ledger_write_failures를 센다.
  */
-import { accessSync, appendFileSync, constants, existsSync, mkdirSync, readFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -101,8 +101,12 @@ export function ensureWritableDir(dir: string): string {
   } catch (e) {
     throw new Error(`cannot create data directory ${dir}: ${String(e)}`);
   }
+  // a real write, not access(W_OK): the permission bits alone are not reliable
+  // (bun 1.1 returned success on a 0555 directory; Windows ACLs and network mounts differ)
+  const probe = join(dir, `.write-probe-${process.pid}-${Date.now()}`);
   try {
-    accessSync(dir, constants.W_OK);
+    writeFileSync(probe, "");
+    unlinkSync(probe);
   } catch (e) {
     throw new Error(`data directory ${dir} is not writable: ${String(e)}`);
   }
