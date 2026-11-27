@@ -121,6 +121,41 @@ FUNDING_USABLE = ("VALID", "VALID_ZERO_RATE")
 #: The other non-usable statuses block the verdict of the step and are re-checked next step.
 FUNDING_STICKY = ("DATA_INVALID",)
 FUNDING_TOL_MS = 60_000
+#: ADR 0116 §8: WHY a fetch is not usable (``status`` says WHAT; gating uses ``status`` only).
+#: Recorded with every fetch so an operator can tell a network outage from an unsupported
+#: symbol, a changed API schema or data that was never collected.  Nothing is guessed: a
+#: cause that cannot be told apart is the broader class (e.g. HTTP 400 without a readable
+#: exchange error code is API_ERROR, not SYMBOL_UNSUPPORTED).
+FUNDING_CAUSES = ("NONE", "NETWORK_ERROR", "API_ERROR", "SYMBOL_UNSUPPORTED", "SCHEMA_CHANGED",
+                  "NOT_COLLECTED", "LOCAL_READ_ERROR", "DATA_INVALID", "COVERAGE_INCOMPLETE",
+                  "SCHEDULE_UNKNOWN")
+#: no feed caches funding answers: every call reads the source again (recorded per fetch)
+FUNDING_CACHE = "none: every funding_checked call reads the source again"
+_STATUS_CAUSE = {"VALID": "NONE", "VALID_ZERO_RATE": "NONE", "DATA_MISSING": "NOT_COLLECTED",
+                 "DATA_INVALID": "DATA_INVALID", "COVERAGE_INCOMPLETE": "COVERAGE_INCOMPLETE",
+                 "SCHEDULE_UNKNOWN": "SCHEDULE_UNKNOWN", "SOURCE_ERROR": "API_ERROR"}
+
+
+def funding_error_cause(exc: BaseException) -> str:
+    """Cause of a failed funding request (``data_fetch.FetchFailure`` or a JSON error)."""
+    kind = getattr(exc, "kind", None)
+    text = str(exc)
+    if kind in ("TRANSIENT", "PROXY_ERROR"):
+        return "NETWORK_ERROR"
+    if kind in ("EXCHANGE_ERROR", "NOT_PUBLISHED"):
+        # Binance answers an unknown symbol with HTTP 400 {"code":-1121,"msg":"Invalid symbol."}
+        return "SYMBOL_UNSUPPORTED" if ("-1121" in text or "invalid symbol" in text.lower()) else "API_ERROR"
+    if isinstance(exc, ValueError):
+        return "SCHEMA_CHANGED"          # the answer is not JSON any more
+    return "API_ERROR"
+
+
+def answer_cause(answer) -> str:
+    """Cause of an answer that parsed but is not the documented list."""
+    if isinstance(answer, dict) and "code" in answer:
+        msg = str(answer.get("msg", ""))
+        return "SYMBOL_UNSUPPORTED" if (answer.get("code") == -1121 or "invalid symbol" in msg.lower()) else "API_ERROR"
+    return "SCHEMA_CHANGED"
 #: ADR 0074: evidence integrity of a plan (warm-up sha256 in the plan id, hash-chained and
 #: sequenced funding / funding-quality logs anchored in the state).  A plan without it
 #: (registered under ADR 0073 only) is never concluded.
@@ -275,6 +310,10 @@ def funding_fetch_result(rows: Sequence, intervals: Mapping, *, source_files: Se
            "interval_basis": INTERVAL_BASIS_DECLARED if iv else INTERVAL_BASIS_NONE,
            "schedule_observation": None}
     out.update(extra or {})
+    out.setdefault("cause", _STATUS_CAUSE[status])
+    if out["cause"] not in FUNDING_CAUSES:
+        raise ValueError(f"unknown funding cause {out['cause']!r}")
+    out.setdefault("cache", FUNDING_CACHE)
     return out
 
 
@@ -286,7 +325,7 @@ def _fetch_summary(fr: Mapping) -> dict:
             "source_files": [{k: f.get(k) for k in ("name", "sha256", "rows", "status", "errors")}
                              for f in fr.get("source_files") or []],
             "interval_basis": fr.get("interval_basis"), "schedule_observation": fr.get("schedule_observation"),
-            **{k: fr[k] for k in ("missing_files", "future_rows") if k in fr}}
+            **{k: fr[k] for k in ("missing_files", "future_rows", "cause", "cache") if k in fr}}
 
 
 def _month_span(name: str, prefix: str) -> Optional[tuple[int, int]]:
@@ -420,7 +459,8 @@ class FileFeed:
         except OSError as e:
             return funding_fetch_result([], {}, status="SOURCE_ERROR", schedule_source=sched, query=query,
                                         issues=[f"{type(e).__name__}: {e}"],
-                                        extra={"missing_files": missing, "future_rows": 0})
+                                        extra={"missing_files": missing, "future_rows": 0,
+                                               "cause": "LOCAL_READ_ERROR"})
         rows = [(t, r) for t, r in pairs if after_ts < t <= now]
         ivs = {t: rep["intervals"][t] for t, _ in rows if t in rep["intervals"]}
         issues = [f"{fs['name']}: {e}" for fs in rep["file_status"] for e in fs["errors"]]
@@ -509,18 +549,18 @@ class BinancePublicFeed:
         sources: list[dict] = []
         obs: dict = {}
 
-        def err(msg):
+        def err(msg, cause):
             return funding_fetch_result([], {}, status="SOURCE_ERROR", source_files=sources, query=query,
                                         issues=[msg], schedule_source=None,
                                         extra={"schedule_observation": dict(obs) or None,
-                                               "interval_basis": INTERVAL_BASIS_NONE})
+                                               "interval_basis": INTERVAL_BASIS_NONE, "cause": cause})
         try:
             blob = self._get_raw("/fapi/v1/fundingInfo")
             info = json.loads(blob)
         except (FetchFailure, ValueError) as e:
-            return err(f"/fapi/v1/fundingInfo: {type(e).__name__}: {e}")
+            return err(f"/fapi/v1/fundingInfo: {type(e).__name__}: {e}", funding_error_cause(e))
         if not isinstance(info, list):
-            return err(f"/fapi/v1/fundingInfo: unexpected response {str(info)[:200]}")
+            return err(f"/fapi/v1/fundingInfo: unexpected response {str(info)[:200]}", answer_cause(info))
         sources.append({"name": "/fapi/v1/fundingInfo", "sha256": hashlib.sha256(blob).hexdigest(),
                         "rows": len(info), "status": "VALID", "errors": []})
         iv, listed = None, False
@@ -535,7 +575,7 @@ class BinancePublicFeed:
                    meaning="current snapshot; not valid for any past settlement (ADR 0074)")
         rows: list[tuple[int, float]] = []
         issues: list[str] = []
-        start, full = after_ts + 1, False
+        start, full, unparsable = after_ts + 1, False, 0
         for _ in range(self.MAX_FUNDING_PAGES):
             path = (f"/fapi/v1/fundingRate?symbol={sym}&startTime={start}&endTime={now}"
                     f"&limit={self.FUNDING_LIMIT}")
@@ -543,15 +583,16 @@ class BinancePublicFeed:
                 blob = self._get_raw(path)
                 data = json.loads(blob)
             except (FetchFailure, ValueError) as e:
-                return err(f"{path}: {type(e).__name__}: {e}")
+                return err(f"{path}: {type(e).__name__}: {e}", funding_error_cause(e))
             if not isinstance(data, list):
-                return err(f"{path}: unexpected response {str(data)[:200]}")
+                return err(f"{path}: unexpected response {str(data)[:200]}", answer_cause(data))
             errs = []
             for x in data:
                 try:
                     t, r = int(x["fundingTime"]), float(x["fundingRate"])
                 except (KeyError, TypeError, ValueError):
                     errs.append(f"unparsable row {str(x)[:80]}")
+                    unparsable += 1
                     continue
                 if not math.isfinite(r):
                     errs.append(f"non-finite rate at {t}")
@@ -583,10 +624,11 @@ class BinancePublicFeed:
                              "not the interval of past settlements" if iv is not None else
                              f"{sym} is not declared in /fapi/v1/fundingInfo")
                           + " (ADR 0074: no interval is assumed or back-dated)")
+        cause = ("SCHEMA_CHANGED" if status == "DATA_INVALID" and unparsable else _STATUS_CAUSE[status])
         return funding_fetch_result(rows, {}, source_files=sources, schedule_source=None, query=query,
                                     status=status, issues=issues,
                                     extra={"schedule_observation": dict(obs),
-                                           "interval_basis": INTERVAL_BASIS_NONE})
+                                           "interval_basis": INTERVAL_BASIS_NONE, "cause": cause})
 
     def funding(self, sym: str, after_ts: int) -> list[tuple[int, float]]:
         fr = self.funding_checked(sym, after_ts)

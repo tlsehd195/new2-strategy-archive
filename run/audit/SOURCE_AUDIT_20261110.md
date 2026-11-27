@@ -5,7 +5,7 @@
   `spot_checked`가 참인 행만 작성자가 직접 다시 읽어 확인했다.
 - 모든 행에서 lines_read = lines_total(파일 전체를 읽음).
 - ADR 0078: 각 행은 검토한 파일 판본(`reviewed_against`: 표 작성 커밋의 sha256)에 묶인다.
-  그 뒤 바뀐 파일은 `검토 후 변경`에 표시되며, 그 행의 수준은 검토한 판본에만 해당한다 (현재 9개).
+  그 뒤 바뀐 파일은 `검토 후 변경`에 표시되며, 그 행의 수준은 검토한 판본에만 해당한다 (현재 22개).
 
 ## 감사 수준별 개수
 
@@ -271,7 +271,7 @@
 | `p3_probe_liquidation.py` | FULL_SOURCE_REVIEW | 78 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `power_audit_ledger.py` | LOGIC_TRACED | 193 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
 | `power_audit_synthetic.py` | TESTED | 339 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
-| `run/discovery/data_fetch.py` | TESTED | 258 | NONE_FOUND | NONE_FOUND | POSSIBLE |  | 예 (현재 266줄) |
+| `run/discovery/data_fetch.py` | TESTED | 258 | NONE_FOUND | NONE_FOUND | POSSIBLE |  | 예 (현재 281줄) |
 | `run/discovery/execution_sim.py` | TESTED | 131 | NONE_FOUND | POSSIBLE | NONE_FOUND |  |  |
 | `run/discovery/funding_cost.py` | LOGIC_TRACED | 326 | NONE_FOUND | CONFIRMED | POSSIBLE |  | 예 (현재 327줄) |
 | `run/discovery/generation.py` | TESTED | 478 | NONE_FOUND | NONE_FOUND | POSSIBLE |  |  |
@@ -279,7 +279,7 @@
 | `run/discovery/newlisting_collect.py` | TESTED | 323 | POSSIBLE | NONE_FOUND | POSSIBLE | 예 | 예 (현재 349줄) |
 | `run/discovery/ops.py` | TESTED | 235 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  | 예 (현재 257줄) |
 | `run/discovery/paper.py` | TESTED | 106 | NONE_FOUND | NONE_FOUND | POSSIBLE |  | 예 (현재 126줄) |
-| `run/discovery/portfolio_sim.py` | FULL_SOURCE_REVIEW | 162 | NONE_FOUND | CONFIRMED | CONFIRMED |  | 예 (현재 169줄) |
+| `run/discovery/portfolio_sim.py` | FULL_SOURCE_REVIEW | 162 | NONE_FOUND | CONFIRMED | CONFIRMED |  | 예 (현재 182줄) |
 | `run/discovery/public_market_collect.py` | TESTED | 164 | NONE_FOUND | POSSIBLE | NONE_FOUND |  |  |
 | `run/discovery/repro_bundle.py` | TESTED | 207 | NONE_FOUND | NONE_FOUND | POSSIBLE | 예 | 예 (현재 215줄) |
 | `run/discovery/store.py` | TESTED | 323 | NONE_FOUND | NONE_FOUND | POSSIBLE | 예 | 예 (현재 364줄) |
@@ -288,7 +288,7 @@
 | `test_broad_universe.py` | TESTED | 79 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `test_bundle_regime.py` | TESTED | 43 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `test_candidate_regime.py` | TESTED | 48 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
-| `test_cross_section_v2.py` | TESTED | 111 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `test_cross_section_v2.py` | TESTED | 111 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  | 예 (현재 132줄) |
 | `test_dev_window_guard.py` | TESTED | 50 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `test_evalue_v3.py` | TESTED | 30 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `test_evalue_walkforward.py` | TESTED | 115 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
@@ -334,28 +334,28 @@
 | `x8_taker_flow_diag.py` | LOGIC_TRACED | 307 | NONE_FOUND | POSSIBLE | CONFIRMED |  |  |
 | `x9_engine_crosscheck.py` | LOGIC_TRACED | 178 | NONE_FOUND | POSSIBLE | POSSIBLE |  |  |
 | `x9_ticket_size_diag.py` | LOGIC_TRACED | 316 | POSSIBLE | POSSIBLE | CONFIRMED |  |  |
-| `dca_extreme_dev.py` | LOGIC_TRACED | 418 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `dca_extreme_dev.py` | LOGIC_TRACED | 418 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  | 예 (현재 422줄) |
 | `dca_extreme_prepare.py` | LOGIC_TRACED | 85 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `test_dca_extreme.py` | TESTED | 128 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
-| `dca_stop_dev.py` | LOGIC_TRACED | 364 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `dca_stop_dev.py` | LOGIC_TRACED | 364 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  | 예 (현재 364줄) |
 | `test_dca_stop.py` | TESTED | 128 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
-| `dca_limit_dev.py` | LOGIC_TRACED | 327 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `dca_limit_dev.py` | LOGIC_TRACED | 327 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  | 예 (현재 327줄) |
 | `dca_winners_analysis.py` | LOGIC_TRACED | 230 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `test_dca_limit.py` | TESTED | 107 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
-| `dca_struct_dev.py` | LOGIC_TRACED | 352 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `dca_struct_dev.py` | LOGIC_TRACED | 352 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  | 예 (현재 352줄) |
 | `test_dca_struct.py` | TESTED | 85 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `winloss_catalog.py` | TESTED | 318 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `winloss_combo_dev.py` | LOGIC_TRACED | 403 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `test_winloss_combo.py` | TESTED | 79 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `maker_lowloss_dev.py` | LOGIC_TRACED | 709 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `test_maker_lowloss.py` | TESTED | 113 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
-| `lowfreq_nonprice_dev.py` | LOGIC_TRACED | 455 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `lowfreq_nonprice_dev.py` | LOGIC_TRACED | 455 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  | 예 (현재 465줄) |
 | `test_lowfreq_nonprice.py` | TESTED | 102 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `h4_retest_dev.py` | LOGIC_TRACED | 327 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `test_h4_retest.py` | TESTED | 114 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
-| `newsrc_r1_dev.py` | LOGIC_TRACED | 527 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `newsrc_r1_dev.py` | LOGIC_TRACED | 527 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  | 예 (현재 547줄) |
 | `test_newsrc_r1.py` | TESTED | 70 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
-| `newsrc_engine.py` | LOGIC_TRACED | 241 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `newsrc_engine.py` | LOGIC_TRACED | 241 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  | 예 (현재 294줄) |
 | `newsrc_r2_dev.py` | LOGIC_TRACED | 133 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `test_newsrc_r2.py` | TESTED | 57 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `newsrc_r3_dev.py` | LOGIC_TRACED | 156 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
@@ -374,19 +374,19 @@
 | `test_newsrc_r9.py` | TESTED | 28 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `newsrc_r10_dev.py` | LOGIC_TRACED | 98 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `test_newsrc_r10.py` | TESTED | 33 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
-| `newsrc_r11_dev.py` | LOGIC_TRACED | 133 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `newsrc_r11_dev.py` | LOGIC_TRACED | 133 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  | 예 (현재 137줄) |
 | `test_newsrc_r11.py` | TESTED | 50 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `newsrc_r12_dev.py` | LOGIC_TRACED | 103 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `test_newsrc_r12.py` | TESTED | 53 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `newsrc_r13_dev.py` | LOGIC_TRACED | 119 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `test_newsrc_r13.py` | TESTED | 51 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
-| `newsrc_r14_dev.py` | LOGIC_TRACED | 157 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `newsrc_r14_dev.py` | LOGIC_TRACED | 157 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  | 예 (현재 160줄) |
 | `test_newsrc_r14.py` | TESTED | 44 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `confirm_iw0.py` | LOGIC_TRACED | 225 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `test_confirm_iw0.py` | TESTED | 67 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
-| `forward_nearmiss.py` | LOGIC_TRACED | 246 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
-| `test_forward_nearmiss.py` | TESTED | 85 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
-| `ml_combo_r15b_dev.py` | LOGIC_TRACED | 238 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
+| `forward_nearmiss.py` | LOGIC_TRACED | 246 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  | 예 (현재 333줄) |
+| `test_forward_nearmiss.py` | TESTED | 85 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  | 예 (현재 291줄) |
+| `ml_combo_r15b_dev.py` | LOGIC_TRACED | 238 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  | 예 (현재 238줄) |
 | `newsrc_r15_dev.py` | LOGIC_TRACED | 172 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `test_ml_combo_r15b.py` | TESTED | 60 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |
 | `test_newsrc_r15.py` | TESTED | 66 | NONE_FOUND | NONE_FOUND | NONE_FOUND |  |  |

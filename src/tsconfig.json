@@ -1,0 +1,17 @@
+{
+  "//": "ADR 0116 §14: type check only (tsc --noEmit). Each service is deployed as a single index.ts; see run/discovery/README.",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM"],
+    "types": ["bun-types"],
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": false,
+    "noUnusedLocals": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["*.ts", "tests/*.ts"]
+}

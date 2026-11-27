@@ -95,7 +95,7 @@ def run_segment(data: Path, seg: str, syms: list, cal: dict) -> dict:
         for t, o in ii.items():
             io.at[t, s] = o
     fund = bu.load_funding(data, syms, t0, t1)
-    fund["day"] = ((fund["t"] - 1) // DAY) * DAY
+    fund["day"] = bu.rdi.funding_day(fund["t"].values)  # ADR 0116 F-04: settlement jitter stays on its day
     fd = fund.groupby(["day", "sym"])["rate"].sum().unstack().reindex(days).reindex(columns=syms)
     ok = po.notna() & io.notna() & (po > 0) & (io > 0)
     ret_p = po.shift(-1) / po - 1.0

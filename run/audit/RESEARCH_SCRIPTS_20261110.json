@@ -67,12 +67,13 @@
   "read_status": "TESTED",
   "traced": null,
   "legacy": false,
-  "lines": 164,
+  "lines": 169,
   "doc": "Eight WorldQuant '101 Formulaic Alphas' as a weekly cross-section, DEV only (ADR 0054).",
   "adr": [
    "035",
    "040",
-   "054"
+   "054",
+   "116"
   ],
   "flags": {}
  },
@@ -186,7 +187,8 @@
   "lines": 209,
   "doc": "Spot-index long / perp short basis harvest, DEV only (ADR 0060).",
   "adr": [
-   "060"
+   "060",
+   "116"
   ],
   "flags": {
    "neg_shift": 3
@@ -199,14 +201,15 @@
   "read_status": "TESTED",
   "traced": "SEGMENTS / NEVER / assert_allowed and the four loaders (load_funding, load_bar2345 had no guard)",
   "legacy": false,
-  "lines": 416,
+  "lines": 462,
   "doc": "Broad-universe cross-sectional DEV check (ADR 0035).",
   "adr": [
    "012",
    "035",
    "038",
    "039",
-   "066"
+   "066",
+   "116"
   ],
   "flags": {
    "neg_shift": 1
@@ -613,11 +616,12 @@
   "read_status": "TESTED",
   "traced": "shift(-1) realised return, as above",
   "legacy": false,
-  "lines": 255,
+  "lines": 264,
   "doc": "Five new cross-sectional hypotheses, DEV only, measured alt cost (ADR 0040).",
   "adr": [
    "035",
-   "040"
+   "040",
+   "116"
   ],
   "flags": {
    "neg_shift": 1
@@ -630,11 +634,12 @@
   "read_status": "TESTED",
   "traced": null,
   "legacy": false,
-  "lines": 418,
+  "lines": 422,
   "doc": "Daily prior-extreme scale-in (DCA / \"물타기\") strategy, DEV only (ADR 0088).",
   "adr": [
    "072",
-   "088"
+   "088",
+   "116"
   ],
   "flags": {
    "neg_shift": 1
@@ -869,10 +874,11 @@
   "read_status": "TESTED",
   "traced": null,
   "legacy": false,
-  "lines": 246,
+  "lines": 333,
   "doc": "Forward paper record of the near-miss candidates CL1, FIP1, AF1 (ADR 0112).",
   "adr": [
-   "112"
+   "112",
+   "116"
   ],
   "flags": {}
  },
@@ -991,11 +997,12 @@
   "read_status": "TESTED",
   "traced": "shift(-1) realised return, as above",
   "legacy": false,
-  "lines": 288,
+  "lines": 329,
   "doc": "High/low line + volume-spike strategy, DEV only, measured alt cost (ADR 0043).",
   "adr": [
    "035",
-   "043"
+   "043",
+   "116"
   ],
   "flags": {
    "neg_shift": 1
@@ -1158,12 +1165,13 @@
   "read_status": "TESTED",
   "traced": null,
   "legacy": false,
-  "lines": 455,
+  "lines": 465,
   "doc": "Low-frequency (28-day) time-series momentum + Binance metrics cross-section, DEV only (ADR 0094).",
   "adr": [
    "041",
    "047",
-   "094"
+   "094",
+   "116"
   ],
   "flags": {
    "neg_shift": 1
@@ -1258,7 +1266,8 @@
   "lines": 238,
   "doc": "Round 15b, DEV only (ADR 0113): supervised + unsupervised + RL walk-forward combination.",
   "adr": [
-   "113"
+   "113",
+   "116"
   ],
   "flags": {}
  },
@@ -1314,12 +1323,13 @@
   "read_status": "LOGIC_TRACED",
   "traced": null,
   "legacy": false,
-  "lines": 241,
+  "lines": 294,
   "doc": "Shared cross-sectional DEV engine of the repeated new-source rounds (ADR 0097 onwards).",
   "adr": [
    "041",
    "047",
-   "097"
+   "097",
+   "116"
   ],
   "flags": {
    "neg_shift": 1
@@ -1346,10 +1356,11 @@
   "read_status": "TESTED",
   "traced": null,
   "legacy": false,
-  "lines": 133,
+  "lines": 137,
   "doc": "Round 11 of the repeated new-source search, DEV only (ADR 0106).",
   "adr": [
-   "106"
+   "106",
+   "116"
   ],
   "flags": {}
  },
@@ -1388,10 +1399,11 @@
   "read_status": "TESTED",
   "traced": null,
   "legacy": false,
-  "lines": 157,
+  "lines": 160,
   "doc": "Round 14 of the repeated new-source search, DEV only (ADR 0109).",
   "adr": [
-   "109"
+   "109",
+   "116"
   ],
   "flags": {
    "network": 2
@@ -1421,11 +1433,12 @@
   "read_status": "TESTED",
   "traced": null,
   "legacy": false,
-  "lines": 527,
+  "lines": 547,
   "doc": "Round 1 of the repeated new-source search, DEV only (ADR 0096).",
   "adr": [
    "041",
-   "096"
+   "096",
+   "116"
   ],
   "flags": {
    "neg_shift": 1
@@ -1679,6 +1692,22 @@
   "flags": {}
  },
  {
+  "file": "research_data_integrity.py",
+  "class": "NOT_SURVEYED",
+  "reason": "no rule — new file",
+  "read_status": "TESTED",
+  "traced": null,
+  "legacy": false,
+  "lines": 413,
+  "doc": "Common data-integrity rules of the daily cross-sectional research scripts (ADR 0116).",
+  "adr": [
+   "039",
+   "041",
+   "116"
+  ],
+  "flags": {}
+ },
+ {
   "file": "residual_signals_dev.py",
   "class": "KEPT_INDEPENDENT",
   "reason": "market-factor residual panel signals (ADR 0051); NOT_PROMISING",
@@ -1795,6 +1824,20 @@
   "flags": {}
  },
  {
+  "file": "test_code_audit_registry.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 113,
+  "doc": "ADR 0116 §10: code audit registry — temp git repository only (never the real tree).",
+  "adr": [
+   "116"
+  ],
+  "flags": {}
+ },
+ {
   "file": "test_confirm_iw0.py",
   "class": "TEST",
   "reason": "unit test of a run/ tool (root-level research tests, CI)",
@@ -1815,10 +1858,11 @@
   "read_status": "TESTED",
   "traced": null,
   "legacy": false,
-  "lines": 111,
+  "lines": 132,
   "doc": "Tests for the cross-section v2 DEV check (ADR 0040). Needs numpy and pandas.",
   "adr": [
-   "040"
+   "040",
+   "116"
   ],
   "flags": {}
  },
@@ -1940,10 +1984,11 @@
   "read_status": "TESTED",
   "traced": null,
   "legacy": false,
-  "lines": 85,
+  "lines": 291,
   "doc": "Tests for the forward paper record of CL1/FIP1/AF1 (ADR 0112). Synthetic data only.",
   "adr": [
-   "112"
+   "112",
+   "116"
   ],
   "flags": {}
  },
@@ -2381,6 +2426,20 @@
   "flags": {}
  },
  {
+  "file": "test_research_data_integrity.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 136,
+  "doc": "ADR 0116: common data-integrity rules of the daily research scripts. Synthetic data only.",
+  "adr": [
+   "116"
+  ],
+  "flags": {}
+ },
+ {
   "file": "test_residual_signals.py",
   "class": "TEST",
   "reason": "unit test of a run/ tool (root-level research tests, CI)",
@@ -2506,6 +2565,20 @@
   "flags": {}
  },
  {
+  "file": "test_zero_fill_scan.py",
+  "class": "TEST",
+  "reason": "unit test of a run/ tool (root-level research tests, CI)",
+  "read_status": "INVENTORIED",
+  "traced": null,
+  "legacy": false,
+  "lines": 41,
+  "doc": "ADR 0116: zero-fill ratchet — temp directory only.",
+  "adr": [
+   "116"
+  ],
+  "flags": {}
+ },
+ {
   "file": "traders_r15d_dev.py",
   "class": "NOT_SURVEYED",
   "reason": "no rule — new file",
@@ -2571,11 +2644,12 @@
   "read_status": "TESTED",
   "traced": "shift(-1) realised return, as above",
   "legacy": false,
-  "lines": 383,
+  "lines": 391,
   "doc": "Wide-universe cross-sectional DEV check with effective independent names (ADR 0044).",
   "adr": [
    "041",
-   "044"
+   "044",
+   "116"
   ],
   "flags": {
    "neg_shift": 1

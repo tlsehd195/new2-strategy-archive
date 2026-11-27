@@ -36,6 +36,9 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE / "discovery"))
 from engine_lib import expected_max_sr  # noqa: E402
 
+sys.path.insert(0, str(HERE))
+import research_data_integrity as rdi  # noqa: E402
+
 VERSION = "broad-universe-dev-v1"
 EVID = HERE / "audit" / "evidence_broad_universe_20261023"
 PREREG = EVID / "prereg_broad_universe_v1.json"
@@ -89,7 +92,11 @@ def load_daily(data: Path, seg: str) -> dict:
             t = int(f[0])
             if t0 <= t <= t1:
                 recs.append((sym, t, float(f[1]), float(f[4]), float(f[7])))
-    df = pd.DataFrame(recs, columns=["sym", "t", "open", "close", "qv"]).drop_duplicates(["sym", "t"])
+    df = pd.DataFrame(recs, columns=["sym", "t", "open", "close", "qv"])
+    # ADR 0116: conflicting duplicate rows, off-grid times and invalid prices are
+    # recorded and become missing values (the old drop_duplicates kept the first copy)
+    df, _ = rdi.clean_panel(df, ("open", "close", "qv"), positive_cols=("open", "close"), nonneg_cols=("qv",),
+                            log=rdi.panel_log("broad_universe_dev.load_daily", data, seg))
     assert df["t"].between(t0, t1).all()
     days = np.arange(t0, t1 + 1, DAY_MS)
     piv = {k: df.pivot(index="t", columns="sym", values=k).reindex(days) for k in ("open", "close", "qv")}
@@ -100,16 +107,30 @@ def load_funding(data: Path, syms: list, t0: int, t1: int) -> pd.DataFrame:
     """Funding settlements in [t0, t1 + 1 day].  The requested range must not
     touch a never-read range (ADR 0066).  The one settlement at 00:00 after t1
     is the payment for holding on the last DEV day; its rate is fixed from the
-    premium of the 8 h before it (DEV time)."""
+    premium of the 8 h before it (DEV time).
+
+    ADR 0116: the archive's settlement times carry a few ms of jitter, so the
+    upper bound includes the tolerance of ``funding_schedule`` (the 00:00:00.002
+    settlement of the day after t1 used to be dropped), and the declared
+    ``funding_interval_hours`` of every settlement is kept as ``interval_ms``
+    (NaN when the row declares none) for the completeness check."""
     assert_allowed(t0, t1)
     recs = []
     for s in syms:
         for p in sorted((data / "funding").glob(f"{s}-fundingRate-*.csv")):
             for f in read_rows(p):
                 t = int(f[0])
-                if t0 <= t <= t1 + DAY_MS:
-                    recs.append((s, t, float(f[2])))
-    return pd.DataFrame(recs, columns=["sym", "t", "rate"])
+                if t0 <= t <= t1 + DAY_MS + rdi.FUNDING_TOL_MS:
+                    try:
+                        iv = float(f[1]) * 3_600_000 if len(f) > 2 and f[1].strip() else float("nan")
+                    except ValueError:
+                        iv = float("nan")
+                    try:
+                        rate = float(f[2])
+                    except (IndexError, ValueError):
+                        rate = float("nan")       # recorded as FUNDING_DATA_INVALID by the check
+                    recs.append((s, t, rate, iv))
+    return pd.DataFrame(recs, columns=["sym", "t", "rate", "interval_ms"])
 
 
 def load_bar2345(data: Path, syms: list, t0: int, t1: int) -> dict:
@@ -203,9 +224,10 @@ def run_segment(data: Path, seg: str, cost: dict) -> dict:
     t0, t1 = int(days[0]), int(days[-1])
     fund = load_funding(data, syms, t0, t1)
     # funding settled in (d 00:00, d+1 00:00] belongs to day d
-    fund["day"] = ((fund["t"] - 1) // DAY_MS) * DAY_MS
+    fund["day"] = rdi.funding_day(fund["t"].values)   # ADR 0116: settlement jitter
     fund_daily = fund.groupby(["day", "sym"])["rate"].sum().unstack().reindex(days)
     fund_daily = fund_daily.reindex(columns=syms)
+    fcal = rdi.FundingCalendar(fund, syms)
     bars = load_bar2345(data, syms, t0, t1)
     opn, qv = piv["open"], piv["qv"]
     # open-to-open return of day d (held from d 00:00 to d+1 00:00)
@@ -219,7 +241,11 @@ def run_segment(data: Path, seg: str, cost: dict) -> dict:
     gross_daily = {h: np.zeros(len(days)) for h in hyps}
     mkt = np.full(len(days), np.nan)
     flags = {"missing_return_days": 0, "impact_bar_fallback": 0, "participation_over_max": 0,
-             "no_volume_cost_fallback": 0, "rebalances": 0, "universe_sizes": []}
+             "no_volume_cost_fallback": 0, "rebalances": 0, "universe_sizes": [],
+             "funding_invalid_name_days": 0, "impact_volume_missing": 0}
+    state = {h: rdi.SeriesState(len(days), h) for h in hyps}
+    ret_a = ret.values
+    col = {s: k for k, s in enumerate(syms)}
     turnover = {h: [] for h in hyps}
     cost_paid = {h: 0.0 for h in hyps}
     prev = {h: {} for h in hyps}
@@ -242,7 +268,7 @@ def run_segment(data: Path, seg: str, cost: dict) -> dict:
         # market: equal weight of the universe
         for d in hold:
             r = ret.iloc[d][universe]
-            mkt[d] = float(r.mean()) if r.notna().any() else 0.0
+            mkt[d] = float(r.mean()) if r.notna().any() else float("nan")
         for h in hyps:
             w = pick(sig[h], universe, LONG_TOP[h])
             if not w:
@@ -255,16 +281,20 @@ def run_segment(data: Path, seg: str, cost: dict) -> dict:
                     dw = abs(w.get(s, 0.0) - prev[h].get(s, 0.0))
                     if dw == 0:
                         continue
-                    b = bars.get((s, int(days[i - 1]) + 23 * 3_600_000 + 45 * 60_000))
-                    if b is None or b <= 0:
-                        dq = qv.iloc[i - 1][s] if not math.isnan(qv.iloc[i - 1][s]) else np.nan
-                        if m == "assumed":
+                    # ADR 0116: observed vs estimated impact volume; none = cost unknown (old: 1.0)
+                    b, kind = rdi.impact_volume(bars, qv, s, i, int(days[i - 1]) + 23 * 3_600_000 + 45 * 60_000)
+                    if m == "assumed":
+                        if kind != "OBSERVED_BAR2345":
                             flags["impact_bar_fallback"] += 1
-                        if not (dq > 0):
-                            dq = float(np.nanmean(qv[s].iloc[max(0, i - 30): i].values)) if s in qv else np.nan
-                            if m == "assumed":
-                                flags["no_volume_cost_fallback"] += 1
-                        b = dq / 96.0 if dq > 0 else 1.0
+                        if kind in ("ESTIMATED_MEAN30_96", "MISSING"):
+                            flags["no_volume_cost_fallback"] += 1
+                        # the 30-day volume is a cost input only for the calibrated cost
+                        if not state[h].cost_volume(i, s, days, b, kind, float(vol30[s]) if "calib" in cost else None):
+                            flags["impact_volume_missing"] += 1
+                    if b is None or ("calib" in cost and not (vol30[s] > 0)):
+                        if m == "assumed":
+                            to += dw
+                        continue
                     if m == "assumed" and ORDER_VALUE / b > cost["maxp"]:
                         flags["participation_over_max"] += 1
                     c = side_cost(b, cost, m, vol30[s] / 96.0)
@@ -275,21 +305,21 @@ def run_segment(data: Path, seg: str, cost: dict) -> dict:
                 if m == "assumed":
                     cost_paid[h] += cst
             turnover[h].append(to)
-            for d in hold:
-                pnl = 0.0
-                for s, ws in w.items():
-                    r = ret.iloc[d][s]
-                    if math.isnan(r):
-                        flags["missing_return_days"] += 1
-                        r = 0.0
-                    f = fund_daily.iloc[d][s] if s in fund_daily.columns else np.nan
-                    pnl += ws * r - ws * (0.0 if math.isnan(f) else f)
+
+            def add(d, pnl, h=h):
                 gross_daily[h][d] += pnl
                 for m in modes:
                     daily[h][m][d] += pnl
+            # fixed weights (no drift, as before); a missing return / funding is unobserved, never 0
+            state[h].hold(dict(w), hold.start, hold.stop, ret_a, col, days, fcal, add, drift=False, flags=flags)
             prev[h] = w
     lo_i = active[0] if active else 0
     span = slice(lo_i, len(days) - 1)
+    for h in hyps:
+        state[h].finish([*daily[h].values(), gross_daily[h]])
+    flags["invalid_days"] = {h: int(state[h].invalid[span].sum()) for h in hyps}
+    res_issues = {h: state[h].log.to_json() for h in hyps}
+    res_volume = {h: state[h].volume.to_json() for h in hyps}
     res = {"days": [int(x) for x in days[span]], "mkt": mkt[span]}
     res["daily"] = {h: {m: daily[h][m][span] for m in modes} for h in hyps}
     res["gross"] = {h: gross_daily[h][span] for h in hyps}
@@ -298,6 +328,8 @@ def run_segment(data: Path, seg: str, cost: dict) -> dict:
     us = flags.pop("universe_sizes")
     flags["universe_size_min_mean"] = [min(us) if us else 0, float(np.mean(us)) if us else 0.0]
     res["flags"] = flags
+    res["issues"], res["volume"] = res_issues, res_volume
+    res["panel_issues"] = rdi.panel_issues(data, seg)
     return res
 
 
@@ -319,7 +351,14 @@ def ever_top50(data: Path) -> list:
 
 
 def stats(x: np.ndarray, mkt: np.ndarray) -> dict:
+    """Daily-series statistics.  ADR 0116: a NaN day is a day whose PnL was not
+    observable (research_data_integrity); it is excluded here and counted in
+    ``n_days_unobserved`` — results with exclusions are not full-period results."""
     x = np.asarray(x, float)
+    mkt = np.asarray(mkt, float)
+    n_total = len(x)
+    keep = np.isfinite(x)
+    x, mkt = x[keep], mkt[keep] if len(mkt) == n_total else mkt
     n = len(x)
     sd = x.std(ddof=1) if n > 1 else float("nan")
     m = x.mean()
@@ -333,7 +372,9 @@ def stats(x: np.ndarray, mkt: np.ndarray) -> dict:
         res = x[ok] - beta * mkt[ok]
         a_mean = float(res.mean())
         a_t = float(res.mean() / res.std(ddof=1) * math.sqrt(len(res)))
-    return {"n_days": n, "sr_ann": float(m / sd * math.sqrt(365)) if sd > 0 else 0.0,
+    return {"n_days": n, "n_days_unobserved": int(n_total - n),
+            "unobserved_share": float((n_total - n) / n_total) if n_total else 0.0,
+            "sr_ann": float(m / sd * math.sqrt(365)) if sd > 0 else 0.0,
             "ann_return_pct": float(m * 365 * 100), "max_dd_pct": mdd * 100,
             "t": float(m / sd * math.sqrt(n)) if sd > 0 else 0.0,
             "beta": beta, "corr_mkt": corr, "alpha_bp_day": a_mean * 1e4, "alpha_t": a_t}
@@ -366,11 +407,15 @@ def main(argv=None) -> int:
            "cost_profile_sha256": sha(COST_PROFILE),
            "cost_record_sha256": sha(a.cost_record) if a.cost_record else None,
            "cost_calibration_sha256": sha(a.cost_calibration) if a.cost_calibration else None,
-           "cost": cost if "calib" not in cost else {"calibration": a.cost_calibration.name, "maxp": cost["maxp"]}, "segments": {}, "hypotheses": {}}
+           "cost": cost if "calib" not in cost else {"calibration": a.cost_calibration.name, "maxp": cost["maxp"]},
+           "data_policy": rdi.POLICY, "cost_evidence": rdi.COST_EVIDENCE, "segments": {}, "hypotheses": {}}
     segs = {s: run_segment(a.data_dir, s, cost) for s in SEGMENTS}
     for s, r in segs.items():
         out["segments"][s] = {"first_day": r["days"][0], "last_day": r["days"][-1], "n_days": len(r["days"]),
-                              "flags": r["flags"], "market_ew": stats(np.nan_to_num(r["mkt"]), r["mkt"])}
+                              "flags": r["flags"], "issues": r["issues"], "volume_provenance": r["volume"],
+                              "panel_issues": r["panel_issues"],
+                              # market proxy: days without any observed return are excluded (not 0)
+                              "market_ew": stats(r["mkt"], r["mkt"])}
     s1_years = len(segs["S1"]["days"]) / 365.0
     null4 = expected_max_sr(4) / math.sqrt(s1_years)
     nullref = expected_max_sr(PRIOR_TRIALS_REF + 4) / math.sqrt(s1_years)
@@ -394,7 +439,8 @@ def main(argv=None) -> int:
         s1, s2 = row["S1"]["assumed"], row["S2"]["assumed"]
         promising = (s1["sr_ann"] > null4 and s1["alpha_t"] >= 2 and min(row["S1"]["halves_sr_ann"]) > 0
                      and s2["sr_ann"] > 0.5)
-        row["flag"] = "DEV_PROMISING" if promising else "NOT_PROMISING"
+        row["flag"] = rdi.withhold_flag("DEV_PROMISING" if promising else "NOT_PROMISING",
+                                        [row[s]["assumed"] for s in segs])
         out["hypotheses"][h] = row
     a.out.write_text(json.dumps(out, indent=1, default=float))
     print(f"null max SR (N=4) {null4:.2f}; reference N={PRIOR_TRIALS_REF + 4}: {nullref:.2f}")

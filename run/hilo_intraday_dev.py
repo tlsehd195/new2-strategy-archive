@@ -289,7 +289,7 @@ def main(argv=None) -> int:
     segs = {s: run_segment(a.data_dir, s, cfgs, costs, ever) for s in SEGMENTS}
     for s, r in segs.items():
         out["segments"][s] = {"first_day": r["days"][0], "last_day": r["days"][-1], "n_days": len(r["days"]),
-                              "flags": r["flags"], "market_ew": bu.stats(np.nan_to_num(r["mkt"]), r["mkt"])}
+                              "flags": r["flags"], "market_ew": bu.stats(r["mkt"], r["mkt"])}
     s1_years = len(segs["S1"]["days"]) / 365.0
     n_cfg = len(cfgs)
     prior = hv.prior_trials()

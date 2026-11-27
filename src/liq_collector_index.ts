@@ -9,14 +9,36 @@
  * 게이트웨이 규격 준수: 이 서비스는 외부(Binance/OKX)로 나가는 클라이언트일 뿐, 외부 요청 URL에 절대경로 사용 안 함.
  */
 import { Database } from "bun:sqlite";
+import { accessSync, constants, mkdirSync } from "node:fs";
+import { dirname, isAbsolute, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const PORT = 3020;
-const DB_PATH = new URL("./data/liquidations.db", import.meta.url).pathname;
+export const PORT = 3020;
 
-// ---------- DB ----------
-const db = new Database(DB_PATH);
-db.exec("PRAGMA journal_mode = WAL;");
-db.exec(`
+// ---------- 저장 위치 (ADR 0116 §6-1) ----------
+// LIQ_DATA_DIR(절대 또는 이 파일 기준 상대경로), 없으면 <이 파일 위치>/data.
+// URL.pathname은 Windows("/C:/...")와 공백(%20)에서 틀린 경로를 만든다 → fileURLToPath.
+export function resolveDataDir(configured: string | undefined, baseDir: string): string {
+  if (!configured || !configured.trim()) return join(baseDir, "data");
+  return isAbsolute(configured) ? configured : resolve(baseDir, configured);
+}
+
+/** 폴더를 만들고 쓰기 권한을 확인한다. 실패는 이유가 담긴 Error (조용히 실패하지 않음). */
+export function ensureWritableDir(dir: string): string {
+  try {
+    mkdirSync(dir, { recursive: true });
+  } catch (e) {
+    throw new Error(`cannot create data directory ${dir}: ${String(e)}`);
+  }
+  try {
+    accessSync(dir, constants.W_OK);
+  } catch (e) {
+    throw new Error(`data directory ${dir} is not writable: ${String(e)}`);
+  }
+  return dir;
+}
+
+export const SCHEMA = `
 CREATE TABLE IF NOT EXISTS liquidations (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   ts_ms INTEGER NOT NULL,
@@ -32,12 +54,34 @@ CREATE TABLE IF NOT EXISTS liquidations (
 );
 CREATE UNIQUE INDEX IF NOT EXISTS ux_liq ON liquidations(exchange, symbol, ts_ms, side, price, qty);
 CREATE INDEX IF NOT EXISTS ix_ts ON liquidations(ts_ms);
-`);
+`;
 
-const ins = db.prepare(
-  `INSERT OR IGNORE INTO liquidations (ts_ms, exchange, symbol, side, pos_side, price, qty, qty_unit, raw, collected_at)
-   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-);
+/** 저장 폴더 생성·쓰기 확인 후 DB를 연다. 실패하면 이유가 담긴 Error. */
+export function openDb(dataDir: string): { db: Database; path: string } {
+  const dir = ensureWritableDir(dataDir);
+  const path = join(dir, "liquidations.db");
+  let db: Database;
+  try {
+    db = new Database(path, { create: true });
+    db.exec("PRAGMA journal_mode = WAL;");
+    db.exec(SCHEMA);
+  } catch (e) {
+    throw new Error(`cannot open liquidation DB ${path}: ${String(e)}`);
+  }
+  return { db, path };
+}
+
+/** 한 건의 청산 기록이 저장할 만한지 검사 (시간·가격·수량이 유한한 양수). */
+export function validRecord(ts: number, price: number, qty: number): string | null {
+  if (!Number.isFinite(ts) || ts <= 0) return `bad ts ${ts}`;
+  if (!Number.isFinite(price) || price <= 0) return `bad price ${price}`;
+  if (!Number.isFinite(qty) || qty <= 0) return `bad qty ${qty}`;
+  return null;
+}
+
+let db: Database;
+let DB_PATH = "";
+let ins: ReturnType<Database["prepare"]>;
 
 // ---------- 통계 ----------
 const state = {
@@ -48,6 +92,7 @@ const state = {
   okx_last_ok: null as number | null,
   inserted: 0,
   dedup_skipped: 0,
+  rejected: 0,
   errors: [] as string[],
 };
 function noteError(src: string, e: unknown) {
@@ -73,9 +118,13 @@ function connectBinance() {
         const msg = JSON.parse(String(ev.data));
         const o = msg?.data?.o;
         if (!o) return;
-        const ts = Number(o.T || msg.data.E || Date.now());
+        // 이벤트 시각이 없으면 수신 시각으로 대체하지 않는다 (ADR 0116: 대체값 금지)
+        const ts = Number(o.T || msg.data.E);
+        const price = Number(o.ap || o.p), qty = Number(o.z || o.l);
+        const bad = validRecord(ts, price, qty);
+        if (bad) { state.rejected++; noteError("binance_invalid", bad); return; }
         // SELL = 롱 포지션 강제청산, BUY = 숏 포지션 강제청산
-        countInserted(ins.run(ts, "binance", o.s, o.S, null, Number(o.ap || o.p), Number(o.z || o.l || 0), "coin", JSON.stringify(o), Date.now()));
+        countInserted(ins.run(ts, "binance", o.s, o.S, null, price, qty, "coin", JSON.stringify(o), Date.now()));
       } catch (e) { noteError("binance_parse", e); }
     };
     ws.onclose = () => {
@@ -108,7 +157,8 @@ async function pollOkx() {
         const sym = g.uly ?? g.instId ?? uly;
         for (const d of g.details ?? []) {
           const ts = Number(d.time || d.ts || 0);
-          if (!ts) continue;
+          const bad = validRecord(ts, Number(d.bkPx), Number(d.sz));
+          if (bad) { state.rejected++; noteError("okx_invalid", bad); continue; }
           // posSide long→청산 주문 side sell / short→buy
           countInserted(ins.run(ts, "okx", sym, d.side, d.pos_side, Number(d.bkPx), Number(d.sz), "contract", JSON.stringify(d), Date.now()));
         }
@@ -141,6 +191,8 @@ function statsPayload() {
     okx_last_ok: state.okx_last_ok ? new Date(state.okx_last_ok).toISOString() : null,
     inserted: state.inserted,
     dedup_skipped: state.dedup_skipped,
+    rejected_invalid: state.rejected,
+    db_path: DB_PATH,
     by_exchange: rows.map((r) => ({
       exchange: r.exchange,
       n: r.n,
@@ -151,23 +203,37 @@ function statsPayload() {
   };
 }
 
-Bun.serve({
-  port: PORT,
-  fetch(req) {
-    const u = new URL(req.url);
-    if (u.pathname === "/stats" || u.pathname === "/api/stats") {
-      return new Response(JSON.stringify(statsPayload(), null, 2), {
-        headers: { "Content-Type": "application/json; charset=utf-8" },
+if (import.meta.main) {
+  try {
+    const o = openDb(resolveDataDir(process.env.LIQ_DATA_DIR, dirname(fileURLToPath(import.meta.url))));
+    db = o.db;
+    DB_PATH = o.path;
+  } catch (e) {
+    console.error(`[p3-liq-collector] cannot start: ${String(e)}`);
+    process.exit(1);
+  }
+  ins = db.prepare(
+    `INSERT OR IGNORE INTO liquidations (ts_ms, exchange, symbol, side, pos_side, price, qty, qty_unit, raw, collected_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  );
+  Bun.serve({
+    port: PORT,
+    fetch(req) {
+      const u = new URL(req.url);
+      if (u.pathname === "/stats" || u.pathname === "/api/stats") {
+        return new Response(JSON.stringify(statsPayload(), null, 2), {
+          headers: { "Content-Type": "application/json; charset=utf-8" },
+        });
+      }
+      return new Response(JSON.stringify({ ok: true, hint: "/stats" }), {
+        headers: { "Content-Type": "application/json" },
       });
-    }
-    return new Response(JSON.stringify({ ok: true, hint: "/stats" }), {
-      headers: { "Content-Type": "application/json" },
-    });
-  },
-});
+    },
+  });
 
-// ---------- 시작 ----------
-connectBinance();
-pollOkx();
-setInterval(pollOkx, 60_000); // OKX 60초 폴링 — 최근 청산 누적
-console.log(`[p3-liq-collector] started on :${PORT} — DB ${DB_PATH}`);
+  // ---------- 시작 ----------
+  connectBinance();
+  pollOkx();
+  setInterval(pollOkx, 60_000); // OKX 60초 폴링 — 최근 청산 누적
+  console.log(`[p3-liq-collector] started on :${PORT} — DB ${DB_PATH}`);
+}

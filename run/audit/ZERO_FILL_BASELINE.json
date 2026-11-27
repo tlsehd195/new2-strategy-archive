@@ -1,0 +1,21 @@
+{
+ "run/aggtrades_minute_build.py": 1,
+ "run/audit/evidence_independent_check_20261102/independent_engine.py": 2,
+ "run/basis_harvest_dev.py": 2,
+ "run/bundle_regime_dev.py": 1,
+ "run/candidate_regime_dev.py": 1,
+ "run/confirm_iw0.py": 2,
+ "run/gold_dev.py": 6,
+ "run/hilo_intraday_dev.py": 1,
+ "run/liquid_search_dev.py": 3,
+ "run/maker_lowloss_dev.py": 1,
+ "run/ml_combo_r15b_dev.py": 3,
+ "run/newlisting_short_dev.py": 2,
+ "run/strong_search_dev.py": 3,
+ "run/structural_search_dev.py": 5,
+ "run/unsup_regime_dev.py": 1,
+ "run/valentini_of_dev.py": 2,
+ "run/valentini_vp_r15c_dev.py": 1,
+ "run/wide_universe_dev.py": 1,
+ "run/winloss_combo_dev.py": 1
+}

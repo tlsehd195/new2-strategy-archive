@@ -27,6 +27,7 @@ import pandas as pd
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import broad_universe_dev as bu  # noqa: E402
+import research_data_integrity as rdi  # noqa: E402
 import newsrc_engine as ne  # noqa: E402
 import wide_universe_dev as wu  # noqa: E402
 
@@ -81,7 +82,9 @@ def load_volume(data: Path, seg: str, days: np.ndarray, syms: list) -> pd.DataFr
             t = int(f[0])
             if t0 <= t <= t1:
                 recs.append((sym, t, float(f[5])))
-    df = pd.DataFrame(recs, columns=["sym", "t", "vol"]).drop_duplicates(["sym", "t"])
+    df = pd.DataFrame(recs, columns=["sym", "t", "vol"])
+    df, _ = rdi.clean_panel(df, ("vol",), nonneg_cols=("vol",),
+                            log=rdi.panel_log("newsrc_r14_dev.load_volume", data, seg))   # ADR 0116
     return df.pivot(index="t", columns="sym", values="vol").reindex(days).reindex(columns=syms)
 
 

@@ -29,6 +29,7 @@ import pandas as pd
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import broad_universe_dev as bu  # noqa: E402
+import research_data_integrity as rdi  # noqa: E402
 from broad_universe_dev import expected_max_sr  # noqa: E402
 
 VERSION = "cross-section-dev-v2"
@@ -56,7 +57,10 @@ def load_daily(data: Path, seg: str) -> dict:
             t = int(f[0])
             if t0 <= t <= t1:
                 recs.append((sym, t, float(f[1]), float(f[4]), float(f[7]), float(f[10])))
-    df = pd.DataFrame(recs, columns=["sym", "t", "open", "close", "qv", "tbq"]).drop_duplicates(["sym", "t"])
+    df = pd.DataFrame(recs, columns=["sym", "t", "open", "close", "qv", "tbq"])
+    # ADR 0116: conflicting duplicates / off-grid times / invalid values are recorded, never kept silently
+    df, _ = rdi.clean_panel(df, ("open", "close", "qv", "tbq"), positive_cols=("open", "close"),
+                            nonneg_cols=("qv", "tbq"), log=rdi.panel_log("cross_section_v2_dev.load_daily", data, seg))
     assert df["t"].between(t0, t1).all()
     days = np.arange(t0, t1 + 1, bu.DAY_MS)
     return {k: df.pivot(index="t", columns="sym", values=k).reindex(days) for k in ("open", "close", "qv", "tbq")}
@@ -109,12 +113,11 @@ def run_segment(data: Path, seg: str, measured: dict, assumed: dict) -> dict:
     syms = list(piv["open"].columns)
     t0, t1 = int(days[0]), int(days[-1])
     fund = bu.load_funding(data, syms, t0, t1)
-    fund["day"] = ((fund["t"] - 1) // bu.DAY_MS) * bu.DAY_MS
-    fund_daily = fund.groupby(["day", "sym"])["rate"].sum().unstack().reindex(days).reindex(columns=syms)
+    fund["day"] = rdi.funding_day(fund["t"].values)       # ADR 0116: settlement jitter
+    fcal = rdi.FundingCalendar(fund, syms)
     bars = bu.load_bar2345(data, syms, t0, t1)
     opn, qv = piv["open"], piv["qv"]
     ret = (opn.shift(-1) / opn - 1.0).values
-    fnd = fund_daily.values
     col = {s: k for k, s in enumerate(syms)}
     n_bars = piv["close"].notna().cumsum()
     last_bar = {s: (piv["close"][s].last_valid_index()) for s in syms}
@@ -124,7 +127,9 @@ def run_segment(data: Path, seg: str, measured: dict, assumed: dict) -> dict:
     mkt = np.full(len(days), np.nan)
     flags = {"missing_return_days": 0, "impact_bar_fallback": 0, "no_volume_cost_fallback": 0,
              "participation_over_max": 0, "rebalances": 0, "universe_sizes": [],
-             "data_end_while_held": {h: {"long": 0, "short": 0} for h in hyps}}
+             "data_end_while_held": {h: {"long": 0, "short": 0} for h in hyps},
+             "funding_invalid_name_days": 0, "impact_volume_missing": 0}
+    state = {h: rdi.SeriesState(len(days), h) for h in hyps}
     turnover = {h: [] for h in hyps}
     cost_paid = {h: 0.0 for h in hyps}
     held = {h: {} for h in hyps}  # drifted weights
@@ -145,24 +150,27 @@ def run_segment(data: Path, seg: str, measured: dict, assumed: dict) -> dict:
         uc = [col[s] for s in universe]
         for d in range(i, end):
             r = ret[d, uc]
-            mkt[d] = float(np.nanmean(r)) if np.isfinite(r).any() else 0.0
+            mkt[d] = float(np.nanmean(r)) if np.isfinite(r).any() else float("nan")
         bar_t = int(days[i - 1]) + 23 * 3_600_000 + 45 * 60_000
         for h in hyps:
             w = bu.pick(sig[h], universe, LONG_TOP[h])
             prev = held[h]
+            state[h].rebalance(i, prev, days)
             to = 0.0
             for s in sorted(set(w) | set(prev)):
                 dw = abs(w.get(s, 0.0) - prev.get(s, 0.0))
                 if dw == 0:
                     continue
-                b = bars.get((s, bar_t))
-                if b is None or b <= 0:
+                # ADR 0116: observed vs estimated impact volume; none = cost unknown (old: 1.0)
+                b, kind = rdi.impact_volume(bars, qv, s, i, bar_t)
+                if kind != "OBSERVED_BAR2345":
                     flags["impact_bar_fallback"] += 1
-                    dq = qv.iloc[i - 1][s]
-                    if not (dq > 0):
-                        dq = float(np.nanmean(qv[s].iloc[max(0, i - 30): i].values))
-                        flags["no_volume_cost_fallback"] += 1
-                    b = dq / 96.0 if dq > 0 else 1.0
+                if kind in ("ESTIMATED_MEAN30_96", "MISSING"):
+                    flags["no_volume_cost_fallback"] += 1
+                if not state[h].cost_volume(i, s, days, b, kind):
+                    flags["impact_volume_missing"] += 1
+                    to += dw
+                    continue
                 if bu.ORDER_VALUE / b > measured["maxp"]:
                     flags["participation_over_max"] += 1
                 for row in COST_ROWS:
@@ -175,26 +183,26 @@ def run_segment(data: Path, seg: str, measured: dict, assumed: dict) -> dict:
                 if lb is not None and lb < days[end] and lb >= days[i]:
                     flags["data_end_while_held"][h]["long" if ws > 0 else "short"] += 1
             cur = dict(w)
-            for d in range(i, end):
-                pnl = 0.0
-                for s, ws in cur.items():
-                    r = ret[d, col[s]]
-                    if math.isnan(r):
-                        flags["missing_return_days"] += 1
-                        r = 0.0
-                    f = fnd[d, col[s]]
-                    pnl += ws * r - ws * (0.0 if math.isnan(f) else f)
-                    cur[s] = ws * (1.0 + r)
+
+            def add(d, pnl, h=h):
                 for row in COST_ROWS:
                     daily[h][row][d] += pnl
+            # a missing return / funding is an unobserved day, never 0 (ADR 0116)
+            state[h].hold(cur, i, end, ret, col, days, fcal, add, drift=True, flags=flags)
             held[h] = cur
     span = slice(reb[0], len(days) - 1)
+    for h in hyps:
+        state[h].finish(daily[h].values())
+    flags["invalid_days"] = {h: int(state[h].invalid[span].sum()) for h in hyps}
     us = flags.pop("universe_sizes")
     flags["universe_size_min_mean"] = [min(us) if us else 0, float(np.mean(us)) if us else 0.0]
     return {"days": [int(x) for x in days[span]], "mkt": mkt[span],
             "daily": {h: {r: daily[h][r][span] for r in COST_ROWS} for h in hyps},
             "turnover": {h: float(np.mean(turnover[h])) if turnover[h] else 0.0 for h in hyps},
-            "cost_paid": cost_paid, "flags": flags}
+            "cost_paid": cost_paid, "flags": flags,
+            "issues": {h: state[h].log.to_json() for h in hyps},
+            "volume": {h: state[h].volume.to_json() for h in hyps},
+            "panel_issues": rdi.panel_issues(data, seg)}
 
 
 def flag(row: dict, null_sr: float) -> str:
@@ -213,11 +221,12 @@ def main(argv=None) -> int:
     out = {"version": VERSION, "prereg_sha256": bu.sha(PREREG), "script_sha256": bu.sha(Path(__file__)),
            "helper_sha256": bu.sha(HERE / "broad_universe_dev.py"), "cost_record_sha256": bu.sha(COST_RECORD),
            "cost_profile_sha256": bu.sha(bu.COST_PROFILE), "cost": {"measured": measured, "assumed": assumed},
-           "segments": {}, "hypotheses": {}}
+           "data_policy": rdi.POLICY, "cost_evidence": rdi.COST_EVIDENCE, "segments": {}, "hypotheses": {}}
     segs = {s: run_segment(a.data_dir, s, measured, assumed) for s in SEGMENTS}
     for s, r in segs.items():
         out["segments"][s] = {"first_day": r["days"][0], "last_day": r["days"][-1], "n_days": len(r["days"]),
-                              "flags": r["flags"], "market_ew": bu.stats(np.nan_to_num(r["mkt"]), r["mkt"])}
+                              "flags": r["flags"], "issues": r["issues"], "volume_provenance": r["volume"],
+                              "panel_issues": r["panel_issues"], "market_ew": bu.stats(r["mkt"], r["mkt"])}
     s1_years = len(segs["S1"]["days"]) / 365.0
     null_sr = expected_max_sr(len(LONG_TOP)) / math.sqrt(s1_years)
     out["null_max_sr_ann"] = {f"N={len(LONG_TOP)}": null_sr}
@@ -231,7 +240,7 @@ def main(argv=None) -> int:
             x = r["daily"][h]["measured"]
             half = len(x) // 2
             row[s]["halves_sr_ann"] = [bu.stats(x[:half], mk[:half])["sr_ann"], bu.stats(x[half:], mk[half:])["sr_ann"]]
-        row["flag"] = flag(row, null_sr)
+        row["flag"] = rdi.withhold_flag(flag(row, null_sr), [row[s]["measured"] for s in segs])
         out["hypotheses"][h] = row
     s1 = pd.DataFrame({h: segs["S1"]["daily"][h]["measured"] for h in LONG_TOP})
     out["s1_correlation_measured"] = s1.corr().round(3).to_dict()

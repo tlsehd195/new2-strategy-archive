@@ -35,6 +35,7 @@ sys.path.insert(0, str(HERE))
 import broad_universe_dev as bu
 import cross_section_v2_dev as cs
 import lowliq_cost_calibration as lc
+import research_data_integrity as rdi
 from broad_universe_dev import expected_max_sr
 
 VERSION = "wide-universe-dev-v1"
@@ -144,12 +145,12 @@ def run_segment(data: Path, seg: str, cal: dict) -> dict:
     syms = list(piv["open"].columns)
     t0, t1 = int(days[0]), int(days[-1])
     fund = bu.load_funding(data, syms, t0, t1)
-    fund["day"] = ((fund["t"] - 1) // bu.DAY_MS) * bu.DAY_MS
+    fund["day"] = rdi.funding_day(fund["t"].values)
     fund_daily = fund.groupby(["day", "sym"])["rate"].sum().unstack().reindex(days).reindex(columns=syms)
+    fcal = rdi.FundingCalendar(fund, syms)      # ADR 0116: declared-schedule completeness per held day
     bars = bu.load_bar2345(data, syms, t0, t1)
     opn, qv = piv["open"], piv["qv"]
     ret = (opn.shift(-1) / opn - 1.0).values
-    fnd = fund_daily.values
     col = {s: k for k, s in enumerate(syms)}
     n_bars = piv["close"].notna().cumsum()
     last_bar = {s: piv["close"][s].last_valid_index() for s in syms}
@@ -160,7 +161,9 @@ def run_segment(data: Path, seg: str, cal: dict) -> dict:
     turnover = {k: [] for k in keys}
     sizes = {k: [] for k in keys}
     legs = {k: [0, 0] for k in keys}  # traded legs, legs over max participation
+    state = {k: rdi.SeriesState(len(days), f"{k[1]}:{k[0]}") for k in keys}
     flags = {"missing_return_days": 0, "impact_bar_fallback": 0, "no_volume_cost_fallback": 0,
+             "funding_invalid_name_days": 0, "impact_volume_missing": 0,
              "skipped_small_universe": {u: 0 for u in UNIVERSES},
              "data_end_while_held": {f"{h}:{u}": {"long": 0, "short": 0} for h, u in keys}}
     held = {k: {} for k in keys}
@@ -195,22 +198,25 @@ def run_segment(data: Path, seg: str, cal: dict) -> dict:
                     uc = [col[s] for s in universe]
                     for d in range(i, end):
                         r = ret[d, uc]
-                        mkt[k][d] = float(np.nanmean(r)) if np.isfinite(r).any() else 0.0
+                        mkt[k][d] = float(np.nanmean(r)) if np.isfinite(r).any() else float("nan")
                 prev = held[k]
+                state[k].rebalance(i, prev, days)
                 to = 0.0
                 for s in sorted(set(w) | set(prev)):
                     dw = abs(w.get(s, 0.0) - prev.get(s, 0.0))
                     if dw == 0:
                         continue
-                    b = bars.get((s, bar_t))
-                    if b is None or b <= 0:
+                    # ADR 0116: observed vs estimated impact volume; no volume = cost unknown (old: 1.0)
+                    b, kind = rdi.impact_volume(bars, qv, s, i, bar_t)
+                    if kind != "OBSERVED_BAR2345":
                         flags["impact_bar_fallback"] += 1
-                        dq = qv.iloc[i - 1][s]
-                        if not (dq > 0):
-                            dq = float(np.nanmean(qv[s].iloc[max(0, i - 30): i].values))
-                            flags["no_volume_cost_fallback"] += 1
-                        b = dq / 96.0 if dq > 0 else 1.0
-                    q15 = float(v30[s]) / 96.0 if not math.isnan(v30[s]) else 0.0
+                    if kind in ("ESTIMATED_MEAN30_96", "MISSING"):
+                        flags["no_volume_cost_fallback"] += 1
+                    if not state[k].cost_volume(i, s, days, b, kind, float(v30[s])):
+                        flags["impact_volume_missing"] += 1
+                        to += dw
+                        continue
+                    q15 = float(v30[s]) / 96.0
                     legs[k][0] += 1
                     if bu.ORDER_VALUE / b > cal["maxp"]:
                         legs[k][1] += 1
@@ -224,23 +230,20 @@ def run_segment(data: Path, seg: str, cal: dict) -> dict:
                     if lb is not None and days[i] <= lb < days[end]:
                         flags["data_end_while_held"][f"{h}:{u}"]["long" if ws > 0 else "short"] += 1
                 cur = dict(w)
-                for d in range(i, end):
-                    pnl = 0.0
-                    for s, ws in cur.items():
-                        r = ret[d, col[s]]
-                        if math.isnan(r):
-                            flags["missing_return_days"] += 1
-                            r = 0.0
-                        f = fnd[d, col[s]]
-                        pnl += ws * r - ws * (0.0 if math.isnan(f) else f)
-                        cur[s] = ws * (1.0 + r)
+
+                def add(d, pnl, k=k):
                     for row in COST_ROWS:
                         daily[k][row][d] += pnl
+                # ADR 0116: a missing return / funding is an unobserved day, never 0
+                state[k].hold(cur, i, end, ret, col, days, fcal, add, drift=True, flags=flags)
                 held[k] = cur
         spans[h] = reb[0] if reb else 0
     # common comparison span: from the first rebalance of the shortest hold on, to the last day
     start = min(spans.values())
     span = slice(start, len(days) - 1)
+    for k in keys:
+        state[k].finish(daily[k].values())
+    flags["invalid_days"] = {f"{k[1]}:{k[0]}": int(state[k].invalid[span].sum()) for k in keys}
     # effective independent names on the Monday grid (all universes)
     neff = {u: [] for u in UNIVERSES}
     for i in reb_by_hold[7]:
@@ -257,7 +260,10 @@ def run_segment(data: Path, seg: str, cal: dict) -> dict:
             "daily": {k: {r: v[span] for r, v in daily[k].items()} for k in keys},
             "mkt": {k: v[span] for k, v in mkt.items()},
             "turnover": {k: float(np.mean(v)) if v else 0.0 for k, v in turnover.items()},
-            "cost_paid": cost_paid, "legs": legs, "sizes": sizes, "neff": neff, "flags": flags}
+            "cost_paid": cost_paid, "legs": legs, "sizes": sizes, "neff": neff, "flags": flags,
+            "issues": {f"{k[1]}:{k[0]}": state[k].log.to_json() for k in keys},
+            "volume": {f"{k[1]}:{k[0]}": state[k].volume.to_json() for k in keys},
+            "panel_issues": rdi.panel_issues(data, seg)}
 
 
 def neff_summary(rows: list) -> dict:
@@ -315,11 +321,13 @@ def main(argv=None) -> int:
     cal = {**cal["calib"], "maxp": cal["maxp"]}
     out = {"version": VERSION, "prereg_sha256": bu.sha(PREREG), "script_sha256": bu.sha(Path(__file__)),
            "helper_sha256": bu.sha(HERE / "broad_universe_dev.py"), "calibration_sha256": bu.sha(CALIBRATION),
-           "floor_usdt_per_day": FLOOR, "segments": {}, "hypotheses": {}}
+           "floor_usdt_per_day": FLOOR, "data_policy": rdi.POLICY, "cost_evidence": rdi.COST_EVIDENCE,
+           "segments": {}, "hypotheses": {}}
     segs = {s: run_segment(a.data_dir, s, cal) for s in SEGMENTS}
     for s, r in segs.items():
         out["segments"][s] = {"first_day": r["days"][0], "last_day": r["days"][-1], "n_days": len(r["days"]),
-                              "flags": r["flags"],
+                              "flags": r["flags"], "issues": r["issues"], "volume_provenance": r["volume"],
+                              "panel_issues": r["panel_issues"],
                               "effective_names": {u: neff_summary(r["neff"][u]) for u in UNIVERSES}}
     s1_years = len(segs["S1"]["days"]) / 365.0
     prior = prior_trials()
@@ -357,7 +365,7 @@ def main(argv=None) -> int:
             x = r["daily"][k]["cal"]
             half = len(x) // 2
             row[s]["halves_sr_ann"] = [bu.stats(x[:half], mk[:half])["sr_ann"], bu.stats(x[half:], mk[half:])["sr_ann"]]
-        row["flag"] = flag(row, null_sr)
+        row["flag"] = rdi.withhold_flag(flag(row, null_sr), [row[s]["cal"] for s in segs])
         row["s1_sr_above_cumulative_null"] = row["S1"]["cal"]["sr_ann"] > null_cum
         out["hypotheses"][f"{u}:{h}"] = row
     a.out.write_text(json.dumps(out, indent=1, default=float))

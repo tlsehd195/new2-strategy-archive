@@ -12,10 +12,10 @@ Read status: INVENTORIED = header, imports, paths and risk patterns scanned (not
 | DUPLICATE_RESEARCH | superseded by a later tool for the same hypothesis | 1 |
 | RETIRED_OR_ON_HOLD | retired v1 execution path (LEGACY_SCRIPTS.md) or on hold | 43 |
 | NEEDS_MORE_DATA | hypothesis needs a dataset the repository does not have | 21 |
-| TEST | test file of a run/ tool | 55 |
-| NOT_SURVEYED | not surveyed | 34 |
+| TEST | test file of a run/ tool | 58 |
+| NOT_SURVEYED | not surveyed | 35 |
 
-Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 60, TESTED 109
+Read status: FULL_SOURCE_REVIEW 33, INVENTORIED 3, LOGIC_TRACED 60, TESTED 110
 
 | file | lines | class | read status | reason | flags |
 |---|---|---|---|---|---|
@@ -23,7 +23,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 60, TESTED 109
 | `a1_family_precheck.py` | 129 | INTEGRATED_CORE | LOGIC_TRACED | A1 Amihud illiquidity z (prior-960 window) = feature illiq_z of opt-in set v2 (ADR 0066); script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=2 |
 | `a1_illiq_diag.py` | 263 | INTEGRATED_CORE | LOGIC_TRACED | A1 Amihud illiquidity z (prior-960 window) = feature illiq_z of opt-in set v2 (ADR 0066); script itself retired (v1 paths, LEGACY_SCRIPTS.md) — traced: header rule (z vs prior 960, shift 1) — used for illiq_z | future_index=5, v1_path=2 |
 | `aggtrades_minute_build.py` | 254 | NOT_SURVEYED | LOGIC_TRACED | no rule — new file | network=2 |
-| `alpha101_dev.py` | 164 | KEPT_INDEPENDENT | TESTED | weekly cross-section of 101 Alphas (ADR 0054): multi-asset panel, engine is per-symbol; NOT_PROMISING |  |
+| `alpha101_dev.py` | 169 | KEPT_INDEPENDENT | TESTED | weekly cross-section of 101 Alphas (ADR 0054): multi-asset panel, engine is per-symbol; NOT_PROMISING |  |
 | `alt_download.py` | 62 | RETIRED_OR_ON_HOLD | FULL_SOURCE_REVIEW | alt funding extremes, v1 rounds; funding signal = funding_z in the engine (BTC/ETH), alt cross-sections re-done by broad/wide_universe_dev; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | network=3, v1_path=2 |
 | `alt_download_r2.py` | 61 | RETIRED_OR_ON_HOLD | FULL_SOURCE_REVIEW | alt funding extremes, v1 rounds; funding signal = funding_z in the engine (BTC/ETH), alt cross-sections re-done by broad/wide_universe_dev; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | network=3, v1_path=2 |
 | `alt_funding_diag.py` | 271 | RETIRED_OR_ON_HOLD | LOGIC_TRACED | alt funding extremes, v1 rounds; funding signal = funding_z in the engine (BTC/ETH), alt cross-sections re-done by broad/wide_universe_dev; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=2 |
@@ -32,7 +32,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 60, TESTED 109
 | `alt_funding_r2_engine_crosscheck.py` | 173 | RETIRED_OR_ON_HOLD | LOGIC_TRACED | v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029) | v1_path=2 |
 | `alt_funding_r2_precheck.py` | 78 | RETIRED_OR_ON_HOLD | LOGIC_TRACED | alt funding extremes, v1 rounds; funding signal = funding_z in the engine (BTC/ETH), alt cross-sections re-done by broad/wide_universe_dev; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=2 |
 | `basis_harvest_dev.py` | 209 | KEPT_INDEPENDENT | LOGIC_TRACED | spot-index long / perp short (ADR 0060): two-leg carry; NOT_PROMISING — traced: shift(-1): open-to-next-open realised return of a position opened at the signal open | neg_shift=3 |
-| `broad_universe_dev.py` | 416 | KEPT_INDEPENDENT | TESTED | broad-universe cross-section (ADR 0035); also the shared DEV-window guard / loaders of the panel tools — traced: SEGMENTS / NEVER / assert_allowed and the four loaders (load_funding, load_bar2345 had no guard) | neg_shift=1 |
+| `broad_universe_dev.py` | 462 | KEPT_INDEPENDENT | TESTED | broad-universe cross-section (ADR 0035); also the shared DEV-window guard / loaders of the panel tools — traced: SEGMENTS / NEVER / assert_allowed and the four loaders (load_funding, load_bar2345 had no guard) | neg_shift=1 |
 | `broad_universe_fetch.py` | 204 | KEPT_INDEPENDENT | FULL_SOURCE_REVIEW | public download for the panel tools (ADR 0035) | network=2 |
 | `bundle_regime_dev.py` | 211 | KEPT_INDEPENDENT | TESTED | bundle by regime vs buy-and-hold (ADR 0026); NOT stable |  |
 | `c1_basis_momentum_diag.py` | 310 | NEEDS_MORE_DATA | LOGIC_TRACED | basis momentum: premium-index / basis history not in the repository; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | future_index=2, v1_path=2 |
@@ -59,8 +59,8 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 60, TESTED 109
 | `candidate_regime_dev.py` | 236 | STANDARD_INTERFACE | TESTED | per-regime scorecard via canonicalize_spec + CostContext (ADR 0044) |  |
 | `compare_selection_dev.py` | 107 | STANDARD_INTERFACE | FULL_SOURCE_REVIEW | compares two evolve ledgers (ADR 0019) |  |
 | `confirm_iw0.py` | 225 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1 |
-| `cross_section_v2_dev.py` | 255 | KEPT_INDEPENDENT | TESTED | five cross-sectional hypotheses (ADR 0040); NOT_PROMISING — traced: shift(-1) realised return, as above | neg_shift=1 |
-| `dca_extreme_dev.py` | 418 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1 |
+| `cross_section_v2_dev.py` | 264 | KEPT_INDEPENDENT | TESTED | five cross-sectional hypotheses (ADR 0040); NOT_PROMISING — traced: shift(-1) realised return, as above | neg_shift=1 |
+| `dca_extreme_dev.py` | 422 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1 |
 | `dca_extreme_prepare.py` | 85 | NOT_SURVEYED | LOGIC_TRACED | no rule — new file |  |
 | `dca_limit_dev.py` | 327 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `dca_stop_dev.py` | 364 | NOT_SURVEYED | TESTED | no rule — new file |  |
@@ -76,7 +76,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 60, TESTED 109
 | `f2x6_fng_extreme_diag.py` | 322 | INTEGRATED_CORE | LOGIC_TRACED | Fear & Greed extremes = legacy family fng and features fng_max / fng_min; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | future_index=2, v1_path=3 |
 | `fast_short_dev.py` | 404 | KEPT_INDEPENDENT | TESTED | fast short-horizon panel strategies (ADR 0045); NOT_PROMISING |  |
 | `fng_refresh_check.py` | 36 | INTEGRATED_CORE | FULL_SOURCE_REVIEW | F&G refresh check; F&G is a dataset of the engine (fng); script itself retired (v1 paths, LEGACY_SCRIPTS.md) | network=2, v1_path=1 |
-| `forward_nearmiss.py` | 246 | NOT_SURVEYED | TESTED | no rule — new file |  |
+| `forward_nearmiss.py` | 333 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `forward_v2_entry_bar_dev.py` | 86 | STANDARD_INTERFACE | TESTED | prereg v2 entry bar via canonicalize_spec + CostContext (ADR 0036) |  |
 | `fr_crosscheck_engine_cost.py` | 198 | INTEGRATED_CORE | LOGIC_TRACED | funding extremes = legacy family fund_z and feature funding_z; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=2, cointrader=1 |
 | `fr_extreme_diag.py` | 213 | INTEGRATED_CORE | LOGIC_TRACED | funding extremes = legacy family fund_z and feature funding_z; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=2 |
@@ -84,7 +84,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 60, TESTED 109
 | `gold_dev.py` | 340 | KEPT_INDEPENDENT | TESTED | gold XAUUSD single-asset DEV feasibility, third-party spot bid/ask feed (ADR 0086); NOT_PROMISING |  |
 | `h4_retest_dev.py` | 327 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `hilo_intraday_dev.py` | 343 | KEPT_INDEPENDENT | TESTED | high/low line + volume spike, 15m/1h panel (ADR 0046); variant of hilo_volume_dev — traced: swing_lines: future-looking pivot test shifted by k (known at j+k) — causal | neg_shift=3 |
-| `hilo_volume_dev.py` | 288 | KEPT_INDEPENDENT | TESTED | high/low line + volume spike, daily panel (ADR 0043); NOT_PROMISING — traced: shift(-1) realised return, as above | neg_shift=1 |
+| `hilo_volume_dev.py` | 329 | KEPT_INDEPENDENT | TESTED | high/low line + volume spike, daily panel (ADR 0043); NOT_PROMISING — traced: shift(-1) realised return, as above | neg_shift=1 |
 | `iw1_statistic_dev.py` | 78 | STANDARD_INTERFACE | LOGIC_TRACED | IW1 statistic re-score via evaluator.run_event_study (ADR 0019/0036) |  |
 | `kp_diag.py` | 218 | NEEDS_MORE_DATA | FULL_SOURCE_REVIEW | kimchi premium: KRW exchange prices / FX not in the repository; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | future_index=1, v1_path=1 |
 | `kp_download.py` | 98 | RETIRED_OR_ON_HOLD | FULL_SOURCE_REVIEW | v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029) | network=5, v1_path=2 |
@@ -95,7 +95,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 60, TESTED 109
 | `l3_engine_crosscheck.py` | 185 | RETIRED_OR_ON_HOLD | LOGIC_TRACED | v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029) | future_index=1, v1_path=2, cointrader=1 |
 | `l3_rv_tail_diag.py` | 335 | INTEGRATED_CORE | LOGIC_TRACED | realised-vol tail z ~ vol_ratio (engine) and range_z (v2); the exact RV-z rule is not a registered feature (partial); script itself retired (v1 paths, LEGACY_SCRIPTS.md) — traced: header rule only | future_index=2, v1_path=2 |
 | `liquid_search_dev.py` | 927 | STANDARD_INTERFACE | FULL_SOURCE_REVIEW | DEV search on a liquid universe via evaluator + CostContext, forbidden-read guard (ADR 0024) |  |
-| `lowfreq_nonprice_dev.py` | 455 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1 |
+| `lowfreq_nonprice_dev.py` | 465 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1 |
 | `lowliq_cost_calibration.py` | 113 | STANDARD_INTERFACE | TESTED | volume-scaled alt cost calibration (ADR 0041), feeds CostContext |  |
 | `maker_entry_estimate.py` | 377 | KEPT_INDEPENDENT | TESTED | maker-entry cost estimate from public books (ADR 0049) | future_index=2 |
 | `maker_entry_reeval.py` | 194 | STANDARD_INTERFACE | FULL_SOURCE_REVIEW | re-evaluates engine DEV candidates with maker cost (ADR 0049) |  |
@@ -105,14 +105,14 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 60, TESTED 109
 | `n2_engine_crosscheck.py` | 240 | RETIRED_OR_ON_HOLD | LOGIC_TRACED | v1 cross-check against the main repository engine (cointrader) or v1 download; cannot run here (LEGACY_SCRIPTS.md, ADR 0029) | v1_path=1 |
 | `n2_maker_exec_diag.py` | 389 | NEEDS_MORE_DATA | LOGIC_TRACED | maker execution layer needs queue / order-book history; maker cost estimated by maker_entry_estimate.py; script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=1 |
 | `newlisting_short_dev.py` | 288 | KEPT_INDEPENDENT | LOGIC_TRACED | new-listing short event study (ADR 0060); funding read per DEV segment since ADR 0066 — traced: load_symbol (segment filter), fund_sum (read 2021-01..2025-10 incl. the never-read gap) | neg_shift=1 |
-| `newsrc_engine.py` | 241 | NOT_SURVEYED | LOGIC_TRACED | no rule — new file | neg_shift=1 |
+| `newsrc_engine.py` | 294 | NOT_SURVEYED | LOGIC_TRACED | no rule — new file | neg_shift=1 |
 | `newsrc_r10_dev.py` | 98 | NOT_SURVEYED | TESTED | no rule — new file |  |
-| `newsrc_r11_dev.py` | 133 | NOT_SURVEYED | TESTED | no rule — new file |  |
+| `newsrc_r11_dev.py` | 137 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `newsrc_r12_dev.py` | 103 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `newsrc_r13_dev.py` | 119 | NOT_SURVEYED | TESTED | no rule — new file |  |
-| `newsrc_r14_dev.py` | 157 | NOT_SURVEYED | TESTED | no rule — new file | network=2 |
+| `newsrc_r14_dev.py` | 160 | NOT_SURVEYED | TESTED | no rule — new file | network=2 |
 | `newsrc_r15_dev.py` | 172 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1, network=2 |
-| `newsrc_r1_dev.py` | 527 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1 |
+| `newsrc_r1_dev.py` | 547 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1 |
 | `newsrc_r2_dev.py` | 133 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `newsrc_r3_dev.py` | 156 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `newsrc_r4_dev.py` | 189 | NOT_SURVEYED | TESTED | no rule — new file | network=2 |
@@ -130,6 +130,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 60, TESTED 109
 | `pdf_check_sim.py` | 242 | KEPT_INDEPENDENT | TESTED | synthetic checks of two papers (ADR 0032) |  |
 | `power_audit_ledger.py` | 193 | KEPT_INDEPENDENT | LOGIC_TRACED | reads one DEV state directory: what the gates removed (ADR 0022) |  |
 | `power_audit_synthetic.py` | 339 | KEPT_INDEPENDENT | TESTED | synthetic miss rate of the gates (ADR 0022); superseded for promo-v5 by discovery/power_analysis.py (ADR 0064) |  |
+| `research_data_integrity.py` | 413 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `residual_signals_dev.py` | 159 | KEPT_INDEPENDENT | TESTED | market-factor residual panel signals (ADR 0051); NOT_PROMISING |  |
 | `stepm_block_sim.py` | 270 | KEPT_INDEPENDENT | TESTED | StepM FWER vs bootstrap block length (ADR 0027) |  |
 | `strong_search_dev.py` | 919 | STANDARD_INTERFACE | TESTED | strong-candidate DEV search via evaluator + CostContext, forbidden-read guard (ADR 0019) |  |
@@ -138,8 +139,9 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 60, TESTED 109
 | `test_broad_universe.py` | 79 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_bundle_regime.py` | 43 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_candidate_regime.py` | 48 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_code_audit_registry.py` | 113 | TEST | INVENTORIED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_confirm_iw0.py` | 67 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
-| `test_cross_section_v2.py` | 111 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_cross_section_v2.py` | 132 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_dca_extreme.py` | 128 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_dca_limit.py` | 107 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_dca_stop.py` | 128 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
@@ -148,7 +150,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 60, TESTED 109
 | `test_evalue_v3.py` | 30 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_evalue_walkforward.py` | 115 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_fast_short.py` | 132 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
-| `test_forward_nearmiss.py` | 85 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_forward_nearmiss.py` | 291 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_forward_v2_entry_bar.py` | 36 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_gold_dev.py` | 65 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_h4_retest.py` | 114 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
@@ -180,6 +182,7 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 60, TESTED 109
 | `test_okx_tendency.py` | 141 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_pdf_check.py` | 127 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_power_audit.py` | 47 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_research_data_integrity.py` | 136 | TEST | INVENTORIED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_residual_signals.py` | 96 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_stepm_block_sim.py` | 37 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_structural_search.py` | 83 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
@@ -189,11 +192,12 @@ Read status: FULL_SOURCE_REVIEW 33, LOGIC_TRACED 60, TESTED 109
 | `test_valentini_vp_r15c.py` | 69 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_wide_universe.py` | 152 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `test_winloss_combo.py` | 79 | TEST | TESTED | unit test of a run/ tool (root-level research tests, CI) |  |
+| `test_zero_fill_scan.py` | 41 | TEST | INVENTORIED | unit test of a run/ tool (root-level research tests, CI) |  |
 | `traders_r15d_dev.py` | 160 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `unsup_regime_dev.py` | 199 | KEPT_INDEPENDENT | TESTED | k-means regime classifier on DEV S1 (ADR 0050); NOT_USEFUL |  |
 | `valentini_of_dev.py` | 579 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `valentini_vp_r15c_dev.py` | 211 | NOT_SURVEYED | TESTED | no rule — new file |  |
-| `wide_universe_dev.py` | 383 | KEPT_INDEPENDENT | TESTED | wide-universe panel with effective independent names (ADR 0047); variant of broad_universe_dev — traced: shift(-1) realised return, as above | neg_shift=1 |
+| `wide_universe_dev.py` | 391 | KEPT_INDEPENDENT | TESTED | wide-universe panel with effective independent names (ADR 0047); variant of broad_universe_dev — traced: shift(-1) realised return, as above | neg_shift=1 |
 | `winloss_catalog.py` | 318 | NOT_SURVEYED | TESTED | no rule — new file |  |
 | `winloss_combo_dev.py` | 403 | NOT_SURVEYED | TESTED | no rule — new file | neg_shift=1 |
 | `x10_calendar_diag.py` | 283 | INTEGRATED_CORE | LOGIC_TRACED | calendar = legacy family tod and features hour_utc / dow_utc (v2); script itself retired (v1 paths, LEGACY_SCRIPTS.md) | v1_path=2 |
