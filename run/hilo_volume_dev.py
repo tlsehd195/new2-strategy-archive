@@ -30,6 +30,7 @@ import pandas as pd
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import broad_universe_dev as bu  # noqa: E402
+import research_data_integrity as rdi  # noqa: E402
 from broad_universe_dev import expected_max_sr  # noqa: E402
 
 VERSION = "hilo-volume-dev-v1"
@@ -66,7 +67,10 @@ def load_ohlcv(data: Path, seg: str) -> dict:
             t = int(f[0])
             if t0 <= t <= t1:
                 recs.append((sym, t, float(f[1]), float(f[2]), float(f[3]), float(f[4]), float(f[7])))
-    df = pd.DataFrame(recs, columns=["sym", "t", "open", "high", "low", "close", "qv"]).drop_duplicates(["sym", "t"])
+    df = pd.DataFrame(recs, columns=["sym", "t", "open", "high", "low", "close", "qv"])
+    # ADR 0116: conflicting duplicates / invalid prices are recorded and become missing
+    df, _ = rdi.clean_panel(df, ("open", "high", "low", "close", "qv"), positive_cols=("open", "high", "low", "close"),
+                            nonneg_cols=("qv",), log=rdi.panel_log("hilo_volume_dev.load_ohlcv", data, seg))
     assert df["t"].between(t0, t1).all()
     days = np.arange(t0, t1 + 1, bu.DAY_MS)
     return {k: df.pivot(index="t", columns="sym", values=k).reindex(days)
@@ -111,6 +115,10 @@ def simulate(cfg: dict, sig: tuple, mask: np.ndarray, ctx: dict) -> dict:
     start, h = ctx["start"], cfg["H"]
     gross = np.zeros(n_days)
     cost = {r: np.zeros(n_days) for r in COST_ROWS}
+    # ADR 0116: days whose PnL / cost was not observable (never 0-filled)
+    invalid = np.zeros(n_days, dtype=bool)
+    log = ctx.get("log")
+    fund_ok = ctx.get("fund_ok") or (lambda d, k: math.isfinite(ctx["fnd"][d, k]))
     busy = np.zeros(n_sym, int)
     trades, skipped = [], 0
     for e in range(max(start, 1), n_days - h):
@@ -127,33 +135,55 @@ def simulate(cfg: dict, sig: tuple, mask: np.ndarray, ctx: dict) -> dict:
             side = 1.0 if long_sig[k] else -1.0
             busy[k] = e + h
             pnl = 0.0
+            observed = True
             for d in range(e, e + h):
                 r = ctx["ret"][d, k]
-                if math.isnan(r):
-                    ctx["flags"]["missing_return_days"] += 1
-                    r = 0.0
                 f = ctx["fnd"][d, k]
-                pnl += side * r - side * (0.0 if math.isnan(f) else f)
-                gross[d] += WEIGHT * (side * r - side * (0.0 if math.isnan(f) else f))
+                okr, okf = math.isfinite(r), fund_ok(d, k)
+                if not (okr and okf):
+                    if not okr:
+                        ctx["flags"]["missing_return_days"] += 1
+                    if not okf:
+                        ctx["flags"]["funding_invalid_name_days"] = ctx["flags"].get("funding_invalid_name_days", 0) + 1
+                    if log is not None:
+                        log.add("PRICE_RETURN_MISSING" if not okr else "FUNDING_DATA_MISSING", ctx["syms"][k],
+                                int(ctx["days"][d]), series=cfg["id"])
+                    invalid[d] = True
+                    observed = False
+                    continue
+                f = 0.0 if not math.isfinite(f) else f    # fund_ok: no settlement due that day
+                pnl += side * r - side * f
+                gross[d] += WEIGHT * (side * r - side * f)
             tc = {r: 0.0 for r in COST_ROWS}
             for idx in (e, e + h):
                 b, q15 = ctx["impact"](k, idx)
+                if b is None:
+                    # no volume at all: the cost is unknown (old: volume 1.0)
+                    invalid[idx] = True
+                    observed = False
+                    continue
                 for r in COST_ROWS:
                     c = WEIGHT * ctx["side_cost"](b, r, q15)
                     cost[r][idx] -= c
                     tc[r] += c / WEIGHT
-            trades.append({"sym": ctx["syms"][k], "e": e, "side": side, "gross": pnl, "cost": tc["measured"]})
-    return {"gross": gross, "cost": cost, "trades": trades, "skipped": skipped}
+            trades.append({"sym": ctx["syms"][k], "e": e, "side": side, "gross": pnl, "cost": tc["measured"],
+                           "observed": observed})
+    gross[invalid] = np.nan
+    for r in COST_ROWS:
+        cost[r][invalid] = np.nan
+    return {"gross": gross, "cost": cost, "trades": trades, "skipped": skipped, "invalid": invalid}
 
 
 def trade_stats(trades: list) -> dict:
+    unobserved = sum(1 for t in trades if not t.get("observed", True))
+    trades = [t for t in trades if t.get("observed", True)]   # ADR 0116: unobserved trades excluded, counted
     if not trades:
-        return {"n": 0}
+        return {"n": 0, "n_unobserved_excluded": unobserved}
     g = np.array([t["gross"] for t in trades])
     c = np.array([t["cost"] for t in trades])
     side = np.array([t["side"] for t in trades])
     net = g - c
-    return {"n": len(trades), "n_long": int((side > 0).sum()), "n_short": int((side < 0).sum()),
+    return {"n": len(trades), "n_unobserved_excluded": unobserved, "n_long": int((side > 0).sum()), "n_short": int((side < 0).sum()),
             "mean_gross_bp": float(g.mean() * 1e4), "mean_net_bp": float(net.mean() * 1e4),
             "hit_rate": float((net > 0).mean()),
             "mean_net_bp_long": float(net[side > 0].mean() * 1e4) if (side > 0).any() else None,
@@ -166,27 +196,33 @@ def run_segment(data: Path, seg: str, cfgs: list, costs: dict) -> dict:
     syms = list(piv["open"].columns)
     t0, t1 = int(days[0]), int(days[-1])
     fund = bu.load_funding(data, syms, t0, t1)
-    fund["day"] = ((fund["t"] - 1) // bu.DAY_MS) * bu.DAY_MS
+    fund["day"] = rdi.funding_day(fund["t"].values)       # ADR 0116: settlement jitter
+    fcal = rdi.FundingCalendar(fund, syms)
     fnd = fund.groupby(["day", "sym"])["rate"].sum().unstack().reindex(days).reindex(columns=syms).values
     bars = bu.load_bar2345(data, syms, t0, t1)
     opn = piv["open"]
     ret = (opn.shift(-1) / opn - 1.0).values
     q30 = piv["qv"].rolling(30, min_periods=10).mean().values
-    qv = piv["qv"].values
     flags = {"missing_return_days": 0, "impact_bar_fallback": 0, "no_volume_cost_fallback": 0,
-             "participation_over_max": 0, "no_q15_fallback": 0}
+             "participation_over_max": 0, "no_q15_fallback": 0, "funding_invalid_name_days": 0,
+             "impact_volume_missing": 0}
+    log = rdi.IssueLog()
+    volume = rdi.VolumeProvenance()
     mask, mondays = universe_mask(piv, SEGMENTS[seg][2])
     start = mondays[0]
 
     def impact(k: int, idx: int) -> tuple:
-        b = bars.get((syms[k], int(days[idx - 1]) + 23 * 3_600_000 + 45 * 60_000))
-        if b is None or b <= 0:
+        # ADR 0116: observed vs estimated impact volume; none = cost unknown (old: 1.0)
+        b, kind = rdi.impact_volume(bars, piv["qv"], syms[k], idx, int(days[idx - 1]) + 23 * 3_600_000 + 45 * 60_000)
+        volume.add(kind)
+        if kind != "OBSERVED_BAR2345":
             flags["impact_bar_fallback"] += 1
-            dq = qv[idx - 1, k]
-            if not (dq > 0):
-                dq = float(np.nanmean(qv[max(0, idx - 30): idx, k])) if idx else float("nan")
-                flags["no_volume_cost_fallback"] += 1
-            b = dq / 96.0 if dq > 0 else 1.0
+        if kind in ("ESTIMATED_MEAN30_96", "MISSING"):
+            flags["no_volume_cost_fallback"] += 1
+        if b is None:
+            flags["impact_volume_missing"] += 1
+            log.add("IMPACT_VOLUME_MISSING", syms[k], int(days[idx]))
+            return None, None
         if bu.ORDER_VALUE / b > costs["measured"]["maxp"]:
             flags["participation_over_max"] += 1
         q15 = q30[idx - 1, k] / 96.0
@@ -205,11 +241,12 @@ def run_segment(data: Path, seg: str, cfgs: list, costs: dict) -> dict:
         v = bu.side_cost(b, costs["measured"], "")
         return 2.0 * v if row == "measured_x2" else v
 
-    ctx = {"start": start, "syms": syms, "ret": ret, "fnd": fnd, "impact": impact, "side_cost": side_cost, "flags": flags}
+    ctx = {"start": start, "syms": syms, "ret": ret, "fnd": fnd, "impact": impact, "side_cost": side_cost, "flags": flags,
+           "days": days, "log": log, "fund_ok": lambda d, k: fcal.status(syms[k], int(days[d])) == "OK"}
     mkt = np.full(len(days), np.nan)
     for d in range(start, len(days) - 1):
         r = ret[d, mask[d]]
-        mkt[d] = float(np.nanmean(r)) if np.isfinite(r).any() else 0.0
+        mkt[d] = float(np.nanmean(r)) if np.isfinite(r).any() else float("nan")
     out = {}
     sigs = {}
     for cfg in cfgs:
@@ -218,7 +255,9 @@ def run_segment(data: Path, seg: str, cfgs: list, costs: dict) -> dict:
             sigs[key] = signal_arrays(piv, *key)
         out[cfg["id"]] = simulate(cfg, sigs[key], mask, ctx)
     span = slice(start, len(days) - 1)
-    return {"days": [int(x) for x in days[span]], "mkt": mkt[span], "span": span, "runs": out, "flags": flags}
+    flags["invalid_days"] = {cid: int(run["invalid"][span].sum()) for cid, run in out.items()}
+    return {"days": [int(x) for x in days[span]], "mkt": mkt[span], "span": span, "runs": out, "flags": flags,
+            "issues": log.to_json(), "volume": volume.to_json(), "panel_issues": rdi.panel_issues(data, seg)}
 
 
 def flag(row: dict, null_sr: float) -> str:
@@ -244,11 +283,12 @@ def main(argv=None) -> int:
     out = {"version": VERSION, "prereg_sha256": bu.sha(PREREG), "script_sha256": bu.sha(Path(__file__)),
            "helper_sha256": bu.sha(HERE / "broad_universe_dev.py"), "cost_record_sha256": bu.sha(COST_RECORD),
            "calibration_sha256": bu.sha(CALIBRATION), "cost_profile_sha256": bu.sha(bu.COST_PROFILE),
-           "segments": {}, "configs": {}}
+           "data_policy": rdi.POLICY, "cost_evidence": rdi.COST_EVIDENCE, "segments": {}, "configs": {}}
     segs = {s: run_segment(a.data_dir, s, cfgs, costs) for s in SEGMENTS}
     for s, r in segs.items():
         out["segments"][s] = {"first_day": r["days"][0], "last_day": r["days"][-1], "n_days": len(r["days"]),
-                              "flags": r["flags"], "market_ew": bu.stats(np.nan_to_num(r["mkt"]), r["mkt"])}
+                              "flags": r["flags"], "issues": r["issues"], "volume_provenance": r["volume"],
+                              "panel_issues": r["panel_issues"], "market_ew": bu.stats(r["mkt"], r["mkt"])}
     s1_years = len(segs["S1"]["days"]) / 365.0
     n_cfg = len(cfgs)
     prior = prior_trials()
@@ -267,10 +307,11 @@ def main(argv=None) -> int:
             d["halves_sr_ann"] = [bu.stats(net[:half], mk[:half])["sr_ann"], bu.stats(net[half:], mk[half:])["sr_ann"]]
             d["trades"] = trade_stats(run["trades"])
             d["skipped_capacity"] = run["skipped"]
-            tot = net.sum()
-            d["top10_days_share_of_net"] = float(np.sort(net)[-10:].sum() / tot) if tot > 0 else None
+            tot = np.nansum(net)
+            netf = net[np.isfinite(net)]
+            d["top10_days_share_of_net"] = float(np.sort(netf)[-10:].sum() / tot) if tot > 0 else None
             row[s] = d
-        row["flag"] = flag(row, null_sr)
+        row["flag"] = rdi.withhold_flag(flag(row, null_sr), [row[s]["measured"] for s in segs])
         out["configs"][cfg["id"]] = row
     a.out.write_text(json.dumps(out, indent=1, default=float))
     print("null max SR", {k: round(v, 2) for k, v in out["null_max_sr_ann"].items()}, "prior trials", prior)

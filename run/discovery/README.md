@@ -233,6 +233,18 @@ isolated temp dirs — the real ledger/state and the locked TEST windows are
 NEVER touched.  The run log of the last verification is in the residual-fix
 audit report.
 
+To run single test files, name the shared-lock isolation module FIRST, e.g.
+`cd run/discovery && python3 -m unittest tests.test_00_isolate_shared_lock_dir tests.test_adr0116_portfolio_inputs`.
+Without it (`python -m unittest tests.test_x`, and also `discover -p test_x.py`, which
+does not load `test_00_*`) tests that use locked windows write the repository-level
+`locked_shared/` record (ADR 0116 F-15).  CI fails if a test run leaves that directory.
+
+ADR 0116 (`docs/data_integrity_standard.md`): `portfolio.validate_signals` refuses
+invalid signals / bars (`SignalInputError`, a ValueError); `paper_forward` records the
+`cause` and `cache` of every funding fetch; `portfolio_sim.py` refuses to run without
+`--legacy-diagnostic`.  Repository-wide: `run/audit/code_audit_registry.py check`
+(hash-bound review statuses), `run/audit/zero_fill_scan.py check`, `cd src && bun test`.
+
 ## Honesty rules enforced in code
 
 1. 10-state candidate machine (incl. `AWAITING_FDR`) — transitions checked, PASS terminal

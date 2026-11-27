@@ -60,6 +60,10 @@ from costs_bridge import CostComputationError, CostContext, CostDataMissing, Cos
 from data_quality import Bar
 
 PORTFOLIO_MODEL_VERSION = "portfolio-mtm-v4"   # v4: funding completeness per closed position (ADR 0078)
+#: ADR 0116: strict signal / bar validation.  Valid inputs simulate exactly as
+#: before (the model version, and so the runner's context id, is unchanged);
+#: inputs v4 interpreted silently (decision_index -1, 3.7, side 0, ...) are refused.
+SIGNAL_VALIDATION = "portfolio-signals-v1"
 END_POLICY = "force_close_at_last_open"
 
 
@@ -133,6 +137,11 @@ class PortfolioResult:
     #: closed positions ("OK" only when every held settlement is accounted for)
     funding_status: str = "OK"
     funding_issues: list = field(default_factory=list)
+    #: ADR 0116: signals handed in, and valid signals whose entry bar is the
+    #: final (forced-close) bar, so they cannot be executed — counted, not dropped silently
+    signals_received: int = 0
+    signals_unexecuted_at_data_end: int = 0
+    signal_validation: str = SIGNAL_VALIDATION
     config: dict = field(default_factory=dict)
     context_id: Optional[str] = None
     result_id: str = ""
@@ -142,6 +151,84 @@ class PortfolioResult:
         d["equity_curve"] = list(self.equity_curve)
         d["cash_curve"] = list(self.cash_curve)
         return d
+
+
+class SignalInputError(ValueError):
+    """A signal or bar the simulator must not interpret (ADR 0116).  It is a
+    ValueError so callers that already fail closed on ValueError (runner:
+    ``portfolio = {"error": ..., "passed": False}``) keep doing so."""
+
+
+def _is_int(x) -> bool:
+    import numbers
+    return isinstance(x, numbers.Integral) and not isinstance(x, bool)
+
+
+def _bar_problem(b: Bar) -> Optional[str]:
+    vals = (b.open, b.high, b.low, b.close)
+    if not all(isinstance(v, (int, float)) and math.isfinite(v) and v > 0 for v in vals):
+        return f"non-finite or non-positive price {vals}"
+    if not (b.low <= min(b.open, b.close) and max(b.open, b.close) <= b.high):
+        return f"inconsistent OHLC {vals}"
+    q = b.quote_volume
+    if q is not None and not (isinstance(q, (int, float)) and math.isfinite(q) and q >= 0):
+        return f"invalid quote volume {q!r}"
+    return None
+
+
+def validate_signals(bars_by_symbol: Mapping[str, Sequence[Bar]], signals: Sequence) -> list[dict]:
+    """Check every signal before anything is simulated (ADR 0116).
+
+    Rejected (``SignalInputError``, nothing is corrected):
+    a non-mapping signal; an unknown symbol; ``decision_index`` that is not an
+    integer (bools and floats such as 3.7 included — ``int(3.7)`` used to
+    truncate silently), negative (-1 used to enter at the FIRST bar and read
+    the LAST bar's volume as the "previous" bar), or at / beyond the last bar
+    (no next bar to enter at); ``side`` other than +1 / -1; ``horizon`` that is
+    not an integer >= 1; ``reduce`` outside (0, 1); a decision or entry bar with
+    a non-finite / non-positive / inconsistent price or an invalid volume.
+    The entry is always the bar AFTER the decision (strictly later timestamp).
+    Returns the signals with the validated fields as Python ints."""
+    out = []
+    for k, s in enumerate(signals):
+        if not isinstance(s, Mapping):
+            raise SignalInputError(f"signal {k}: not a mapping ({type(s).__name__})")
+        sym = s.get("symbol")
+        if sym not in bars_by_symbol:
+            raise SignalInputError(f"signal {k}: unknown symbol {sym!r}")
+        bars = bars_by_symbol[sym]
+        n = len(bars)
+        di = s.get("decision_index")
+        if not _is_int(di):
+            raise SignalInputError(f"signal {k} ({sym}): decision_index {di!r} is not an integer")
+        di = int(di)
+        if di < 0:
+            raise SignalInputError(f"signal {k} ({sym}): negative decision_index {di}")
+        if di >= n - 1:
+            raise SignalInputError(f"signal {k} ({sym}): decision_index {di} leaves no entry bar "
+                                   f"(series has {n} bars)")
+        if not bars[di + 1].ts > bars[di].ts:
+            raise SignalInputError(f"signal {k} ({sym}): entry bar not after the decision bar")
+        for j in (di, di + 1):
+            why = _bar_problem(bars[j])
+            if why:
+                raise SignalInputError(f"signal {k} ({sym}): bar {j}: {why}")
+        t = dict(s, decision_index=di)
+        if "reduce" in s:
+            f = s["reduce"]
+            if not (isinstance(f, (int, float)) and not isinstance(f, bool) and math.isfinite(f) and 0.0 < f < 1.0):
+                raise SignalInputError(f"signal {k} ({sym}): reduce {f!r} not in (0, 1)")
+        else:
+            side = s.get("side")
+            if not _is_int(side) or int(side) not in (1, -1):
+                raise SignalInputError(f"signal {k} ({sym}): side {side!r} is not +1 / -1")
+            t["side"] = int(side)
+            h = s.get("horizon", 4)
+            if not _is_int(h) or int(h) < 1:
+                raise SignalInputError(f"signal {k} ({sym}): horizon {h!r} is not an integer >= 1")
+            t["horizon"] = int(h)
+        out.append(t)
+    return out
 
 
 def _liq_price(side: int, entry: float, leverage: float, mmr: float) -> float:
@@ -177,6 +264,8 @@ def simulate_portfolio(bars_by_symbol: Mapping[str, Sequence[Bar]],
         elif ts != ref:
             raise ValueError("symbols do not share a common timestamp grid")
     n = len(next(iter(grids.values())))
+    if ref is not None and any(b <= a for a, b in zip(ref, ref[1:])):
+        raise SignalInputError("timestamp grid is not strictly increasing (duplicate or reversed bars)")
     if cfg.leverage <= 0 or not math.isfinite(cfg.leverage):
         raise ValueError("leverage must be finite and > 0")
     res = PortfolioResult()
@@ -188,10 +277,15 @@ def simulate_portfolio(bars_by_symbol: Mapping[str, Sequence[Bar]],
     positions: dict[str, OpenPosition] = {}
 
     sig_by_entry: dict[int, list[dict]] = {}
-    for s in signals:
-        entry_i = int(s["decision_index"]) + 1
-        if 0 <= entry_i < n:
-            sig_by_entry.setdefault(entry_i, []).append(s)
+    checked = validate_signals(bars_by_symbol, signals)
+    res.signals_received = len(checked)
+    for s in checked:
+        entry_i = s["decision_index"] + 1
+        if entry_i == n - 1:
+            # the last bar only force-closes; a valid signal there is counted
+            res.signals_unexecuted_at_data_end += 1
+            continue
+        sig_by_entry.setdefault(entry_i, []).append(s)
 
     def flag_cost(kind: str, sym: str, i: int, err: Exception) -> None:
         res.cost_failures.append({"where": kind, "symbol": sym, "index": i,

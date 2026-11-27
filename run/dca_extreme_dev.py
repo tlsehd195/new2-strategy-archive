@@ -35,6 +35,7 @@ import pandas as pd
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import broad_universe_dev as bu  # noqa: E402
+import research_data_integrity as rdi  # noqa: E402
 from broad_universe_dev import expected_max_sr  # noqa: E402
 
 VERSION = "dca-extreme-dev-v1"
@@ -75,7 +76,10 @@ def load_ohlcv(data: Path, seg: str) -> dict:
             t = int(f[0])
             if t0 <= t <= t1:
                 recs.append((sym, t, float(f[1]), float(f[2]), float(f[3]), float(f[4]), float(f[7])))
-    df = pd.DataFrame(recs, columns=["sym", "t", "open", "high", "low", "close", "qv"]).drop_duplicates(["sym", "t"])
+    df = pd.DataFrame(recs, columns=["sym", "t", "open", "high", "low", "close", "qv"])
+    # ADR 0116: conflicting duplicates / invalid prices are recorded and become missing
+    df, _ = rdi.clean_panel(df, ("open", "high", "low", "close", "qv"), positive_cols=("open", "high", "low", "close"),
+                            nonneg_cols=("qv",), log=rdi.panel_log("dca_extreme_dev.load_ohlcv", data, seg))
     assert df["t"].between(t0, t1).all()
     days = np.arange(t0, t1 + 1, bu.DAY_MS)
     return {k: df.pivot(index="t", columns="sym", values=k).reindex(days)
@@ -372,7 +376,7 @@ def main(argv=None) -> int:
     for s, r in segs.items():
         out["segments"][s] = {"first_day": r["days"][0], "last_day": r["days"][-1], "n_days": len(r["days"]),
                               "n_symbols": r["n_symbols"], "flags": r["flags"],
-                              "market_ew": bu.stats(np.nan_to_num(r["mkt"]), r["mkt"])}
+                              "market_ew": bu.stats(r["mkt"], r["mkt"])}
     s1_years = len(segs["S1"]["days"]) / 365.0
     n_cfg, prior = len(cfgs), prior_trials()
     out["null_max_sr_ann"] = {f"N={n_cfg}": expected_max_sr(n_cfg) / math.sqrt(s1_years),

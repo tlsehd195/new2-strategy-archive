@@ -24,6 +24,7 @@ import pandas as pd
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import broad_universe_dev as bu  # noqa: E402
+import research_data_integrity as rdi  # noqa: E402
 import newsrc_engine as ne  # noqa: E402
 import wide_universe_dev as wu  # noqa: E402
 
@@ -56,7 +57,10 @@ def load_extra(data: Path, seg: str, days: np.ndarray, syms: list) -> dict:
             t = int(f[0])
             if t0 <= t <= t1:
                 recs.append((sym, t, float(f[2]), float(f[3]), float(f[8])))
-    df = pd.DataFrame(recs, columns=["sym", "t", "high", "low", "count"]).drop_duplicates(["sym", "t"])
+    df = pd.DataFrame(recs, columns=["sym", "t", "high", "low", "count"])
+    # ADR 0116: same panel rule as the open/close loader
+    df, _ = rdi.clean_panel(df, ("high", "low", "count"), positive_cols=("high", "low"), nonneg_cols=("count",),
+                            log=rdi.panel_log("newsrc_r11_dev.load_extra", data, seg))
     out = {k: df.pivot(index="t", columns="sym", values=k).reindex(days).reindex(columns=syms)
            for k in ("high", "low", "count")}
     _EXTRA[key] = out

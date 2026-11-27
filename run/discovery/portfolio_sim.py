@@ -21,8 +21,8 @@ DEPRECATED (ADR 0070, 2026-11-10): 이 파일은 어디서도 쓰지 않는다. 
   - 진입 i+1 시가 → 청산 i+1+h 시가 (engine_lib.event_study와 동일 규약)
   - locked TEST 구간 진입 배제 (engine_lib 재사용 — 판정 논리 0 변경)
 
-사용: python3 portfolio_sim.py            # state 생존자 대상
-      python3 portfolio_sim.py '{"family":"fng","symbols":["BTCUSDT","ETHUSDT"],"params":{"lo":5,"hi":95,"horizons":[16]}}'
+사용: python3 portfolio_sim.py --legacy-diagnostic            # state 생존자 대상 (플래그 없으면 거부, ADR 0116)
+      python3 portfolio_sim.py --legacy-diagnostic '{"family":"fng","symbols":["BTCUSDT","ETHUSDT"],"params":{"lo":5,"hi":95,"horizons":[16]}}'
 출력: 일일 수익 시계·누적·MDD·Sharpe·Sortino·스킵률 (stdout + results/portfolio_sim_*.json)
 """
 import json
@@ -30,6 +30,18 @@ import math
 import os
 import sys
 import datetime as dt
+
+# ADR 0116 §9: a DEPRECATED diagnostic with known defects must not run by accident.
+# Refused before any import (funding_cost needs pandas) unless explicitly asked for;
+# its output is stamped so it cannot be mistaken for a verdict input.
+LEGACY_FLAG = "--legacy-diagnostic"
+if __name__ == "__main__":
+    if LEGACY_FLAG not in sys.argv[1:]:
+        sys.stderr.write("portfolio_sim.py is DEPRECATED (ADR 0070, known defects: missing funding as 0, "
+                         "day-only annualisation, unweighted sums) and is not used by the runner.\n"
+                         f"Use portfolio_multi.py (ADR 0068).  To run this diagnostic anyway: {LEGACY_FLAG}\n")
+        sys.exit(2)
+    sys.argv = [a for a in sys.argv if a != LEGACY_FLAG]
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import engine_lib as E  # noqa: E402
@@ -158,6 +170,7 @@ def main():
                 "params": st["survivor_specs"][cid]["params"],
                 "variant": st["survivor_specs"][cid].get("variant")}
     res = simulate(cand)
+    res.update(deprecated=True, verdict_use="FORBIDDEN (ADR 0070 / 0116: known defects, diagnostic only)")
     ts = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     out = f"{OUT}/portfolio_sim_{ts}.json"
     json.dump(res, open(out, "w"), ensure_ascii=False, indent=1)

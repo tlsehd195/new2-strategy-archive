@@ -1,0 +1,39 @@
+{
+ "schema": "forward_nearmiss_prereg_addendum_v1",
+ "adr": "0116",
+ "prereg": "prereg_forward_nearmiss_v1.json",
+ "prereg_sha256": "9e8298dd4b3b0d4981945f763f487e5af730115bafcc4fb54e42388d6dc8d318",
+ "written_before_any_forward_result": true,
+ "first_forward_evaluation": "2026-12-03 (monthly workflow, ADR 0115); no evaluation has run when this file is committed",
+ "requested_by": "동동, 2026-11-27 00:13 UTC, directive §3 (P1 forward data integrity)",
+ "changes_candidates_parameters_universe_cost_or_statistics": false,
+ "what_changes": [
+  "A held name's missing open-to-open return is no longer a 0 % day: the day, the rest of that holding period and the next rebalance day are not observable (NaN) and excluded; v1 used 0.0.",
+  "A held name's funding for the holding day (D, D+1] is checked against the archive's declared settlement schedule (funding_schedule.settlement_check, the core engine rule); missing / gapped / schedule-less / invalid funding makes the day not observable; v1 charged NaN as 0.",
+  "Settlement-time jitter (00:00:00.002): a settlement up to 60 s after 00:00 pays for the previous day (v1 put it on the next day: one settlement misattributed at every jittered boundary).",
+  "Impact volume is labelled OBSERVED_BAR2345 / ESTIMATED_DAILY_96 / ESTIMATED_MEAN30_96; with no volume at all the trade's cost is unknown and the day not observable (v1 used volume 1.0).",
+  "Conflicting duplicate daily candles, off-grid timestamps and non-positive prices are recorded and dropped (v1 kept the first duplicate silently).",
+  "Each candidate gets status PASS / FAIL / INVALID_DATA / INSUFFICIENT_DATA / UNDETERMINED / ERROR (final_status). FORWARD_PASS becomes PASS only with zero unobserved days, estimated-volume share <= limit, no panel issue on a held name and finite statistics; otherwise the verdict is withheld (WITHHELD_*). A candidate with INVALID data enters Holm (m = 3 unchanged) with p = 1."
+ ],
+ "unchanged": "candidates, signal code, universe (U50 without BTC/ETH), rebalance grid, cost model and rows, NW lag 14, Holm m = 3, alpha 0.0213, interim 182 / final 364 days, FORWARD_PASS rule; on complete data the daily series are identical to v1 (test_forward_nearmiss GOLDEN_V1)",
+ "data_policy": {
+  "version": "research-data-integrity-v1",
+  "max_invalid_day_share": 0.02,
+  "max_estimated_volume_share": 0.1,
+  "forward_pass_requires_zero_invalid_days": true,
+  "funding_tolerance_ms": 60000
+ },
+ "code_sha256": {
+  "run/forward_nearmiss.py": "afc361d992df4b2583a2ff9c0645ab5209af46f3e11b97a783f30a9dea76da90",
+  "run/newsrc_engine.py": "5eabc982f288c0646b80bb2d252d434b071740c87c65f2fb69440eb1bce88210",
+  "run/research_data_integrity.py": "291c6a9aa77d5cb5bf47d534c4f58bf70083692b15845935fa6ed659bdd58966",
+  "run/broad_universe_dev.py": "adcd77a0f1d37d67b5c068e446b2eceec40c8c7d85eee04024e01bd19f829f77",
+  "run/cross_section_v2_dev.py": "96cab784aabf98f50b2a4e85fa0b10f368899f9ca9e19697056a7c6986db835e",
+  "run/wide_universe_dev.py": "c47bf5ea8e949c18263f907e948f03999efe2e8d10e21f693e58f22d586e423c",
+  "run/newsrc_r3_dev.py": "ae8f512c96ee6a20b6deaee26c42fee3ee23cfe2e40f37a9844e02c5999b02f4",
+  "run/newsrc_r11_dev.py": "4e60e966da68777efa48b915f14a8136bcd7e44d68536ab1bf206500808d305b",
+  "run/newsrc_r12_dev.py": "5b6a146c736c4fa24fe33c37548e4b03e20f5f564a75199aedd37a5c51c10e7c",
+  "run/broad_universe_fetch.py": "d1df2c8cb1b49a6d769c0085b7e3ca88a4b6727d781443a26c76ef4e1be97dfd",
+  "run/discovery/funding_schedule.py": "4292374b7761e3ee3543f8d34d8977d90cb9df5574f06545aa63f01fc44bb799"
+ }
+}

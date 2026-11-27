@@ -218,7 +218,18 @@ def check() -> list[str]:
     if len(files) != len(set(files)):
         errs.append("duplicate rows")
     inv = json.loads(INVENTORY.read_text(encoding="utf-8"))
-    left = sorted(r["file"] for r in inv if r["read_status"] == "INVENTORIED")
+    # ADR 0116: a script added after this table is classified in the hash-bound
+    # CODE_AUDIT_REGISTRY instead; it passes here only if that registry holds a read
+    # status for the file AT ITS CURRENT sha256 (CHANGED_SINCE_REVIEW / NOT_REVIEWED do not)
+    reg_path = HERE / "CODE_AUDIT_REGISTRY.json"
+    reg = {r["path"]: r for r in json.loads(reg_path.read_text(encoding="utf-8"))["files"]} if reg_path.exists() else {}
+    read_ok = {"FULL_SOURCE_REVIEW", "LOGIC_TRACED", "TESTED", "PARTIALLY_REVIEWED"}
+
+    def registered(name: str) -> bool:
+        r = reg.get(f"run/{name}")
+        return bool(r) and r["status"] in read_ok and r["reviewed_sha256"] == hashlib.sha256(
+            (REPO / "run" / name).read_bytes()).hexdigest()
+    left = sorted(r["file"] for r in inv if r["read_status"] == "INVENTORIED" and not registered(r["file"]))
     if left:
         errs.append(f"scripts still only INVENTORIED (no whole-file read): {left}")
     known = {r["file"] for r in inv}

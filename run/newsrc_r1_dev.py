@@ -46,6 +46,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE / "discovery"))
 import broad_universe_dev as bu  # noqa: E402
+import research_data_integrity as rdi  # noqa: E402
 import broad_universe_fetch as bf  # noqa: E402
 import cross_section_v2_dev as cs  # noqa: E402
 import wide_universe_dev as wu  # noqa: E402
@@ -198,7 +199,8 @@ def load_side(data: Path, sub: str, col: int, days: np.ndarray, syms: list) -> p
                 recs.append((sym, t, float(f[col])))
     if not recs:
         return pd.DataFrame(np.nan, index=days, columns=syms)
-    df = pd.DataFrame(recs, columns=["sym", "t", "v"]).drop_duplicates(["sym", "t"])
+    df = pd.DataFrame(recs, columns=["sym", "t", "v"])
+    df, _ = rdi.clean_panel(df, ("v",), log=rdi.panel_log(f"newsrc_r1_dev.load_side:{sub}", data, "any"))   # ADR 0116
     return df.pivot(index="t", columns="sym", values="v").reindex(index=days, columns=syms)
 
 
@@ -276,14 +278,15 @@ def events(piv: dict, n_bars: pd.DataFrame, first_spot: dict, days: np.ndarray, 
 
 # --------------------------------------------------------------------------- simulation
 
-def impact_bar(bars, qv, s, i, bar_t, flags):
-    b = bars.get((s, bar_t))
-    if b is None or b <= 0:
+def impact_bar(bars, qv, s, i, bar_t, flags, ss=None, days=None, v30=None):
+    """ADR 0116: observed vs estimated impact volume (recorded in ``ss``); no
+    volume at all returns None (the cost is unknown; the old code used 1.0)."""
+    b, kind = rdi.impact_volume(bars, qv, s, i, bar_t)
+    if kind != "OBSERVED_BAR2345":
         flags["impact_bar_fallback"] += 1
-        dq = qv.iloc[i - 1][s]
-        if not (dq > 0):
-            dq = float(np.nanmean(qv[s].iloc[max(0, i - 30): i].values))
-        b = dq / 96.0 if dq > 0 else 1.0
+    if ss is not None and not ss.cost_volume(i, s, days, b, kind, v30):
+        flags["impact_volume_missing"] = flags.get("impact_volume_missing", 0) + 1
+        return None
     return b
 
 
@@ -293,8 +296,8 @@ def run_segment(data: Path, seg: str, cal: dict, first_spot: dict) -> dict:
     syms = list(piv["open"].columns)
     t0, t1 = int(days[0]), int(days[-1])
     fund = bu.load_funding(data, syms, t0, t1)
-    fund["day"] = ((fund["t"] - 1) // bu.DAY_MS) * bu.DAY_MS
-    fnd = fund.groupby(["day", "sym"])["rate"].sum().unstack().reindex(days).reindex(columns=syms).values
+    fund["day"] = rdi.funding_day(fund["t"].values)       # ADR 0116: settlement jitter
+    fcal = rdi.FundingCalendar(fund, syms)
     bars = bu.load_bar2345(data, syms, t0, t1)
     spot_qv = load_side(data, "spot1d", 7, days, syms)
     prem = load_side(data, "prem1d", 4, days, syms)
@@ -310,7 +313,9 @@ def run_segment(data: Path, seg: str, cal: dict, first_spot: dict) -> dict:
     n_reb = {k: 0 for k in XS_KEYS}
     flat_reb = {k: 0 for k in XS_KEYS}
     names_sig = {k: [] for k in XS_KEYS}
-    flags = {"missing_return_days": 0, "impact_bar_fallback": 0,
+    state = {k: rdi.SeriesState(len(days), f"{k[1]}:{k[0]}") for k in keys}
+    flags = {"missing_return_days": 0, "impact_bar_fallback": 0, "funding_invalid_name_days": 0,
+             "impact_volume_missing": 0,
              "spot_symbol_days": int(spot_qv.notna().sum().sum()), "premium_symbol_days": int(prem.notna().sum().sum())}
     held = {k: {} for k in XS_KEYS}
     reb = wu.rebalance_days(days, SEGMENTS[seg][2], HOLD)
@@ -330,7 +335,7 @@ def run_segment(data: Path, seg: str, cal: dict, first_spot: dict) -> dict:
             uc = [col[s] for s in u50]
             for d in range(i, end):
                 r = ret[d, uc]
-                mkt[d] = float(np.nanmean(r)) if np.isfinite(r).any() else 0.0
+                mkt[d] = float(np.nanmean(r)) if np.isfinite(r).any() else float("nan")
         sig = xs_signals(piv, spot_qv, prem, cut)
         for k in XS_KEYS:
             h, u = k
@@ -343,31 +348,29 @@ def run_segment(data: Path, seg: str, cal: dict, first_spot: dict) -> dict:
             if not w:
                 flat_reb[k] += 1
             prev = held[k]
+            state[k].rebalance(i, prev, days)
             to = 0.0
             for s in sorted(set(w) | set(prev)):
                 dw = abs(w.get(s, 0.0) - prev.get(s, 0.0))
                 if dw == 0:
                     continue
-                b = impact_bar(bars, qv, s, i, bar_t, flags)
-                q15 = float(v30[s]) / 96.0 if not math.isnan(v30[s]) else 0.0
+                b = impact_bar(bars, qv, s, i, bar_t, flags, state[k], days, float(v30[s]))
+                if b is None:
+                    to += dw
+                    continue
+                q15 = float(v30[s]) / 96.0
                 for row in COST_ROWS:
                     daily[k][row][i] -= dw * wu.side_cost(row, cal, b, q15)
                 cost_paid[k] += dw * wu.side_cost("cal", cal, b, q15)
                 to += dw
             turnover[k].append(to)
             cur = dict(w)
-            for d in range(i, end):
-                pnl = 0.0
-                for s, ws in cur.items():
-                    r = ret[d, col[s]]
-                    if math.isnan(r):
-                        flags["missing_return_days"] += 1
-                        r = 0.0
-                    f = fnd[d, col[s]]
-                    pnl += ws * r - ws * (0.0 if math.isnan(f) else f)
-                    cur[s] = ws * (1.0 + r)
+
+            def add(d, pnl, k=k):
                 for row in COST_ROWS:
                     daily[k][row][d] += pnl
+            # a missing return / funding is an unobserved day, never 0 (ADR 0116)
+            state[k].hold(cur, i, end, ret, col, days, fcal, add, drift=True, flags=flags)
             held[k] = cur
     # events
     evs = events(piv, n_bars, first_spot, days, ev["X"])
@@ -378,41 +381,53 @@ def run_segment(data: Path, seg: str, cal: dict, first_spot: dict) -> dict:
             x = e + hold
             if x > len(days) - 1:
                 continue
-            c = col[perp]
             cut = e - 2
             q15e = float(qv.iloc[max(0, cut - 29): cut + 1][perp].mean()) / 96.0
-            be = impact_bar(bars, qv, perp, e, int(days[e - 1]) + 23 * 3_600_000 + 45 * 60_000, flags)
+            ss = state[k]
+            be = impact_bar(bars, qv, perp, e, int(days[e - 1]) + 23 * 3_600_000 + 45 * 60_000, flags,
+                            ss, days, q15e * 96.0)
             w = EV_WEIGHT
-            for row in COST_ROWS:
-                daily[k][row][e] -= abs(w) * wu.side_cost(row, cal, be, q15e)
-            cost_paid[k] += abs(w) * wu.side_cost("cal", cal, be, q15e)
-            tot = 0.0
-            for d in range(e, x):
-                r = ret[d, c]
-                if math.isnan(r):
-                    flags["missing_return_days"] += 1
-                    r = 0.0
-                f = fnd[d, c]
-                pnl = w * r - w * (0.0 if math.isnan(f) else f)
-                tot += pnl
+            if be is not None:
+                for row in COST_ROWS:
+                    daily[k][row][e] -= abs(w) * wu.side_cost(row, cal, be, q15e)
+                cost_paid[k] += abs(w) * wu.side_cost("cal", cal, be, q15e)
+            acc = [0.0]
+            pos = {perp: w}
+
+            def add(d, pnl, k=k, acc=acc):
+                acc[0] += pnl
                 for row in COST_ROWS:
                     daily[k][row][d] += pnl
-                w = w * (1.0 + r)
+            before = ss.log.counts["PRICE_RETURN_MISSING"]
+            ss.hold(pos, e, x, ret, col, days, fcal, add, drift=True, flags=flags)
+            ss.unknown = False       # one event = one position; its exit is handled below
+            observed = ss.log.counts["PRICE_RETURN_MISSING"] == before and not ss.invalid[e:x].any()
+            w = pos[perp]
+            tot = acc[0] if observed else float("nan")
             cutx = x - 2
             q15x = float(qv.iloc[max(0, cutx - 29): cutx + 1][perp].mean()) / 96.0
-            bx = impact_bar(bars, qv, perp, x, int(days[x - 1]) + 23 * 3_600_000 + 45 * 60_000, flags)
-            for row in COST_ROWS:
-                daily[k][row][x] -= abs(w) * wu.side_cost(row, cal, bx, q15x)
-            cost_paid[k] += abs(w) * wu.side_cost("cal", cal, bx, q15x)
+            bx = impact_bar(bars, qv, perp, x, int(days[x - 1]) + 23 * 3_600_000 + 45 * 60_000, flags,
+                            ss, days, q15x * 96.0)
+            if not observed:
+                ss.invalid[x] = True          # exit size unknown after an unobserved return
+            elif bx is not None:
+                for row in COST_ROWS:
+                    daily[k][row][x] -= abs(w) * wu.side_cost(row, cal, bx, q15x)
+                cost_paid[k] += abs(w) * wu.side_cost("cal", cal, bx, q15x)
             ev_log[k].append({"perp": perp, "spot_day": day_iso(int(days[e - 1])), "gross_pnl_pct_of_capital": tot * 100,
                               "perp_return_pct": (opn.iloc[x][perp] / opn.iloc[e][perp] - 1) * 100})
     spans = {}
     for k in keys:
         a = int(np.searchsorted(days, ev[family(k[0])]))
         spans[k] = slice(a, len(days) - 1)
+        state[k].finish(daily[k].values())
+    flags["invalid_days"] = {f"{k[1]}:{k[0]}": int(state[k].invalid[spans[k]].sum()) for k in keys}
     return {"days": days, "spans": spans, "daily": daily, "mkt": mkt, "cost_paid": cost_paid,
             "turnover": turnover, "n_reb": n_reb, "flat_reb": flat_reb, "names_sig": names_sig,
-            "flags": flags, "events": ev_log}
+            "flags": flags, "events": ev_log,
+            "issues": {f"{k[1]}:{k[0]}": state[k].log.to_json() for k in keys},
+            "volume": {f"{k[1]}:{k[0]}": state[k].volume.to_json() for k in keys},
+            "panel_issues": rdi.panel_issues(data, "any")}
 
 
 def flag(row: dict, n_events_s1: int | None = None) -> str:
@@ -427,6 +442,7 @@ def flag(row: dict, n_events_s1: int | None = None) -> str:
 
 def moments(x: np.ndarray) -> tuple:
     x = np.asarray(x, float)
+    x = x[np.isfinite(x)]          # ADR 0116: unobserved days excluded
     sd = x.std(ddof=1)
     if not sd > 0:
         return 0.0, 0.0, 3.0
@@ -454,7 +470,8 @@ def main(argv=None) -> int:
     prior = prior_trials()
     for s, r in segs.items():
         out["segments"][s] = {"first_day": day_iso(int(r["days"][0])), "last_day": day_iso(int(r["days"][-2])),
-                              "flags": r["flags"]}
+                              "flags": r["flags"], "issues": r["issues"], "volume_provenance": r["volume"],
+                              "panel_issues": r["panel_issues"]}
     for k in TRIAL_KEYS:
         h, u = k
         row = {}
@@ -484,18 +501,21 @@ def main(argv=None) -> int:
         y1 = row["S1"]["years"]
         row["null_max_sr_ann_N7"] = expected_max_sr(N_TRIALS) / math.sqrt(y1)
         row["null_max_sr_ann_cumulative"] = expected_max_sr(prior + N_TRIALS) / math.sqrt(y1)
-        row["flag"] = flag(row, row["S1"].get("n_events") if k in EV_KEYS else None)
+        row["flag"] = rdi.withhold_flag(flag(row, row["S1"].get("n_events") if k in EV_KEYS else None),
+                                        [row[s]["cal"] for s in segs])
         out["trials"][f"{u}:{h}"] = row
     srs = {k: moments(segs["S1"]["daily"][k]["cal"][segs["S1"]["spans"][k]]) for k in TRIAL_KEYS}
     var_sr = float(np.var([v[0] for v in srs.values()], ddof=1))
     for k, (sr, sk, ku) in srs.items():
-        n = segs["S1"]["spans"][k].stop - segs["S1"]["spans"][k].start
+        n = int(np.isfinite(segs["S1"]["daily"][k]["cal"][segs["S1"]["spans"][k]]).sum())
         row = out["trials"][f"{k[1]}:{k[0]}"]
         row["dsr_N7"] = deflated_sharpe(sr, n, sk, ku, N_TRIALS, var_sr)
         row["dsr_cumulative"] = deflated_sharpe(sr, n, sk, ku, prior + N_TRIALS, var_sr)
     common = max(segs["S1"]["spans"][k].start for k in XS_KEYS)
     stop = segs["S1"]["spans"][XS_KEYS[0]].stop
     mat = np.column_stack([segs["S1"]["daily"][k]["cal"][common:stop] for k in XS_KEYS])
+    ok_rows = np.isfinite(mat).all(axis=1)    # ADR 0116: one calendar, unobserved days dropped
+    mat = mat[ok_rows]
     pbo, ncomb = pbo_cscv(mat.tolist(), n_partitions=16)
     out["multiple_testing"] = {"n_trials_here": N_TRIALS, "prior_trials_on_main": prior, "cumulative": prior + N_TRIALS,
                                "cross_trial_var_sr_daily": var_sr, "pbo_cscv_16_xs5": pbo, "pbo_combinations": ncomb,

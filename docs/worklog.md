@@ -1397,3 +1397,11 @@ Stage Summary:
 - 기준 `66bf37c`(PR #79). `build_handoff`가 과거 FNG PAPER_PASSED를 그대로 내보내던 것을 HandoffRefused(FNG_NOT_PINNED, UNVERIFIED_PRIOR_CONCLUSION)로 바꿨다. PAPER_PASSED 상태는 그 기록과 증거 ID가 맞아야 하고, 명세가 없으면 거부한다
 - 신규 테스트 4개(`TestC04HandoffFng`, 실제 승격 흐름의 합성 FNG 전략). 수정 전 3개가 실패한다. 기록·기존 handoff 파일이 바이트 단위로 보존됨을 확인했다
 - 보고서 `run/audit/FINAL_REPORT_C04_HANDOFF_20261113.md`
+
+## 2026-11-27 전체 문제 해결 및 코드 무결성 강화 (ADR 0116)
+
+- 기준 `d564456`. 사용자 지시문(§1~§17). 실거래·키·주문 기능 없음, 통계 기준·승격 조건 불변, 사전등록·구간 개방 없음
+- 누락 수익률·펀딩 0 대체 제거(공통 모듈 `run/research_data_integrity.py`, 일봉 엔진 13개), 펀딩 지터 귀속 수정, 거래량 대체값 1.0 제거와 출처 기록, 값이 다른 중복 일봉 처리
+- 전진 기록 CL1·FIP1·AF1: 6상태 판정, Holm m=3 고정(무효 p=1), 사전등록 부속 문서에 코드 해시(첫 평가 2026-12-03 전), 완전한 자료에서 옛 결과와 같음(골든 테스트)
+- `portfolio.py` 신호 검증, 페이퍼 펀딩 실패 원인(`cause`), `portfolio_sim.py` 실행 거부, 수집기·F&G·메이커 감시기 복구 재작성(bun 테스트 35개), git 해시 기반 감사 레지스트리, 0 대체 증가 차단, CI 강화
+- 미해결: 연구 스크립트 전수 정밀 검토, 옛 0 대체 39줄, 수집기 실제 장기 실행 미확인. 판정 PARTIALLY_VERIFIED. 보고서 `run/audit/FINAL_REPORT_20261127_ADR0116.md`

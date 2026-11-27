@@ -96,9 +96,24 @@ def fetch_with_retry(url: str, *, opener: Optional[Callable[[str], bytes]] = Non
             last = e
             kind = classify_error(e)
             if kind != "TRANSIENT" or k == attempts - 1:
-                raise FetchFailure(kind, f"{type(e).__name__}: {e}", k + 1) from e
+                raise FetchFailure(kind, f"{type(e).__name__}: {e}{_error_body(e)}", k + 1) from e
             sleep(base_delay * (2 ** k))
     raise FetchFailure("TRANSIENT", str(last), attempts)  # pragma: no cover
+
+
+def _error_body(exc: BaseException) -> str:
+    """First 200 bytes of an HTTP error answer (exchange error code such as
+    Binance -1121 "Invalid symbol"), so the failure can be classified (ADR 0116 §8)."""
+    read = getattr(exc, "read", None)
+    if not callable(read) or getattr(exc, "code", None) is None:
+        return ""
+    try:
+        body = read(200)
+    except Exception:  # noqa: BLE001 — the body is optional evidence
+        return ""
+    if isinstance(body, bytes):
+        body = body.decode("utf-8", "replace")
+    return f" body={body.strip()[:200]!r}" if body else ""
 
 
 def _default_opener(url: str) -> bytes:  # pragma: no cover - network

@@ -99,6 +99,10 @@ jobs:
           git diff --exit-code -- run/audit/RESEARCH_SCRIPTS_20261110.json run/audit/RESEARCH_SCRIPTS_20261110.md run/audit/RESEARCH_STRATEGIES_20261110.jsonl
       - name: Source audit table covers every script (run/audit/SOURCE_AUDIT_20261110.*; ADR 0070)
         run: python run/audit/source_audit_20261110.py check
+      - name: Code audit registry matches the git tree (hash-bound statuses, new / moved / changed files; ADR 0116)
+        run: python run/audit/code_audit_registry.py check
+      - name: No new silent zero fill in research code (ratchet on ZERO_FILL_BASELINE.json; ADR 0116)
+        run: python run/audit/zero_fill_scan.py check
       - name: Audit provenance separates reviewer claims from author checks (run/audit/AUDIT_PROVENANCE_20261111.*; ADR 0071)
         run: python run/audit/audit_provenance_20261111.py check
       # src/*.ts are the collectors / paper monitors that run on the user's machines
@@ -110,12 +114,25 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/ts"
           for f in src/*.ts; do bun build --no-bundle "$f" --outdir "$RUNNER_TEMP/ts" > /dev/null || { echo "FAIL $f"; exit 1; }; echo "ok $f"; done
+      - name: Collector / monitor unit tests (temp dirs, injected fetch and clock, no network; ADR 0116)
+        working-directory: src
+        run: bun test
+      - name: TypeScript strict type check (tsc --noEmit; pinned versions, installed outside the repo; ADR 0116)
+        run: |
+          mkdir -p "$RUNNER_TEMP/tsc" && cd "$RUNNER_TEMP/tsc"
+          npm install --silent --no-save --no-audit --no-fund typescript@5.7.3 bun-types@1.1.38
+          cd "$GITHUB_WORKSPACE/src"
+          "$RUNNER_TEMP/tsc/node_modules/.bin/tsc" -p tsconfig.json --typeRoots "$RUNNER_TEMP/tsc/node_modules"
+      - name: No machine-specific absolute paths in src/ (ADR 0116 §6)
+        run: "! grep -rnE '/home/z/|/my-project/' src/"
       - name: Package manifests parse
         run: for f in src/*_package.json; do python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$f"; done
       - name: Unit tests
         working-directory: run
         run: python -m unittest discover -s discovery/tests -v 2>&1 | tail -n 40
         shell: bash -o pipefail {0}
+      - name: Tests left no repository-level lock record (shared-lock isolation held; ADR 0116 F-15)
+        run: test -z "$(git status --porcelain --ignored run/discovery/locked_shared)"
       - name: Root-level research tests (run/test_*.py, DEV-only tools; ADR 0025)
         working-directory: run
         # these DEV-only analysis tools use numpy/pandas (the engine in run/discovery stays stdlib-only)

@@ -6,8 +6,9 @@ different temp state directories would block each other, and none may write the
 committed directory.  Loaded first by discovery (alphabetical): it wraps
 ``unittest.TestCase.run`` so each test runs with a fresh shared directory.  Tests
 that need two directories to share one patch the variable themselves in ``setUp``
-(they run inside this wrapper, so theirs wins).  Run a single test file through
-``python -m unittest discover -s discovery/tests -p <file>`` so this module loads."""
+(they run inside this wrapper, so theirs wins).  To run single test files, name this
+module first: ``python -m unittest tests.test_00_isolate_shared_lock_dir tests.test_x``
+(ADR 0116 F-15: ``discover -p <file>`` does NOT load this module)."""
 import os
 import tempfile
 import unittest

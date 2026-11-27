@@ -281,7 +281,7 @@ def main(argv=None) -> int:
     for s, r in segs.items():
         out["segments"][s] = {"first_day": r["days"][0], "last_day": r["days"][-1], "n_days": len(r["days"]),
                               "n_symbols": r["n_symbols"], "flags": r["flags"],
-                              "market_ew": bu.stats(np.nan_to_num(r["mkt"]), r["mkt"])}
+                              "market_ew": bu.stats(r["mkt"], r["mkt"])}
     s1_years = len(segs["S1"]["days"]) / 365.0
     n_cfg = len(counted)
     prior = sum(json.loads(l).get("dev_evaluated", 0) for l in TRIALS.read_text().splitlines() if l.strip()

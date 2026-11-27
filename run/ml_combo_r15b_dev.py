@@ -107,7 +107,7 @@ def build_panel(data: Path, seg: str) -> list:
     days = piv["open"].index.values
     syms = list(piv["open"].columns)
     fund = bu.load_funding(data, syms, int(days[0]), int(days[-1]))
-    fund["day"] = ((fund["t"] - 1) // DAY) * DAY
+    fund["day"] = bu.rdi.funding_day(fund["t"].values)  # ADR 0116 F-04: settlement jitter stays on its day
     fd = fund.groupby(["day", "sym"])["rate"].sum().unstack().reindex(days).reindex(columns=syms)
     n_bars = piv["close"].notna().cumsum()
     g0 = wu.rebalance_days(days, bu.SEGMENTS[seg][2], HOLD)[0]

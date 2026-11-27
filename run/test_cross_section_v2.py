@@ -80,20 +80,41 @@ class CrossSectionV2Test(unittest.TestCase):
         self.assertAlmostEqual(x.side_cost(b, "assumed_public_v1", m, a),
                                0.0010 + a["imp"] * math.sqrt(bu.ORDER_VALUE / b))
 
+    def _flat(self, d: Path, days, funding: bool) -> None:
+        for sub in ("daily", "funding", "bar2345"):
+            (d / sub).mkdir()
+        for k in range(25):
+            sym = f"S{k:02d}USDT"
+            qv = 1e6 * (k + 1)
+            rows = [f"{t},1,1,1,1,1,{t + bu.DAY_MS - 1},{qv},10,0.5,{qv * (0.4 + k / 100)},0" for t in days]
+            (d / "daily" / f"{sym}-1d-all.csv").write_text("\n".join(rows) + "\n")
+            if funding:   # a recorded rate of 0 at every 8h settlement: observed zero funding
+                fr = [f"{t + h * 3_600_000},8,0.0" for t in days for h in (0, 8, 16)] + [f"{days[-1] + bu.DAY_MS},8,0.0"]
+                (d / "funding" / f"{sym}-fundingRate-all.csv").write_text("\n".join(fr) + "\n")
+
+    def test_no_funding_series_is_unobserved_not_zero(self):
+        """ADR 0116: without any funding data the held days are NaN (unobserved), never 0 funding."""
+        lo, hi, _ = x.SEGMENTS["S1"]
+        days = np.arange(bu.ms(lo), bu.ms(hi) + 1, bu.DAY_MS)
+        with tempfile.TemporaryDirectory() as td:
+            self._flat(Path(td), days, funding=False)
+            r = x.run_segment(Path(td), "S1", bu.load_cost_record(x.COST_RECORD), bu.load_cost())
+        for h in x.LONG_TOP:
+            v = r["daily"][h]["cost0"]
+            self.assertTrue(np.isnan(v).any())
+            self.assertGreater(r["flags"]["invalid_days"][h], 0)
+            self.assertIn("FUNDING_DATA_MISSING", r["issues"][h]["counts"])
+            st = bu.stats(v, r["mkt"])
+            self.assertGreater(st["n_days_unobserved"], 0)
+
     def test_end_to_end_flat_prices_only_cost(self):
-        """Constant prices and no funding: cost0 earns exactly 0, measured loses only on rebalance days,
-        and the first rebalance trades gross 1 (from flat to +-1/20 x 20)."""
+        """Constant prices and observed zero funding: cost0 earns exactly 0, measured loses only on
+        rebalance days, and the first rebalance trades gross 1 (from flat to +-1/20 x 20)."""
         lo, hi, _ = x.SEGMENTS["S1"]
         days = np.arange(bu.ms(lo), bu.ms(hi) + 1, bu.DAY_MS)
         with tempfile.TemporaryDirectory() as td:
             d = Path(td)
-            for sub in ("daily", "funding", "bar2345"):
-                (d / sub).mkdir()
-            for k in range(25):
-                sym = f"S{k:02d}USDT"
-                qv = 1e6 * (k + 1)
-                rows = [f"{t},1,1,1,1,1,{t + bu.DAY_MS - 1},{qv},10,0.5,{qv * (0.4 + k / 100)},0" for t in days]
-                (d / "daily" / f"{sym}-1d-all.csv").write_text("\n".join(rows) + "\n")
+            self._flat(d, days, funding=True)
             m, a = bu.load_cost_record(x.COST_RECORD), bu.load_cost()
             r = x.run_segment(d, "S1", m, a)
         for h in x.LONG_TOP:
